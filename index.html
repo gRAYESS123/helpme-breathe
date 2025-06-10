@@ -12,6 +12,10 @@
     <meta property="og:description" content="Free breathing exercises with beautiful nature themes. Find calm, focus, and energy through guided breathing techniques.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpme-breathe.com">
+    <meta property="og:image" content="https://helpme-breathe.com/og-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -19,6 +23,32 @@
     <!-- Google AdSense (Replace with your actual AdSense code) -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
          crossorigin="anonymous"></script>
+    
+    <!-- Google Analytics (Replace with your actual GA code) -->
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script> -->
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Help Me Breathe",
+      "description": "Free nature-inspired breathing exercises for wellness and relaxation",
+      "url": "https://helpme-breathe.com",
+      "applicationCategory": "HealthApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
     
     <style>
         /* Additional styles for ads and Patreon */
@@ -169,7 +199,91 @@
             justify-content: center;
         }
         
-        /* Mobile responsive ads */
+        /* Legal links */
+        .legal-links {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            font-size: 0.8125rem;
+        }
+        
+        .legal-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .legal-links a:hover {
+            color: var(--text-primary);
+        }
+        
+        /* Cookie consent banner */
+        #cookieConsent {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        #cookieConsent.show {
+            transform: translateY(0);
+        }
+        
+        #cookieConsent p {
+            margin: 0 0 1rem 0;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        #cookieConsent a {
+            color: var(--text-primary);
+            text-decoration: underline;
+        }
+        
+        .cookie-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cookie-btn {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border: none;
+            padding: 0.5rem 2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+        
+        .cookie-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .cookie-btn.secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        /* Mobile responsive */
         @media (max-width: 768px) {
             .ad-container {
                 min-height: 250px;
@@ -177,6 +291,26 @@
             
             .bottom-banner-ad {
                 padding: 0.25rem;
+            }
+            
+            .legal-links {
+                flex-wrap: wrap;
+                gap: 0.75rem 1.5rem;
+            }
+            
+            #cookieConsent {
+                padding: 1rem;
+            }
+            
+            .cookie-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 200px;
+                margin: 0 auto;
+            }
+            
+            .cookie-btn {
+                width: 100%;
             }
         }
     </style>
@@ -356,6 +490,13 @@
                 <a href="https://www.patreon.com/YOUR_PATREON_USERNAME" target="_blank" rel="noopener noreferrer">Patreon</a>
                 <!-- Add more social links as needed -->
             </div>
+            <div class="legal-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <span style="opacity: 0.5">•</span>
+                <a href="terms.html">Terms of Service</a>
+                <span style="opacity: 0.5">•</span>
+                <a href="mailto:your-email@example.com">Contact</a>
+            </div>
         </footer>
     </div>
 
@@ -373,6 +514,18 @@
         </script>
     </div>
 
+    <!-- Cookie Consent Banner -->
+    <div id="cookieConsent">
+        <p>
+            We use cookies to improve your experience and show relevant ads. By continuing to use this site, you agree to our use of cookies as described in our 
+            <a href="privacy.html">Privacy Policy</a>.
+        </p>
+        <div class="cookie-buttons">
+            <button class="cookie-btn" onclick="acceptCookies()">Accept All</button>
+            <button class="cookie-btn secondary" onclick="acceptEssentialCookies()">Essential Only</button>
+        </div>
+    </div>
+
     <div class="keyboard-hint" id="keyboardHint">
         Press <kbd>Space</kbd> to start/pause • <kbd>S</kbd> to stop • <kbd>1-5</kbd> to switch techniques
     </div>
@@ -380,6 +533,47 @@
     <script src="script.js"></script>
     
     <script>
+        // Cookie consent management
+        function checkCookieConsent() {
+            const consent = localStorage.getItem('cookieConsent');
+            if (!consent) {
+                setTimeout(() => {
+                    document.getElementById('cookieConsent').classList.add('show');
+                }, 2000); // Show after 2 seconds
+            } else if (consent === 'essential') {
+                // Disable analytics and non-essential features
+                window['ga-disable-G-XXXXXXXXXX'] = true;
+            }
+        }
+        
+        function acceptCookies() {
+            localStorage.setItem('cookieConsent', 'all');
+            document.getElementById('cookieConsent').classList.remove('show');
+            // Enable all features
+            if (typeof gtag !== 'undefined') {
+                gtag('consent', 'update', {
+                    'analytics_storage': 'granted',
+                    'ad_storage': 'granted'
+                });
+            }
+        }
+        
+        function acceptEssentialCookies() {
+            localStorage.setItem('cookieConsent', 'essential');
+            document.getElementById('cookieConsent').classList.remove('show');
+            // Disable analytics
+            window['ga-disable-G-XXXXXXXXXX'] = true;
+            if (typeof gtag !== 'undefined') {
+                gtag('consent', 'update', {
+                    'analytics_storage': 'denied',
+                    'ad_storage': 'denied'
+                });
+            }
+        }
+        
+        // Check on page load
+        document.addEventListener('DOMContentLoaded', checkCookieConsent);
+        
         // Ad management functions
         function hideAdsForBreathing() {
             document.body.classList.add('breathing-active');
@@ -427,6 +621,17 @@
                 }
             }
         }, 60000);
+        
+        // PWA Support - Register Service Worker (optional)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('SW registered:', registration);
+                }).catch(error => {
+                    console.log('SW registration failed:', error);
+                });
+            });
+        }
     </script>
 </body>
 </html>
