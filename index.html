@@ -12,26 +12,31 @@
     <meta property="og:description" content="Free breathing exercises with beautiful nature themes. Find calm, focus, and energy through guided breathing techniques.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpme-breathe.com">
-    <meta property="og:image" content="https://helpme-breathe.com/og-image.jpg">
+    <!-- TODO: Add og-image.jpg to root directory -->
+    <!-- <meta property="og:image" content="https://helpme-breathe.com/og-image.jpg"> -->
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="favicon.png">
+    <!-- TODO: Add favicon.png to root directory -->
+    <!-- <link rel="icon" type="image/png" href="favicon.png"> -->
     
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
     
-    <!-- Google AdSense (Replace with your actual AdSense code) -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+    <!-- Google AdSense - TODO: Replace with your actual AdSense client ID -->
+    <!-- Uncomment and update when ready to monetize
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR-CLIENT-ID"
          crossorigin="anonymous"></script>
+    -->
     
-    <!-- Google Analytics (Replace with your actual GA code) -->
-    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <!-- Google Analytics - TODO: Replace with your actual GA tracking ID -->
+    <!-- Uncomment and update when ready to track
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YOUR-TRACKING-ID"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX');
-    </script> -->
+      gtag('config', 'G-YOUR-TRACKING-ID');
+    </script>
+    -->
     
     <!-- Structured Data for SEO -->
     <script type="application/ld+json">
@@ -437,27 +442,21 @@
                     </div>
                 </div>
 
+                <!-- Ad placeholders - Enable when ready to monetize -->
                 <!-- Top Sidebar Ad -->
-                <div class="ad-container" id="sidebarAdTop">
+                <div class="ad-container" id="sidebarAdTop" style="display: none;">
                     <span class="ad-label">ADVERTISEMENT</span>
-                    <!-- Google AdSense Rectangle (300x250) -->
-                    <ins class="adsbygoogle ad-responsive"
-                         style="display:block"
-                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                         data-ad-slot="XXXXXXXXXX"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
-                    <script>
-                         (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
+                    <!-- TODO: Replace with your actual AdSense code -->
+                    <p style="color: var(--text-secondary); font-size: 0.875rem;">Ad space - Configure AdSense when ready</p>
                 </div>
 
                 <div class="card donation-section">
                     <h3>Support Wellness</h3>
                     <p>Enjoy an ad-free experience and support our mission.</p>
                     <div class="donation-options">
+                        <!-- TODO: Update with your actual Patreon username -->
                         <a href="https://www.patreon.com/YOUR_PATREON_USERNAME" target="_blank" rel="noopener noreferrer" class="patreon-btn">
-                            Remove Ads with Patreon
+                            Support on Patreon
                         </a>
                         <div class="or-divider">or</div>
                         <button class="donate-btn" onclick="showDonationModal()">
@@ -467,18 +466,10 @@
                 </div>
 
                 <!-- Bottom Sidebar Ad -->
-                <div class="ad-container" id="sidebarAdBottom">
+                <div class="ad-container" id="sidebarAdBottom" style="display: none;">
                     <span class="ad-label">ADVERTISEMENT</span>
-                    <!-- Google AdSense Rectangle (300x250) -->
-                    <ins class="adsbygoogle ad-responsive"
-                         style="display:block"
-                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                         data-ad-slot="XXXXXXXXXX"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
-                    <script>
-                         (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
+                    <!-- TODO: Replace with your actual AdSense code -->
+                    <p style="color: var(--text-secondary); font-size: 0.875rem;">Ad space - Configure AdSense when ready</p>
                 </div>
             </div>
         </div>
@@ -487,38 +478,33 @@
             <p>Made with 💚 for a more mindful world</p>
             <p><a href="https://helpme-breathe.com">helpme-breathe.com</a></p>
             <div class="social-links">
+                <!-- TODO: Update with your actual Patreon username -->
                 <a href="https://www.patreon.com/YOUR_PATREON_USERNAME" target="_blank" rel="noopener noreferrer">Patreon</a>
                 <!-- Add more social links as needed -->
             </div>
             <div class="legal-links">
-                <a href="privacy.html">Privacy Policy</a>
+                <a href="legal/privacy-policy.html">Privacy Policy</a>
                 <span style="opacity: 0.5">•</span>
-                <a href="terms.html">Terms of Service</a>
+                <a href="legal/terms-of-service.html">Terms of Service</a>
                 <span style="opacity: 0.5">•</span>
+                <!-- TODO: Update with your actual email -->
                 <a href="mailto:your-email@example.com">Contact</a>
             </div>
         </footer>
     </div>
 
-    <!-- Bottom Banner Ad (Hidden during breathing) -->
-    <div class="bottom-banner-ad" id="bottomBannerAd">
+    <!-- Bottom Banner Ad (Hidden by default) -->
+    <div class="bottom-banner-ad hidden" id="bottomBannerAd">
         <button class="close-ad" onclick="closeBottomBanner()" title="Close ad">×</button>
         <span class="ad-label">ADVERTISEMENT</span>
-        <!-- Google AdSense Banner (728x90 or responsive) -->
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:728px;height:90px"
-             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-             data-ad-slot="XXXXXXXXXX"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
+        <!-- TODO: Configure when ready to monetize -->
     </div>
 
     <!-- Cookie Consent Banner -->
     <div id="cookieConsent">
         <p>
-            We use cookies to improve your experience and show relevant ads. By continuing to use this site, you agree to our use of cookies as described in our 
-            <a href="privacy.html">Privacy Policy</a>.
+            We use cookies to improve your experience. By continuing to use this site, you agree to our use of cookies as described in our 
+            <a href="legal/privacy-policy.html">Privacy Policy</a>.
         </p>
         <div class="cookie-buttons">
             <button class="cookie-btn" onclick="acceptCookies()">Accept All</button>
@@ -530,7 +516,7 @@
         Press <kbd>Space</kbd> to start/pause • <kbd>S</kbd> to stop • <kbd>1-5</kbd> to switch techniques
     </div>
 
-    <script src="script.js"></script>
+    <script src="js/scripts.js"></script>
     
     <script>
         // Cookie consent management
@@ -540,16 +526,13 @@
                 setTimeout(() => {
                     document.getElementById('cookieConsent').classList.add('show');
                 }, 2000); // Show after 2 seconds
-            } else if (consent === 'essential') {
-                // Disable analytics and non-essential features
-                window['ga-disable-G-XXXXXXXXXX'] = true;
             }
         }
         
         function acceptCookies() {
             localStorage.setItem('cookieConsent', 'all');
             document.getElementById('cookieConsent').classList.remove('show');
-            // Enable all features
+            // Enable analytics when configured
             if (typeof gtag !== 'undefined') {
                 gtag('consent', 'update', {
                     'analytics_storage': 'granted',
@@ -562,7 +545,6 @@
             localStorage.setItem('cookieConsent', 'essential');
             document.getElementById('cookieConsent').classList.remove('show');
             // Disable analytics
-            window['ga-disable-G-XXXXXXXXXX'] = true;
             if (typeof gtag !== 'undefined') {
                 gtag('consent', 'update', {
                     'analytics_storage': 'denied',
@@ -596,41 +578,24 @@
         
         // Simple donation modal
         function showDonationModal() {
-            alert('One-time donation options coming soon! For now, please support us on Patreon for an ad-free experience. Thank you! 💚');
+            alert('One-time donation options coming soon! For now, please support us on Patreon. Thank you! 💚');
         }
         
         // Modify the existing breathing functions to hide/show ads
-        const originalStartBreathing = window.startBreathing;
-        window.startBreathing = function() {
-            hideAdsForBreathing();
-            originalStartBreathing();
-        };
+        if (typeof window.startBreathing !== 'undefined') {
+            const originalStartBreathing = window.startBreathing;
+            window.startBreathing = function() {
+                hideAdsForBreathing();
+                originalStartBreathing();
+            };
+        }
         
-        const originalStopBreathing = window.stopBreathing;
-        window.stopBreathing = function() {
-            originalStopBreathing();
-            setTimeout(showAdsAfterBreathing, 3000); // Show ads 3 seconds after stopping
-        };
-        
-        // Ad refresh timer (refresh ads every 60 seconds when not breathing)
-        setInterval(() => {
-            if (!document.body.classList.contains('breathing-active')) {
-                // Only refresh if ads are visible
-                if (typeof googletag !== 'undefined' && googletag.pubads) {
-                    googletag.pubads().refresh();
-                }
-            }
-        }, 60000);
-        
-        // PWA Support - Register Service Worker (optional)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(registration => {
-                    console.log('SW registered:', registration);
-                }).catch(error => {
-                    console.log('SW registration failed:', error);
-                });
-            });
+        if (typeof window.stopBreathing !== 'undefined') {
+            const originalStopBreathing = window.stopBreathing;
+            window.stopBreathing = function() {
+                originalStopBreathing();
+                setTimeout(showAdsAfterBreathing, 3000); // Show ads 3 seconds after stopping
+            };
         }
     </script>
 </body>
