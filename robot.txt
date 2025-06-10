@@ -1,0 +1,27 @@
+# robots.txt for https://helpmebreath.com/
+# -------------------------------------------------
+# 1. Default rules for *every* crawler
+User-agent: *
+# Block typical non-public areas (edit the paths to match your CMS)
+Disallow: /admin/
+Disallow: /login/
+Disallow: /cgi-bin/
+Disallow: /tmp/
+# If you use URL parameters for searches or filters you don’t want indexed,
+# uncomment the next line and adjust the pattern:
+# Disallow: /*?*sessionid=
+
+# 2. Allow everything else
+Allow: /
+
+# 3. Point crawlers to your XML sitemap
+Sitemap: https://helpmebreath.com/sitemap.xml
+
+# 4. (Optional) Explicit directives for major bots
+# — Google
+User-agent: Googlebot
+Allow: /
+# — Bing
+User-agent: Bingbot
+Allow: /
+# -------------------------------------------------
