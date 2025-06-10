@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Me Breathe - Natural Breathing Journey</title>
+    <meta name="description" content="Free nature-inspired breathing exercises for deep sleep, focus, heart coherence, and energy. Your natural guide to mindful breathing and inner peace.">
+    <meta name="keywords" content="breathing exercises, meditation, relaxation, sleep, mindfulness, stress relief, 4-7-8 breathing, box breathing">
+    
+    <!-- Open Graph tags for social sharing -->
+    <meta property="og:title" content="Help Me Breathe - Natural Breathing Journey">
+    <meta property="og:description" content="Free breathing exercises with beautiful nature themes. Find calm, focus, and energy through guided breathing techniques.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://helpme-breathe.com">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Google AdSense (Replace with your actual AdSense code) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+         crossorigin="anonymous"></script>
+    
+    <style>
+        /* Additional styles for ads and Patreon */
+        .ad-container {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ad-container.hidden {
+            display: none;
+        }
+        
+        .ad-label {
+            position: absolute;
+            top: 0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.625rem;
+            color: var(--text-secondary);
+            opacity: 0.6;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Responsive ad unit */
+        .ad-responsive {
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        /* Banner ad at bottom */
+        .bottom-banner-ad {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            padding: 0.5rem;
+            text-align: center;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+        
+        .bottom-banner-ad.hidden {
+            transform: translateY(100%);
+        }
+        
+        .close-ad {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .close-ad:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .patreon-btn {
+            background: #FF424D;
+            color: white;
+            padding: 0.875rem 1.75rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+        
+        .patreon-btn:hover {
+            background: #E93E47;
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(255, 66, 77, 0.3);
+        }
+        
+        .donation-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .or-divider {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            margin: 0.5rem 0;
+            opacity: 0.7;
+        }
+        
+        /* Hide ads during breathing sessions */
+        body.breathing-active .ad-container,
+        body.breathing-active .bottom-banner-ad {
+            display: none;
+        }
+        
+        /* Footer styles */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            padding-bottom: 4rem; /* Extra padding for bottom banner */
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 3rem;
+        }
+        
+        .footer a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .footer a:hover {
+            opacity: 0.7;
+        }
+        
+        .social-links {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        /* Mobile responsive ads */
+        @media (max-width: 768px) {
+            .ad-container {
+                min-height: 250px;
+            }
+            
+            .bottom-banner-ad {
+                padding: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body class="theme-478">
+    <!-- Natural background layer -->
+    <div class="nature-bg"></div>
+    
+    <!-- Theme-specific natural elements -->
+    <!-- Stars for sleep theme -->
+    <div class="natural-element star star-1"></div>
+    <div class="natural-element star star-2"></div>
+    <div class="natural-element star star-3"></div>
+    <div class="natural-element star star-4"></div>
+    
+    <!-- Leaves for earth theme -->
+    <div class="natural-element leaf leaf-1"></div>
+    <div class="natural-element leaf leaf-2"></div>
+    <div class="natural-element leaf leaf-3"></div>
+    
+    <!-- Water ripples for heart theme -->
+    <div class="natural-element ripple ripple-1"></div>
+    <div class="natural-element ripple ripple-2"></div>
+    <div class="natural-element ripple ripple-3"></div>
+    
+    <!-- Clouds for calm theme -->
+    <div class="natural-element cloud cloud-1"></div>
+    
+    <!-- Sun rays for energy theme -->
+    <div class="natural-element sun-ray sun-ray-1"></div>
+    <div class="natural-element sun-ray sun-ray-2"></div>
+    <div class="natural-element sun-ray sun-ray-3"></div>
+
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>Help Me Breathe</h1>
+                <p class="subtitle">Your natural guide to mindful breathing and inner peace</p>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="breathing-section">
+                <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
+                <div class="settings-panel" id="settingsPanel">
+                    <div class="setting-item">
+                        <span class="setting-label">Sound</span>
+                        <div class="toggle-switch active" id="soundToggle"></div>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Vibration</span>
+                        <div class="toggle-switch active" id="vibrationToggle"></div>
+                    </div>
+                </div>
+                
+                <h2 id="technique-title">Deep Sleep</h2>
+                
+                <div class="breathing-container">
+                    <div class="breathing-circle technique-478" id="breathingCircle">
+                        <span id="circleText">Ready</span>
+                    </div>
+                    <div class="breathing-aura"></div>
+                    <div class="breathing-particles">
+                        <span class="particle-float"></span>
+                        <span class="particle-float"></span>
+                        <span class="particle-float"></span>
+                        <span class="particle-float"></span>
+                        <span class="particle-float"></span>
+                        <span class="particle-float"></span>
+                    </div>
+                </div>
+                
+                <div class="breathing-text" id="breathingText">Click Begin to start your practice</div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                    <div class="progress-time" id="progressTime"></div>
+                </div>
+                
+                <div class="timer" id="timer">00:00</div>
+                
+                <div class="session-stats" id="sessionStats" style="display: none;">
+                    <div class="stat-item">
+                        <span class="stat-value" id="breathCount">0</span>
+                        <span class="stat-label">Breaths</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="avgBreathTime">0s</span>
+                        <span class="stat-label">Avg. Breath</span>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="control-btn" id="startBtn" onclick="startBreathing()">Begin</button>
+                    <button class="control-btn" id="pauseBtn" onclick="pauseBreathing()" disabled>Pause</button>
+                    <button class="control-btn" id="stopBtn" onclick="stopBreathing()" disabled>Stop</button>
+                </div>
+                
+                <div class="technique-info" id="techniqueInfo">
+                    <h3>Deep Sleep & Relaxation</h3>
+                    <p>The 4-7-8 breathing technique helps activate your parasympathetic nervous system, promoting deep relaxation and better sleep. Like the gentle phases of the moon, this practice guides you into peaceful rest.</p>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card technique-selector">
+                    <h3>Breathing Journeys</h3>
+                    <div class="technique-buttons">
+                        <button class="technique-btn active" onclick="selectTechnique('478')">
+                            🌙 Deep Sleep
+                        </button>
+                        <button class="technique-btn" onclick="selectTechnique('box')">
+                            🌿 Focus & Grounding
+                        </button>
+                        <button class="technique-btn" onclick="selectTechnique('coherent')">
+                            💗 Heart Coherence
+                        </button>
+                        <button class="technique-btn" onclick="selectTechnique('triangle')">
+                            ☁️ Quick Calm
+                        </button>
+                        <button class="technique-btn" onclick="selectTechnique('wim')">
+                            ☀️ Energy Boost
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Top Sidebar Ad -->
+                <div class="ad-container" id="sidebarAdTop">
+                    <span class="ad-label">ADVERTISEMENT</span>
+                    <!-- Google AdSense Rectangle (300x250) -->
+                    <ins class="adsbygoogle ad-responsive"
+                         style="display:block"
+                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                         data-ad-slot="XXXXXXXXXX"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                         (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
+
+                <div class="card donation-section">
+                    <h3>Support Wellness</h3>
+                    <p>Enjoy an ad-free experience and support our mission.</p>
+                    <div class="donation-options">
+                        <a href="https://www.patreon.com/YOUR_PATREON_USERNAME" target="_blank" rel="noopener noreferrer" class="patreon-btn">
+                            Remove Ads with Patreon
+                        </a>
+                        <div class="or-divider">or</div>
+                        <button class="donate-btn" onclick="showDonationModal()">
+                            One-time Donation
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bottom Sidebar Ad -->
+                <div class="ad-container" id="sidebarAdBottom">
+                    <span class="ad-label">ADVERTISEMENT</span>
+                    <!-- Google AdSense Rectangle (300x250) -->
+                    <ins class="adsbygoogle ad-responsive"
+                         style="display:block"
+                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                         data-ad-slot="XXXXXXXXXX"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>
+                         (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <p>Made with 💚 for a more mindful world</p>
+            <p><a href="https://helpme-breathe.com">helpme-breathe.com</a></p>
+            <div class="social-links">
+                <a href="https://www.patreon.com/YOUR_PATREON_USERNAME" target="_blank" rel="noopener noreferrer">Patreon</a>
+                <!-- Add more social links as needed -->
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bottom Banner Ad (Hidden during breathing) -->
+    <div class="bottom-banner-ad" id="bottomBannerAd">
+        <button class="close-ad" onclick="closeBottomBanner()" title="Close ad">×</button>
+        <span class="ad-label">ADVERTISEMENT</span>
+        <!-- Google AdSense Banner (728x90 or responsive) -->
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:728px;height:90px"
+             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+             data-ad-slot="XXXXXXXXXX"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+
+    <div class="keyboard-hint" id="keyboardHint">
+        Press <kbd>Space</kbd> to start/pause • <kbd>S</kbd> to stop • <kbd>1-5</kbd> to switch techniques
+    </div>
+
+    <script src="script.js"></script>
+    
+    <script>
+        // Ad management functions
+        function hideAdsForBreathing() {
+            document.body.classList.add('breathing-active');
+        }
+        
+        function showAdsAfterBreathing() {
+            document.body.classList.remove('breathing-active');
+        }
+        
+        function closeBottomBanner() {
+            document.getElementById('bottomBannerAd').classList.add('hidden');
+            // Remember user preference for session
+            sessionStorage.setItem('bottomBannerClosed', 'true');
+        }
+        
+        // Check if bottom banner was closed
+        if (sessionStorage.getItem('bottomBannerClosed') === 'true') {
+            document.getElementById('bottomBannerAd').classList.add('hidden');
+        }
+        
+        // Simple donation modal
+        function showDonationModal() {
+            alert('One-time donation options coming soon! For now, please support us on Patreon for an ad-free experience. Thank you! 💚');
+        }
+        
+        // Modify the existing breathing functions to hide/show ads
+        const originalStartBreathing = window.startBreathing;
+        window.startBreathing = function() {
+            hideAdsForBreathing();
+            originalStartBreathing();
+        };
+        
+        const originalStopBreathing = window.stopBreathing;
+        window.stopBreathing = function() {
+            originalStopBreathing();
+            setTimeout(showAdsAfterBreathing, 3000); // Show ads 3 seconds after stopping
+        };
+        
+        // Ad refresh timer (refresh ads every 60 seconds when not breathing)
+        setInterval(() => {
+            if (!document.body.classList.contains('breathing-active')) {
+                // Only refresh if ads are visible
+                if (typeof googletag !== 'undefined' && googletag.pubads) {
+                    googletag.pubads().refresh();
+                }
+            }
+        }, 60000);
+    </script>
+</body>
+</html>
