@@ -230,7 +230,7 @@ body:not(.theme-wim) .sun-ray { display: none; }
     50% { opacity: 0.6; transform: scaleY(1.2) rotate(var(--rotation, 0deg)); }
 }
 
-/* Theme specific colors */
+/* Theme specific colors - Consistent color system */
 body.theme-478 {
     background: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
     background-attachment: fixed;
@@ -239,6 +239,7 @@ body.theme-478 {
     --surface: rgba(255, 255, 255, 0.08);
     --border: rgba(255, 255, 255, 0.15);
     --progress-color: #a78bfa;
+    --glow-color: #8b5cf6;
 }
 
 body.theme-box {
@@ -249,6 +250,7 @@ body.theme-box {
     --surface: rgba(255, 255, 255, 0.08);
     --border: rgba(255, 255, 255, 0.15);
     --progress-color: #6ee7b7;
+    --glow-color: #22c55e;
 }
 
 body.theme-coherent {
@@ -259,6 +261,7 @@ body.theme-coherent {
     --surface: rgba(255, 255, 255, 0.08);
     --border: rgba(255, 255, 255, 0.15);
     --progress-color: #fda4af;
+    --glow-color: #ec4899;
 }
 
 body.theme-triangle {
@@ -269,6 +272,7 @@ body.theme-triangle {
     --surface: rgba(255, 255, 255, 0.08);
     --border: rgba(255, 255, 255, 0.15);
     --progress-color: #7dd3fc;
+    --glow-color: #38bdf8;
 }
 
 body.theme-wim {
@@ -279,6 +283,7 @@ body.theme-wim {
     --surface: rgba(255, 255, 255, 0.08);
     --border: rgba(255, 255, 255, 0.15);
     --progress-color: #fcd34d;
+    --glow-color: #fbbf24;
 }
 
 .container {
@@ -450,397 +455,189 @@ h1 {
     transform: translateX(20px);
 }
 
-/* Breathing Circle Container - Optimized */
+/* Breathing Circle Container - Fluid Design */
 .breathing-container {
     position: relative;
     width: 320px;
     height: 320px;
     margin: 2rem auto;
-    /* Enable GPU acceleration */
-    will-change: transform;
     transform: translateZ(0);
+    will-change: contents;
 }
 
-/* Breathing Circle - Optimized with smoother animations */
+/* SVG Filter Container for Fluid Effect */
+.breathing-svg-filter {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+/* Breathing Circle - Fluid Blob */
 .breathing-circle {
     width: 240px;
     height: 240px;
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(1) translateZ(0);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.25rem;
     font-weight: 500;
     color: var(--text-primary);
+    transform: translate(-50%, -50%);
     border-radius: 50%;
-    /* Optimize for animations */
     will-change: transform, border-radius;
+    transform-style: preserve-3d;
     backface-visibility: hidden;
-    -webkit-font-smoothing: antialiased;
-    /* Remove transition - we'll use CSS animations instead */
-    transition: none;
+    -webkit-font-smoothing: subpixel-antialiased;
+    filter: url(#fluid-effect);
 }
 
-/* CSS Custom Properties for dynamic values */
-.breathing-circle {
-    --breath-scale: 1;
-    --breath-rotation: 0deg;
-    --breath-morph: 50%;
-    --breath-duration: 4s;
-}
-
-/* Base breathing animation */
-@keyframes smooth-breathe {
-    0% {
-        transform: translate(-50%, -50%) 
-                   scale(var(--breath-scale-start, 0.6)) 
-                   rotate(var(--breath-rotation)) 
-                   translateZ(0);
-        border-radius: var(--breath-morph);
-    }
-    50% {
-        transform: translate(-50%, -50%) 
-                   scale(var(--breath-scale-peak, 1.4)) 
-                   rotate(calc(var(--breath-rotation) + 5deg)) 
-                   translateZ(0);
-        border-radius: calc(var(--breath-morph) - 2%);
-    }
-    100% {
-        transform: translate(-50%, -50%) 
-                   scale(var(--breath-scale-end, 0.6)) 
-                   rotate(calc(var(--breath-rotation) + 10deg)) 
-                   translateZ(0);
-        border-radius: var(--breath-morph);
-    }
-}
-
-/* Apply animation when active */
-.breathing-circle.animating {
-    animation: smooth-breathe var(--breath-duration) cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
-}
-
-/* Specific phase animations with natural easing */
-.breathing-circle.inhale-phase {
-    --breath-scale-start: 0.8;
-    --breath-scale-peak: 1.4;
-    --breath-scale-end: 1.35;
-    animation: inhale-smooth var(--breath-duration) cubic-bezier(0.42, 0, 0.58, 1) forwards;
-}
-
-@keyframes inhale-smooth {
-    0% {
-        transform: translate(-50%, -50%) scale(0.8) translateZ(0);
-        border-radius: 52% 48% 53% 47% / 48% 52% 48% 52%;
-    }
-    30% {
-        transform: translate(-50%, -50%) scale(1.1) translateZ(0);
-        border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1.4) translateZ(0);
-        border-radius: 48% 52% 47% 53% / 52% 48% 52% 48%;
-    }
-}
-
-.breathing-circle.hold-phase {
-    --breath-scale-start: 1.35;
-    --breath-scale-peak: 1.35;
-    --breath-scale-end: 1.35;
-    animation: hold-smooth var(--breath-duration) cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
-}
-
-@keyframes hold-smooth {
+/* Breathing animation - Single fluid motion */
+@keyframes fluid-breathe {
     0%, 100% {
-        transform: translate(-50%, -50%) scale(1.35) translateZ(0);
-        border-radius: 50%;
+        transform: translate(-50%, -50%) scale(0.7);
+        border-radius: 65% 35% 40% 60% / 60% 40% 60% 40%;
     }
-    50% {
-        transform: translate(-50%, -50%) scale(1.37) translateZ(0);
-        border-radius: 50%;
+    10% {
+        transform: translate(-50%, -50%) scale(0.8) rotate(30deg);
+        border-radius: 55% 45% 45% 55% / 55% 45% 55% 45%;
     }
-}
-
-.breathing-circle.exhale-phase {
-    --breath-scale-start: 1.35;
-    --breath-scale-peak: 1.0;
-    --breath-scale-end: 0.6;
-    animation: exhale-smooth var(--breath-duration) cubic-bezier(0.42, 0, 0.58, 1) forwards;
-}
-
-@keyframes exhale-smooth {
-    0% {
-        transform: translate(-50%, -50%) scale(1.35) translateZ(0);
-        border-radius: 48% 52% 47% 53% / 52% 48% 52% 48%;
+    25% {
+        transform: translate(-50%, -50%) scale(1.35) rotate(60deg);
+        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
     }
-    70% {
-        transform: translate(-50%, -50%) scale(0.8) translateZ(0);
+    35% {
+        transform: translate(-50%, -50%) scale(1.4) rotate(90deg);
         border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
     }
-    100% {
-        transform: translate(-50%, -50%) scale(0.6) translateZ(0);
-        border-radius: 52% 48% 53% 47% / 48% 52% 48% 52%;
+    50% {
+        transform: translate(-50%, -50%) scale(1.35) rotate(120deg);
+        border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%;
+    }
+    60% {
+        transform: translate(-50%, -50%) scale(1.1) rotate(150deg);
+        border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+    }
+    75% {
+        transform: translate(-50%, -50%) scale(0.8) rotate(180deg);
+        border-radius: 60% 40% 45% 55% / 45% 55% 45% 55%;
+    }
+    90% {
+        transform: translate(-50%, -50%) scale(0.75) rotate(210deg);
+        border-radius: 55% 45% 50% 50% / 50% 50% 55% 45%;
     }
 }
 
-/* Natural breathing aura - Optimized */
+/* Active breathing state */
+.breathing-circle.active {
+    animation: fluid-breathe var(--breath-cycle-duration, 10s) cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+/* Technique-specific fluid styles */
+.breathing-circle.technique-478 {
+    background: radial-gradient(circle at 35% 35%, #c7d2fe 0%, #8b5cf6 70%);
+    box-shadow: 0 0 60px var(--glow-color);
+    --breath-cycle-duration: 19s;
+}
+
+.breathing-circle.technique-box {
+    background: radial-gradient(circle at 40% 40%, #86efac 0%, #22c55e 70%);
+    box-shadow: 0 0 60px var(--glow-color);
+    --breath-cycle-duration: 16s;
+}
+
+.breathing-circle.technique-coherent {
+    background: radial-gradient(circle at 45% 45%, #fbcfe8 0%, #ec4899 70%);
+    box-shadow: 0 0 60px var(--glow-color);
+    --breath-cycle-duration: 10s;
+}
+
+.breathing-circle.technique-triangle {
+    background: radial-gradient(circle at 50% 50%, #bae6fd 0%, #38bdf8 70%);
+    box-shadow: 0 0 60px var(--glow-color);
+    --breath-cycle-duration: 9s;
+}
+
+.breathing-circle.technique-wim {
+    background: radial-gradient(circle at 55% 55%, #fed7aa 0%, #fbbf24 70%);
+    box-shadow: 0 0 60px var(--glow-color);
+    --breath-cycle-duration: 3s;
+}
+
+/* Natural breathing aura - Simplified */
 .breathing-aura {
     position: absolute;
     inset: -40px;
     border-radius: 50%;
+    background: radial-gradient(circle, var(--glow-color) 0%, transparent 60%);
     opacity: 0;
     transition: opacity 1s ease;
-    will-change: transform, opacity;
-    transform: translateZ(0);
     pointer-events: none;
+    filter: blur(30px);
 }
 
 .breathing-circle.active ~ .breathing-aura {
-    opacity: 1;
+    opacity: 0.3;
+    animation: aura-pulse 4s ease-in-out infinite;
 }
 
-/* Optimize aura pulse animation */
 @keyframes aura-pulse {
     0%, 100% { 
-        transform: scale(1) translateZ(0); 
+        transform: scale(1); 
         opacity: 0.3; 
     }
     50% { 
-        transform: scale(1.1) translateZ(0); 
-        opacity: 0.6; 
-    }
-}
-
-/* Deep Sleep - Moon glow effect */
-.breathing-circle.technique-478 {
-    background: radial-gradient(circle at 30% 30%, rgba(199, 210, 254, 0.3), rgba(139, 92, 246, 0.1));
-    box-shadow: 
-        0 0 80px rgba(139, 92, 246, 0.4),
-        inset 0 0 40px rgba(199, 210, 254, 0.2);
-}
-
-.breathing-circle.technique-478 ~ .breathing-aura {
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent 70%);
-    filter: blur(20px);
-}
-
-.breathing-circle.technique-478.active::after {
-    content: '';
-    position: absolute;
-    inset: -60px;
-    border-radius: 50%;
-    background: 
-        radial-gradient(circle at 30% 30%, transparent 30%, rgba(199, 210, 254, 0.1) 70%, transparent 100%);
-    animation: moon-phases-smooth 8s ease-in-out infinite;
-}
-
-@keyframes moon-phases-smooth {
-    0%, 100% { 
-        transform: rotate(0deg) scale(1) translateZ(0); 
+        transform: scale(1.2); 
         opacity: 0.5; 
     }
-    25% {
-        transform: rotate(90deg) scale(1.1) translateZ(0); 
-        opacity: 0.7;
-    }
-    50% { 
-        transform: rotate(180deg) scale(1.2) translateZ(0); 
-        opacity: 0.8; 
-    }
-    75% {
-        transform: rotate(270deg) scale(1.1) translateZ(0); 
-        opacity: 0.7;
-    }
 }
 
-/* Box Breathing - Earth energy */
-.breathing-circle.technique-box {
-    background: 
-        radial-gradient(circle at center, rgba(74, 222, 128, 0.3), rgba(34, 197, 94, 0.1));
-    box-shadow: 
-        0 0 80px rgba(74, 222, 128, 0.4),
-        inset 0 0 40px rgba(134, 239, 172, 0.2);
-}
-
-.breathing-circle.technique-box ~ .breathing-aura {
-    background: 
-        conic-gradient(from 0deg, 
-            rgba(34, 197, 94, 0.2), 
-            rgba(74, 222, 128, 0.3), 
-            rgba(34, 197, 94, 0.2));
-    animation: earth-rotate-smooth 12s linear infinite;
-}
-
-@keyframes earth-rotate-smooth {
-    0% { transform: rotate(0deg) translateZ(0); }
-    100% { transform: rotate(360deg) translateZ(0); }
-}
-
-/* Heart Coherence - Water flow */
-.breathing-circle.technique-coherent {
-    background: 
-        radial-gradient(circle at 50% 50%, rgba(244, 114, 182, 0.3), rgba(236, 72, 153, 0.1));
-    box-shadow: 
-        0 0 80px rgba(236, 72, 153, 0.4),
-        inset 0 0 40px rgba(251, 207, 232, 0.2);
-}
-
-.breathing-circle.technique-coherent ~ .breathing-aura {
-    background: radial-gradient(circle, rgba(236, 72, 153, 0.2), transparent 60%);
-    animation: heart-flow-smooth 3s ease-in-out infinite;
-}
-
-@keyframes heart-flow-smooth {
-    0%, 100% { 
-        transform: scale(1) translateZ(0);
-        filter: blur(20px);
-        opacity: 0.6;
-    }
-    20% { 
-        transform: scale(1.15) translateZ(0);
-        filter: blur(15px);
-        opacity: 0.7;
-    }
-    40% { 
-        transform: scale(1.05) translateZ(0);
-        filter: blur(25px);
-        opacity: 0.5;
-    }
-    60% { 
-        transform: scale(1.2) translateZ(0);
-        filter: blur(10px);
-        opacity: 0.8;
-    }
-}
-
-/* Triangle - Air current */
-.breathing-circle.technique-triangle {
-    background: 
-        radial-gradient(circle at center, rgba(125, 211, 252, 0.3), rgba(56, 189, 248, 0.1));
-    box-shadow: 
-        0 0 80px rgba(56, 189, 248, 0.4),
-        inset 0 0 40px rgba(186, 230, 253, 0.2);
-}
-
-.breathing-circle.technique-triangle ~ .breathing-aura {
-    background: 
-        radial-gradient(ellipse at center, rgba(56, 189, 248, 0.2), transparent 60%);
-    animation: air-flow 6s ease-in-out infinite;
-}
-
-@keyframes air-flow {
-    0%, 100% { 
-        transform: scale(1) rotate(0deg);
-        opacity: 0.3;
-    }
-    50% { 
-        transform: scale(1.3) rotate(180deg);
-        opacity: 0.6;
-    }
-}
-
-/* Wim Hof - Solar energy */
-.breathing-circle.technique-wim {
-    background: 
-        radial-gradient(circle at center, rgba(251, 191, 36, 0.4), rgba(245, 158, 11, 0.2));
-    box-shadow: 
-        0 0 100px rgba(251, 191, 36, 0.5),
-        inset 0 0 50px rgba(254, 240, 138, 0.3);
-}
-
-.breathing-circle.technique-wim ~ .breathing-aura {
-    background: 
-        radial-gradient(circle at center, rgba(251, 191, 36, 0.3), transparent 50%);
-    animation: solar-burst 2s ease-in-out infinite;
-}
-
-@keyframes solar-burst {
-    0%, 100% { 
-        transform: scale(1);
-        filter: blur(10px) brightness(1);
-    }
-    50% { 
-        transform: scale(1.4);
-        filter: blur(5px) brightness(1.3);
-    }
-}
-
-/* Reduce complexity during animation for each technique */
-.breathing-circle.animating.technique-478 {
-    box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
-}
-
-.breathing-circle.animating.technique-box {
-    box-shadow: 0 0 40px rgba(74, 222, 128, 0.3);
-}
-
-.breathing-circle.animating.technique-coherent {
-    box-shadow: 0 0 40px rgba(236, 72, 153, 0.3);
-}
-
-.breathing-circle.animating.technique-triangle {
-    box-shadow: 0 0 40px rgba(56, 189, 248, 0.3);
-}
-
-.breathing-circle.animating.technique-wim {
-    box-shadow: 0 0 40px rgba(251, 191, 36, 0.3);
-}
-
-/* Natural elements around breathing circle */
+/* Floating particles - Optimized */
 .breathing-particles {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    will-change: transform;
-    transform: translateZ(0);
 }
 
 .particle-float {
     position: absolute;
-    width: 4px;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.6);
+    width: 3px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.7);
     border-radius: 50%;
     opacity: 0;
-    will-change: transform, opacity;
 }
 
-/* Smooth particle animation */
-@keyframes float-around-smooth {
+@keyframes particle-orbit {
     0% {
-        transform: translate(120px, 0) scale(0) translateZ(0);
+        transform: rotate(0deg) translateX(140px) rotate(0deg);
         opacity: 0;
     }
     10% {
         opacity: 1;
-        transform: translate(110px, -10px) scale(1) translateZ(0);
-    }
-    50% {
-        transform: translate(0, -30px) scale(1.2) translateZ(0);
-        opacity: 0.8;
     }
     90% {
-        opacity: 0.5;
-        transform: translate(-110px, -45px) scale(0.8) translateZ(0);
+        opacity: 1;
     }
     100% {
-        transform: translate(-120px, -50px) scale(0) translateZ(0);
+        transform: rotate(360deg) translateX(140px) rotate(-360deg);
         opacity: 0;
     }
 }
 
 .breathing-circle.active ~ .breathing-particles .particle-float {
-    animation: float-around-smooth 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    animation: particle-orbit 8s linear infinite;
 }
 
 .particle-float:nth-child(1) { animation-delay: 0s; }
-.particle-float:nth-child(2) { animation-delay: 1s; }
-.particle-float:nth-child(3) { animation-delay: 2s; }
-.particle-float:nth-child(4) { animation-delay: 3s; }
-.particle-float:nth-child(5) { animation-delay: 4s; }
-.particle-float:nth-child(6) { animation-delay: 5s; }
+.particle-float:nth-child(2) { animation-delay: 1.33s; }
+.particle-float:nth-child(3) { animation-delay: 2.67s; }
+.particle-float:nth-child(4) { animation-delay: 4s; }
+.particle-float:nth-child(5) { animation-delay: 5.33s; }
+.particle-float:nth-child(6) { animation-delay: 6.67s; }
 
 .breathing-text {
     font-size: 1.125rem;
@@ -1024,7 +821,7 @@ h1 {
     top: 0;
     height: 100%;
     width: 4px;
-    background: currentColor;
+    background: var(--progress-color);
     transform: translateX(-100%);
     transition: transform 0.3s ease;
     border-radius: 2px;
@@ -1091,7 +888,7 @@ h1 {
     font-size: 0.875rem;
 }
 
-/* Enhanced Progress Bar */
+/* Enhanced Progress Bar - Smooth animation */
 .progress-bar {
     width: 100%;
     height: 12px;
@@ -1110,11 +907,11 @@ h1 {
         rgba(255, 255, 255, 0.4) 50%, 
         var(--progress-color) 100%);
     border-radius: 50px;
-    transition: width 0.1s linear;
     width: 0%;
     position: relative;
     background-size: 200% 100%;
     animation: shimmer 2s linear infinite;
+    transition: width 100ms linear;
 }
 
 @keyframes shimmer {
@@ -1178,72 +975,43 @@ h1 {
     letter-spacing: 0.05em;
 }
 
-/* Performance optimization for mobile */
+/* Mobile Optimizations */
 @media (max-width: 768px) {
-    /* Reduce visual complexity on mobile */
-    .breathing-circle.animating {
-        box-shadow: none;
+    /* Simplify animations on mobile */
+    .breathing-circle {
+        filter: none !important;
     }
     
-    .breathing-aura {
-        display: none;
+    .breathing-circle.active {
+        animation: simple-breathe var(--breath-cycle-duration, 10s) ease-in-out infinite;
     }
     
+    @keyframes simple-breathe {
+        0%, 100% { transform: translate(-50%, -50%) scale(0.8); }
+        50% { transform: translate(-50%, -50%) scale(1.3); }
+    }
+    
+    .breathing-aura,
     .breathing-particles {
         display: none;
     }
     
-    /* Simpler animations for mobile */
-    .breathing-circle.inhale-phase,
-    .breathing-circle.hold-phase,
-    .breathing-circle.exhale-phase {
-        animation-timing-function: ease-in-out;
-    }
-}
-
-/* Reduce motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-    .breathing-circle,
-    .breathing-aura,
-    .particle-float {
-        animation: none !important;
-        transition: transform 0.3s ease !important;
-    }
-}
-
-@media (max-width: 1024px) {
-    .main-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-    
-    .technique-buttons {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 0.75rem;
-    }
-}
-
-@media (max-width: 768px) {
     .container {
         padding: 1rem;
         min-height: 100vh;
     }
     
-    /* Switch to flexbox for mobile to control order */
     .main-content {
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
     }
     
-    /* Mobile-first breathing view */
     .breathing-section {
-        order: -1; /* Move breathing section to top */
+        order: -1;
         margin-bottom: 1rem;
     }
     
-    /* Compact header on mobile */
     header {
         margin-bottom: 1.5rem;
     }
@@ -1260,7 +1028,6 @@ h1 {
         font-size: 1rem;
     }
     
-    /* Make breathing bubble prominent */
     #technique-title {
         font-size: 1.25rem;
         margin-bottom: 0.5rem;
@@ -1277,7 +1044,6 @@ h1 {
         height: 200px;
     }
     
-    /* Streamline controls */
     .controls {
         flex-wrap: wrap;
         gap: 0.75rem;
@@ -1289,7 +1055,6 @@ h1 {
         padding: 0.75rem 1.25rem;
     }
     
-    /* Show technique info but make it more compact */
     .technique-info {
         padding: 1.5rem;
         margin: 1rem 0;
@@ -1304,15 +1069,13 @@ h1 {
         font-size: 0.8125rem;
     }
     
-    /* Compact progress bar */
     .progress-bar {
         margin: 1rem 0;
         height: 10px;
     }
     
-    /* Technique selector and other cards at bottom */
     .sidebar {
-        order: 1; /* Move sidebar to bottom */
+        order: 1;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
@@ -1353,7 +1116,6 @@ h1 {
         font-size: 0.8125rem;
     }
     
-    /* Keep donation and ad sections but make them more compact */
     .donation-section {
         padding: 1.5rem;
     }
@@ -1375,6 +1137,19 @@ h1 {
     
     .keyboard-hint {
         display: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .technique-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.75rem;
     }
 }
 
@@ -1413,7 +1188,6 @@ h1 {
         margin-bottom: 0.75rem;
     }
     
-    /* Ensure all content is visible */
     body {
         overflow-x: hidden;
         overflow-y: auto;
@@ -1421,5 +1195,19 @@ h1 {
     
     .container {
         padding-bottom: 2rem;
+    }
+}
+
+/* Reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .breathing-circle,
+    .breathing-aura,
+    .particle-float,
+    .natural-element {
+        animation: none !important;
+    }
+    
+    .breathing-circle.active {
+        transform: translate(-50%, -50%) scale(1.2);
     }
 }
