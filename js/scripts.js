@@ -6,15 +6,14 @@ let phaseTimer = 0;
 let totalTimer = 0;
 let breathingInterval;
 let timerInterval;
-let progressInterval;
+let animationInterval;
 let breathCount = 0;
 let breathStartTime = 0;
 let totalBreathTime = 0;
 
-// Animation frame management
-let animationFrameId = null;
+// Animation timing
 let phaseStartTime = 0;
-let phaseProgress = 0;
+let currentPhaseProgress = 0;
 
 // Settings
 let soundEnabled = true;
@@ -23,146 +22,83 @@ let vibrationEnabled = true;
 // Audio context for sound generation
 let audioContext;
 
-// Enhanced Audio System for Natural Breathing Sounds
-class BreathingAudioSystem {
+// Enhanced Audio System with Binaural Beats and Nature Sounds
+class EnhancedBreathingAudio {
     constructor() {
         this.audioContext = null;
         this.isInitialized = false;
-        this.activeNodes = [];
+        this.activeNodes = new Set();
+        this.masterGain = null;
+        this.binauralEnabled = true;
     }
 
     init() {
         if (!this.audioContext) {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.masterGain = this.audioContext.createGain();
+            this.masterGain.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+            this.masterGain.connect(this.audioContext.destination);
             this.isInitialized = true;
         }
     }
 
-    // Create a more complex, natural sound
-    createNaturalTone(frequency, duration, type = 'inhale') {
+    // Create binaural beat effect
+    createBinauralBeat(baseFreq, beatFreq, duration) {
+        const leftOsc = this.audioContext.createOscillator();
+        const rightOsc = this.audioContext.createOscillator();
+        const leftGain = this.audioContext.createGain();
+        const rightGain = this.audioContext.createGain();
+        const merger = this.audioContext.createChannelMerger(2);
+        
+        leftOsc.frequency.setValueAtTime(baseFreq, this.audioContext.currentTime);
+        rightOsc.frequency.setValueAtTime(baseFreq + beatFreq, this.audioContext.currentTime);
+        
+        leftOsc.connect(leftGain);
+        rightOsc.connect(rightGain);
+        leftGain.connect(merger, 0, 0);
+        rightGain.connect(merger, 0, 1);
+        
+        return { leftOsc, rightOsc, merger, leftGain, rightGain };
+    }
+
+    // Create layered, natural breathing sound
+    createBreathSound(frequency, duration, type = 'inhale') {
         this.init();
         
         const now = this.audioContext.currentTime;
         const endTime = now + duration;
         
-        // Main oscillator with warmer triangle wave
-        const mainOsc = this.audioContext.createOscillator();
-        mainOsc.type = 'triangle'; // Warmer than sine
-        mainOsc.frequency.setValueAtTime(frequency, now);
+        // Base tone with warm triangle wave
+        const baseOsc = this.audioContext.createOscillator();
+        baseOsc.type = 'triangle';
+        baseOsc.frequency.setValueAtTime(frequency, now);
         
-        // Add subtle frequency modulation for natural feel
+        // Add subtle vibrato for naturalness
         const vibrato = this.audioContext.createOscillator();
-        vibrato.frequency.setValueAtTime(4.5, now); // Slow vibrato
+        vibrato.frequency.setValueAtTime(5.5, now);
         const vibratoGain = this.audioContext.createGain();
-        vibratoGain.gain.setValueAtTime(frequency * 0.01, now); // 1% frequency variation
+        vibratoGain.gain.setValueAtTime(frequency * 0.015, now);
         vibrato.connect(vibratoGain);
-        vibratoGain.connect(mainOsc.frequency);
+        vibratoGain.connect(baseOsc.frequency);
         
-        // Second harmonic for richness
-        const harmonic = this.audioContext.createOscillator();
-        harmonic.type = 'sine';
-        harmonic.frequency.setValueAtTime(frequency * 2, now);
+        // Harmonic layers
+        const harmonic1 = this.audioContext.createOscillator();
+        harmonic1.type = 'sine';
+        harmonic1.frequency.setValueAtTime(frequency * 2, now);
         
-        // Sub-harmonic for depth
+        const harmonic2 = this.audioContext.createOscillator();
+        harmonic2.type = 'sine';
+        harmonic2.frequency.setValueAtTime(frequency * 3, now);
+        
         const subHarmonic = this.audioContext.createOscillator();
         subHarmonic.type = 'sine';
         subHarmonic.frequency.setValueAtTime(frequency * 0.5, now);
         
-        // Gain nodes for mixing
-        const mainGain = this.audioContext.createGain();
-        const harmonicGain = this.audioContext.createGain();
-        const subGain = this.audioContext.createGain();
-        
-        // Set relative volumes
-        mainGain.gain.setValueAtTime(0, now);
-        harmonicGain.gain.setValueAtTime(0, now);
-        subGain.gain.setValueAtTime(0, now);
-        
-        // Low-pass filter for smoothness
-        const filter = this.audioContext.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(frequency * 3, now);
-        filter.Q.setValueAtTime(0.5, now);
-        
-        // Master gain with envelope
-        const masterGain = this.audioContext.createGain();
-        masterGain.gain.setValueAtTime(0, now);
-        
-        // Connect the audio graph
-        mainOsc.connect(mainGain);
-        harmonic.connect(harmonicGain);
-        subHarmonic.connect(subGain);
-        
-        mainGain.connect(filter);
-        harmonicGain.connect(filter);
-        subGain.connect(filter);
-        
-        filter.connect(masterGain);
-        masterGain.connect(this.audioContext.destination);
-        
-        // Natural envelope based on breath type
-        if (type === 'inhale') {
-            // Gentle rise like drawing breath
-            masterGain.gain.linearRampToValueAtTime(0.02, now + 0.3);
-            masterGain.gain.exponentialRampToValueAtTime(0.035, now + duration * 0.7);
-            masterGain.gain.exponentialRampToValueAtTime(0.02, now + duration - 0.1);
-            masterGain.gain.linearRampToValueAtTime(0, endTime);
-            
-            // Gradually introduce harmonics
-            mainGain.gain.linearRampToValueAtTime(0.7, now + 0.5);
-            harmonicGain.gain.linearRampToValueAtTime(0.15, now + 1);
-            subGain.gain.linearRampToValueAtTime(0.2, now + 0.3);
-            
-            // Filter sweep for natural breath sound
-            filter.frequency.exponentialRampToValueAtTime(frequency * 4, now + duration * 0.5);
-            filter.frequency.exponentialRampToValueAtTime(frequency * 2, endTime);
-        } else if (type === 'exhale') {
-            // Gentle release like letting go
-            masterGain.gain.linearRampToValueAtTime(0.025, now + 0.1);
-            masterGain.gain.exponentialRampToValueAtTime(0.015, now + duration * 0.5);
-            masterGain.gain.exponentialRampToValueAtTime(0.005, now + duration - 0.3);
-            masterGain.gain.linearRampToValueAtTime(0, endTime);
-            
-            // Different harmonic balance for exhale
-            mainGain.gain.linearRampToValueAtTime(0.8, now + 0.2);
-            harmonicGain.gain.linearRampToValueAtTime(0.1, now + 0.5);
-            subGain.gain.linearRampToValueAtTime(0.3, now + 0.2);
-            
-            // Descending filter for release
-            filter.frequency.exponentialRampToValueAtTime(frequency * 1.5, now + duration * 0.7);
-            filter.frequency.exponentialRampToValueAtTime(frequency * 0.8, endTime);
-        }
-        
-        // Start oscillators
-        vibrato.start(now);
-        mainOsc.start(now);
-        harmonic.start(now);
-        subHarmonic.start(now);
-        
-        // Stop oscillators
-        vibrato.stop(endTime + 0.1);
-        mainOsc.stop(endTime + 0.1);
-        harmonic.stop(endTime + 0.1);
-        subHarmonic.stop(endTime + 0.1);
-        
-        // Track active nodes for cleanup
-        this.activeNodes.push({ vibrato, mainOsc, harmonic, subHarmonic, endTime });
-    }
-
-    // Create ambient pad sound for hold phases
-    createAmbientPad(duration) {
-        this.init();
-        
-        const now = this.audioContext.currentTime;
-        const endTime = now + duration;
-        
-        // Create pink noise for texture
-        const bufferSize = 2 * this.audioContext.sampleRate;
-        const noiseBuffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
-        const output = noiseBuffer.getChannelData(0);
-        
+        // Create pink noise for breath texture
+        const noiseBuffer = this.audioContext.createBuffer(1, duration * this.audioContext.sampleRate, this.audioContext.sampleRate);
+        const noiseData = noiseBuffer.getChannelData(0);
         let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-        for (let i = 0; i < bufferSize; i++) {
+        for (let i = 0; i < noiseData.length; i++) {
             const white = Math.random() * 2 - 1;
             b0 = 0.99886 * b0 + white * 0.0555179;
             b1 = 0.99332 * b1 + white * 0.0750759;
@@ -170,49 +106,219 @@ class BreathingAudioSystem {
             b3 = 0.86650 * b3 + white * 0.3104856;
             b4 = 0.55000 * b4 + white * 0.5329522;
             b5 = -0.7616 * b5 - white * 0.0168980;
-            output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.03;
+            noiseData[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.02;
             b6 = white * 0.115926;
         }
         
         const noiseSource = this.audioContext.createBufferSource();
         noiseSource.buffer = noiseBuffer;
-        noiseSource.loop = true;
         
-        // Filter for shaping
-        const filter1 = this.audioContext.createBiquadFilter();
-        filter1.type = 'bandpass';
-        filter1.frequency.setValueAtTime(400, now);
-        filter1.Q.setValueAtTime(0.3, now);
+        // Gain envelopes
+        const baseGain = this.audioContext.createGain();
+        const harmonicGain1 = this.audioContext.createGain();
+        const harmonicGain2 = this.audioContext.createGain();
+        const subGain = this.audioContext.createGain();
+        const noiseGain = this.audioContext.createGain();
         
-        const filter2 = this.audioContext.createBiquadFilter();
-        filter2.type = 'lowpass';
-        filter2.frequency.setValueAtTime(800, now);
+        // Filters for shaping
+        const baseFilter = this.audioContext.createBiquadFilter();
+        baseFilter.type = 'lowpass';
+        baseFilter.frequency.setValueAtTime(frequency * 4, now);
+        baseFilter.Q.setValueAtTime(0.7, now);
         
-        // Gain with envelope
-        const gainNode = this.audioContext.createGain();
-        gainNode.gain.setValueAtTime(0, now);
-        gainNode.gain.linearRampToValueAtTime(0.01, now + 1);
-        gainNode.gain.setValueAtTime(0.01, endTime - 1);
-        gainNode.gain.linearRampToValueAtTime(0, endTime);
+        const noiseFilter = this.audioContext.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.frequency.setValueAtTime(1000, now);
+        noiseFilter.Q.setValueAtTime(0.5, now);
         
-        // Connect
-        noiseSource.connect(filter1);
-        filter1.connect(filter2);
-        filter2.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
+        // Connect audio graph
+        baseOsc.connect(baseGain);
+        harmonic1.connect(harmonicGain1);
+        harmonic2.connect(harmonicGain2);
+        subHarmonic.connect(subGain);
+        noiseSource.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
         
+        baseGain.connect(baseFilter);
+        harmonicGain1.connect(baseFilter);
+        harmonicGain2.connect(baseFilter);
+        subGain.connect(baseFilter);
+        noiseGain.connect(this.masterGain);
+        baseFilter.connect(this.masterGain);
+        
+        // Natural envelopes for different breath phases
+        if (type === 'inhale') {
+            // Gradual rise
+            baseGain.gain.setValueAtTime(0, now);
+            baseGain.gain.linearRampToValueAtTime(0.3, now + 0.5);
+            baseGain.gain.exponentialRampToValueAtTime(0.5, now + duration * 0.7);
+            baseGain.gain.exponentialRampToValueAtTime(0.3, now + duration - 0.2);
+            baseGain.gain.linearRampToValueAtTime(0, endTime);
+            
+            harmonicGain1.gain.setValueAtTime(0, now);
+            harmonicGain1.gain.linearRampToValueAtTime(0.1, now + 1);
+            harmonicGain1.gain.linearRampToValueAtTime(0, endTime);
+            
+            harmonicGain2.gain.setValueAtTime(0, now);
+            harmonicGain2.gain.linearRampToValueAtTime(0.05, now + 1.5);
+            harmonicGain2.gain.linearRampToValueAtTime(0, endTime);
+            
+            subGain.gain.setValueAtTime(0, now);
+            subGain.gain.linearRampToValueAtTime(0.15, now + 0.3);
+            subGain.gain.linearRampToValueAtTime(0, endTime);
+            
+            noiseGain.gain.setValueAtTime(0, now);
+            noiseGain.gain.linearRampToValueAtTime(0.08, now + 0.2);
+            noiseGain.gain.exponentialRampToValueAtTime(0.12, now + duration * 0.5);
+            noiseGain.gain.linearRampToValueAtTime(0, endTime);
+            
+            // Filter sweep
+            baseFilter.frequency.exponentialRampToValueAtTime(frequency * 6, now + duration * 0.5);
+            baseFilter.frequency.exponentialRampToValueAtTime(frequency * 3, endTime);
+            
+        } else if (type === 'exhale') {
+            // Gentle release
+            baseGain.gain.setValueAtTime(0, now);
+            baseGain.gain.linearRampToValueAtTime(0.4, now + 0.2);
+            baseGain.gain.exponentialRampToValueAtTime(0.2, now + duration * 0.5);
+            baseGain.gain.exponentialRampToValueAtTime(0.05, now + duration - 0.5);
+            baseGain.gain.linearRampToValueAtTime(0, endTime);
+            
+            harmonicGain1.gain.setValueAtTime(0, now);
+            harmonicGain1.gain.linearRampToValueAtTime(0.08, now + 0.5);
+            harmonicGain1.gain.linearRampToValueAtTime(0, endTime);
+            
+            harmonicGain2.gain.setValueAtTime(0, now);
+            harmonicGain2.gain.linearRampToValueAtTime(0.03, now + 0.7);
+            harmonicGain2.gain.linearRampToValueAtTime(0, endTime);
+            
+            subGain.gain.setValueAtTime(0, now);
+            subGain.gain.linearRampToValueAtTime(0.2, now + 0.2);
+            subGain.gain.exponentialRampToValueAtTime(0.1, now + duration * 0.7);
+            subGain.gain.linearRampToValueAtTime(0, endTime);
+            
+            noiseGain.gain.setValueAtTime(0, now);
+            noiseGain.gain.linearRampToValueAtTime(0.15, now + 0.1);
+            noiseGain.gain.exponentialRampToValueAtTime(0.05, now + duration * 0.6);
+            noiseGain.gain.linearRampToValueAtTime(0, endTime);
+            
+            // Descending filter
+            baseFilter.frequency.exponentialRampToValueAtTime(frequency * 2, now + duration * 0.7);
+            baseFilter.frequency.exponentialRampToValueAtTime(frequency, endTime);
+        }
+        
+        // Start oscillators
+        vibrato.start(now);
+        baseOsc.start(now);
+        harmonic1.start(now);
+        harmonic2.start(now);
+        subHarmonic.start(now);
         noiseSource.start(now);
-        noiseSource.stop(endTime);
+        
+        // Stop oscillators
+        vibrato.stop(endTime + 0.1);
+        baseOsc.stop(endTime + 0.1);
+        harmonic1.stop(endTime + 0.1);
+        harmonic2.stop(endTime + 0.1);
+        subHarmonic.stop(endTime + 0.1);
+        noiseSource.stop(endTime + 0.1);
+        
+        // Add binaural beat for deep relaxation techniques
+        if (this.binauralEnabled && (currentTechnique === '478' || currentTechnique === 'coherent')) {
+            const beatFreq = currentTechnique === '478' ? 4 : 8; // Delta for sleep, Alpha for coherence
+            const binaural = this.createBinauralBeat(frequency, beatFreq, duration);
+            
+            const binauralGain = this.audioContext.createGain();
+            binauralGain.gain.setValueAtTime(0, now);
+            binauralGain.gain.linearRampToValueAtTime(0.1, now + 1);
+            binauralGain.gain.linearRampToValueAtTime(0, endTime);
+            
+            binaural.merger.connect(binauralGain);
+            binauralGain.connect(this.masterGain);
+            
+            binaural.leftOsc.start(now);
+            binaural.rightOsc.start(now);
+            binaural.leftOsc.stop(endTime);
+            binaural.rightOsc.stop(endTime);
+        }
+        
+        // Track active nodes
+        this.activeNodes.add({ endTime, nodes: [vibrato, baseOsc, harmonic1, harmonic2, subHarmonic, noiseSource] });
+    }
+
+    // Create ambient hold sound
+    createHoldSound(duration) {
+        this.init();
+        
+        const now = this.audioContext.currentTime;
+        const endTime = now + duration;
+        
+        // Soft pad sound
+        const osc1 = this.audioContext.createOscillator();
+        const osc2 = this.audioContext.createOscillator();
+        osc1.type = 'sine';
+        osc2.type = 'sine';
+        
+        // Slightly detuned for richness
+        const baseFreq = 110; // A2
+        osc1.frequency.setValueAtTime(baseFreq, now);
+        osc2.frequency.setValueAtTime(baseFreq * 1.01, now);
+        
+        // Slow LFO for gentle movement
+        const lfo = this.audioContext.createOscillator();
+        lfo.frequency.setValueAtTime(0.2, now);
+        const lfoGain = this.audioContext.createGain();
+        lfoGain.gain.setValueAtTime(5, now);
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc1.frequency);
+        lfoGain.connect(osc2.frequency);
+        
+        const gain1 = this.audioContext.createGain();
+        const gain2 = this.audioContext.createGain();
+        
+        const filter = this.audioContext.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(500, now);
+        filter.Q.setValueAtTime(2, now);
+        
+        osc1.connect(gain1);
+        osc2.connect(gain2);
+        gain1.connect(filter);
+        gain2.connect(filter);
+        filter.connect(this.masterGain);
+        
+        // Gentle fade in and out
+        gain1.gain.setValueAtTime(0, now);
+        gain2.gain.setValueAtTime(0, now);
+        gain1.gain.linearRampToValueAtTime(0.1, now + 1);
+        gain2.gain.linearRampToValueAtTime(0.1, now + 1);
+        gain1.gain.setValueAtTime(0.1, endTime - 1);
+        gain2.gain.setValueAtTime(0.1, endTime - 1);
+        gain1.gain.linearRampToValueAtTime(0, endTime);
+        gain2.gain.linearRampToValueAtTime(0, endTime);
+        
+        lfo.start(now);
+        osc1.start(now);
+        osc2.start(now);
+        lfo.stop(endTime);
+        osc1.stop(endTime);
+        osc2.stop(endTime);
+        
+        this.activeNodes.add({ endTime, nodes: [lfo, osc1, osc2] });
     }
 
     cleanup() {
         const now = this.audioContext ? this.audioContext.currentTime : 0;
-        this.activeNodes = this.activeNodes.filter(node => node.endTime > now);
+        for (const node of this.activeNodes) {
+            if (node.endTime < now - 1) {
+                this.activeNodes.delete(node);
+            }
+        }
     }
 }
 
-// Create the audio system instance
-const audioSystem = new BreathingAudioSystem();
+// Create audio system instance
+const audioSystem = new EnhancedBreathingAudio();
 
 const techniques = {
     '478': {
@@ -221,9 +327,9 @@ const techniques = {
         theme: 'theme-478',
         circleClass: 'technique-478',
         phases: [
-            { name: 'Inhale', duration: 4, class: 'inhale', text: 'Breathe in slowly, filling with moonlight...', frequency: 174.61 }, // F3 - calming
+            { name: 'Inhale', duration: 4, class: 'inhale', text: 'Breathe in slowly, filling with moonlight...', frequency: 174.61 },
             { name: 'Hold', duration: 7, class: 'hold', text: 'Hold gently, let the calm settle in...', frequency: 0 },
-            { name: 'Exhale', duration: 8, class: 'exhale', text: 'Release completely, drift into peace...', frequency: 130.81 } // C3 - grounding
+            { name: 'Exhale', duration: 8, class: 'exhale', text: 'Release completely, drift into peace...', frequency: 130.81 }
         ],
         description: 'The 4-7-8 breathing technique helps activate your parasympathetic nervous system, promoting deep relaxation and better sleep. Like the gentle phases of the moon, this practice guides you into peaceful rest.'
     },
@@ -233,9 +339,9 @@ const techniques = {
         theme: 'theme-box',
         circleClass: 'technique-box',
         phases: [
-            { name: 'Inhale', duration: 4, class: 'inhale', text: 'Draw in earth\'s grounding energy...', frequency: 146.83 }, // D3 - rooting
+            { name: 'Inhale', duration: 4, class: 'inhale', text: 'Draw in earth\'s grounding energy...', frequency: 146.83 },
             { name: 'Hold', duration: 4, class: 'hold', text: 'Feel rooted and centered...', frequency: 0 },
-            { name: 'Exhale', duration: 4, class: 'exhale', text: 'Release with steady control...', frequency: 110 }, // A2 - deep grounding
+            { name: 'Exhale', duration: 4, class: 'exhale', text: 'Release with steady control...', frequency: 110 },
             { name: 'Hold', duration: 4, class: 'hold', text: 'Rest in perfect stillness...', frequency: 0 }
         ],
         description: 'Box breathing connects you to the earth\'s stable energy. Like a tree with deep roots, find unshakeable focus and mental clarity through this grounding practice.'
@@ -246,8 +352,8 @@ const techniques = {
         theme: 'theme-coherent',
         circleClass: 'technique-coherent',
         phases: [
-            { name: 'Inhale', duration: 5, class: 'inhale', text: 'Breathe love into your heart...', frequency: 220 }, // A3 - heart opening
-            { name: 'Exhale', duration: 5, class: 'exhale', text: 'Send gratitude flowing outward...', frequency: 164.81 } // E3 - release
+            { name: 'Inhale', duration: 5, class: 'inhale', text: 'Breathe love into your heart...', frequency: 220 },
+            { name: 'Exhale', duration: 5, class: 'exhale', text: 'Send gratitude flowing outward...', frequency: 164.81 }
         ],
         description: 'Heart coherence breathing creates a harmonious flow between mind and heart. Like gentle waves, this rhythm reduces stress and opens you to deeper emotional balance.'
     },
@@ -257,9 +363,9 @@ const techniques = {
         theme: 'theme-triangle',
         circleClass: 'technique-triangle',
         phases: [
-            { name: 'Inhale', duration: 3, class: 'inhale', text: 'Breathe in fresh clarity...', frequency: 261.63 }, // C4 - clarity
+            { name: 'Inhale', duration: 3, class: 'inhale', text: 'Breathe in fresh clarity...', frequency: 261.63 },
             { name: 'Hold', duration: 3, class: 'hold', text: 'Float in peaceful pause...', frequency: 0 },
-            { name: 'Exhale', duration: 3, class: 'exhale', text: 'Let go like a soft breeze...', frequency: 196 } // G3 - release
+            { name: 'Exhale', duration: 3, class: 'exhale', text: 'Let go like a soft breeze...', frequency: 196 }
         ],
         description: 'Quick and balancing, this technique brings the lightness of clouds and sky. Perfect for busy moments when you need instant calm and mental clarity.'
     },
@@ -269,8 +375,8 @@ const techniques = {
         theme: 'theme-wim',
         circleClass: 'technique-wim',
         phases: [
-            { name: 'Inhale', duration: 2, class: 'inhale', text: 'Draw in solar energy...', frequency: 329.63 }, // E4 - energizing
-            { name: 'Exhale', duration: 1, class: 'exhale', text: 'Release with power...', frequency: 246.94 } // B3 - grounding energy
+            { name: 'Inhale', duration: 2, class: 'inhale', text: 'Draw in solar energy...', frequency: 329.63 },
+            { name: 'Exhale', duration: 1, class: 'exhale', text: 'Release with power...', frequency: 246.94 }
         ],
         description: 'Channel the sun\'s vibrant energy through this dynamic breathing practice. Awaken your inner fire, boost alertness, and enhance your natural vitality.'
     }
@@ -283,54 +389,48 @@ function initAudio() {
     }
 }
 
-// Optimize natural elements update
+// Update natural elements visibility
 function updateNaturalElements() {
     requestAnimationFrame(() => {
         const elements = document.querySelectorAll('.natural-element');
         elements.forEach(el => {
             el.style.opacity = '0';
-            el.style.transition = 'opacity 0.5s ease';
-        });
-        
-        setTimeout(() => {
-            elements.forEach(el => {
+            setTimeout(() => {
                 el.style.opacity = '';
-            });
-        }, 50);
+            }, 100);
+        });
         
         const natureBg = document.querySelector('.nature-bg');
         if (natureBg) {
-            natureBg.style.transition = 'opacity 1s ease';
             natureBg.style.opacity = '0';
             setTimeout(() => {
                 natureBg.style.opacity = '';
-            }, 100);
+            }, 150);
         }
     });
 }
 
-// Update the breathing sound function
+// Enhanced breathing sound function
 function playBreathingSound(frequency, duration) {
-    if (!soundEnabled || frequency === 0) {
-        // For hold phases, play ambient pad
-        if (soundEnabled && frequency === 0) {
-            audioSystem.createAmbientPad(duration);
-        }
-        return;
-    }
+    if (!soundEnabled) return;
     
     try {
         const technique = techniques[currentTechnique];
         const phase = technique.phases[currentPhase];
         
-        // Use the enhanced audio system
-        audioSystem.createNaturalTone(frequency, duration, phase.name.toLowerCase());
+        if (frequency === 0) {
+            // Hold phase
+            audioSystem.createHoldSound(duration);
+        } else {
+            // Inhale or exhale
+            audioSystem.createBreathSound(frequency, duration, phase.name.toLowerCase());
+        }
         
-        // Cleanup old nodes periodically
+        // Cleanup old nodes
         audioSystem.cleanup();
         
     } catch (e) {
-        console.log('Enhanced audio not supported:', e);
+        console.log('Audio error:', e);
     }
 }
 
@@ -403,6 +503,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize the default technique
     selectTechnique('478');
     
+    // Add SVG filter to the page
+    const svgFilter = document.createElement('div');
+    svgFilter.innerHTML = `
+        <svg class="breathing-svg-filter" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="fluid-effect">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                    <feColorMatrix in="blur" mode="matrix" 
+                        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                    <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+                </filter>
+            </defs>
+        </svg>
+    `;
+    document.querySelector('.breathing-container').appendChild(svgFilter.firstElementChild);
+    
     hintTimeout = setTimeout(() => {
         document.getElementById('keyboardHint').classList.add('show');
         setTimeout(() => {
@@ -419,7 +535,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Optimized technique selection
 function selectTechnique(techniqueKey) {
     if (isBreathing) {
         stopBreathing();
@@ -428,11 +543,8 @@ function selectTechnique(techniqueKey) {
     currentTechnique = techniqueKey;
     const technique = techniques[techniqueKey];
     
-    // Use CSS custom properties instead of changing classes
-    document.documentElement.style.setProperty('--transition-duration', '0.8s');
-    
     // Smooth theme transition
-    document.body.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+    document.body.style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
     document.body.className = technique.theme;
     
     // Update UI
@@ -442,50 +554,44 @@ function selectTechnique(techniqueKey) {
         <p>${technique.description}</p>
     `;
     
-    // Update breathing circle without forced reflows
+    // Update breathing circle
     const circle = document.getElementById('breathingCircle');
-    circle.style.transition = 'none';
     circle.className = `breathing-circle ${technique.circleClass}`;
     
-    // Use requestAnimationFrame for smooth transition
-    requestAnimationFrame(() => {
-        circle.style.transition = '';
-        
-        // Reset progress bar
-        document.getElementById('progressFill').style.width = '0%';
-        document.getElementById('progressTime').textContent = '';
-        
-        // Update active button
-        document.querySelectorAll('.technique-btn').forEach(btn => btn.classList.remove('active'));
-        
-        // Find and activate the correct button
-        const buttons = document.querySelectorAll('.technique-btn');
-        const techniqueNames = {
-            '478': '🌙 Deep Sleep',
-            'box': '🌿 Focus & Grounding',
-            'coherent': '💗 Heart Coherence',
-            'triangle': '☁️ Quick Calm',
-            'wim': '☀️ Energy Boost'
-        };
-        
-        buttons.forEach(btn => {
-            if (btn.textContent.trim() === techniqueNames[techniqueKey]) {
-                btn.classList.add('active');
-            }
-        });
-        
-        // Reset state
-        document.getElementById('circleText').textContent = 'Ready';
-        document.getElementById('breathingText').textContent = 'Click Begin to start your practice';
-        
-        // Update natural elements smoothly
-        updateNaturalElements();
+    // Reset progress bar
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('progressTime').textContent = '';
+    
+    // Update active button
+    document.querySelectorAll('.technique-btn').forEach(btn => btn.classList.remove('active'));
+    
+    // Find and activate the correct button
+    const buttons = document.querySelectorAll('.technique-btn');
+    const techniqueNames = {
+        '478': '🌙 Deep Sleep',
+        'box': '🌿 Focus & Grounding',
+        'coherent': '💗 Heart Coherence',
+        'triangle': '☁️ Quick Calm',
+        'wim': '☀️ Energy Boost'
+    };
+    
+    buttons.forEach(btn => {
+        if (btn.textContent.trim() === techniqueNames[techniqueKey]) {
+            btn.classList.add('active');
+        }
     });
+    
+    // Reset state
+    document.getElementById('circleText').textContent = 'Ready';
+    document.getElementById('breathingText').textContent = 'Click Begin to start your practice';
+    
+    // Update natural elements
+    updateNaturalElements();
 }
 
-// Optimized start breathing function
 function startBreathing() {
     if (isPaused) {
+        // Resume from pause
         isPaused = false;
         document.getElementById('startBtn').disabled = true;
         document.getElementById('pauseBtn').disabled = false;
@@ -494,31 +600,29 @@ function startBreathing() {
         const circle = document.getElementById('breathingCircle');
         circle.classList.add('active');
         
-        // Resume from where we left off
-        phaseStartTime = performance.now() - (phaseProgress * techniques[currentTechnique].phases[currentPhase].duration * 1000);
-        animateProgress();
+        // Resume animation
+        animateBreathingProgress();
         
-        // Resume breathing cycle
-        const remainingTime = (1 - phaseProgress) * techniques[currentTechnique].phases[currentPhase].duration * 1000;
+        // Resume phase timer
+        const remainingTime = (techniques[currentTechnique].phases[currentPhase].duration - currentPhaseProgress) * 1000;
         breathingInterval = setTimeout(() => {
-            currentPhase = (currentPhase + 1) % techniques[currentTechnique].phases.length;
-            if (isBreathing && !isPaused) {
-                startBreathingCycle();
-            }
+            nextPhase();
         }, remainingTime);
         
         startTimers();
         return;
     }
 
+    // Start fresh
     isBreathing = true;
+    isPaused = false;
     currentPhase = 0;
     phaseTimer = 0;
     totalTimer = 0;
     breathCount = 0;
     totalBreathTime = 0;
     breathStartTime = Date.now();
-    phaseProgress = 0;
+    currentPhaseProgress = 0;
 
     document.getElementById('startBtn').disabled = true;
     document.getElementById('pauseBtn').disabled = false;
@@ -535,28 +639,26 @@ function startBreathing() {
     startTimers();
 }
 
-// Optimized pause function
 function pauseBreathing() {
     isPaused = true;
     clearTimeout(breathingInterval);
     clearInterval(timerInterval);
-    cancelAnimationFrame(animationFrameId);
+    cancelAnimationFrame(animationInterval);
     
     document.getElementById('startBtn').disabled = false;
     document.getElementById('pauseBtn').disabled = true;
     document.getElementById('breathingText').textContent = 'Paused - click Begin to continue';
     
     const circle = document.getElementById('breathingCircle');
-    circle.classList.remove('active', 'animating');
+    circle.classList.remove('active');
 }
 
-// Optimized stop function
 function stopBreathing() {
     isBreathing = false;
     isPaused = false;
     clearTimeout(breathingInterval);
     clearInterval(timerInterval);
-    cancelAnimationFrame(animationFrameId);
+    cancelAnimationFrame(animationInterval);
 
     document.getElementById('startBtn').disabled = false;
     document.getElementById('pauseBtn').disabled = true;
@@ -565,11 +667,10 @@ function stopBreathing() {
     const technique = techniques[currentTechnique];
     const circle = document.getElementById('breathingCircle');
     
-    // Smooth reset animation
-    circle.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-    circle.classList.remove('active', 'animating', 'inhale-phase', 'hold-phase', 'exhale-phase');
+    // Smooth reset
+    circle.classList.remove('active');
     
-    requestAnimationFrame(() => {
+    setTimeout(() => {
         circle.className = `breathing-circle ${technique.circleClass}`;
         
         document.getElementById('circleText').textContent = 'Ready';
@@ -582,7 +683,7 @@ function stopBreathing() {
         setTimeout(() => {
             document.getElementById('sessionStats').style.display = 'none';
         }, 3000);
-    });
+    }, 300);
     
     // Completion vibration pattern
     vibrate([100, 50, 100]);
@@ -590,70 +691,62 @@ function stopBreathing() {
     currentPhase = 0;
     phaseTimer = 0;
     totalTimer = 0;
-    phaseProgress = 0;
+    currentPhaseProgress = 0;
 }
 
-// Optimized breathing cycle with requestAnimationFrame
 function startBreathingCycle() {
     const technique = techniques[currentTechnique];
     const phase = technique.phases[currentPhase];
     
     const circle = document.getElementById('breathingCircle');
     
-    // Set CSS custom properties for animation
-    circle.style.setProperty('--breath-duration', `${phase.duration}s`);
+    document.getElementById('circleText').textContent = phase.name;
+    document.getElementById('breathingText').textContent = phase.text;
     
-    // Remove old phase classes
-    circle.classList.remove('inhale-phase', 'hold-phase', 'exhale-phase', 'animating');
-    
-    // Use requestAnimationFrame for smooth class addition
-    requestAnimationFrame(() => {
-        // Add new phase class
-        const phaseClass = phase.name.toLowerCase() + '-phase';
-        circle.classList.add(phaseClass, 'active', 'animating');
-        
-        document.getElementById('circleText').textContent = phase.name;
-        document.getElementById('breathingText').textContent = phase.text;
-        
-        // Track breath cycles
-        if (currentPhase === 0) {
-            breathCount++;
-            if (breathStartTime > 0) {
-                totalBreathTime += (Date.now() - breathStartTime) / 1000;
-                breathStartTime = Date.now();
-            }
-            updateStats();
+    // Track breath cycles
+    if (currentPhase === 0) {
+        breathCount++;
+        if (breathStartTime > 0) {
+            totalBreathTime += (Date.now() - breathStartTime) / 1000;
+            breathStartTime = Date.now();
         }
-        
-        // Play sound for this phase
-        playBreathingSound(phase.frequency, phase.duration);
-        
-        // Smooth vibration patterns
-        if (phase.name === 'Inhale') {
-            vibrate([50, 100, 50]);
-        } else if (phase.name === 'Exhale') {
-            vibrate([100, 50, 100]);
-        }
-        
-        phaseTimer = phase.duration;
-        phaseStartTime = performance.now();
-        
-        // Start smooth progress animation
-        animateProgress();
-    });
+        updateStats();
+    }
     
-    // Set up phase transition
+    // Play sound for this phase
+    playBreathingSound(phase.frequency, phase.duration);
+    
+    // Vibration pattern based on phase
+    if (phase.name === 'Inhale') {
+        vibrate([50, 100, 50]);
+    } else if (phase.name === 'Exhale') {
+        vibrate([100, 50, 100]);
+    }
+    
+    phaseTimer = phase.duration;
+    phaseStartTime = performance.now();
+    currentPhaseProgress = 0;
+    
+    // Start animation
+    animateBreathingProgress();
+    
+    // Set timer for next phase
     breathingInterval = setTimeout(() => {
-        currentPhase = (currentPhase + 1) % technique.phases.length;
-        
-        if (isBreathing && !isPaused) {
-            startBreathingCycle();
-        }
+        nextPhase();
     }, phase.duration * 1000);
 }
 
-// Smooth progress bar animation using requestAnimationFrame
-function animateProgress() {
+function nextPhase() {
+    const technique = techniques[currentTechnique];
+    currentPhase = (currentPhase + 1) % technique.phases.length;
+    
+    if (isBreathing && !isPaused) {
+        startBreathingCycle();
+    }
+}
+
+// Smooth progress animation using requestAnimationFrame
+function animateBreathingProgress() {
     if (!isBreathing || isPaused) return;
     
     const technique = techniques[currentTechnique];
@@ -661,10 +754,10 @@ function animateProgress() {
     const currentTime = performance.now();
     const elapsed = (currentTime - phaseStartTime) / 1000;
     
-    phaseProgress = Math.min(elapsed / phase.duration, 1);
-    const progressPercent = phaseProgress * 100;
+    currentPhaseProgress = Math.min(elapsed / phase.duration, 1);
+    const progressPercent = currentPhaseProgress * 100;
     
-    // Update progress bar
+    // Update progress bar smoothly
     const progressFill = document.getElementById('progressFill');
     progressFill.style.width = `${progressPercent}%`;
     
@@ -673,8 +766,8 @@ function animateProgress() {
     document.getElementById('progressTime').textContent = `${Math.ceil(remainingTime)}s`;
     
     // Continue animation
-    if (phaseProgress < 1 && isBreathing && !isPaused) {
-        animationFrameId = requestAnimationFrame(animateProgress);
+    if (currentPhaseProgress < 1 && isBreathing && !isPaused) {
+        animationInterval = requestAnimationFrame(animateBreathingProgress);
     }
 }
 
@@ -713,11 +806,20 @@ window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
         if (isBreathing && !isPaused) {
+            // Maintain smooth animation during resize
             const circle = document.getElementById('breathingCircle');
-            circle.style.transition = 'none';
+            circle.style.animationPlayState = 'paused';
             requestAnimationFrame(() => {
-                circle.style.transition = '';
+                circle.style.animationPlayState = 'running';
             });
         }
     }, 250);
+});
+
+// Add page visibility handling to pause audio when tab is hidden
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden && isBreathing && !isPaused) {
+        // Optionally pause when tab is hidden
+        // pauseBreathing();
+    }
 });
