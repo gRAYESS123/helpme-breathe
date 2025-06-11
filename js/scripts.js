@@ -15,8 +15,8 @@ let totalBreathTime = 0;
 let phaseStartTime = 0;
 let currentPhaseProgress = 0;
 
-// ADDED: Session management
-let sessionDuration = 600; // Default 10 minutes
+// Session management
+let sessionDuration = 600;
 let sessionStartTime = 0;
 let sessionTimer = 0;
 let sessionInterval;
@@ -25,7 +25,7 @@ let sessionInterval;
 let soundEnabled = true;
 let vibrationEnabled = true;
 
-// OPTIMIZED: Simplified audio system
+// Audio system
 class OptimizedAudioSystem {
     constructor() {
         this.audioContext = null;
@@ -45,7 +45,6 @@ class OptimizedAudioSystem {
         try {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             
-            // Resume context if suspended (mobile browser requirement)
             if (this.audioContext.state === 'suspended') {
                 await this.audioContext.resume();
             }
@@ -60,14 +59,12 @@ class OptimizedAudioSystem {
         }
     }
 
-    // OPTIMIZED: Simplified sound generation
     createBreathSound(frequency, duration, type = 'inhale') {
         if (!this.isSupported || !soundEnabled || !this.isInitialized) return;
 
         const now = this.audioContext.currentTime;
         const endTime = now + duration;
 
-        // Single oscillator with envelope - much simpler than original
         const osc = this.audioContext.createOscillator();
         const gain = this.audioContext.createGain();
         const filter = this.audioContext.createBiquadFilter();
@@ -78,7 +75,6 @@ class OptimizedAudioSystem {
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(frequency * 2, now);
 
-        // Simple envelope based on breath type
         if (type === 'inhale') {
             gain.gain.setValueAtTime(0, now);
             gain.gain.linearRampToValueAtTime(0.15, now + duration * 0.7);
@@ -88,7 +84,6 @@ class OptimizedAudioSystem {
             gain.gain.linearRampToValueAtTime(0.12, now + 0.2);
             gain.gain.exponentialRampToValueAtTime(0.01, endTime);
         } else {
-            // Hold - very quiet ambient tone
             gain.gain.setValueAtTime(0, now);
             gain.gain.linearRampToValueAtTime(0.05, now + 1);
             gain.gain.setValueAtTime(0.05, endTime - 1);
@@ -102,10 +97,8 @@ class OptimizedAudioSystem {
         osc.start(now);
         osc.stop(endTime);
 
-        // Track for cleanup
         this.activeNodes.add({ endTime, nodes: [osc] });
         
-        // Auto cleanup
         setTimeout(() => {
             this.cleanup();
         }, duration * 1000 + 100);
@@ -120,7 +113,6 @@ class OptimizedAudioSystem {
         }
     }
 
-    // Cleanup all audio
     stop() {
         if (this.audioContext && this.audioContext.state !== 'closed') {
             this.audioContext.close();
@@ -131,10 +123,8 @@ class OptimizedAudioSystem {
     }
 }
 
-// Create audio system instance
 const audioSystem = new OptimizedAudioSystem();
 
-// OPTIMIZED: Simplified technique definitions
 const techniques = {
     '478': {
         name: '🌙 Deep Sleep',
@@ -154,12 +144,12 @@ const techniques = {
         theme: 'theme-box',
         circleClass: 'technique-box',
         phases: [
-            { name: 'Inhale', duration: 4, class: 'inhale', text: 'Draw in earth\\'s grounding energy...', frequency: 146.83 },
+            { name: 'Inhale', duration: 4, class: 'inhale', text: 'Draw in earth\'s grounding energy...', frequency: 146.83 },
             { name: 'Hold', duration: 4, class: 'hold', text: 'Feel rooted and centered...', frequency: 0 },
             { name: 'Exhale', duration: 4, class: 'exhale', text: 'Release with steady control...', frequency: 110 },
             { name: 'Hold', duration: 4, class: 'hold', text: 'Rest in perfect stillness...', frequency: 0 }
         ],
-        description: 'Box breathing connects you to the earth\\'s stable energy. Like a tree with deep roots, find unshakeable focus and mental clarity through this grounding practice.'
+        description: 'Box breathing connects you to the earth\'s stable energy. Like a tree with deep roots, find unshakeable focus and mental clarity through this grounding practice.'
     },
     'coherent': {
         name: '💗 Heart Coherence',
@@ -193,11 +183,18 @@ const techniques = {
             { name: 'Inhale', duration: 2, class: 'inhale', text: 'Draw in solar energy...', frequency: 329.63 },
             { name: 'Exhale', duration: 1, class: 'exhale', text: 'Release with power...', frequency: 246.94 }
         ],
-        description: 'Channel the sun\\'s vibrant energy through this dynamic breathing practice. Awaken your inner fire, boost alertness, and enhance your natural vitality.'
+        description: 'Channel the sun\'s vibrant energy through this dynamic breathing practice. Awaken your inner fire, boost alertness, and enhance your natural vitality.'
     }
 };
 
-// OPTIMIZED: Audio function with error handling
+function safeGetElement(id) {
+    const element = document.getElementById(id);
+    if (!element) {
+        console.warn(`Element not found: ${id}`);
+    }
+    return element;
+}
+
 function playBreathingSound(frequency, duration) {
     if (!soundEnabled) return;
     
@@ -212,7 +209,6 @@ function playBreathingSound(frequency, duration) {
     }
 }
 
-// Vibrate device
 function vibrate(pattern) {
     if (!vibrationEnabled || !navigator.vibrate) return;
     try {
@@ -222,21 +218,20 @@ function vibrate(pattern) {
     }
 }
 
-// ADDED: Session duration management
 function getSessionDuration() {
-    const select = document.getElementById('sessionDuration');
-    return parseInt(select.value);
+    const select = safeGetElement('sessionDuration');
+    return select ? parseInt(select.value) : 600;
 }
 
 function updateSessionProgress() {
-    if (sessionDuration === -1) return; // Unlimited session
+    if (sessionDuration === -1) return;
     
     const elapsed = Date.now() - sessionStartTime;
     const progress = Math.min((elapsed / 1000) / sessionDuration, 1);
     const remaining = Math.max(sessionDuration - (elapsed / 1000), 0);
     
-    const progressFill = document.getElementById('sessionProgressFill');
-    const timeRemaining = document.getElementById('sessionTimeRemaining');
+    const progressFill = safeGetElement('sessionProgressFill');
+    const timeRemaining = safeGetElement('sessionTimeRemaining');
     
     if (progressFill) {
         progressFill.style.width = `${progress * 100}%`;
@@ -248,7 +243,6 @@ function updateSessionProgress() {
         timeRemaining.textContent = `${minutes}:${seconds.toString().padStart(2, '0')} remaining`;
     }
     
-    // Auto-stop when session complete
     if (progress >= 1 && isBreathing) {
         stopBreathing();
         showSessionComplete();
@@ -256,10 +250,11 @@ function updateSessionProgress() {
 }
 
 function showSessionComplete() {
-    const breathingText = document.getElementById('breathingText');
-    breathingText.textContent = '🎉 Session complete! Well done.';
+    const breathingText = safeGetElement('breathingText');
+    if (breathingText) {
+        breathingText.textContent = '🎉 Session complete! Well done.';
+    }
     
-    // Track completion
     if (typeof gtag !== 'undefined') {
         gtag('event', 'session_complete', {
             'event_category': 'breathing',
@@ -268,30 +263,11 @@ function showSessionComplete() {
         });
     }
     
-    // Show completion vibration
     vibrate([200, 100, 200, 100, 200]);
 }
 
-// Settings panel management
-document.getElementById('settingsBtn').addEventListener('click', function(e) {
-    e.stopPropagation();
-    const panel = document.getElementById('settingsPanel');
-    panel.classList.toggle('show');
-});
-
-// Close settings when clicking outside
-document.addEventListener('click', function(e) {
-    const settingsBtn = document.getElementById('settingsBtn');
-    const settingsPanel = document.getElementById('settingsPanel');
-    
-    if (!settingsBtn.contains(e.target) && !settingsPanel.contains(e.target)) {
-        settingsPanel.classList.remove('show');
-    }
-});
-
-// Toggle switches with keyboard support
 function setupToggle(toggleId, callback) {
-    const toggle = document.getElementById(toggleId);
+    const toggle = safeGetElement(toggleId);
     if (!toggle) return;
     
     const handleToggle = () => {
@@ -308,34 +284,426 @@ function setupToggle(toggleId, callback) {
     });
 }
 
-setupToggle('soundToggle', (enabled) => {
-    soundEnabled = enabled;
-    if (enabled) {
+function initializeSettings() {
+    const settingsBtn = safeGetElement('settingsBtn');
+    const settingsPanel = safeGetElement('settingsPanel');
+    
+    if (!settingsBtn || !settingsPanel) return;
+    
+    settingsBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        settingsPanel.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!settingsBtn.contains(e.target) && !settingsPanel.contains(e.target)) {
+            settingsPanel.classList.remove('show');
+        }
+    });
+
+    setupToggle('soundToggle', (enabled) => {
+        soundEnabled = enabled;
+        if (enabled) {
+            audioSystem.init();
+        }
+    });
+
+    setupToggle('vibrationToggle', (enabled) => {
+        vibrationEnabled = enabled;
+    });
+
+    const sessionSelect = safeGetElement('sessionDuration');
+    if (sessionSelect) {
+        sessionSelect.addEventListener('change', function() {
+            sessionDuration = getSessionDuration();
+            
+            const sessionInfo = safeGetElement('sessionInfo');
+            if (sessionInfo) {
+                if (sessionDuration === -1) {
+                    sessionInfo.style.display = 'none';
+                } else {
+                    sessionInfo.style.display = 'block';
+                    updateSessionProgress();
+                }
+            }
+        });
+    }
+}
+
+function selectTechnique(techniqueKey) {
+    if (isBreathing) {
+        stopBreathing();
+    }
+
+    currentTechnique = techniqueKey;
+    const technique = techniques[techniqueKey];
+    
+    if (!technique) {
+        console.error('Technique not found:', techniqueKey);
+        return;
+    }
+    
+    document.body.style.transition = 'background 1s cubic-bezier(0.4, 0, 0.2, 1)';
+    document.body.className = technique.theme;
+    
+    requestAnimationFrame(() => {
+        const techniqueTitle = safeGetElement('technique-title');
+        if (techniqueTitle) {
+            techniqueTitle.textContent = technique.name;
+        }
+        
+        const techniqueInfo = safeGetElement('techniqueInfo');
+        if (techniqueInfo) {
+            techniqueInfo.innerHTML = `
+                <h3>${technique.title}</h3>
+                <p>${technique.description}</p>
+            `;
+        }
+        
+        const circle = safeGetElement('breathingCircle');
+        if (circle) {
+            circle.className = `breathing-circle ${technique.circleClass}`;
+        }
+        
+        const progressFill = safeGetElement('progressFill');
+        if (progressFill) {
+            progressFill.style.width = '0%';
+        }
+        
+        const progressTime = safeGetElement('progressTime');
+        if (progressTime) {
+            progressTime.textContent = '';
+        }
+        
+        updateActiveButton(techniqueKey);
+        
+        const circleText = safeGetElement('circleText');
+        if (circleText) {
+            circleText.textContent = 'Ready';
+        }
+        
+        const breathingText = safeGetElement('breathingText');
+        if (breathingText) {
+            breathingText.textContent = 'Click Begin to start your practice';
+        }
+    });
+}
+
+function updateActiveButton(techniqueKey) {
+    document.querySelectorAll('.technique-btn').forEach(btn => btn.classList.remove('active'));
+    
+    const techniqueNames = {
+        '478': '🌙 Deep Sleep',
+        'box': '🌿 Focus & Grounding',
+        'coherent': '💗 Heart Coherence',
+        'triangle': '☁️ Quick Calm',
+        'wim': '☀️ Energy Boost'
+    };
+    
+    const buttons = document.querySelectorAll('.technique-btn');
+    buttons.forEach(btn => {
+        if (btn.textContent.trim() === techniqueNames[techniqueKey]) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+function startBreathing() {
+    if (isPaused) {
+        isPaused = false;
+        updateButtonStates();
+        
+        const circle = safeGetElement('breathingCircle');
+        if (circle) {
+            circle.classList.add('active');
+        }
+        
+        animateBreathingProgress();
+        
+        const remainingTime = (techniques[currentTechnique].phases[currentPhase].duration - currentPhaseProgress) * 1000;
+        breathingInterval = setTimeout(() => {
+            nextPhase();
+        }, remainingTime);
+        
+        startTimers();
+        return;
+    }
+
+    isBreathing = true;
+    isPaused = false;
+    currentPhase = 0;
+    phaseTimer = 0;
+    totalTimer = 0;
+    breathCount = 0;
+    totalBreathTime = 0;
+    breathStartTime = Date.now();
+    currentPhaseProgress = 0;
+    
+    sessionDuration = getSessionDuration();
+    sessionStartTime = Date.now();
+    sessionTimer = 0;
+    
+    const sessionInfo = safeGetElement('sessionInfo');
+    if (sessionInfo && sessionDuration !== -1) {
+        sessionInfo.style.display = 'block';
+    }
+
+    updateButtonStates();
+    
+    const sessionStats = safeGetElement('sessionStats');
+    if (sessionStats) {
+        sessionStats.style.display = 'flex';
+    }
+
+    const circle = safeGetElement('breathingCircle');
+    if (circle) {
+        circle.classList.add('active');
+    }
+
+    if (soundEnabled) {
         audioSystem.init();
     }
-});
 
-setupToggle('vibrationToggle', (enabled) => {
-    vibrationEnabled = enabled;
-});
+    vibrate(100);
 
-// Session duration change handler
-document.getElementById('sessionDuration').addEventListener('change', function() {
-    sessionDuration = getSessionDuration();
+    startBreathingCycle();
+    startTimers();
     
-    // Update UI based on duration
-    const sessionInfo = document.getElementById('sessionInfo');
-    if (sessionDuration === -1) {
-        sessionInfo.style.display = 'none';
-    } else {
-        sessionInfo.style.display = 'block';
-        updateSessionProgress();
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'session_start', {
+            'event_category': 'breathing',
+            'event_label': currentTechnique,
+            'value': sessionDuration === -1 ? 0 : Math.floor(sessionDuration / 60)
+        });
     }
-});
+}
 
-// OPTIMIZED: Keyboard shortcuts with better event handling
+function pauseBreathing() {
+    isPaused = true;
+    clearTimeout(breathingInterval);
+    clearInterval(timerInterval);
+    clearInterval(sessionInterval);
+    cancelAnimationFrame(animationInterval);
+    
+    updateButtonStates();
+    
+    const breathingText = safeGetElement('breathingText');
+    if (breathingText) {
+        breathingText.textContent = 'Paused - click Begin to continue';
+    }
+    
+    const circle = safeGetElement('breathingCircle');
+    if (circle) {
+        circle.classList.remove('active');
+    }
+}
+
+function stopBreathing() {
+    isBreathing = false;
+    isPaused = false;
+    clearTimeout(breathingInterval);
+    clearInterval(timerInterval);
+    clearInterval(sessionInterval);
+    cancelAnimationFrame(animationInterval);
+
+    updateButtonStates();
+
+    const technique = techniques[currentTechnique];
+    const circle = safeGetElement('breathingCircle');
+    
+    if (circle) {
+        circle.classList.remove('active');
+    }
+    
+    setTimeout(() => {
+        if (circle) {
+            circle.className = `breathing-circle ${technique.circleClass}`;
+        }
+        
+        const circleText = safeGetElement('circleText');
+        if (circleText) {
+            circleText.textContent = 'Ready';
+        }
+        
+        const breathingText = safeGetElement('breathingText');
+        if (breathingText) {
+            breathingText.textContent = 'Click Begin to start your practice';
+        }
+        
+        const progressFill = safeGetElement('progressFill');
+        if (progressFill) {
+            progressFill.style.width = '0%';
+        }
+        
+        const progressTime = safeGetElement('progressTime');
+        if (progressTime) {
+            progressTime.textContent = '';
+        }
+        
+        const timer = safeGetElement('timer');
+        if (timer) {
+            timer.textContent = '00:00';
+        }
+        
+        const sessionInfo = safeGetElement('sessionInfo');
+        if (sessionInfo) {
+            sessionInfo.style.display = 'none';
+        }
+        
+        setTimeout(() => {
+            const sessionStats = safeGetElement('sessionStats');
+            if (sessionStats) {
+                sessionStats.style.display = 'none';
+            }
+        }, 3000);
+    }, 300);
+    
+    vibrate([100, 50, 100]);
+    
+    currentPhase = 0;
+    phaseTimer = 0;
+    totalTimer = 0;
+    sessionTimer = 0;
+    currentPhaseProgress = 0;
+}
+
+function updateButtonStates() {
+    const startBtn = safeGetElement('startBtn');
+    const pauseBtn = safeGetElement('pauseBtn');
+    const stopBtn = safeGetElement('stopBtn');
+    
+    if (startBtn) startBtn.disabled = isBreathing && !isPaused;
+    if (pauseBtn) pauseBtn.disabled = !isBreathing || isPaused;
+    if (stopBtn) stopBtn.disabled = !isBreathing;
+}
+
+function startBreathingCycle() {
+    const technique = techniques[currentTechnique];
+    const phase = technique.phases[currentPhase];
+    
+    const circleText = safeGetElement('circleText');
+    if (circleText) {
+        circleText.textContent = phase.name;
+    }
+    
+    const breathingText = safeGetElement('breathingText');
+    if (breathingText) {
+        breathingText.textContent = phase.text;
+    }
+    
+    if (currentPhase === 0) {
+        breathCount++;
+        if (breathStartTime > 0) {
+            totalBreathTime += (Date.now() - breathStartTime) / 1000;
+            breathStartTime = Date.now();
+        }
+        updateStats();
+    }
+    
+    if (phase.frequency > 0) {
+        playBreathingSound(phase.frequency, phase.duration);
+    }
+    
+    if (phase.name === 'Inhale') {
+        vibrate([50, 100, 50]);
+    } else if (phase.name === 'Exhale') {
+        vibrate([100, 50, 100]);
+    }
+    
+    phaseTimer = phase.duration;
+    phaseStartTime = performance.now();
+    currentPhaseProgress = 0;
+    
+    animateBreathingProgress();
+    
+    breathingInterval = setTimeout(() => {
+        nextPhase();
+    }, phase.duration * 1000);
+}
+
+function nextPhase() {
+    const technique = techniques[currentTechnique];
+    currentPhase = (currentPhase + 1) % technique.phases.length;
+    
+    if (isBreathing && !isPaused) {
+        startBreathingCycle();
+    }
+}
+
+function animateBreathingProgress() {
+    if (!isBreathing || isPaused) return;
+    
+    const technique = techniques[currentTechnique];
+    const phase = technique.phases[currentPhase];
+    const currentTime = performance.now();
+    const elapsed = (currentTime - phaseStartTime) / 1000;
+    
+    currentPhaseProgress = Math.min(elapsed / phase.duration, 1);
+    const progressPercent = currentPhaseProgress * 100;
+    
+    const progressFill = safeGetElement('progressFill');
+    if (progressFill) {
+        progressFill.style.width = `${progressPercent}%`;
+    }
+    
+    if (Math.floor(elapsed * 4) !== Math.floor((elapsed - 0.016) * 4)) {
+        const remainingTime = Math.max(phase.duration - elapsed, 0);
+        const progressTime = safeGetElement('progressTime');
+        if (progressTime) {
+            progressTime.textContent = `${Math.ceil(remainingTime)}s`;
+        }
+    }
+    
+    if (currentPhaseProgress < 1 && isBreathing && !isPaused) {
+        animationInterval = requestAnimationFrame(animateBreathingProgress);
+    }
+}
+
+function startTimers() {
+    timerInterval = setInterval(() => {
+        totalTimer++;
+        const minutes = Math.floor(totalTimer / 60);
+        const seconds = totalTimer % 60;
+        const timer = safeGetElement('timer');
+        if (timer) {
+            timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+    }, 1000);
+    
+    if (sessionDuration !== -1) {
+        sessionInterval = setInterval(() => {
+            updateSessionProgress();
+        }, 1000);
+    }
+}
+
+function updateStats() {
+    const breathCountEl = safeGetElement('breathCount');
+    if (breathCountEl) {
+        breathCountEl.textContent = breathCount;
+    }
+    
+    if (breathCount > 0) {
+        const avgTime = Math.round(totalBreathTime / breathCount);
+        const avgBreathTime = safeGetElement('avgBreathTime');
+        if (avgBreathTime) {
+            avgBreathTime.textContent = `${avgTime}s`;
+        }
+    }
+    
+    const sessionProgress = safeGetElement('sessionProgress');
+    if (sessionProgress) {
+        if (sessionDuration !== -1) {
+            const elapsed = (Date.now() - sessionStartTime) / 1000;
+            const progress = Math.min((elapsed / sessionDuration) * 100, 100);
+            sessionProgress.textContent = `${Math.round(progress)}%`;
+        } else {
+            sessionProgress.textContent = '∞';
+        }
+    }
+}
+
 document.addEventListener('keydown', function(e) {
-    // Ignore if typing in input
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
     
     switch(e.code) {
@@ -376,358 +744,48 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// OPTIMIZED: Initialize on DOM load
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize default technique
-    selectTechnique('478');
+    console.log('Initializing Help Me Breathe...');
     
-    // Initialize session duration
-    sessionDuration = getSessionDuration();
-    
-    // Show keyboard hint
-    let hintTimeout = setTimeout(() => {
-        const hint = document.getElementById('keyboardHint');
-        if (hint) {
-            hint.classList.add('show');
-            setTimeout(() => hint.classList.remove('show'), 5000);
+    try {
+        initializeSettings();
+        selectTechnique('478');
+        sessionDuration = getSessionDuration();
+        
+        setTimeout(() => {
+            const hint = safeGetElement('keyboardHint');
+            if (hint) {
+                hint.classList.add('show');
+                setTimeout(() => hint.classList.remove('show'), 5000);
+            }
+        }, 3000);
+        
+        if (!navigator.vibrate) {
+            const vibrationToggle = safeGetElement('vibrationToggle');
+            if (vibrationToggle && vibrationToggle.parentElement) {
+                vibrationToggle.parentElement.style.display = 'none';
+            }
         }
-    }, 3000);
-    
-    // Check for vibration support
-    if (!navigator.vibrate) {
-        const vibrationToggle = document.getElementById('vibrationToggle');
-        if (vibrationToggle && vibrationToggle.parentElement) {
-            vibrationToggle.parentElement.style.display = 'none';
-        }
+        
+        document.addEventListener('click', () => {
+            if (!audioSystem.isInitialized && soundEnabled) {
+                audioSystem.init();
+            }
+        }, { once: true });
+        
+        console.log('Initialization complete');
+        
+    } catch (error) {
+        console.error('Initialization failed:', error);
     }
-    
-    // Initialize audio on first user interaction
-    document.addEventListener('click', () => {
-        if (!audioSystem.isInitialized && soundEnabled) {
-            audioSystem.init();
-        }
-    }, { once: true });
 });
 
-// OPTIMIZED: Technique selection with better performance
-function selectTechnique(techniqueKey) {
-    if (isBreathing) {
-        stopBreathing();
-    }
-
-    currentTechnique = techniqueKey;
-    const technique = techniques[techniqueKey];
-    
-    // Smooth theme transition
-    document.body.style.transition = 'background 1s cubic-bezier(0.4, 0, 0.2, 1)';
-    document.body.className = technique.theme;
-    
-    // Batch DOM updates for better performance
-    requestAnimationFrame(() => {
-        // Update UI elements
-        document.getElementById('technique-title').textContent = technique.name;
-        
-        const techniqueInfo = document.getElementById('techniqueInfo');
-        techniqueInfo.innerHTML = `
-            <h3>${technique.title}</h3>
-            <p>${technique.description}</p>
-        `;
-        
-        // Update breathing circle
-        const circle = document.getElementById('breathingCircle');
-        circle.className = `breathing-circle ${technique.circleClass}`;
-        
-        // Reset progress
-        document.getElementById('progressFill').style.width = '0%';
-        document.getElementById('progressTime').textContent = '';
-        
-        // Update active button
-        updateActiveButton(techniqueKey);
-        
-        // Reset state
-        document.getElementById('circleText').textContent = 'Ready';
-        document.getElementById('breathingText').textContent = 'Click Begin to start your practice';
-    });
-}
-
-function updateActiveButton(techniqueKey) {
-    document.querySelectorAll('.technique-btn').forEach(btn => btn.classList.remove('active'));
-    
-    const techniqueNames = {
-        '478': '🌙 Deep Sleep',
-        'box': '🌿 Focus & Grounding',
-        'coherent': '💗 Heart Coherence',
-        'triangle': '☁️ Quick Calm',
-        'wim': '☀️ Energy Boost'
-    };
-    
-    const buttons = document.querySelectorAll('.technique-btn');
-    buttons.forEach(btn => {
-        if (btn.textContent.trim() === techniqueNames[techniqueKey]) {
-            btn.classList.add('active');
-        }
-    });
-}
-
-// OPTIMIZED: Start breathing with session management
-function startBreathing() {
-    if (isPaused) {
-        // Resume from pause
-        isPaused = false;
-        updateButtonStates();
-        
-        const circle = document.getElementById('breathingCircle');
-        circle.classList.add('active');
-        
-        // Resume animation
-        animateBreathingProgress();
-        
-        // Resume phase timer
-        const remainingTime = (techniques[currentTechnique].phases[currentPhase].duration - currentPhaseProgress) * 1000;
-        breathingInterval = setTimeout(() => {
-            nextPhase();
-        }, remainingTime);
-        
-        startTimers();
-        return;
-    }
-
-    // Start fresh session
-    isBreathing = true;
-    isPaused = false;
-    currentPhase = 0;
-    phaseTimer = 0;
-    totalTimer = 0;
-    breathCount = 0;
-    totalBreathTime = 0;
-    breathStartTime = Date.now();
-    currentPhaseProgress = 0;
-    
-    // Initialize session
-    sessionDuration = getSessionDuration();
-    sessionStartTime = Date.now();
-    sessionTimer = 0;
-    
-    // Show session info if time-bound
-    const sessionInfo = document.getElementById('sessionInfo');
-    if (sessionDuration !== -1) {
-        sessionInfo.style.display = 'block';
-    }
-
-    updateButtonStates();
-    document.getElementById('sessionStats').style.display = 'flex';
-
-    const circle = document.getElementById('breathingCircle');
-    circle.classList.add('active');
-
-    // Initialize audio
-    if (soundEnabled) {
-        audioSystem.init();
-    }
-
-    // Start vibration
-    vibrate(100);
-
-    startBreathingCycle();
-    startTimers();
-    
-    // Track session start
-    if (typeof gtag !== 'undefined') {
-        gtag('event', 'session_start', {
-            'event_category': 'breathing',
-            'event_label': currentTechnique,
-            'value': sessionDuration === -1 ? 0 : Math.floor(sessionDuration / 60)
-        });
-    }
-}
-
-function pauseBreathing() {
-    isPaused = true;
-    clearTimeout(breathingInterval);
-    clearInterval(timerInterval);
-    clearInterval(sessionInterval);
-    cancelAnimationFrame(animationInterval);
-    
-    updateButtonStates();
-    document.getElementById('breathingText').textContent = 'Paused - click Begin to continue';
-    
-    const circle = document.getElementById('breathingCircle');
-    circle.classList.remove('active');
-}
-
-function stopBreathing() {
-    isBreathing = false;
-    isPaused = false;
-    clearTimeout(breathingInterval);
-    clearInterval(timerInterval);
-    clearInterval(sessionInterval);
-    cancelAnimationFrame(animationInterval);
-
-    updateButtonStates();
-
-    const technique = techniques[currentTechnique];
-    const circle = document.getElementById('breathingCircle');
-    
-    // Smooth reset
-    circle.classList.remove('active');
-    
-    setTimeout(() => {
-        circle.className = `breathing-circle ${technique.circleClass}`;
-        
-        document.getElementById('circleText').textContent = 'Ready';
-        document.getElementById('breathingText').textContent = 'Click Begin to start your practice';
-        document.getElementById('progressFill').style.width = '0%';
-        document.getElementById('progressTime').textContent = '';
-        document.getElementById('timer').textContent = '00:00';
-        document.getElementById('sessionInfo').style.display = 'none';
-        
-        // Hide session stats after delay
-        setTimeout(() => {
-            document.getElementById('sessionStats').style.display = 'none';
-        }, 3000);
-    }, 300);
-    
-    // Completion vibration
-    vibrate([100, 50, 100]);
-    
-    // Reset counters
-    currentPhase = 0;
-    phaseTimer = 0;
-    totalTimer = 0;
-    sessionTimer = 0;
-    currentPhaseProgress = 0;
-}
-
-function updateButtonStates() {
-    document.getElementById('startBtn').disabled = isBreathing && !isPaused;
-    document.getElementById('pauseBtn').disabled = !isBreathing || isPaused;
-    document.getElementById('stopBtn').disabled = !isBreathing;
-}
-
-function startBreathingCycle() {
-    const technique = techniques[currentTechnique];
-    const phase = technique.phases[currentPhase];
-    
-    const circle = document.getElementById('breathingCircle');
-    
-    document.getElementById('circleText').textContent = phase.name;
-    document.getElementById('breathingText').textContent = phase.text;
-    
-    // Track breath cycles
-    if (currentPhase === 0) {
-        breathCount++;
-        if (breathStartTime > 0) {
-            totalBreathTime += (Date.now() - breathStartTime) / 1000;
-            breathStartTime = Date.now();
-        }
-        updateStats();
-    }
-    
-    // Play sound for this phase
-    if (phase.frequency > 0) {
-        playBreathingSound(phase.frequency, phase.duration);
-    }
-    
-    // Vibration pattern based on phase
-    if (phase.name === 'Inhale') {
-        vibrate([50, 100, 50]);
-    } else if (phase.name === 'Exhale') {
-        vibrate([100, 50, 100]);
-    }
-    
-    phaseTimer = phase.duration;
-    phaseStartTime = performance.now();
-    currentPhaseProgress = 0;
-    
-    // Start animation
-    animateBreathingProgress();
-    
-    // Set timer for next phase
-    breathingInterval = setTimeout(() => {
-        nextPhase();
-    }, phase.duration * 1000);
-}
-
-function nextPhase() {
-    const technique = techniques[currentTechnique];
-    currentPhase = (currentPhase + 1) % technique.phases.length;
-    
-    if (isBreathing && !isPaused) {
-        startBreathingCycle();
-    }
-}
-
-// OPTIMIZED: Animation loop with better performance
-function animateBreathingProgress() {
-    if (!isBreathing || isPaused) return;
-    
-    const technique = techniques[currentTechnique];
-    const phase = technique.phases[currentPhase];
-    const currentTime = performance.now();
-    const elapsed = (currentTime - phaseStartTime) / 1000;
-    
-    currentPhaseProgress = Math.min(elapsed / phase.duration, 1);
-    const progressPercent = currentPhaseProgress * 100;
-    
-    // Update progress bar
-    const progressFill = document.getElementById('progressFill');
-    progressFill.style.width = `${progressPercent}%`;
-    
-    // Update time display (less frequently for performance)
-    if (Math.floor(elapsed * 4) !== Math.floor((elapsed - 0.016) * 4)) {
-        const remainingTime = Math.max(phase.duration - elapsed, 0);
-        document.getElementById('progressTime').textContent = `${Math.ceil(remainingTime)}s`;
-    }
-    
-    // Continue animation
-    if (currentPhaseProgress < 1 && isBreathing && !isPaused) {
-        animationInterval = requestAnimationFrame(animateBreathingProgress);
-    }
-}
-
-function startTimers() {
-    // Main timer
-    timerInterval = setInterval(() => {
-        totalTimer++;
-        const minutes = Math.floor(totalTimer / 60);
-        const seconds = totalTimer % 60;
-        document.getElementById('timer').textContent = 
-            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }, 1000);
-    
-    // Session timer (if time-bound)
-    if (sessionDuration !== -1) {
-        sessionInterval = setInterval(() => {
-            updateSessionProgress();
-        }, 1000);
-    }
-}
-
-function updateStats() {
-    document.getElementById('breathCount').textContent = breathCount;
-    
-    if (breathCount > 0) {
-        const avgTime = Math.round(totalBreathTime / breathCount);
-        document.getElementById('avgBreathTime').textContent = `${avgTime}s`;
-    }
-    
-    // Update session progress percentage
-    if (sessionDuration !== -1) {
-        const elapsed = (Date.now() - sessionStartTime) / 1000;
-        const progress = Math.min((elapsed / sessionDuration) * 100, 100);
-        document.getElementById('sessionProgress').textContent = `${Math.round(progress)}%`;
-    } else {
-        document.getElementById('sessionProgress').textContent = '∞';
-    }
-}
-
-// OPTIMIZED: Resize handling with debounce
 let resizeTimeout;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
         if (isBreathing && !isPaused) {
-            const circle = document.getElementById('breathingCircle');
+            const circle = safeGetElement('breathingCircle');
             if (circle) {
                 circle.style.animationPlayState = 'paused';
                 requestAnimationFrame(() => {
@@ -738,15 +796,12 @@ window.addEventListener('resize', () => {
     }, 250);
 });
 
-// Page visibility handling
 document.addEventListener('visibilitychange', () => {
     if (document.hidden && isBreathing && !isPaused) {
-        // Optionally pause when tab is hidden
         // pauseBreathing();
     }
 });
 
-// Cleanup on page unload
 window.addEventListener('beforeunload', () => {
     if (audioSystem) {
         audioSystem.stop();
@@ -757,7 +812,6 @@ window.addEventListener('beforeunload', () => {
     clearInterval(sessionInterval);
     cancelAnimationFrame(animationInterval);
     
-    // Track session abandonment if in progress
     if (isBreathing && typeof gtag !== 'undefined') {
         gtag('event', 'session_abandon', {
             'event_category': 'breathing',
@@ -767,7 +821,6 @@ window.addEventListener('beforeunload', () => {
     }
 });
 
-// Touch handling for mobile
 if ('ontouchstart' in window) {
     const techniqueButtons = document.querySelector('.technique-buttons');
     if (techniqueButtons) {
@@ -776,3 +829,8 @@ if ('ontouchstart' in window) {
         }, { passive: true });
     }
 }
+
+window.selectTechnique = selectTechnique;
+window.startBreathing = startBreathing;
+window.pauseBreathing = pauseBreathing;
+window.stopBreathing = stopBreathing;
