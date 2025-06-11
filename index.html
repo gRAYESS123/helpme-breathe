@@ -375,10 +375,22 @@
                 <h2 id="technique-title">Deep Sleep</h2>
                 
                 <div class="breathing-container">
+                    <!-- SVG Filter for Fluid Effect -->
+                    <svg class="breathing-svg-filter" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <filter id="fluid-effect">
+                                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                                <feColorMatrix in="blur" mode="matrix" 
+                                    values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+                            </filter>
+                        </defs>
+                    </svg>
+                    
+                    <div class="breathing-aura"></div>
                     <div class="breathing-circle technique-478" id="breathingCircle">
                         <span id="circleText">Ready</span>
                     </div>
-                    <div class="breathing-aura"></div>
                     <div class="breathing-particles">
                         <span class="particle-float"></span>
                         <span class="particle-float"></span>
