@@ -450,49 +450,167 @@ h1 {
     transform: translateX(20px);
 }
 
-/* Breathing Circle Container */
+/* Breathing Circle Container - Optimized */
 .breathing-container {
     position: relative;
     width: 320px;
     height: 320px;
     margin: 2rem auto;
+    /* Enable GPU acceleration */
+    will-change: transform;
+    transform: translateZ(0);
 }
 
-/* Breathing Circle - Now with fluid, natural animations */
+/* Breathing Circle - Optimized with smoother animations */
 .breathing-circle {
     width: 240px;
     height: 240px;
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) scale(1) translateZ(0);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 2.5s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 1.25rem;
     font-weight: 500;
     color: var(--text-primary);
     border-radius: 50%;
+    /* Optimize for animations */
+    will-change: transform, border-radius;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    /* Remove transition - we'll use CSS animations instead */
+    transition: none;
 }
 
-/* Natural breathing aura */
+/* CSS Custom Properties for dynamic values */
+.breathing-circle {
+    --breath-scale: 1;
+    --breath-rotation: 0deg;
+    --breath-morph: 50%;
+    --breath-duration: 4s;
+}
+
+/* Base breathing animation */
+@keyframes smooth-breathe {
+    0% {
+        transform: translate(-50%, -50%) 
+                   scale(var(--breath-scale-start, 0.6)) 
+                   rotate(var(--breath-rotation)) 
+                   translateZ(0);
+        border-radius: var(--breath-morph);
+    }
+    50% {
+        transform: translate(-50%, -50%) 
+                   scale(var(--breath-scale-peak, 1.4)) 
+                   rotate(calc(var(--breath-rotation) + 5deg)) 
+                   translateZ(0);
+        border-radius: calc(var(--breath-morph) - 2%);
+    }
+    100% {
+        transform: translate(-50%, -50%) 
+                   scale(var(--breath-scale-end, 0.6)) 
+                   rotate(calc(var(--breath-rotation) + 10deg)) 
+                   translateZ(0);
+        border-radius: var(--breath-morph);
+    }
+}
+
+/* Apply animation when active */
+.breathing-circle.animating {
+    animation: smooth-breathe var(--breath-duration) cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+}
+
+/* Specific phase animations with natural easing */
+.breathing-circle.inhale-phase {
+    --breath-scale-start: 0.8;
+    --breath-scale-peak: 1.4;
+    --breath-scale-end: 1.35;
+    animation: inhale-smooth var(--breath-duration) cubic-bezier(0.42, 0, 0.58, 1) forwards;
+}
+
+@keyframes inhale-smooth {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8) translateZ(0);
+        border-radius: 52% 48% 53% 47% / 48% 52% 48% 52%;
+    }
+    30% {
+        transform: translate(-50%, -50%) scale(1.1) translateZ(0);
+        border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.4) translateZ(0);
+        border-radius: 48% 52% 47% 53% / 52% 48% 52% 48%;
+    }
+}
+
+.breathing-circle.hold-phase {
+    --breath-scale-start: 1.35;
+    --breath-scale-peak: 1.35;
+    --breath-scale-end: 1.35;
+    animation: hold-smooth var(--breath-duration) cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes hold-smooth {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1.35) translateZ(0);
+        border-radius: 50%;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.37) translateZ(0);
+        border-radius: 50%;
+    }
+}
+
+.breathing-circle.exhale-phase {
+    --breath-scale-start: 1.35;
+    --breath-scale-peak: 1.0;
+    --breath-scale-end: 0.6;
+    animation: exhale-smooth var(--breath-duration) cubic-bezier(0.42, 0, 0.58, 1) forwards;
+}
+
+@keyframes exhale-smooth {
+    0% {
+        transform: translate(-50%, -50%) scale(1.35) translateZ(0);
+        border-radius: 48% 52% 47% 53% / 52% 48% 52% 48%;
+    }
+    70% {
+        transform: translate(-50%, -50%) scale(0.8) translateZ(0);
+        border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(0.6) translateZ(0);
+        border-radius: 52% 48% 53% 47% / 48% 52% 48% 52%;
+    }
+}
+
+/* Natural breathing aura - Optimized */
 .breathing-aura {
     position: absolute;
     inset: -40px;
     border-radius: 50%;
     opacity: 0;
     transition: opacity 1s ease;
-    animation: aura-pulse 4s ease-in-out infinite;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    pointer-events: none;
 }
 
 .breathing-circle.active ~ .breathing-aura {
     opacity: 1;
 }
 
+/* Optimize aura pulse animation */
 @keyframes aura-pulse {
-    0%, 100% { transform: scale(1); opacity: 0.3; }
-    50% { transform: scale(1.1); opacity: 0.6; }
+    0%, 100% { 
+        transform: scale(1) translateZ(0); 
+        opacity: 0.3; 
+    }
+    50% { 
+        transform: scale(1.1) translateZ(0); 
+        opacity: 0.6; 
+    }
 }
 
 /* Deep Sleep - Moon glow effect */
@@ -515,12 +633,26 @@ h1 {
     border-radius: 50%;
     background: 
         radial-gradient(circle at 30% 30%, transparent 30%, rgba(199, 210, 254, 0.1) 70%, transparent 100%);
-    animation: moon-phases 8s ease-in-out infinite;
+    animation: moon-phases-smooth 8s ease-in-out infinite;
 }
 
-@keyframes moon-phases {
-    0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.5; }
-    50% { transform: rotate(180deg) scale(1.2); opacity: 0.8; }
+@keyframes moon-phases-smooth {
+    0%, 100% { 
+        transform: rotate(0deg) scale(1) translateZ(0); 
+        opacity: 0.5; 
+    }
+    25% {
+        transform: rotate(90deg) scale(1.1) translateZ(0); 
+        opacity: 0.7;
+    }
+    50% { 
+        transform: rotate(180deg) scale(1.2) translateZ(0); 
+        opacity: 0.8; 
+    }
+    75% {
+        transform: rotate(270deg) scale(1.1) translateZ(0); 
+        opacity: 0.7;
+    }
 }
 
 /* Box Breathing - Earth energy */
@@ -538,12 +670,12 @@ h1 {
             rgba(34, 197, 94, 0.2), 
             rgba(74, 222, 128, 0.3), 
             rgba(34, 197, 94, 0.2));
-    animation: earth-rotate 12s linear infinite;
+    animation: earth-rotate-smooth 12s linear infinite;
 }
 
-@keyframes earth-rotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+@keyframes earth-rotate-smooth {
+    0% { transform: rotate(0deg) translateZ(0); }
+    100% { transform: rotate(360deg) translateZ(0); }
 }
 
 /* Heart Coherence - Water flow */
@@ -557,25 +689,29 @@ h1 {
 
 .breathing-circle.technique-coherent ~ .breathing-aura {
     background: radial-gradient(circle, rgba(236, 72, 153, 0.2), transparent 60%);
-    animation: heart-flow 3s ease-in-out infinite;
+    animation: heart-flow-smooth 3s ease-in-out infinite;
 }
 
-@keyframes heart-flow {
+@keyframes heart-flow-smooth {
     0%, 100% { 
-        transform: scale(1);
+        transform: scale(1) translateZ(0);
         filter: blur(20px);
+        opacity: 0.6;
     }
     20% { 
-        transform: scale(1.15);
+        transform: scale(1.15) translateZ(0);
         filter: blur(15px);
+        opacity: 0.7;
     }
     40% { 
-        transform: scale(1.05);
+        transform: scale(1.05) translateZ(0);
         filter: blur(25px);
+        opacity: 0.5;
     }
     60% { 
-        transform: scale(1.2);
+        transform: scale(1.2) translateZ(0);
         filter: blur(10px);
+        opacity: 0.8;
     }
 }
 
@@ -631,20 +767,25 @@ h1 {
     }
 }
 
-/* Breathing States with natural transitions */
-.breathing-circle.inhale {
-    transform: translate(-50%, -50%) scale(1.4);
-    border-radius: 48% 52% 47% 53% / 52% 48% 52% 48%;
+/* Reduce complexity during animation for each technique */
+.breathing-circle.animating.technique-478 {
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
 }
 
-.breathing-circle.hold {
-    transform: translate(-50%, -50%) scale(1.35);
-    border-radius: 50%;
+.breathing-circle.animating.technique-box {
+    box-shadow: 0 0 40px rgba(74, 222, 128, 0.3);
 }
 
-.breathing-circle.exhale {
-    transform: translate(-50%, -50%) scale(0.6);
-    border-radius: 52% 48% 53% 47% / 48% 52% 48% 52%;
+.breathing-circle.animating.technique-coherent {
+    box-shadow: 0 0 40px rgba(236, 72, 153, 0.3);
+}
+
+.breathing-circle.animating.technique-triangle {
+    box-shadow: 0 0 40px rgba(56, 189, 248, 0.3);
+}
+
+.breathing-circle.animating.technique-wim {
+    box-shadow: 0 0 40px rgba(251, 191, 36, 0.3);
 }
 
 /* Natural elements around breathing circle */
@@ -652,6 +793,8 @@ h1 {
     position: absolute;
     inset: 0;
     pointer-events: none;
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 .particle-float {
@@ -661,10 +804,35 @@ h1 {
     background: rgba(255, 255, 255, 0.6);
     border-radius: 50%;
     opacity: 0;
+    will-change: transform, opacity;
+}
+
+/* Smooth particle animation */
+@keyframes float-around-smooth {
+    0% {
+        transform: translate(120px, 0) scale(0) translateZ(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+        transform: translate(110px, -10px) scale(1) translateZ(0);
+    }
+    50% {
+        transform: translate(0, -30px) scale(1.2) translateZ(0);
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.5;
+        transform: translate(-110px, -45px) scale(0.8) translateZ(0);
+    }
+    100% {
+        transform: translate(-120px, -50px) scale(0) translateZ(0);
+        opacity: 0;
+    }
 }
 
 .breathing-circle.active ~ .breathing-particles .particle-float {
-    animation: float-around 8s ease-in-out infinite;
+    animation: float-around-smooth 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 .particle-float:nth-child(1) { animation-delay: 0s; }
@@ -673,24 +841,6 @@ h1 {
 .particle-float:nth-child(4) { animation-delay: 3s; }
 .particle-float:nth-child(5) { animation-delay: 4s; }
 .particle-float:nth-child(6) { animation-delay: 5s; }
-
-@keyframes float-around {
-    0% {
-        transform: translate(120px, 0) scale(0);
-        opacity: 0;
-    }
-    10% {
-        opacity: 1;
-        transform: translate(120px, 0) scale(1);
-    }
-    90% {
-        opacity: 1;
-    }
-    100% {
-        transform: translate(-120px, -50px) scale(0);
-        opacity: 0;
-    }
-}
 
 .breathing-text {
     font-size: 1.125rem;
@@ -1026,6 +1176,39 @@ h1 {
     margin-bottom: 1rem;
     color: var(--text-primary);
     letter-spacing: 0.05em;
+}
+
+/* Performance optimization for mobile */
+@media (max-width: 768px) {
+    /* Reduce visual complexity on mobile */
+    .breathing-circle.animating {
+        box-shadow: none;
+    }
+    
+    .breathing-aura {
+        display: none;
+    }
+    
+    .breathing-particles {
+        display: none;
+    }
+    
+    /* Simpler animations for mobile */
+    .breathing-circle.inhale-phase,
+    .breathing-circle.hold-phase,
+    .breathing-circle.exhale-phase {
+        animation-timing-function: ease-in-out;
+    }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .breathing-circle,
+    .breathing-aura,
+    .particle-float {
+        animation: none !important;
+        transition: transform 0.3s ease !important;
+    }
 }
 
 @media (max-width: 1024px) {
