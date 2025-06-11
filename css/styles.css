@@ -326,7 +326,7 @@ h1 {
     transform: translateX(20px);
 }
 
-/* ADDED: Duration selector */
+/* Duration selector */
 .duration-select {
     background: rgba(255, 255, 255, 0.1);
     color: var(--text-primary);
@@ -335,11 +335,12 @@ h1 {
     padding: 0.5rem;
     font-size: 0.875rem;
     cursor: pointer;
+    width: 120px;
 }
 
 .duration-select option {
-    background: var(--bg-primary);
-    color: var(--text-primary);
+    background: #1e1b4b;
+    color: #ffffff;
 }
 
 /* OPTIMIZED: Breathing circle with fixed text rotation */
@@ -385,7 +386,7 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* This ensures text never rotates */
+    z-index: 10;
     animation: counter-rotate var(--breath-cycle-duration, 10s) linear infinite;
     animation-play-state: paused;
 }
@@ -490,16 +491,22 @@ h1 {
     50% { transform: scale(1.2); opacity: 0.5; }
 }
 
-/* ADDED: Session progress indicators */
+/* Session progress indicators */
 .session-info {
+    display: none;
     margin: 1rem 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    text-align: center;
 }
 
 .session-progress {
     width: 100%;
-    height: 6px;
+    height: 8px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
+    border-radius: 4px;
     overflow: hidden;
     margin-bottom: 0.5rem;
 }
@@ -507,7 +514,7 @@ h1 {
 .session-progress-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--theme-primary), var(--theme-secondary));
-    border-radius: 3px;
+    border-radius: 4px;
     width: 0%;
     transition: width 0.3s ease;
 }
@@ -515,6 +522,7 @@ h1 {
 .session-time-remaining {
     font-size: 0.875rem;
     color: var(--text-secondary);
+    margin-top: 0.5rem;
 }
 
 /* Text and controls */
@@ -833,10 +841,14 @@ h1 {
     z-index: 1000;
     transform: translateY(100%);
     transition: transform 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
 }
 
 #cookieConsent.show {
     transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
 }
 
 #cookieConsent p {
@@ -1018,6 +1030,18 @@ h1 {
     
     .cookie-btn {
         width: 100%;
+    }
+    
+    .settings-panel {
+        right: 0.5rem;
+        left: 0.5rem;
+        min-width: auto;
+        max-width: none;
+    }
+    
+    .duration-select {
+        width: 100px;
+        font-size: 0.8rem;
     }
 }
 
