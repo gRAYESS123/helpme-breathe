@@ -3,48 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Help Me Breath - Natural Breathing Journey</title>
+    <!-- FIXED: Changed "Breath" to "Breathe" -->
+    <title>Help Me Breathe - Natural Breathing Journey</title>
     <meta name="description" content="Free nature-inspired breathing exercises for deep sleep, focus, heart coherence, and energy. Your natural guide to mindful breathing and inner peace.">
     <meta name="keywords" content="breathing exercises, meditation, relaxation, sleep, mindfulness, stress relief, 4-7-8 breathing, box breathing">
+    
     <!-- Open Graph tags for social sharing -->
-    <meta property="og:title" content="Help Me Breath - Natural Breathing Journey">
+    <meta property="og:title" content="Help Me Breathe - Natural Breathing Journey">
     <meta property="og:description" content="Free breathing exercises with beautiful nature themes. Find calm, focus, and energy through guided breathing techniques.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpmebreath.com">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7348129075274196"
-     crossorigin="anonymous"></script>
-    <!-- TODO: Add og-image.jpg to root directory -->
-    <!-- <meta property="og:image" content="https://helpme-breathe.com/og-image.jpg"> -->
+    <meta property="og:image" content="https://helpmebreath.com/og-image.jpg">
     
-    <!-- TODO: Add favicon.png to root directory -->
-    <!-- <link rel="icon" type="image/png" href="favicon.png"> -->
+    <!-- ADDED: Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🌙</text></svg>">
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><text y='140' font-size='120'>🌙</text></svg>">
+    
+    <!-- OPTIMIZED: Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style">
+    <link rel="preload" href="css/styles.css" as="style">
+    <link rel="preload" href="js/scripts.js" as="script">
     
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7348129075274196"
-     crossorigin="anonymous"></script>
-    <!-- Google AdSense - TODO: Replace with your actual AdSense client ID -->
-    <!-- Uncomment and update when ready to monetize
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR-CLIENT-ID"
-         crossorigin="anonymous"></script>
-    -->
     
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-09WY9JD4YM');
-</script>
+    <!-- OPTIMIZED: Single AdSense script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7348129075274196" crossorigin="anonymous"></script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-09WY9JD4YM');
+    </script>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
     
     <!-- Structured Data for SEO -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "Help Me Breath",
+      "name": "Help Me Breathe",
       "description": "Free nature-inspired breathing exercises for wellness and relaxation",
       "url": "https://helpmebreath.com",
       "applicationCategory": "HealthApplication",
@@ -55,297 +59,27 @@
       }
     }
     </script>
-    
-    <style>
-        /* Additional styles for ads and Patreon */
-        .ad-container {
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            min-height: 280px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .ad-container.hidden {
-            display: none;
-        }
-        
-        .ad-label {
-            position: absolute;
-            top: 0.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.625rem;
-            color: var(--text-secondary);
-            opacity: 0.6;
-            letter-spacing: 0.05em;
-        }
-        
-        /* Responsive ad unit */
-        .ad-responsive {
-            width: 100%;
-            overflow: hidden;
-        }
-        
-        /* Banner ad at bottom */
-        .bottom-banner-ad {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border);
-            padding: 0.5rem;
-            text-align: center;
-            z-index: 100;
-            transition: transform 0.3s ease;
-        }
-        
-        .bottom-banner-ad.hidden {
-            transform: translateY(100%);
-        }
-        
-        .close-ad {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 0.75rem;
-            transition: all 0.3s ease;
-        }
-        
-        .close-ad:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .patreon-btn {
-            background: #FF424D;
-            color: white;
-            padding: 0.875rem 1.75rem;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 100%;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-            margin-top: 0.5rem;
-        }
-        
-        .patreon-btn:hover {
-            background: #E93E47;
-            transform: scale(1.02);
-            box-shadow: 0 4px 20px rgba(255, 66, 77, 0.3);
-        }
-        
-        .donation-options {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-        
-        .or-divider {
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            margin: 0.5rem 0;
-            opacity: 0.7;
-        }
-        
-        /* Hide ads during breathing sessions */
-        body.breathing-active .ad-container,
-        body.breathing-active .bottom-banner-ad {
-            display: none;
-        }
-        
-        /* Footer styles */
-        .footer {
-            text-align: center;
-            padding: 2rem;
-            padding-bottom: 4rem; /* Extra padding for bottom banner */
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            margin-top: 3rem;
-        }
-        
-        .footer a {
-            color: var(--text-primary);
-            text-decoration: none;
-            transition: opacity 0.3s ease;
-        }
-        
-        .footer a:hover {
-            opacity: 0.7;
-        }
-        
-        .social-links {
-            margin-top: 1rem;
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-        
-        /* Legal links */
-        .legal-links {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            font-size: 0.8125rem;
-        }
-        
-        .legal-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        
-        .legal-links a:hover {
-            color: var(--text-primary);
-        }
-        
-        /* Cookie consent banner */
-        #cookieConsent {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            padding: 1.5rem;
-            text-align: center;
-            border-top: 1px solid var(--border);
-            z-index: 1000;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-        }
-        
-        #cookieConsent.show {
-            transform: translateY(0);
-        }
-        
-        #cookieConsent p {
-            margin: 0 0 1rem 0;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        #cookieConsent a {
-            color: var(--text-primary);
-            text-decoration: underline;
-        }
-        
-        .cookie-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .cookie-btn {
-            background: var(--text-primary);
-            color: var(--bg-primary);
-            border: none;
-            padding: 0.5rem 2rem;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: opacity 0.3s ease;
-        }
-        
-        .cookie-btn:hover {
-            opacity: 0.9;
-        }
-        
-        .cookie-btn.secondary {
-            background: transparent;
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-        
-        /* Mobile responsive */
-        @media (max-width: 768px) {
-            .ad-container {
-                min-height: 250px;
-            }
-            
-            .bottom-banner-ad {
-                padding: 0.25rem;
-            }
-            
-            .legal-links {
-                flex-wrap: wrap;
-                gap: 0.75rem 1.5rem;
-            }
-            
-            #cookieConsent {
-                padding: 1rem;
-            }
-            
-            .cookie-buttons {
-                flex-direction: column;
-                width: 100%;
-                max-width: 200px;
-                margin: 0 auto;
-            }
-            
-            .cookie-btn {
-                width: 100%;
-            }
-        }
-    </style>
 </head>
 <body class="theme-478">
     <!-- Natural background layer -->
     <div class="nature-bg"></div>
     
     <!-- Theme-specific natural elements -->
-    <!-- Stars for sleep theme -->
     <div class="natural-element star star-1"></div>
     <div class="natural-element star star-2"></div>
     <div class="natural-element star star-3"></div>
     <div class="natural-element star star-4"></div>
     
-    <!-- Leaves for earth theme -->
     <div class="natural-element leaf leaf-1"></div>
     <div class="natural-element leaf leaf-2"></div>
     <div class="natural-element leaf leaf-3"></div>
     
-    <!-- Water ripples for heart theme -->
     <div class="natural-element ripple ripple-1"></div>
     <div class="natural-element ripple ripple-2"></div>
     <div class="natural-element ripple ripple-3"></div>
     
-    <!-- Clouds for calm theme -->
     <div class="natural-element cloud cloud-1"></div>
     
-    <!-- Sun rays for energy theme -->
     <div class="natural-element sun-ray sun-ray-1"></div>
     <div class="natural-element sun-ray sun-ray-2"></div>
     <div class="natural-element sun-ray sun-ray-3"></div>
@@ -353,22 +87,32 @@
     <div class="container">
         <header>
             <div class="header-content">
-                <h1>Help Me Breath</h1>
+                <h1>Help Me Breathe</h1>
                 <p class="subtitle">Your natural guide to mindful breathing and inner peace</p>
             </div>
         </header>
 
         <div class="main-content">
             <div class="breathing-section">
-                <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
+                <button class="settings-btn" id="settingsBtn" title="Settings" aria-label="Open settings">⚙️</button>
                 <div class="settings-panel" id="settingsPanel">
                     <div class="setting-item">
                         <span class="setting-label">Sound</span>
-                        <div class="toggle-switch active" id="soundToggle"></div>
+                        <div class="toggle-switch active" id="soundToggle" role="button" tabindex="0" aria-label="Toggle sound"></div>
                     </div>
                     <div class="setting-item">
                         <span class="setting-label">Vibration</span>
-                        <div class="toggle-switch active" id="vibrationToggle"></div>
+                        <div class="toggle-switch active" id="vibrationToggle" role="button" tabindex="0" aria-label="Toggle vibration"></div>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Session Duration</span>
+                        <select id="sessionDuration" class="duration-select">
+                            <option value="300">5 minutes</option>
+                            <option value="600" selected>10 minutes</option>
+                            <option value="900">15 minutes</option>
+                            <option value="1200">20 minutes</option>
+                            <option value="-1">Unlimited</option>
+                        </select>
                     </div>
                 </div>
                 
@@ -389,7 +133,10 @@
                     
                     <div class="breathing-aura"></div>
                     <div class="breathing-circle technique-478" id="breathingCircle">
-                        <span id="circleText">Ready</span>
+                        <!-- FIXED: Text container that doesn't rotate -->
+                        <div class="circle-text-container">
+                            <span id="circleText">Ready</span>
+                        </div>
                     </div>
                     <div class="breathing-particles">
                         <span class="particle-float"></span>
@@ -402,6 +149,14 @@
                 </div>
                 
                 <div class="breathing-text" id="breathingText">Click Begin to start your practice</div>
+                
+                <!-- ADDED: Session progress and time remaining -->
+                <div class="session-info" id="sessionInfo" style="display: none;">
+                    <div class="session-progress">
+                        <div class="session-progress-fill" id="sessionProgressFill"></div>
+                    </div>
+                    <div class="session-time-remaining" id="sessionTimeRemaining"></div>
+                </div>
                 
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
@@ -418,6 +173,10 @@
                     <div class="stat-item">
                         <span class="stat-value" id="avgBreathTime">0s</span>
                         <span class="stat-label">Avg. Breath</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="sessionProgress">0%</span>
+                        <span class="stat-label">Progress</span>
                     </div>
                 </div>
                 
@@ -455,19 +214,10 @@
                     </div>
                 </div>
 
-                <!-- Ad placeholders - Enable when ready to monetize -->
-                <!-- Top Sidebar Ad -->
-                <div class="ad-container" id="sidebarAdTop" style="display: none;">
-                    <span class="ad-label">ADVERTISEMENT</span>
-                    <!-- TODO: Replace with your actual AdSense code -->
-                    <p style="color: var(--text-secondary); font-size: 0.875rem;">Ad space - Configure AdSense when ready</p>
-                </div>
-
                 <div class="card donation-section">
                     <h3>Support Wellness</h3>
                     <p>Enjoy an ad-free experience and support our mission.</p>
                     <div class="donation-options">
-                        <!-- TODO: Update with your actual Patreon username -->
                         <a href="https://www.patreon.com/GeorgesRayess" target="_blank" rel="noopener noreferrer" class="patreon-btn">
                             Support on Patreon
                         </a>
@@ -477,13 +227,6 @@
                         </button>
                     </div>
                 </div>
-
-                <!-- Bottom Sidebar Ad -->
-                <div class="ad-container" id="sidebarAdBottom" style="display: none;">
-                    <span class="ad-label">ADVERTISEMENT</span>
-                    <!-- TODO: Replace with your actual AdSense code -->
-                    <p style="color: var(--text-secondary); font-size: 0.875rem;">Ad space - Configure AdSense when ready</p>
-                </div>
             </div>
         </div>
         
@@ -491,26 +234,16 @@
             <p>Made with 💚 for a more mindful world</p>
             <p><a href="https://helpmebreath.com">helpmebreath.com</a></p>
             <div class="social-links">
-                <!-- TODO: Update with your actual Patreon username -->
                 <a href="https://www.patreon.com/GeorgesRayess" target="_blank" rel="noopener noreferrer">Patreon</a>
-                <!-- Add more social links as needed -->
             </div>
             <div class="legal-links">
                 <a href="legal/privacy-policy.html">Privacy Policy</a>
                 <span style="opacity: 0.5">•</span>
                 <a href="legal/terms-of-service.html">Terms of Service</a>
                 <span style="opacity: 0.5">•</span>
-                <!-- TODO: Update with your actual email -->
-                <a href="mailto:your-email@example.com">Contact</a>
+                <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>
-    </div>
-
-    <!-- Bottom Banner Ad (Hidden by default) -->
-    <div class="bottom-banner-ad hidden" id="bottomBannerAd">
-        <button class="close-ad" onclick="closeBottomBanner()" title="Close ad">×</button>
-        <span class="ad-label">ADVERTISEMENT</span>
-        <!-- TODO: Configure when ready to monetize -->
     </div>
 
     <!-- Cookie Consent Banner -->
@@ -529,23 +262,37 @@
         Press <kbd>Space</kbd> to start/pause • <kbd>S</kbd> to stop • <kbd>1-5</kbd> to switch techniques
     </div>
 
-    <script src="js/scripts.js"></script>
+    <!-- OPTIMIZED: Load scripts at the end -->
+    <script src="js/scripts.js" defer></script>
     
+    <!-- PWA Installation -->
     <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
         // Cookie consent management
         function checkCookieConsent() {
             const consent = localStorage.getItem('cookieConsent');
             if (!consent) {
                 setTimeout(() => {
                     document.getElementById('cookieConsent').classList.add('show');
-                }, 2000); // Show after 2 seconds
+                }, 2000);
             }
         }
         
         function acceptCookies() {
             localStorage.setItem('cookieConsent', 'all');
             document.getElementById('cookieConsent').classList.remove('show');
-            // Enable analytics when configured
             if (typeof gtag !== 'undefined') {
                 gtag('consent', 'update', {
                     'analytics_storage': 'granted',
@@ -557,7 +304,6 @@
         function acceptEssentialCookies() {
             localStorage.setItem('cookieConsent', 'essential');
             document.getElementById('cookieConsent').classList.remove('show');
-            // Disable analytics
             if (typeof gtag !== 'undefined') {
                 gtag('consent', 'update', {
                     'analytics_storage': 'denied',
@@ -569,46 +315,9 @@
         // Check on page load
         document.addEventListener('DOMContentLoaded', checkCookieConsent);
         
-        // Ad management functions
-        function hideAdsForBreathing() {
-            document.body.classList.add('breathing-active');
-        }
-        
-        function showAdsAfterBreathing() {
-            document.body.classList.remove('breathing-active');
-        }
-        
-        function closeBottomBanner() {
-            document.getElementById('bottomBannerAd').classList.add('hidden');
-            // Remember user preference for session
-            sessionStorage.setItem('bottomBannerClosed', 'true');
-        }
-        
-        // Check if bottom banner was closed
-        if (sessionStorage.getItem('bottomBannerClosed') === 'true') {
-            document.getElementById('bottomBannerAd').classList.add('hidden');
-        }
-        
         // Simple donation modal
         function showDonationModal() {
             alert('One-time donation options coming soon! For now, please support us on Patreon. Thank you! 💚');
-        }
-        
-        // Modify the existing breathing functions to hide/show ads
-        if (typeof window.startBreathing !== 'undefined') {
-            const originalStartBreathing = window.startBreathing;
-            window.startBreathing = function() {
-                hideAdsForBreathing();
-                originalStartBreathing();
-            };
-        }
-        
-        if (typeof window.stopBreathing !== 'undefined') {
-            const originalStopBreathing = window.stopBreathing;
-            window.stopBreathing = function() {
-                originalStopBreathing();
-                setTimeout(showAdsAfterBreathing, 3000); // Show ads 3 seconds after stopping
-            };
         }
     </script>
 </body>
