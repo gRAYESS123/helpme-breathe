@@ -11,6 +11,11 @@ let breathCount = 0;
 let breathStartTime = 0;
 let totalBreathTime = 0;
 
+// Animation frame management
+let animationFrameId = null;
+let phaseStartTime = 0;
+let phaseProgress = 0;
+
 // Settings
 let soundEnabled = true;
 let vibrationEnabled = true;
@@ -278,24 +283,30 @@ function initAudio() {
     }
 }
 
-// Update natural elements visibility
+// Optimize natural elements update
 function updateNaturalElements() {
-    // Force CSS to recalculate for natural elements
-    const elements = document.querySelectorAll('.natural-element');
-    elements.forEach(el => {
-        el.style.display = 'none';
-        void el.offsetWidth; // Force reflow
-        el.style.display = '';
-    });
-    
-    // Also update the nature background
-    const natureBg = document.querySelector('.nature-bg');
-    if (natureBg) {
-        natureBg.style.opacity = '0';
+    requestAnimationFrame(() => {
+        const elements = document.querySelectorAll('.natural-element');
+        elements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transition = 'opacity 0.5s ease';
+        });
+        
         setTimeout(() => {
-            natureBg.style.opacity = '';
+            elements.forEach(el => {
+                el.style.opacity = '';
+            });
         }, 50);
-    }
+        
+        const natureBg = document.querySelector('.nature-bg');
+        if (natureBg) {
+            natureBg.style.transition = 'opacity 1s ease';
+            natureBg.style.opacity = '0';
+            setTimeout(() => {
+                natureBg.style.opacity = '';
+            }, 100);
+        }
+    });
 }
 
 // Update the breathing sound function
@@ -408,6 +419,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Optimized technique selection
 function selectTechnique(techniqueKey) {
     if (isBreathing) {
         stopBreathing();
@@ -416,9 +428,11 @@ function selectTechnique(techniqueKey) {
     currentTechnique = techniqueKey;
     const technique = techniques[techniqueKey];
     
-    // Change theme - force a reflow to ensure CSS transitions work
-    document.body.className = '';
-    void document.body.offsetWidth; // Force reflow
+    // Use CSS custom properties instead of changing classes
+    document.documentElement.style.setProperty('--transition-duration', '0.8s');
+    
+    // Smooth theme transition
+    document.body.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
     document.body.className = technique.theme;
     
     // Update UI
@@ -428,44 +442,48 @@ function selectTechnique(techniqueKey) {
         <p>${technique.description}</p>
     `;
     
-    // Update breathing circle - remove all classes and re-add
+    // Update breathing circle without forced reflows
     const circle = document.getElementById('breathingCircle');
-    circle.className = '';
-    void circle.offsetWidth; // Force reflow
+    circle.style.transition = 'none';
     circle.className = `breathing-circle ${technique.circleClass}`;
-    circle.style.transitionDuration = '2.5s'; // Reset transition duration
     
-    // Reset progress bar
-    document.getElementById('progressFill').style.width = '0%';
-    document.getElementById('progressTime').textContent = '';
-    
-    // Update active button
-    document.querySelectorAll('.technique-btn').forEach(btn => btn.classList.remove('active'));
-    
-    // Find and activate the correct button
-    const buttons = document.querySelectorAll('.technique-btn');
-    const techniqueNames = {
-        '478': '🌙 Deep Sleep',
-        'box': '🌿 Focus & Grounding',
-        'coherent': '💗 Heart Coherence',
-        'triangle': '☁️ Quick Calm',
-        'wim': '☀️ Energy Boost'
-    };
-    
-    buttons.forEach(btn => {
-        if (btn.textContent.trim() === techniqueNames[techniqueKey]) {
-            btn.classList.add('active');
-        }
+    // Use requestAnimationFrame for smooth transition
+    requestAnimationFrame(() => {
+        circle.style.transition = '';
+        
+        // Reset progress bar
+        document.getElementById('progressFill').style.width = '0%';
+        document.getElementById('progressTime').textContent = '';
+        
+        // Update active button
+        document.querySelectorAll('.technique-btn').forEach(btn => btn.classList.remove('active'));
+        
+        // Find and activate the correct button
+        const buttons = document.querySelectorAll('.technique-btn');
+        const techniqueNames = {
+            '478': '🌙 Deep Sleep',
+            'box': '🌿 Focus & Grounding',
+            'coherent': '💗 Heart Coherence',
+            'triangle': '☁️ Quick Calm',
+            'wim': '☀️ Energy Boost'
+        };
+        
+        buttons.forEach(btn => {
+            if (btn.textContent.trim() === techniqueNames[techniqueKey]) {
+                btn.classList.add('active');
+            }
+        });
+        
+        // Reset state
+        document.getElementById('circleText').textContent = 'Ready';
+        document.getElementById('breathingText').textContent = 'Click Begin to start your practice';
+        
+        // Update natural elements smoothly
+        updateNaturalElements();
     });
-    
-    // Reset state
-    document.getElementById('circleText').textContent = 'Ready';
-    document.getElementById('breathingText').textContent = 'Click Begin to start your practice';
-    
-    // Force update of natural elements visibility
-    updateNaturalElements();
 }
 
+// Optimized start breathing function
 function startBreathing() {
     if (isPaused) {
         isPaused = false;
@@ -476,7 +494,19 @@ function startBreathing() {
         const circle = document.getElementById('breathingCircle');
         circle.classList.add('active');
         
-        startBreathingCycle();
+        // Resume from where we left off
+        phaseStartTime = performance.now() - (phaseProgress * techniques[currentTechnique].phases[currentPhase].duration * 1000);
+        animateProgress();
+        
+        // Resume breathing cycle
+        const remainingTime = (1 - phaseProgress) * techniques[currentTechnique].phases[currentPhase].duration * 1000;
+        breathingInterval = setTimeout(() => {
+            currentPhase = (currentPhase + 1) % techniques[currentTechnique].phases.length;
+            if (isBreathing && !isPaused) {
+                startBreathingCycle();
+            }
+        }, remainingTime);
+        
         startTimers();
         return;
     }
@@ -488,6 +518,7 @@ function startBreathing() {
     breathCount = 0;
     totalBreathTime = 0;
     breathStartTime = Date.now();
+    phaseProgress = 0;
 
     document.getElementById('startBtn').disabled = true;
     document.getElementById('pauseBtn').disabled = false;
@@ -504,26 +535,28 @@ function startBreathing() {
     startTimers();
 }
 
+// Optimized pause function
 function pauseBreathing() {
     isPaused = true;
-    clearInterval(breathingInterval);
+    clearTimeout(breathingInterval);
     clearInterval(timerInterval);
-    clearInterval(progressInterval);
+    cancelAnimationFrame(animationFrameId);
     
     document.getElementById('startBtn').disabled = false;
     document.getElementById('pauseBtn').disabled = true;
     document.getElementById('breathingText').textContent = 'Paused - click Begin to continue';
     
     const circle = document.getElementById('breathingCircle');
-    circle.classList.remove('active');
+    circle.classList.remove('active', 'animating');
 }
 
+// Optimized stop function
 function stopBreathing() {
     isBreathing = false;
     isPaused = false;
-    clearInterval(breathingInterval);
+    clearTimeout(breathingInterval);
     clearInterval(timerInterval);
-    clearInterval(progressInterval);
+    cancelAnimationFrame(animationFrameId);
 
     document.getElementById('startBtn').disabled = false;
     document.getElementById('pauseBtn').disabled = true;
@@ -532,25 +565,24 @@ function stopBreathing() {
     const technique = techniques[currentTechnique];
     const circle = document.getElementById('breathingCircle');
     
-    // Remove all classes and reset
-    circle.className = '';
-    circle.style.transform = '';
-    circle.style.transitionDuration = '';
-    void circle.offsetWidth; // Force reflow
+    // Smooth reset animation
+    circle.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+    circle.classList.remove('active', 'animating', 'inhale-phase', 'hold-phase', 'exhale-phase');
     
-    // Re-add the appropriate classes
-    circle.className = `breathing-circle ${technique.circleClass}`;
-    
-    document.getElementById('circleText').textContent = 'Ready';
-    document.getElementById('breathingText').textContent = 'Click Begin to start your practice';
-    document.getElementById('progressFill').style.width = '0%';
-    document.getElementById('progressTime').textContent = '';
-    document.getElementById('timer').textContent = '00:00';
-    
-    // Hide session stats after a delay
-    setTimeout(() => {
-        document.getElementById('sessionStats').style.display = 'none';
-    }, 3000);
+    requestAnimationFrame(() => {
+        circle.className = `breathing-circle ${technique.circleClass}`;
+        
+        document.getElementById('circleText').textContent = 'Ready';
+        document.getElementById('breathingText').textContent = 'Click Begin to start your practice';
+        document.getElementById('progressFill').style.width = '0%';
+        document.getElementById('progressTime').textContent = '';
+        document.getElementById('timer').textContent = '00:00';
+        
+        // Hide session stats after a delay
+        setTimeout(() => {
+            document.getElementById('sessionStats').style.display = 'none';
+        }, 3000);
+    });
     
     // Completion vibration pattern
     vibrate([100, 50, 100]);
@@ -558,82 +590,92 @@ function stopBreathing() {
     currentPhase = 0;
     phaseTimer = 0;
     totalTimer = 0;
+    phaseProgress = 0;
 }
 
+// Optimized breathing cycle with requestAnimationFrame
 function startBreathingCycle() {
     const technique = techniques[currentTechnique];
     const phase = technique.phases[currentPhase];
     
     const circle = document.getElementById('breathingCircle');
     
-    // Reset transition for immediate state change
-    circle.style.transition = 'none';
-    circle.className = `breathing-circle ${technique.circleClass} active`;
-    void circle.offsetWidth; // Force reflow
+    // Set CSS custom properties for animation
+    circle.style.setProperty('--breath-duration', `${phase.duration}s`);
     
-    // Now apply the transition and phase
-    circle.style.transition = '';
-    circle.style.transitionDuration = `${phase.duration}s`;
-    circle.className = `breathing-circle ${technique.circleClass} ${phase.class} active`;
+    // Remove old phase classes
+    circle.classList.remove('inhale-phase', 'hold-phase', 'exhale-phase', 'animating');
     
-    document.getElementById('circleText').textContent = phase.name;
-    document.getElementById('breathingText').textContent = phase.text;
-    
-    // Track breath cycles
-    if (currentPhase === 0) {
-        breathCount++;
-        if (breathStartTime > 0) {
-            totalBreathTime += (Date.now() - breathStartTime) / 1000;
-            breathStartTime = Date.now();
-        }
-        updateStats();
-    }
-    
-    // Play sound for this phase
-    playBreathingSound(phase.frequency, phase.duration);
-    
-    // Vibration pattern based on phase
-    if (phase.name === 'Inhale') {
-        vibrate([50, 100, 50]);
-    } else if (phase.name === 'Exhale') {
-        vibrate([100, 50, 100]);
-    }
-    
-    phaseTimer = phase.duration;
-    
-    // Update progress bar smoothly
-    let elapsed = 0;
-    const updateFrequency = 100; // Update every 100ms for smooth animation
-    
-    clearInterval(progressInterval);
-    progressInterval = setInterval(() => {
-        elapsed += updateFrequency / 1000;
-        const progress = Math.min((elapsed / phase.duration) * 100, 100);
-        document.getElementById('progressFill').style.width = `${progress}%`;
+    // Use requestAnimationFrame for smooth class addition
+    requestAnimationFrame(() => {
+        // Add new phase class
+        const phaseClass = phase.name.toLowerCase() + '-phase';
+        circle.classList.add(phaseClass, 'active', 'animating');
         
-        const remainingTime = Math.max(phase.duration - elapsed, 0);
-        document.getElementById('progressTime').textContent = `${Math.ceil(remainingTime)}s`;
+        document.getElementById('circleText').textContent = phase.name;
+        document.getElementById('breathingText').textContent = phase.text;
         
-        if (elapsed >= phase.duration) {
-            clearInterval(progressInterval);
-        }
-    }, updateFrequency);
-    
-    breathingInterval = setInterval(() => {
-        phaseTimer--;
-        
-        if (phaseTimer <= 0) {
-            clearInterval(breathingInterval);
-            
-            currentPhase = (currentPhase + 1) % technique.phases.length;
-            
-            if (isBreathing && !isPaused) {
-                setTimeout(() => {
-                    startBreathingCycle();
-                }, 200);
+        // Track breath cycles
+        if (currentPhase === 0) {
+            breathCount++;
+            if (breathStartTime > 0) {
+                totalBreathTime += (Date.now() - breathStartTime) / 1000;
+                breathStartTime = Date.now();
             }
+            updateStats();
         }
-    }, 1000);
+        
+        // Play sound for this phase
+        playBreathingSound(phase.frequency, phase.duration);
+        
+        // Smooth vibration patterns
+        if (phase.name === 'Inhale') {
+            vibrate([50, 100, 50]);
+        } else if (phase.name === 'Exhale') {
+            vibrate([100, 50, 100]);
+        }
+        
+        phaseTimer = phase.duration;
+        phaseStartTime = performance.now();
+        
+        // Start smooth progress animation
+        animateProgress();
+    });
+    
+    // Set up phase transition
+    breathingInterval = setTimeout(() => {
+        currentPhase = (currentPhase + 1) % technique.phases.length;
+        
+        if (isBreathing && !isPaused) {
+            startBreathingCycle();
+        }
+    }, phase.duration * 1000);
+}
+
+// Smooth progress bar animation using requestAnimationFrame
+function animateProgress() {
+    if (!isBreathing || isPaused) return;
+    
+    const technique = techniques[currentTechnique];
+    const phase = technique.phases[currentPhase];
+    const currentTime = performance.now();
+    const elapsed = (currentTime - phaseStartTime) / 1000;
+    
+    phaseProgress = Math.min(elapsed / phase.duration, 1);
+    const progressPercent = phaseProgress * 100;
+    
+    // Update progress bar
+    const progressFill = document.getElementById('progressFill');
+    progressFill.style.width = `${progressPercent}%`;
+    
+    // Update time display
+    const remainingTime = Math.max(phase.duration - elapsed, 0);
+    document.getElementById('progressTime').textContent = `${Math.ceil(remainingTime)}s`;
+    
+    // Continue animation
+    if (phaseProgress < 1 && isBreathing && !isPaused) {
+        animationFrameId = requestAnimationFrame(animateProgress);
+    }
 }
 
 function startTimers() {
@@ -654,3 +696,28 @@ function updateStats() {
         document.getElementById('avgBreathTime').textContent = `${avgTime}s`;
     }
 }
+
+// Add smooth scrolling for technique buttons on mobile
+if ('ontouchstart' in window) {
+    const techniqueButtons = document.querySelector('.technique-buttons');
+    if (techniqueButtons) {
+        techniqueButtons.addEventListener('touchstart', function(e) {
+            this.style.scrollBehavior = 'smooth';
+        }, { passive: true });
+    }
+}
+
+// Optimize resize handling
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        if (isBreathing && !isPaused) {
+            const circle = document.getElementById('breathingCircle');
+            circle.style.transition = 'none';
+            requestAnimationFrame(() => {
+                circle.style.transition = '';
+            });
+        }
+    }, 250);
+});
