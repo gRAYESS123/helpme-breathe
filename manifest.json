@@ -1,0 +1,122 @@
+"manifest.json": {
+    "name": "Help Me Breathe - Natural Breathing Journey",
+    "short_name": "Breathe",
+    "description": "Free nature-inspired breathing exercises for wellness and relaxation",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "theme_color": "#8b5cf6",
+    "background_color": "#1e1b4b",
+    "categories": ["health", "wellness", "meditation", "lifestyle"],
+    "lang": "en-US",
+    "dir": "ltr",
+    "icons": [
+      {
+        "src": "icon-72.png",
+        "sizes": "72x72",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "icon-96.png",
+        "sizes": "96x96",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "icon-128.png",
+        "sizes": "128x128",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "icon-144.png",
+        "sizes": "144x144",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "icon-152.png",
+        "sizes": "152x152",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "icon-192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "icon-384.png",
+        "sizes": "384x384",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any maskable"
+      }
+    ],
+    "shortcuts": [
+      {
+        "name": "Deep Sleep",
+        "short_name": "Sleep",
+        "description": "4-7-8 breathing for better sleep",
+        "url": "/?technique=478",
+        "icons": [
+          {
+            "src": "icon-96.png",
+            "sizes": "96x96"
+          }
+        ]
+      },
+      {
+        "name": "Quick Calm",
+        "short_name": "Calm",
+        "description": "Triangle breathing for instant peace",
+        "url": "/?technique=triangle",
+        "icons": [
+          {
+            "src": "icon-96.png",
+            "sizes": "96x96"
+          }
+        ]
+      }
+    ]
+  },
+
+  ".eslintrc.json": {
+    "env": {
+      "browser": true,
+      "es2021": true
+    },
+    "extends": ["eslint:recommended"],
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-unused-vars": "warn",
+      "no-console": "warn",
+      "prefer-const": "error",
+      "no-var": "error",
+      "no-undef": "error",
+      "no-debugger": "error"
+    },
+    "globals": {
+      "gtag": "readonly",
+      "adsbygoogle": "readonly"
+    }
+  },
+
+  ".prettierrc": {
+    "semi": true,
+    "trailingComma": "es5",
+    "singleQuote": true,
+    "printWidth": 80,
+    "tabWidth": 2,
+    "useTabs": false
+  },
