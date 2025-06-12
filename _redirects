@@ -1,0 +1,24 @@
+Canonical URL - Redirect www to non-www
+https://www.helpmebreath.com/* https://helpmebreath.com/:splat 301!
+
+# Force HTTPS
+http://helpmebreath.com/* https://helpmebreath.com/:splat 301!
+http://www.helpmebreath.com/* https://helpmebreath.com/:splat 301!
+
+# SPA fallback - serve index.html for all routes that don't match files
+/* /index.html 200
+
+# Future content pages (when created)
+/4-7-8-breathing-technique /index.html 200
+/breathing-exercises-anxiety /index.html 200
+/timer /index.html 200
+/heart-coherence-breathing /index.html 200
+/blog/* /index.html 200
+
+# API routes (if any)
+/api/* 404
+
+# Block sensitive files
+/.env 404
+/config/* 404
+/admin/* 404
