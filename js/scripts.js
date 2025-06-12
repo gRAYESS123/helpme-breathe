@@ -365,7 +365,9 @@ if (circle) {
     circle.classList.remove('active', 'technique-478', 'technique-box', 'technique-coherent', 'technique-triangle', 'technique-wim');
     
     // Add the correct technique class
-    circle.className = `breathing-circle ${technique.circleClass}`;
+   circle.className = 'breathing-circle';
+   circle.classList.add(technique.circleClass);
+   console.log('Applied classes:', circle.className); // Debug line
     
     // Force animation reset
     circle.style.animation = 'none';
@@ -420,10 +422,22 @@ function startBreathing() {
         isPaused = false;
         updateButtonStates();
         
-        const circle = safeGetElement('breathingCircle');
-        if (circle) {
-            circle.classList.add('active');
-        }
+       // FIND the startBreathing function and ADD this after circle.classList.add('active'):
+const circle = safeGetElement('breathingCircle');
+if (circle) {
+    circle.classList.add('active');
+    
+    // ADDED: Ensure proper technique class is applied
+    const technique = techniques[currentTechnique];
+    circle.classList.remove('technique-478', 'technique-box', 'technique-coherent', 'technique-triangle', 'technique-wim');
+    circle.classList.add(technique.circleClass);
+    
+    // Force animation restart
+    circle.style.animation = 'none';
+    requestAnimationFrame(() => {
+        circle.style.animation = '';
+    });
+}
         
         animateBreathingProgress();
         
