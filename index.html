@@ -3,61 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- FIXED: Changed "Breath" to "Breathe" -->
-    <title>Help Me Breathe - Natural Breathing Journey</title>
-    <meta name="description" content="Free nature-inspired breathing exercises for deep sleep, focus, heart coherence, and energy. Your natural guide to mindful breathing and inner peace.">
-    <meta name="keywords" content="breathing exercises, meditation, relaxation, sleep, mindfulness, stress relief, 4-7-8 breathing, box breathing">
+    
+    <!-- SEO OPTIMIZED: Title optimized for target keyword -->
+    <title>4-7-8 Breathing Technique | Guided Timer for Sleep & Stress Relief</title>
+    
+    <!-- SEO OPTIMIZED: Meta description with CTA and keywords -->
+    <meta name="description" content="Learn breathing exercises for anxiety, sleep, and focus with our guided timer. Practice 4-7-8, box breathing, and heart coherence techniques. Start free.">
+    
+    <!-- SEO OPTIMIZED: Canonical URL -->
+    <link rel="canonical" href="https://helpmebreath.com/">
+    
+    <meta name="keywords" content="breathing exercises, 4-7-8 breathing technique, box breathing, breathing timer, anxiety relief, sleep breathing, meditation">
+    <meta name="author" content="Help Me Breathe">
+    <meta name="robots" content="index, follow">
     
     <!-- Open Graph tags for social sharing -->
-    <meta property="og:title" content="Help Me Breathe - Natural Breathing Journey">
-    <meta property="og:description" content="Free breathing exercises with beautiful nature themes. Find calm, focus, and energy through guided breathing techniques.">
+    <meta property="og:title" content="4-7-8 Breathing Technique | Guided Timer for Sleep & Stress Relief">
+    <meta property="og:description" content="Free breathing exercises with guided timer. Practice 4-7-8, box breathing, and heart coherence techniques for better sleep and anxiety relief.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://helpmebreath.com">
-    <meta property="og:image" content="https://helpmebreath.com/og-image.jpg">
+    <meta property="og:url" content="https://helpmebreath.com/">
+    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:site_name" content="Help Me Breathe">
     
-    <!-- ADDED: Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🌙</text></svg>">
-    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><text y='140' font-size='120'>🌙</text></svg>">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="4-7-8 Breathing Technique | Guided Timer">
+    <meta name="twitter:description" content="Free breathing exercises for sleep, anxiety, and focus. Start practicing now.">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/twitter-breathing-timer.jpg">
     
-    <!-- OPTIMIZED: Preload critical resources -->
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><text y='140' font-size='120'>🫁</text></svg>">
+    
+    <!-- PERFORMANCE: Preload critical resources -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style">
     <link rel="preload" href="css/styles.css" as="style">
     <link rel="preload" href="js/scripts.js" as="script">
     
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
-    
-    <!-- OPTIMIZED: Single AdSense script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7348129075274196" crossorigin="anonymous"></script>
-    
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-09WY9JD4YM');
-    </script>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8b5cf6">
     
-    <!-- Structured Data for SEO -->
+    <!-- STRUCTURED DATA: Enhanced WebSite and Organization markup -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Help Me Breathe",
-      "description": "Free nature-inspired breathing exercises for wellness and relaxation",
-      "url": "https://helpmebreath.com",
-      "applicationCategory": "HealthApplication",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      }
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://helpmebreath.com/#website",
+          "url": "https://helpmebreath.com/",
+          "name": "Help Me Breathe",
+          "description": "Guided breathing exercises and timer for sleep, anxiety relief, and mindfulness",
+          "publisher": {
+            "@id": "https://helpmebreath.com/#organization"
+          },
+          "potentialAction": [
+            {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://helpmebreath.com/?search={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          ],
+          "inLanguage": "en-US"
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://helpmebreath.com/#organization",
+          "name": "Help Me Breathe",
+          "url": "https://helpmebreath.com/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://helpmebreath.com/images/logo.png"
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "contact@helpmebreath.com",
+            "contactType": "customer service"
+          },
+          "sameAs": [
+            "https://www.patreon.com/GeorgesRayess"
+          ]
+        },
+        {
+          "@type": "WebApplication",
+          "name": "Help Me Breathe",
+          "description": "Free breathing exercises timer with 4-7-8, box breathing, and heart coherence techniques for sleep, anxiety relief, and focus",
+          "url": "https://helpmebreath.com/",
+          "applicationCategory": "HealthApplication",
+          "operatingSystem": "Web Browser",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "@type": "Offer",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "featureList": [
+            "4-7-8 Breathing Technique",
+            "Box Breathing Timer",
+            "Heart Coherence Breathing",
+            "Guided Audio Cues",
+            "Session Progress Tracking"
+          ]
+        }
+      ]
     }
+    </script>
+    
+    <!-- FAQ Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the 4-7-8 breathing technique?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The 4-7-8 breathing technique involves inhaling for 4 seconds, holding your breath for 7 seconds, and exhaling for 8 seconds. This practice helps activate your parasympathetic nervous system for relaxation and better sleep."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does box breathing work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Box breathing involves inhaling for 4 seconds, holding for 4 seconds, exhaling for 4 seconds, and holding empty for 4 seconds. This technique promotes focus, reduces stress, and improves mental clarity."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is breathing exercise safe for everyone?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Breathing exercises are generally safe for most people. However, if you have any respiratory conditions, heart problems, or are pregnant, consult with your healthcare provider before starting any new breathing practice."
+          }
+        }
+      ]
+    }
+    </script>
+    
+    <!-- PERFORMANCE: Defer non-critical scripts -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7348129075274196" crossorigin="anonymous"></script>
+    
+    <!-- Google Analytics with privacy controls -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-09WY9JD4YM', {
+            'anonymize_ip': true,
+            'cookie_expires': 63072000
+        });
     </script>
 </head>
 <body class="theme-478">
@@ -85,15 +192,19 @@
     <div class="natural-element sun-ray sun-ray-3"></div>
 
     <div class="container">
+        <!-- SEO OPTIMIZED: Semantic header structure -->
         <header>
             <div class="header-content">
-                <h1>Help Me Breathe</h1>
-                <p class="subtitle">Your natural guide to mindful breathing and inner peace</p>
+                <!-- SEO OPTIMIZED: Single H1 matching primary keyword -->
+                <h1>Guided Breathing Exercises for Sleep, Stress & Focus</h1>
+                <p class="subtitle">Free 4-7-8 breathing technique timer with audio cues. Reduce anxiety, improve sleep, and find calm in minutes.</p>
             </div>
         </header>
 
-        <div class="main-content">
-            <div class="breathing-section">
+        <!-- SEO OPTIMIZED: Main content area -->
+        <main class="main-content">
+            <!-- SEO OPTIMIZED: Primary breathing tool section -->
+            <section class="breathing-section" aria-labelledby="breathing-tool-heading">
                 <button class="settings-btn" id="settingsBtn" title="Settings" aria-label="Open settings">⚙️</button>
                 <div class="settings-panel" id="settingsPanel">
                     <div class="setting-item">
@@ -116,7 +227,7 @@
                     </div>
                 </div>
                 
-                <h2 id="technique-title">Deep Sleep</h2>
+                <h2 id="technique-title">4-7-8 Deep Sleep Breathing</h2>
                 
                 <div class="breathing-container">
                     <!-- SVG Filter for Fluid Effect -->
@@ -133,7 +244,6 @@
                     
                     <div class="breathing-aura"></div>
                     <div class="breathing-circle technique-478" id="breathingCircle">
-                        <!-- FIXED: Text container that doesn't rotate -->
                         <div class="circle-text-container">
                             <span id="circleText">Ready</span>
                         </div>
@@ -148,9 +258,9 @@
                     </div>
                 </div>
                 
-                <div class="breathing-text" id="breathingText">Click Begin to start your practice</div>
+                <div class="breathing-text" id="breathingText">Click Begin to start your breathing practice</div>
                 
-                <!-- ADDED: Session progress and time remaining -->
+                <!-- Session progress and time remaining -->
                 <div class="session-info" id="sessionInfo" style="display: none;">
                     <div class="session-progress">
                         <div class="session-progress-fill" id="sessionProgressFill"></div>
@@ -180,43 +290,53 @@
                     </div>
                 </div>
                 
+                <!-- SEO OPTIMIZED: CTA block above the fold -->
                 <div class="controls">
-                    <button class="control-btn" id="startBtn" onclick="startBreathing()">Begin</button>
+                    <button class="control-btn" id="startBtn" onclick="startBreathing()">Begin Practice</button>
                     <button class="control-btn" id="pauseBtn" onclick="pauseBreathing()" disabled>Pause</button>
                     <button class="control-btn" id="stopBtn" onclick="stopBreathing()" disabled>Stop</button>
                 </div>
                 
+                <!-- SEO OPTIMIZED: Technique information with benefits -->
                 <div class="technique-info" id="techniqueInfo">
-                    <h3>Deep Sleep & Relaxation</h3>
-                    <p>The 4-7-8 breathing technique helps activate your parasympathetic nervous system, promoting deep relaxation and better sleep. Like the gentle phases of the moon, this practice guides you into peaceful rest.</p>
+                    <h3>4-7-8 Breathing Technique Benefits</h3>
+                    <p>The 4-7-8 breathing technique helps activate your parasympathetic nervous system, promoting deep relaxation and better sleep. Research shows this practice can reduce anxiety, lower blood pressure, and improve sleep quality. Like the gentle phases of the moon, this practice guides you into peaceful rest.</p>
                 </div>
-            </div>
+            </section>
 
-            <div class="sidebar">
-                <div class="card technique-selector">
-                    <h3>Breathing Journeys</h3>
+            <!-- SEO OPTIMIZED: Technique selection sidebar -->
+            <aside class="sidebar">
+                <section class="card technique-selector" aria-labelledby="technique-selector-heading">
+                    <h3 id="technique-selector-heading">Breathing Techniques</h3>
                     <div class="technique-buttons">
-                        <button class="technique-btn active" onclick="selectTechnique('478')">
-                            🌙 Deep Sleep
+                        <button class="technique-btn active" onclick="selectTechnique('478')" aria-describedby="technique-478-desc">
+                            🌙 4-7-8 Deep Sleep
                         </button>
-                        <button class="technique-btn" onclick="selectTechnique('box')">
-                            🌿 Focus & Grounding
+                        <button class="technique-btn" onclick="selectTechnique('box')" aria-describedby="technique-box-desc">
+                            🌿 Box Breathing Focus
                         </button>
-                        <button class="technique-btn" onclick="selectTechnique('coherent')">
+                        <button class="technique-btn" onclick="selectTechnique('coherent')" aria-describedby="technique-coherent-desc">
                             💗 Heart Coherence
                         </button>
-                        <button class="technique-btn" onclick="selectTechnique('triangle')">
-                            ☁️ Quick Calm
+                        <button class="technique-btn" onclick="selectTechnique('triangle')" aria-describedby="technique-triangle-desc">
+                            ☁️ Triangle Quick Calm
                         </button>
-                        <button class="technique-btn" onclick="selectTechnique('wim')">
-                            ☀️ Energy Boost
+                        <button class="technique-btn" onclick="selectTechnique('wim')" aria-describedby="technique-wim-desc">
+                            ☀️ Energizing Breathwork
                         </button>
                     </div>
-                </div>
+                    
+                    <!-- Hidden descriptions for accessibility -->
+                    <div id="technique-478-desc" class="sr-only">4-7-8 breathing for sleep and relaxation</div>
+                    <div id="technique-box-desc" class="sr-only">Box breathing for focus and stress relief</div>
+                    <div id="technique-coherent-desc" class="sr-only">Heart coherence breathing for emotional balance</div>
+                    <div id="technique-triangle-desc" class="sr-only">Triangle breathing for quick calm</div>
+                    <div id="technique-wim-desc" class="sr-only">Energizing breathing exercises</div>
+                </section>
 
-                <div class="card donation-section">
+                <section class="card donation-section">
                     <h3>Support Wellness</h3>
-                    <p>Enjoy an ad-free experience and support our mission.</p>
+                    <p>Enjoy an ad-free experience and support our mission to make breathing exercises accessible to everyone.</p>
                     <div class="donation-options">
                         <a href="https://www.patreon.com/GeorgesRayess" target="_blank" rel="noopener noreferrer" class="patreon-btn">
                             Support on Patreon
@@ -226,13 +346,13 @@
                             One-time Donation
                         </button>
                     </div>
-                </div>
-            </div>
-        </div>
+                </section>
+            </aside>
+        </main>
         
+        <!-- SEO OPTIMIZED: Semantic footer -->
         <footer class="footer">
             <p>Made with 💚 for a more mindful world</p>
-            <p><a href="https://helpmebreath.com">helpmebreath.com</a></p>
             <div class="social-links">
                 <a href="https://www.patreon.com/GeorgesRayess" target="_blank" rel="noopener noreferrer">Patreon</a>
             </div>
@@ -262,10 +382,10 @@
         Press <kbd>Space</kbd> to start/pause • <kbd>S</kbd> to stop • <kbd>1-5</kbd> to switch techniques
     </div>
 
-    <!-- OPTIMIZED: Load scripts at the end -->
+    <!-- PERFORMANCE: Load scripts at the end with defer -->
     <script src="js/scripts.js" defer></script>
     
-    <!-- PWA Installation -->
+    <!-- PWA and Cookie Management -->
     <script>
         // Service Worker Registration
         if ('serviceWorker' in navigator) {
