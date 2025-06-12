@@ -375,7 +375,6 @@ h1 {
     backface-visibility: hidden;
 }
 
-/* FIXED: Text container that doesn't rotate */
 .circle-text-container {
     position: absolute;
     top: 50%;
@@ -387,8 +386,8 @@ h1 {
     align-items: center;
     justify-content: center;
     z-index: 10;
-    /* Remove any animation - text should NEVER rotate */
-    animation: none !important;
+    /* Text stays stable - no rotation */
+    animation: none;
     transform-style: flat;
 }
 
@@ -398,78 +397,126 @@ h1 {
     color: var(--text-primary);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     z-index: 10;
+    /* Ensure text is always visible and upright */
+    position: relative;
+    display: block;
 }
 
-/* OPTIMIZED: Simplified breathing animation */
-@keyframes breathe-simple {
-    0%, 100% { 
+@keyframes breathe-478 {
+    0% { 
+        transform: translate(-50%, -50%) scale(0.7);
+        border-radius: 50%;
+    }
+    21.05% { /* 4s / 19s = 21.05% - End of inhale */
+        transform: translate(-50%, -50%) scale(1.3);
+        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
+    }
+    57.89% { /* 11s / 19s = 57.89% - End of hold */
+        transform: translate(-50%, -50%) scale(1.3);
+        border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%;
+    }
+    100% { /* 19s / 19s = 100% - End of exhale */
+        transform: translate(-50%, -50%) scale(0.7);
+        border-radius: 50%;
+    }
+}
+
+/* Box Breathing: 4s inhale, 4s hold, 4s exhale, 4s hold = 16s total */
+@keyframes breathe-box {
+    0% { 
         transform: translate(-50%, -50%) scale(0.8);
         border-radius: 50%;
     }
-    50% { 
-        transform: translate(-50%, -50%) scale(1.3);
+    25% { /* 4s / 16s = 25% - End of inhale */
+        transform: translate(-50%, -50%) scale(1.2);
+        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
+    }
+    50% { /* 8s / 16s = 50% - End of first hold */
+        transform: translate(-50%, -50%) scale(1.2);
+        border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%;
+    }
+    75% { /* 12s / 16s = 75% - End of exhale */
+        transform: translate(-50%, -50%) scale(0.8);
+        border-radius: 55% 45% 50% 50% / 50% 50% 45% 55%;
+    }
+    100% { /* 16s / 16s = 100% - End of second hold */
+        transform: translate(-50%, -50%) scale(0.8);
         border-radius: 50%;
     }
 }
 
-/* Counter-rotation to keep text stable */
-@keyframes counter-rotate {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(-360deg); }
-}
-
-/* Complex animation only for desktop */
-@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-    @keyframes fluid-breathe-no-rotate {
-        0%, 100% {
-            transform: translate(-50%, -50%) scale(0.7);
-            border-radius: 65% 35% 40% 60% / 60% 40% 60% 40%;
-        }
-        25% {
-            transform: translate(-50%, -50%) scale(1.35);
-            border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
-        }
-        50% {
-            transform: translate(-50%, -50%) scale(1.35);
-            border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%;
-        }
-        75% {
-            transform: translate(-50%, -50%) scale(0.8);
-            border-radius: 60% 40% 45% 55% / 45% 55% 45% 55%;
-        }
+/* Heart Coherence: 5s inhale, 5s exhale = 10s total */
+@keyframes breathe-coherent {
+    0% { 
+        transform: translate(-50%, -50%) scale(0.8);
+        border-radius: 50%;
     }
-    
-    .breathing-circle {
-        filter: url(#fluid-effect);
+    50% { /* 5s / 10s = 50% - End of inhale */
+        transform: translate(-50%, -50%) scale(1.2);
+        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
     }
-    
-    .breathing-circle.active {
-        animation: fluid-breathe var(--breath-cycle-duration, 10s) cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-    }
-    
-    .breathing-circle.active .circle-text-container {
-        animation-play-state: running;
+    100% { /* 10s / 10s = 100% - End of exhale */
+        transform: translate(-50%, -50%) scale(0.8);
+        border-radius: 50%;
     }
 }
 
-/* Mobile: Simple animation only */
-@media (max-width: 767px) {
-    .breathing-circle.active {
-        animation: breathe-simple var(--breath-cycle-duration, 10s) ease-in-out infinite;
+/* Triangle Breathing: 3s inhale, 3s hold, 3s exhale = 9s total */
+@keyframes breathe-triangle {
+    0% { 
+        transform: translate(-50%, -50%) scale(0.8);
+        border-radius: 50%;
     }
-    
-    .breathing-circle {
-        filter: none !important;
+    33.33% { /* 3s / 9s = 33.33% - End of inhale */
+        transform: translate(-50%, -50%) scale(1.2);
+        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
+    }
+    66.67% { /* 6s / 9s = 66.67% - End of hold */
+        transform: translate(-50%, -50%) scale(1.2);
+        border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%;
+    }
+    100% { /* 9s / 9s = 100% - End of exhale */
+        transform: translate(-50%, -50%) scale(0.8);
+        border-radius: 50%;
     }
 }
 
-/* Technique-specific durations */
-.breathing-circle.technique-478 { --breath-cycle-duration: 19s; }
-.breathing-circle.technique-box { --breath-cycle-duration: 16s; }
-.breathing-circle.technique-coherent { --breath-cycle-duration: 10s; }
-.breathing-circle.technique-triangle { --breath-cycle-duration: 9s; }
-.breathing-circle.technique-wim { --breath-cycle-duration: 3s; }
+/* Wim Hof: 2s inhale, 1s exhale = 3s total */
+@keyframes breathe-wim {
+    0% { 
+        transform: translate(-50%, -50%) scale(0.9);
+        border-radius: 50%;
+    }
+    66.67% { /* 2s / 3s = 66.67% - End of inhale */
+        transform: translate(-50%, -50%) scale(1.1);
+        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
+    }
+    100% { /* 3s / 3s = 100% - End of exhale */
+        transform: translate(-50%, -50%) scale(0.9);
+        border-radius: 50%;
+    }
+}
 
+/* Apply technique-specific animations */
+.breathing-circle.technique-478.active {
+    animation: breathe-478 19s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.breathing-circle.technique-box.active {
+    animation: breathe-box 16s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.breathing-circle.technique-coherent.active {
+    animation: breathe-coherent 10s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.breathing-circle.technique-triangle.active {
+    animation: breathe-triangle 9s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.breathing-circle.technique-wim.active {
+    animation: breathe-wim 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
 /* OPTIMIZED: Simplified aura */
 .breathing-aura {
     position: absolute;
