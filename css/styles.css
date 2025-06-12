@@ -343,7 +343,7 @@ h1 {
     color: #ffffff;
 }
 
-/* OPTIMIZED: Breathing circle with fixed text rotation */
+/* OPTIMIZED: Breathing circle with properly synced animations */
 .breathing-container {
     position: relative;
     width: 320px;
@@ -375,6 +375,7 @@ h1 {
     backface-visibility: hidden;
 }
 
+/* FIXED: Text container that stays completely stable and visible */
 .circle-text-container {
     position: absolute;
     top: 50%;
@@ -386,9 +387,10 @@ h1 {
     align-items: center;
     justify-content: center;
     z-index: 10;
-    /* Text stays stable - no rotation */
-    animation: none;
+    /* Ensure text never rotates or animates */
+    animation: none !important;
     transform-style: flat;
+    pointer-events: none;
 }
 
 .circle-text-container #circleText {
@@ -399,9 +401,18 @@ h1 {
     z-index: 10;
     /* Ensure text is always visible and upright */
     position: relative;
-    display: block;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    pointer-events: none;
+    white-space: nowrap;
 }
 
+/* SYNCED BREATHING ANIMATIONS - Perfectly match breathing phase timings */
+
+/* 4-7-8 Breathing: 4s inhale, 7s hold, 8s exhale = 19s total */
 @keyframes breathe-478 {
     0% { 
         transform: translate(-50%, -50%) scale(0.7);
@@ -497,7 +508,7 @@ h1 {
     }
 }
 
-/* Apply technique-specific animations */
+/* Apply technique-specific animations with proper timing */
 .breathing-circle.technique-478.active {
     animation: breathe-478 19s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -517,6 +528,36 @@ h1 {
 .breathing-circle.technique-wim.active {
     animation: breathe-wim 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* Mobile: Simple scaling animation */
+@media (max-width: 767px) {
+    .breathing-circle {
+        filter: none !important;
+    }
+    
+    .breathing-circle.active {
+        animation-name: breathe-simple;
+    }
+    
+    @keyframes breathe-simple {
+        0%, 100% { 
+            transform: translate(-50%, -50%) scale(0.8);
+            border-radius: 50%;
+        }
+        50% { 
+            transform: translate(-50%, -50%) scale(1.2);
+            border-radius: 50%;
+        }
+    }
+}
+
+/* Technique-specific durations for other elements */
+.breathing-circle.technique-478 { --breath-cycle-duration: 19s; }
+.breathing-circle.technique-box { --breath-cycle-duration: 16s; }
+.breathing-circle.technique-coherent { --breath-cycle-duration: 10s; }
+.breathing-circle.technique-triangle { --breath-cycle-duration: 9s; }
+.breathing-circle.technique-wim { --breath-cycle-duration: 3s; }
+
 /* OPTIMIZED: Simplified aura */
 .breathing-aura {
     position: absolute;
