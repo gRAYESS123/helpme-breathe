@@ -387,8 +387,9 @@ h1 {
     align-items: center;
     justify-content: center;
     z-index: 10;
-    transform: none !important;
+    /* Remove any animation - text should NEVER rotate */
     animation: none !important;
+    transform-style: flat;
 }
 
 .circle-text-container #circleText {
@@ -419,21 +420,21 @@ h1 {
 
 /* Complex animation only for desktop */
 @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-    @keyframes fluid-breathe {
+    @keyframes fluid-breathe-no-rotate {
         0%, 100% {
             transform: translate(-50%, -50%) scale(0.7);
             border-radius: 65% 35% 40% 60% / 60% 40% 60% 40%;
         }
         25% {
-            transform: translate(-50%, -50%) scale(1.35) rotate(60deg);
+            transform: translate(-50%, -50%) scale(1.35);
             border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
         }
         50% {
-            transform: translate(-50%, -50%) scale(1.35) rotate(120deg);
+            transform: translate(-50%, -50%) scale(1.35);
             border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%;
         }
         75% {
-            transform: translate(-50%, -50%) scale(0.8) rotate(180deg);
+            transform: translate(-50%, -50%) scale(0.8);
             border-radius: 60% 40% 45% 55% / 45% 55% 45% 55%;
         }
     }
