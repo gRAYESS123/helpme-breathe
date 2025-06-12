@@ -359,12 +359,19 @@ function selectTechnique(techniqueKey) {
                 <p>${technique.description}</p>
             `;
         }
-        
-        const circle = safeGetElement('breathingCircle');
-        if (circle) {
-            circle.className = `breathing-circle ${technique.circleClass}`;
-        }
-        
+       const circle = safeGetElement('breathingCircle');
+if (circle) {
+    // Remove any existing classes and animations
+    circle.classList.remove('active', 'technique-478', 'technique-box', 'technique-coherent', 'technique-triangle', 'technique-wim');
+    
+    // Add the correct technique class
+    circle.className = `breathing-circle ${technique.circleClass}`;
+    
+    // Force animation reset
+    circle.style.animation = 'none';
+    circle.offsetHeight; // Trigger reflow
+    circle.style.animation = '';
+}
         const progressFill = safeGetElement('progressFill');
         if (progressFill) {
             progressFill.style.width = '0%';
@@ -456,13 +463,20 @@ function startBreathing() {
     }
 
     const circle = safeGetElement('breathingCircle');
-    if (circle) {
-        circle.classList.add('active');
-    }
-
-    if (soundEnabled) {
-        audioSystem.init();
-    }
+        if (circle) {
+            circle.classList.add('active');
+    
+    // ADDED: Ensure proper technique class is applied
+            const technique = techniques[currentTechnique];
+            circle.classList.remove('technique-478', 'technique-box', 'technique-coherent', 'technique-triangle', 'technique-wim');
+            circle.classList.add(technique.circleClass);
+    
+    // Force animation restart
+            circle.style.animation = 'none';
+            requestAnimationFrame(() => {
+           circle.style.animation = '';
+    });
+}
 
     vibrate(100);
 
