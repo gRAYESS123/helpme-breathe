@@ -1,0 +1,89 @@
+[
+  {
+    "file": "images/og-breathing-timer.jpg",
+    "size": [1200, 630],
+    "theme": "478",
+    "title_lines": ["Help Me", "Breathe"],
+    "sub_lines": ["Guided breathing exercises for", "sleep, stress & focus — free"]
+  },
+  {
+    "file": "images/twitter-breathing-timer.jpg",
+    "size": [1200, 600],
+    "theme": "478",
+    "title_lines": ["Help Me", "Breathe"],
+    "sub_lines": ["Guided breathing exercises for", "sleep, stress & focus — free"]
+  },
+  {
+    "file": "images/4-7-8-breathing-guide-og.jpg",
+    "size": [1200, 630],
+    "theme": "478",
+    "kicker": "STEP-BY-STEP GUIDE",
+    "title_lines": ["4-7-8 Breathing", "Technique"],
+    "sub_lines": ["Fall asleep faster with a guided", "timer and audio cues"]
+  },
+
+  {
+    "file": "images/og/box-breathing.jpg",
+    "size": [1200, 630],
+    "theme": "box",
+    "kicker": "BOX BREATHING · 4-4-4-4",
+    "title_lines": ["Box Breathing", "Timer & Guide"],
+    "sub_lines": ["Equal counts in, hold, out, hold", "— with a free guided timer"]
+  },
+  {
+    "file": "images/og/coherent-breathing.jpg",
+    "size": [1200, 630],
+    "theme": "coherent",
+    "kicker": "HEART COHERENCE · 5-5",
+    "title_lines": ["Coherent", "Breathing"],
+    "sub_lines": ["Six slow breaths a minute,", "guided step by step"]
+  },
+  {
+    "file": "images/og/triangle-breathing.jpg",
+    "size": [1200, 630],
+    "theme": "triangle",
+    "kicker": "TRIANGLE BREATHING · 3-3-3",
+    "title_lines": ["Triangle", "Breathing"],
+    "sub_lines": ["A simple three-count rhythm", "you can use anywhere"]
+  },
+  {
+    "file": "images/og/energizing-breathing.jpg",
+    "size": [1200, 630],
+    "theme": "wim",
+    "kicker": "ENERGIZING BREATH · 2-1",
+    "title_lines": ["Energizing", "Breathing"],
+    "sub_lines": ["Faster, rhythmic breaths for", "a morning lift"]
+  },
+  {
+    "file": "images/og/breathing-exercises-for-anxiety.jpg",
+    "size": [1200, 630],
+    "theme": "triangle",
+    "kicker": "GUIDED EXERCISES",
+    "title_lines": ["Breathing", "for Anxious Moments"],
+    "sub_lines": ["Five slow-breathing techniques", "with a free guided timer"]
+  },
+  {
+    "file": "images/og/breathing-exercises-for-sleep.jpg",
+    "size": [1200, 630],
+    "theme": "478",
+    "kicker": "GUIDED EXERCISES",
+    "title_lines": ["Breathing", "for Sleep"],
+    "sub_lines": ["Wind down with slow, guided", "breaths before bed"]
+  },
+  {
+    "file": "images/og/pro.jpg",
+    "size": [1200, 630],
+    "theme": "neutral",
+    "kicker": "GO DEEPER",
+    "title_lines": ["Help Me Breathe Pro"],
+    "sub_lines": ["Every technique, longer sessions", "and offline practice"]
+  },
+  {
+    "file": "images/og/about.jpg",
+    "size": [1200, 630],
+    "theme": "neutral",
+    "kicker": "ABOUT",
+    "title_lines": ["About Help", "Me Breathe"],
+    "sub_lines": ["Free breathing tools, built by", "one person who needed them"]
+  }
+]
