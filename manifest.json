@@ -1,0 +1,28 @@
+{
+  "name": "Help Me Breathe — Guided Breathing Exercises",
+  "short_name": "Breathe",
+  "description": "Free guided breathing exercises and timer for sleep, anxiety relief, and focus. Practice 4-7-8, box breathing, heart coherence, and more.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#1e1b4b",
+  "theme_color": "#8b5cf6",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["health", "lifestyle", "medical"],
+  "icons": [
+    {
+      "src": "/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
