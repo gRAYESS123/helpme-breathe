@@ -2,89 +2,112 @@
  * Service Worker for Help Me Breathe
  * -----------------------------------------------------------------------------
  * Strategy:
- *   - HTML navigations : network-first  (always try for fresh content, fall back
- *                        to cache, then to the offline page when fully offline)
- *   - CSS/JS/images     : stale-while-revalidate (instant from cache, refreshed
- *                        in the background)
- *   - Google Fonts      : stale-while-revalidate in a separate runtime cache
- *   - Analytics / ads / any other cross-origin : NOT intercepted (pass through)
+ *   - HTML navigations        : network-first, cache as offline fallback, then
+ *                               /offline.html when there is nothing cached
+ *   - same-origin assets      : stale-while-revalidate
+ *   - /api/* and cross-origin : never intercepted, never cached
  *
- * IMPORTANT: bump CACHE_VERSION on every deploy so returning visitors pick up
- * new CSS/JS/images. Changing this file is what triggers the SW update.
+ * Bump CACHE_NAME on every deploy that changes CSS, JS or the app shell.
+ * Changing this file is what triggers the service-worker update.
  */
-const CACHE_VERSION = 'v1.0.0';
-const STATIC_CACHE = `hmb-static-${CACHE_VERSION}`;
-const RUNTIME_CACHE = `hmb-runtime-${CACHE_VERSION}`;
+const CACHE_NAME = 'hmb-v2-2026-09-09b';
+const OFFLINE_URL = '/offline.html';
 
-// App shell — must all exist, or install fails.
+// App shell. Install does NOT fail when one entry 404s (a page can ship later);
+// each URL is fetched independently and failures are skipped.
 const PRECACHE_URLS = [
   '/',
-  '/index.html',
-  '/css/styles.css',
-  '/js/scripts.js',
-  '/manifest.json',
+  '/timer',
   '/offline.html',
+  '/css/styles.css',
+  '/js/app.js',
+  '/js/techniques.js',
+  '/js/storage.js',
+  '/js/analytics.js',
+  '/js/entitlements.js',
+  '/js/consent.js',
+  '/js/pro/index.js',
+  '/manifest.json',
   '/images/icon-192.png',
-  '/images/icon-512.png'
+  '/images/icon-512.png',
+  '/images/apple-touch-icon.png'
 ];
 
-const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
+async function precache() {
+  const cache = await caches.open(CACHE_NAME);
+  await Promise.allSettled(
+    PRECACHE_URLS.map(async (url) => {
+      try {
+        const response = await fetch(new Request(url, { cache: 'reload' }));
+        if (response && response.ok) await cache.put(url, response);
+      } catch (error) {
+        // A missing or unreachable entry must never block installation.
+      }
+    })
+  );
+}
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
-      .then(() => self.skipWaiting())
-  );
+  event.waitUntil(precache().then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(
-        keys
-          .filter((key) => key !== STATIC_CACHE && key !== RUNTIME_CACHE)
-          .map((key) => caches.delete(key))
-      ))
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
+
+function isCacheable(url) {
+  if (url.origin !== self.location.origin) return false;
+  if (url.pathname.startsWith('/api/')) return false;
+  return true;
+}
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
 
-  const url = new URL(request.url);
-  const sameOrigin = url.origin === self.location.origin;
-  const isFont = FONT_HOSTS.includes(url.hostname);
+  let url;
+  try {
+    url = new URL(request.url);
+  } catch (error) {
+    return;
+  }
 
-  // Let Google Analytics, AdSense, and any other third party go straight to the
-  // network — caching them would break measurement and ad delivery.
-  if (!sameOrigin && !isFont) return;
+  // Cross-origin (fonts, analytics, ads) and the API go straight to the network.
+  if (!isCacheable(url)) return;
 
-  // Fresh HTML on every visit, cache as offline fallback.
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(STATIC_CACHE).then((cache) => cache.put(request, copy));
+          if (response && response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
           return response;
         })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match('/offline.html')))
+        .catch(() =>
+          caches
+            .match(request)
+            .then((cached) => cached || caches.match(OFFLINE_URL))
+            .then((cached) => cached || Response.error())
+        )
     );
     return;
   }
 
-  // Static assets + fonts: stale-while-revalidate.
+  // Same-origin assets: stale-while-revalidate.
   event.respondWith(
     caches.match(request).then((cached) => {
       const networkFetch = fetch(request)
         .then((response) => {
           if (response && response.status === 200 && response.type !== 'opaque') {
             const copy = response.clone();
-            const target = isFont ? RUNTIME_CACHE : STATIC_CACHE;
-            caches.open(target).then((cache) => cache.put(request, copy));
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
           }
           return response;
         })
@@ -94,7 +117,7 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Allow the page to trigger an immediate update if desired.
+// Let the page trigger an immediate update.
 self.addEventListener('message', (event) => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });

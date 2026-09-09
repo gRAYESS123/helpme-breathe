@@ -7,3 +7,8 @@ __pycache__/
 *.pyc
 .DS_Store
 Thumbs.db
+
+# Private planning docs (business plan, payout research) — never push to the public repo
+docs/private/
+# Local secrets
+*.secret

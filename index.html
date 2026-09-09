@@ -3,56 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- SEO OPTIMIZED: Title optimized for target keyword -->
-    <title>4-7-8 Breathing Technique | Guided Timer for Sleep & Stress Relief</title>
-    
-    <!-- SEO OPTIMIZED: Meta description with CTA and keywords -->
-    <meta name="description" content="Learn breathing exercises for anxiety, sleep, and focus with our guided timer. Practice 4-7-8, box breathing, and heart coherence techniques. Start free.">
-    
-    <!-- SEO OPTIMIZED: Canonical URL -->
+
+    <title>Free Guided Breathing Timer — 4-7-8, Box &amp; Coherence</title>
+    <meta name="description" content="A free guided breathing timer with seven patterns: 4-7-8, box breathing, coherence, cyclic sighing and more. Audio cues, no account, works offline.">
+
     <link rel="canonical" href="https://helpmebreath.com/">
-    
-    <meta name="keywords" content="breathing exercises, 4-7-8 breathing technique, box breathing, breathing timer, anxiety relief, sleep breathing, meditation">
-    <meta name="author" content="Help Me Breathe">
+
+    <meta name="author" content="Georges Rayess">
     <meta name="robots" content="index, follow">
-    
-    <!-- Open Graph tags for social sharing -->
-    <meta property="og:title" content="4-7-8 Breathing Technique | Guided Timer for Sleep & Stress Relief">
-    <meta property="og:description" content="Free breathing exercises with guided timer. Practice 4-7-8, box breathing, and heart coherence techniques for better sleep and anxiety relief.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Free Guided Breathing Timer — 4-7-8, Box &amp; Coherence">
+    <meta property="og:description" content="Seven guided breathing patterns with audio and vibration cues. Free, no account, works offline.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpmebreath.com/">
     <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
-    
+
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="4-7-8 Breathing Technique | Guided Timer">
-    <meta name="twitter:description" content="Free breathing exercises for sleep, anxiety, and focus. Start practicing now.">
+    <meta name="twitter:title" content="Free Guided Breathing Timer">
+    <meta name="twitter:description" content="Seven guided breathing patterns with audio cues. Free, no account, works offline.">
     <meta name="twitter:image" content="https://helpmebreath.com/images/twitter-breathing-timer.jpg">
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
-    <!-- PERFORMANCE: Preconnect to font origins to cut font-fetch latency -->
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
+
+    <!-- PERFORMANCE: font origins + render-critical CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- PERFORMANCE: Preload + load same-origin CSS (render-critical) -->
-    <link rel="preload" href="css/styles.css" as="style">
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="preload" href="js/scripts.js" as="script">
+    <link rel="preload" href="/css/styles.css" as="style">
+    <link rel="stylesheet" href="/css/styles.css">
 
     <!-- Fonts: load without blocking render; display=swap prevents invisible text -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
-    
-    <!-- STRUCTURED DATA: Enhanced WebSite and Organization markup -->
+
+    <!--
+      Google Consent Mode v2. The DENIED defaults must be pushed before
+      gtag('config', …) runs, and ES modules are deferred, so this block stays
+      inline. js/consent.js then replays the visitor's stored choice and owns
+      the banner. Copy this block verbatim onto every page.
+    -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'wait_for_update': 500
+        });
+        gtag('js', new Date());
+        gtag('config', 'G-09WY9JD4YM', {
+            'anonymize_ip': true,
+            'cookie_expires': 63072000
+        });
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
+
+    <!-- Site + organisation + product structured data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -62,20 +78,8 @@
           "@id": "https://helpmebreath.com/#website",
           "url": "https://helpmebreath.com/",
           "name": "Help Me Breathe",
-          "description": "Guided breathing exercises and timer for sleep, anxiety relief, and mindfulness",
-          "publisher": {
-            "@id": "https://helpmebreath.com/#organization"
-          },
-          "potentialAction": [
-            {
-              "@type": "SearchAction",
-              "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": "https://helpmebreath.com/?search={search_term_string}"
-              },
-              "query-input": "required name=search_term_string"
-            }
-          ],
+          "description": "Guided breathing timer with seven patterns, free and without an account",
+          "publisher": { "@id": "https://helpmebreath.com/#organization" },
           "inLanguage": "en-US"
         },
         {
@@ -92,36 +96,110 @@
             "email": "contact@helpmebreath.com",
             "contactType": "customer service"
           },
-          "sameAs": [
-            "https://www.patreon.com/GeorgesRayess"
-          ]
+          "sameAs": ["https://www.patreon.com/GeorgesRayess"]
         },
         {
           "@type": "WebApplication",
+          "@id": "https://helpmebreath.com/#webapp",
           "name": "Help Me Breathe",
-          "description": "Free breathing exercises timer with 4-7-8, box breathing, and heart coherence techniques for sleep, anxiety relief, and focus",
+          "description": "A guided breathing timer with seven patterns, audio and vibration cues, saved settings and offline use. Every technique is free.",
           "url": "https://helpmebreath.com/",
           "applicationCategory": "HealthApplication",
           "operatingSystem": "Web Browser",
+          "browserRequirements": "Requires JavaScript",
+          "isAccessibleForFree": true,
           "offers": {
             "@type": "Offer",
             "price": "0",
             "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock"
+            "availability": "https://schema.org/InStock",
+            "url": "https://helpmebreath.com/"
+          },
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Optional paid upgrades",
+            "url": "https://helpmebreath.com/pro",
+            "itemListElement": [
+              {
+                "@type": "Offer",
+                "name": "Pro — Lifetime",
+                "description": "Custom pattern builder and saved presets, streaks and history export, ambient soundscapes, night mode, ad-free.",
+                "price": "19.00",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock",
+                "url": "https://helpmebreath.com/pro"
+              },
+              {
+                "@type": "Offer",
+                "name": "Pro — Monthly",
+                "description": "The same Pro feature set, billed monthly.",
+                "price": "3.99",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock",
+                "url": "https://helpmebreath.com/pro",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": "3.99",
+                  "priceCurrency": "USD",
+                  "billingDuration": 1,
+                  "billingIncrement": 1,
+                  "unitCode": "MON"
+                }
+              },
+              {
+                "@type": "Offer",
+                "name": "Practitioner",
+                "description": "Commercial-use licence, white-label embed, client session links and class mode. Billed yearly.",
+                "price": "99.00",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock",
+                "url": "https://helpmebreath.com/pro",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": "99.00",
+                  "priceCurrency": "USD",
+                  "billingDuration": 1,
+                  "billingIncrement": 1,
+                  "unitCode": "ANN"
+                }
+              },
+              {
+                "@type": "Offer",
+                "name": "Studio",
+                "description": "Practitioner across ten domains plus a monthly aggregate usage report. Billed yearly.",
+                "price": "199.00",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock",
+                "url": "https://helpmebreath.com/pro",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": "199.00",
+                  "priceCurrency": "USD",
+                  "billingDuration": 1,
+                  "billingIncrement": 1,
+                  "unitCode": "ANN"
+                }
+              }
+            ]
           },
           "featureList": [
-            "4-7-8 Breathing Technique",
-            "Box Breathing Timer",
-            "Heart Coherence Breathing",
-            "Guided Audio Cues",
-            "Session Progress Tracking"
+            "4-7-8 breathing timer",
+            "Box breathing timer",
+            "Heart coherence breathing timer",
+            "Cyclic sighing timer",
+            "Extended exhale timer",
+            "Triangle breathing timer",
+            "Energizing breath timer",
+            "Audio and vibration cues",
+            "Saved settings and session history",
+            "Offline use"
           ]
         }
       ]
     }
     </script>
-    
-    <!-- FAQ Structured Data -->
+
+    <!-- FAQ structured data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -129,10 +207,10 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "What is the 4-7-8 breathing technique?",
+          "name": "What is the 4-7-8 breathing pattern?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The 4-7-8 breathing technique involves inhaling for 4 seconds, holding your breath for 7 seconds, and exhaling for 8 seconds. This practice helps activate your parasympathetic nervous system for relaxation and better sleep."
+            "text": "Breathe in through your nose for four seconds, hold for seven, then breathe out through your mouth for eight. The timer counts it for you and can play a soft tone at each change."
           }
         },
         {
@@ -140,34 +218,27 @@
           "name": "How does box breathing work?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Box breathing involves inhaling for 4 seconds, holding for 4 seconds, exhaling for 4 seconds, and holding empty for 4 seconds. This technique promotes focus, reduces stress, and improves mental clarity."
+            "text": "Four equal counts: breathe in for four seconds, hold for four, breathe out for four, then stay empty for four. It repeats for as long as your session lasts."
           }
         },
         {
           "@type": "Question",
-          "name": "Is breathing exercise safe for everyone?",
+          "name": "Do I need an account, and does it cost anything?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Breathing exercises are generally safe for most people. However, if you have any respiratory conditions, heart problems, or are pregnant, consult with your healthcare provider before starting any new breathing practice."
+            "text": "No account, and all seven patterns are free with no time limit. Your settings and session history stay in your own browser and are never uploaded."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this safe for everyone?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Patterns that hold the breath or speed it up are not right for everyone. If you are pregnant, or you live with a heart, lung, blood pressure, seizure or panic condition, or you have had surgery recently, ask a clinician before you start. Stop if you feel dizzy or unwell. This site is not medical care and does not replace it."
           }
         }
       ]
     }
-    </script>
-    
-    <!-- PERFORMANCE: Defer non-critical scripts -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7348129075274196" crossorigin="anonymous"></script>
-    
-    <!-- Google Analytics with privacy controls -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-09WY9JD4YM', {
-            'anonymize_ip': true,
-            'cookie_expires': 63072000
-        });
     </script>
 </head>
 <body class="theme-478">
@@ -176,54 +247,56 @@
 
     <!-- Natural background layer -->
     <div class="nature-bg"></div>
-    
+
     <!-- Theme-specific natural elements -->
     <div class="natural-element star star-1"></div>
     <div class="natural-element star star-2"></div>
     <div class="natural-element star star-3"></div>
     <div class="natural-element star star-4"></div>
-    
+
     <div class="natural-element leaf leaf-1"></div>
     <div class="natural-element leaf leaf-2"></div>
     <div class="natural-element leaf leaf-3"></div>
-    
+
     <div class="natural-element ripple ripple-1"></div>
     <div class="natural-element ripple ripple-2"></div>
     <div class="natural-element ripple ripple-3"></div>
-    
+
     <div class="natural-element cloud cloud-1"></div>
-    
+
     <div class="natural-element sun-ray sun-ray-1"></div>
     <div class="natural-element sun-ray sun-ray-2"></div>
     <div class="natural-element sun-ray sun-ray-3"></div>
 
     <div class="container">
-        <!-- SEO OPTIMIZED: Semantic header structure -->
         <header>
             <div class="header-content">
-                <!-- SEO OPTIMIZED: Single H1 matching primary keyword -->
-                <h1>Guided Breathing Exercises for Sleep, Stress & Focus</h1>
-                <p class="subtitle">Free 4-7-8 breathing technique timer with audio cues. Reduce anxiety, improve sleep, and find calm in minutes.</p>
+                <h1>Guided Breathing Exercises for Sleep, Stress &amp; Focus</h1>
+                <p class="subtitle">Seven guided patterns with audio and vibration cues — 4-7-8, box breathing, cyclic sighing and more. Free, no account, works offline.</p>
             </div>
         </header>
 
-        <!-- SEO OPTIMIZED: Main content area -->
-        <main class="main-content" id="main">
-            <!-- SEO OPTIMIZED: Primary breathing tool section -->
+        <!--
+          The whole timer UI (breathing section + technique selector) sits inside
+          one app root, so the engine can find every [data-role] with a single
+          scoped query. See docs/PAGE_CONTRACT.md.
+        -->
+        <main class="main-content" id="main" data-breathing-app>
             <section class="breathing-section" aria-labelledby="breathing-tool-heading">
-                <button class="settings-btn" id="settingsBtn" title="Settings" aria-label="Open settings">⚙️</button>
-                <div class="settings-panel" id="settingsPanel">
+                <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">⚙️</button>
+
+                <div class="settings-panel" data-role="settings-panel">
                     <div class="setting-item">
-                        <span class="setting-label">Sound</span>
-                        <div class="toggle-switch active" id="soundToggle" role="button" tabindex="0" aria-label="Toggle sound"></div>
+                        <span class="setting-label" id="label-sound">Sound</span>
+                        <div class="toggle-switch active" data-role="sound-toggle" role="button" tabindex="0" aria-pressed="true" aria-labelledby="label-sound"></div>
                     </div>
                     <div class="setting-item">
-                        <span class="setting-label">Vibration</span>
-                        <div class="toggle-switch active" id="vibrationToggle" role="button" tabindex="0" aria-label="Toggle vibration"></div>
+                        <span class="setting-label" id="label-vibration">Vibration</span>
+                        <div class="toggle-switch active" data-role="vibration-toggle" role="button" tabindex="0" aria-pressed="true" aria-labelledby="label-vibration"></div>
                     </div>
                     <div class="setting-item">
-                        <span class="setting-label">Session Duration</span>
-                        <select id="sessionDuration" class="duration-select">
+                        <label class="setting-label" for="session-duration">Session length</label>
+                        <select id="session-duration" class="duration-select" data-role="duration-select">
                             <option value="300">5 minutes</option>
                             <option value="600" selected>10 minutes</option>
                             <option value="900">15 minutes</option>
@@ -232,29 +305,28 @@
                         </select>
                     </div>
                 </div>
-                
-                <h2 id="technique-title">4-7-8 Deep Sleep Breathing</h2>
-                
+
+                <h2 id="breathing-tool-heading" data-role="technique-title">🌙 Deep Sleep</h2>
+
                 <div class="breathing-container">
-                    <!-- SVG Filter for Fluid Effect -->
-                    <svg class="breathing-svg-filter" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="breathing-svg-filter" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                         <defs>
                             <filter id="fluid-effect">
                                 <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-                                <feColorMatrix in="blur" mode="matrix" 
+                                <feColorMatrix in="blur" mode="matrix"
                                     values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
                                 <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
                             </filter>
                         </defs>
                     </svg>
-                    
+
                     <div class="breathing-aura"></div>
-                    <div class="breathing-circle technique-478" id="breathingCircle">
+                    <div class="breathing-circle technique-478" data-role="circle">
                         <div class="circle-text-container">
-                            <span id="circleText">Ready</span>
+                            <span data-role="circle-text">Ready</span>
                         </div>
                     </div>
-                    <div class="breathing-particles">
+                    <div class="breathing-particles" aria-hidden="true">
                         <span class="particle-float"></span>
                         <span class="particle-float"></span>
                         <span class="particle-float"></span>
@@ -263,191 +335,151 @@
                         <span class="particle-float"></span>
                     </div>
                 </div>
-                
-                <div class="breathing-text" id="breathingText">Click Begin to start your breathing practice</div>
-                
-                <!-- Session progress and time remaining -->
-                <div class="session-info" id="sessionInfo" style="display: none;">
+
+                <p class="breathing-text" data-role="breathing-text">Press Begin to start your practice</p>
+
+                <div class="session-info" data-role="session-info" style="display: none;">
                     <div class="session-progress">
-                        <div class="session-progress-fill" id="sessionProgressFill"></div>
+                        <div class="session-progress-fill" data-role="session-progress-fill"></div>
                     </div>
-                    <div class="session-time-remaining" id="sessionTimeRemaining"></div>
+                    <div class="session-time-remaining" data-role="session-time-remaining"></div>
                 </div>
-                
+
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                    <div class="progress-time" id="progressTime"></div>
+                    <div class="progress-fill" data-role="progress-fill"></div>
+                    <div class="progress-time" data-role="progress-time"></div>
                 </div>
-                
-                <div class="timer" id="timer">00:00</div>
-                
-                <div class="session-stats" id="sessionStats" style="display: none;">
+
+                <div class="timer" data-role="timer">00:00</div>
+
+                <div class="session-stats" data-role="stats" style="display: none;">
                     <div class="stat-item">
-                        <span class="stat-value" id="breathCount">0</span>
+                        <span class="stat-value" data-role="breath-count">0</span>
                         <span class="stat-label">Breaths</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value" id="avgBreathTime">0s</span>
-                        <span class="stat-label">Avg. Breath</span>
+                        <span class="stat-value" data-role="avg-breath">0s</span>
+                        <span class="stat-label">Avg. breath</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value" id="sessionProgress">0%</span>
+                        <span class="stat-value" data-role="session-progress">0%</span>
                         <span class="stat-label">Progress</span>
                     </div>
                 </div>
-                
-                <!-- SEO OPTIMIZED: CTA block above the fold -->
+
+                <!-- Pro modules inject their buttons here. Empty = zero height. -->
+                <div class="tools-row" data-slot="tools"></div>
+
                 <div class="controls">
-                    <button class="control-btn" id="startBtn" onclick="startBreathing()">Begin Practice</button>
-                    <button class="control-btn" id="pauseBtn" onclick="pauseBreathing()" disabled>Pause</button>
-                    <button class="control-btn" id="stopBtn" onclick="stopBreathing()" disabled>Stop</button>
+                    <button class="control-btn" type="button" data-role="start" data-action="start">Begin Practice</button>
+                    <button class="control-btn" type="button" data-role="pause" data-action="pause" disabled>Pause</button>
+                    <button class="control-btn" type="button" data-role="stop" data-action="stop" disabled>Stop</button>
                 </div>
-                
-                <!-- SEO OPTIMIZED: Technique information with benefits -->
-                <div class="technique-info" id="techniqueInfo">
-                    <h3>4-7-8 Breathing Technique Benefits</h3>
-                    <p>The 4-7-8 breathing technique helps activate your parasympathetic nervous system, promoting deep relaxation and better sleep. Research shows this practice can reduce anxiety, lower blood pressure, and improve sleep quality. Like the gentle phases of the moon, this practice guides you into peaceful rest.</p>
+
+                <div class="safety-ack" data-role="safety-ack" hidden>
+                    <h3>Read this before you start this pattern</h3>
+                    <div data-role="safety-ack-body"></div>
+                    <div class="safety-ack-actions">
+                        <button class="control-btn" type="button" data-action="safety-ack-confirm">I understand, begin</button>
+                        <button class="control-btn" type="button" data-action="safety-ack-cancel">Not now</button>
+                    </div>
                 </div>
+
+                <!-- Post-session cards (paywall, printable) render here. -->
+                <div data-slot="post-session"></div>
+
+                <div class="technique-info" data-role="technique-info"></div>
+
+                <p class="live-region" data-role="live-region" aria-live="polite" aria-atomic="true"></p>
             </section>
 
-            <!-- SEO OPTIMIZED: Technique selection sidebar -->
             <aside class="sidebar">
                 <section class="card technique-selector" aria-labelledby="technique-selector-heading">
-                    <h3 id="technique-selector-heading">Breathing Techniques</h3>
-                    <div class="technique-buttons">
-                        <button class="technique-btn active" onclick="selectTechnique('478')" aria-describedby="technique-478-desc">
-                            🌙 4-7-8 Deep Sleep
-                        </button>
-                        <button class="technique-btn" onclick="selectTechnique('box')" aria-describedby="technique-box-desc">
-                            🌿 Box Breathing Focus
-                        </button>
-                        <button class="technique-btn" onclick="selectTechnique('coherent')" aria-describedby="technique-coherent-desc">
-                            💗 Heart Coherence
-                        </button>
-                        <button class="technique-btn" onclick="selectTechnique('triangle')" aria-describedby="technique-triangle-desc">
-                            ☁️ Triangle Quick Calm
-                        </button>
-                        <button class="technique-btn" onclick="selectTechnique('wim')" aria-describedby="technique-wim-desc">
-                            ☀️ Energizing Breathwork
-                        </button>
+                    <h3 id="technique-selector-heading">Breathing techniques</h3>
+                    <div class="technique-buttons" data-role="technique-buttons">
+                        <button class="technique-btn active" type="button" data-action="select-technique" data-technique="478" aria-pressed="true" aria-describedby="desc-478">🌙 Deep Sleep</button>
+                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false" aria-describedby="desc-box">🌿 Focus &amp; Grounding</button>
+                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="false" aria-describedby="desc-coherent">💗 Heart Coherence</button>
+                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="false" aria-describedby="desc-sigh">🌊 Cyclic Sighing</button>
+                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false" aria-describedby="desc-extended">🌅 Extended Exhale</button>
+                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false" aria-describedby="desc-triangle">☁️ Quick Calm</button>
+                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="wim" aria-pressed="false" aria-describedby="desc-wim">☀️ Energizing Breath</button>
                     </div>
-                    
-                    <!-- Hidden descriptions for accessibility -->
-                    <div id="technique-478-desc" class="sr-only">4-7-8 breathing for sleep and relaxation</div>
-                    <div id="technique-box-desc" class="sr-only">Box breathing for focus and stress relief</div>
-                    <div id="technique-coherent-desc" class="sr-only">Heart coherence breathing for emotional balance</div>
-                    <div id="technique-triangle-desc" class="sr-only">Triangle breathing for quick calm</div>
-                    <div id="technique-wim-desc" class="sr-only">Energizing breathing exercises</div>
+
+                    <div id="desc-478" class="sr-only">4-7-8: in for four, hold seven, out for eight</div>
+                    <div id="desc-box" class="sr-only">Box breathing: four equal counts in, hold, out, hold</div>
+                    <div id="desc-coherent" class="sr-only">Coherence: five seconds in, five seconds out</div>
+                    <div id="desc-sigh" class="sr-only">Cyclic sighing: a double inhale then a long exhale</div>
+                    <div id="desc-extended" class="sr-only">Extended exhale: four seconds in, six seconds out</div>
+                    <div id="desc-triangle" class="sr-only">Triangle: three counts in, hold, out</div>
+                    <div id="desc-wim" class="sr-only">Energizing breath: fast rhythmic breathing, read the safety note first</div>
                 </section>
 
-                <section class="card donation-section">
-                    <h3>Support Wellness</h3>
-                    <p>Enjoy an ad-free experience and support our mission to make breathing exercises accessible to everyone.</p>
-                    <div class="donation-options">
-                        <a href="https://www.patreon.com/GeorgesRayess" target="_blank" rel="noopener noreferrer" class="patreon-btn">
-                            Support on Patreon
-                        </a>
-                        <div class="or-divider">or</div>
-                        <button class="donate-btn" onclick="showDonationModal()">
-                            One-time Donation
-                        </button>
+                <section class="card support-card" data-ask="support" aria-labelledby="support-heading">
+                    <h3 id="support-heading">Support this project</h3>
+                    <p>Help Me Breathe is free, needs no account, and keeps your practice on your own device. If it has been useful, there are two ways to keep it going.</p>
+                    <div class="support-options">
+                        <a class="patreon-btn" href="https://www.patreon.com/GeorgesRayess" target="_blank" rel="noopener noreferrer" data-action="support" data-support-label="patreon">Support on Patreon</a>
+                        <a class="pro-link" href="/pro" data-action="support" data-support-label="pro">Unlock Pro — one payment, forever</a>
                     </div>
                 </section>
             </aside>
         </main>
-        
-        <!-- SEO OPTIMIZED: Semantic footer -->
+
         <footer class="footer">
-            <p>Made with 💚 for a more mindful world</p>
+            <p>Made for a calmer, more mindful world.</p>
+
+            <nav class="footer-nav" aria-label="Breathing timers">
+                <a href="/timer">All timers</a>
+                <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                <a href="/box-breathing">Box breathing</a>
+                <a href="/heart-coherence-breathing">Heart coherence</a>
+                <a href="/cyclic-sighing">Cyclic sighing</a>
+                <a href="/extended-exhale-breathing">Extended exhale</a>
+                <a href="/triangle-breathing">Triangle breathing</a>
+                <a href="/energizing-breath">Energizing breath</a>
+            </nav>
+
+            <nav class="footer-nav" aria-label="Guides and comparisons">
+                <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                <a href="/breathing-exercises-for-sleep">For sleep</a>
+                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                <a href="/breathing-exercises-for-focus">For focus</a>
+                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                <a href="/breathing-apps-compared">Apps compared</a>
+                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+            </nav>
+
+            <nav class="footer-nav" aria-label="About and products">
+                <a href="/science">What the research says</a>
+                <a href="/about">About</a>
+                <a href="/pro">Pro</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/embed">Embed the timer</a>
+            </nav>
+
             <div class="social-links">
                 <a href="https://www.patreon.com/GeorgesRayess" target="_blank" rel="noopener noreferrer">Patreon</a>
             </div>
-            <nav class="footer-nav" aria-label="Breathing guides">
-                <a href="/4-7-8-breathing-technique">4-7-8 Breathing Technique Guide</a>
-            </nav>
+
             <div class="legal-links">
-                <a href="legal/privacy-policy.html">Privacy Policy</a>
-                <span style="opacity: 0.5">•</span>
-                <a href="legal/terms-of-service.html">Terms of Service</a>
-                <span style="opacity: 0.5">•</span>
+                <a href="/legal/privacy-policy">Privacy Policy</a>
+                <span aria-hidden="true" style="opacity: 0.5">•</span>
+                <a href="/legal/terms-of-service">Terms of Service</a>
+                <span aria-hidden="true" style="opacity: 0.5">•</span>
+                <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
+                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>
     </div>
 
-    <!-- Cookie Consent Banner -->
-    <div id="cookieConsent">
-        <p>
-            We use cookies to improve your experience. By continuing to use this site, you agree to our use of cookies as described in our 
-            <a href="legal/privacy-policy.html">Privacy Policy</a>.
-        </p>
-        <div class="cookie-buttons">
-            <button class="cookie-btn" onclick="acceptCookies()">Accept All</button>
-            <button class="cookie-btn secondary" onclick="acceptEssentialCookies()">Essential Only</button>
-        </div>
+    <div class="keyboard-hint" data-role="keyboard-hint">
+        Press <kbd>Space</kbd> to start or pause • <kbd>S</kbd> to stop • <kbd>1</kbd>–<kbd>7</kbd> to switch technique
     </div>
 
-    <div class="keyboard-hint" id="keyboardHint">
-        Press <kbd>Space</kbd> to start/pause • <kbd>S</kbd> to stop • <kbd>1-5</kbd> to switch techniques
-    </div>
-
-    <!-- PERFORMANCE: Load scripts at the end with defer -->
-    <script src="js/scripts.js" defer></script>
-    
-    <!-- PWA and Cookie Management -->
-    <script>
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then((registration) => {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch((registrationError) => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
-            });
-        }
-
-        // Cookie consent management
-        function checkCookieConsent() {
-            const consent = localStorage.getItem('cookieConsent');
-            if (!consent) {
-                setTimeout(() => {
-                    document.getElementById('cookieConsent').classList.add('show');
-                }, 2000);
-            }
-        }
-        
-        function acceptCookies() {
-            localStorage.setItem('cookieConsent', 'all');
-            document.getElementById('cookieConsent').classList.remove('show');
-            if (typeof gtag !== 'undefined') {
-                gtag('consent', 'update', {
-                    'analytics_storage': 'granted',
-                    'ad_storage': 'granted'
-                });
-            }
-        }
-        
-        function acceptEssentialCookies() {
-            localStorage.setItem('cookieConsent', 'essential');
-            document.getElementById('cookieConsent').classList.remove('show');
-            if (typeof gtag !== 'undefined') {
-                gtag('consent', 'update', {
-                    'analytics_storage': 'denied',
-                    'ad_storage': 'denied'
-                });
-            }
-        }
-        
-        // Check on page load
-        document.addEventListener('DOMContentLoaded', checkCookieConsent);
-        
-        // Simple donation modal
-        function showDonationModal() {
-            alert('One-time donation options coming soon! For now, please support us on Patreon. Thank you! 💚');
-        }
-    </script>
+    <script type="module" src="/js/consent.js"></script>
+    <script type="module" src="/js/app.js"></script>
+    <script type="module" src="/js/pro/index.js"></script>
 </body>
 </html>
