@@ -1,0 +1,17 @@
+node_modules/
+.vercel/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# Private planning docs (business plan, payout research) — never push to the public repo
+docs/private/
+# Local secrets
+*.secret
+tools/render/node_modules/
+tools/render/out/
+audio/*.wav

@@ -47,11 +47,14 @@ body.theme-478 {
     --progress-color: #a78bfa;
 }
 
+/* Contrast note (hard rule 12, 4.5:1): --text-secondary was #a7f3d0, which
+   measures 4.28:1 on the lightest gradient stop (#047857) and fails. #d1fae5
+   measures 4.84:1 there. Only the text token changed; the gradient is intact. */
 body.theme-box {
     background: linear-gradient(180deg, #064e3b 0%, #065f46 50%, #047857 100%);
     background-attachment: fixed;
     --text-primary: #ffffff;
-    --text-secondary: #a7f3d0;
+    --text-secondary: #d1fae5;
     --surface: rgba(255, 255, 255, 0.08);
     --border: rgba(255, 255, 255, 0.15);
     --theme-primary: #22c55e;
@@ -60,11 +63,13 @@ body.theme-box {
     --progress-color: #6ee7b7;
 }
 
+/* Contrast note (hard rule 12): --text-secondary was #fecdd3 = 4.46:1 on the
+   lightest stop (#be123c). #ffe4e6 measures 5.24:1. Gradient unchanged. */
 body.theme-coherent {
     background: linear-gradient(180deg, #831843 0%, #9f1239 50%, #be123c 100%);
     background-attachment: fixed;
     --text-primary: #ffffff;
-    --text-secondary: #fecdd3;
+    --text-secondary: #ffe4e6;
     --surface: rgba(255, 255, 255, 0.08);
     --border: rgba(255, 255, 255, 0.15);
     --theme-primary: #ec4899;
@@ -73,11 +78,15 @@ body.theme-coherent {
     --progress-color: #fda4af;
 }
 
+/* Contrast note (hard rule 12): the old last stop #0284c7 (sky-600) failed for
+   BOTH tokens — white measured 4.10:1 and #bae6fd only 3.09:1. The ramp now ends
+   one step darker at #0369a1 (sky-700) and --text-secondary is #e0f2fe, giving
+   5.93:1 for white and 5.17:1 for the secondary. Same hue, same sky identity. */
 body.theme-triangle {
-    background: linear-gradient(180deg, #075985 0%, #0c4a6e 50%, #0284c7 100%);
+    background: linear-gradient(180deg, #0c4a6e 0%, #075985 50%, #0369a1 100%);
     background-attachment: fixed;
     --text-primary: #ffffff;
-    --text-secondary: #bae6fd;
+    --text-secondary: #e0f2fe;
     --surface: rgba(255, 255, 255, 0.08);
     --border: rgba(255, 255, 255, 0.15);
     --theme-primary: #38bdf8;
@@ -86,11 +95,22 @@ body.theme-triangle {
     --progress-color: #7dd3fc;
 }
 
+/* Contrast note (hard rule 12) — OWNER REVIEW.
+   The old ramp (#d97706 / #ea580c / #f59e0b) was the only light background on
+   the site and failed badly: white body text measured 3.19 / 2.63 / 2.15:1 and
+   --text-secondary #fed7aa measured 2.35 / 1.63 / 1.59:1. This is the technique
+   that carries the safety acknowledgement, so its copy has to be legible.
+   The ramp is now a sunrise red-to-orange that keeps the warm, energizing
+   identity while matching every other theme's dark ground: white measures
+   9.9 / 7.31 / 5.02:1 and --text-secondary #fff7ed measures 8.9 / 6.88 / 4.73:1.
+   The circle, glow and progress colours are untouched, so the "sun" reads the
+   same. Revert by restoring the two commented values above if the owner
+   prefers the old look. */
 body.theme-wim {
-    background: linear-gradient(180deg, #d97706 0%, #ea580c 50%, #f59e0b 100%);
+    background: linear-gradient(180deg, #7f1d1d 0%, #9a3412 50%, #b45309 100%);
     background-attachment: fixed;
     --text-primary: #ffffff;
-    --text-secondary: #fed7aa;
+    --text-secondary: #fff7ed;
     --surface: rgba(255, 255, 255, 0.08);
     --border: rgba(255, 255, 255, 0.15);
     --theme-primary: #fbbf24;
@@ -535,10 +555,12 @@ h1 {
         filter: none !important;
     }
     
+    /* !important is required: the per-technique selectors (.technique-478.active,
+       etc.) are more specific and would otherwise keep their full animation. */
     .breathing-circle.active {
-        animation-name: breathe-simple;
+        animation-name: breathe-simple !important;
     }
-    
+
     @keyframes breathe-simple {
         0%, 100% { 
             transform: translate(-50%, -50%) scale(0.8);
@@ -1240,18 +1262,6 @@ button[aria-pressed="true"] {
     backdrop-filter: blur(10px);
 }
 
-/* Performance optimization for animations */
-@media (prefers-reduced-motion: reduce) {
-    .breathing-circle,
-    .breathing-aura,
-    .natural-element,
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-
 /* Core Web Vitals optimization */
 .breathing-container {
     contain: layout style paint;
@@ -1280,9 +1290,1010 @@ img[loading="lazy"].loaded {
     .keyboard-hint {
         display: none !important;
     }
-    
+
     .header-content {
         background: white !important;
         color: black !important;
     }
+}
+
+/* Footer guides nav (homepage) */
+.footer-nav {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    font-size: 0.8125rem;
+}
+
+/* ==========================================================================
+   BLOG / ARTICLE PAGES  (scoped to .article-page so the homepage is untouched)
+   ========================================================================== */
+.article-page header {
+    text-align: left;
+    margin-bottom: 1.5rem;
+}
+
+/* Breadcrumb */
+.article-page .breadcrumb {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.article-page .breadcrumb li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.article-page .breadcrumb li:not(:last-child)::after {
+    content: '›';
+    opacity: 0.6;
+}
+
+.article-page .breadcrumb a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.article-page .breadcrumb a:hover {
+    color: var(--text-primary);
+}
+
+/* Article card */
+.article-page article {
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 3rem;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.article-page article > header {
+    margin-bottom: 2rem;
+}
+
+.article-page h1 {
+    font-size: 2.25rem;
+    font-weight: 300;
+    line-height: 1.25;
+    margin-bottom: 1rem;
+    letter-spacing: 0.02em;
+}
+
+.article-page .article-meta {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.article-page .lead {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+    font-weight: 400;
+    margin-bottom: 1rem;
+}
+
+.article-page article section {
+    margin: 2.5rem 0;
+}
+
+.article-page h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.article-page h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.article-page p {
+    line-height: 1.75;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.article-page article ul {
+    margin: 0 0 1rem 1.25rem;
+    color: var(--text-secondary);
+}
+
+.article-page article li {
+    line-height: 1.7;
+    margin-bottom: 0.5rem;
+}
+
+.article-page strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.article-page article a {
+    color: var(--theme-secondary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.3s ease;
+}
+
+.article-page article a:hover {
+    color: var(--text-primary);
+}
+
+/* Step cards */
+.article-page .steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.article-page .step {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--theme-primary);
+    border-radius: 0 12px 12px 0;
+    padding: 1.25rem 1.5rem;
+}
+
+.article-page .step h3 {
+    margin-bottom: 0.35rem;
+}
+
+.article-page .step p {
+    margin-bottom: 0;
+}
+
+/* FAQ */
+.article-page .faq-item {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.article-page .faq-item:last-child {
+    border-bottom: none;
+}
+
+.article-page .faq-item h3 {
+    margin-bottom: 0.5rem;
+}
+
+.article-page .faq-item p {
+    margin-bottom: 0;
+}
+
+/* CTA blocks */
+.article-page .cta-block,
+.article-page .cta-block-final {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(139, 92, 246, 0.1));
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 2.5rem 0;
+    text-align: center;
+}
+
+.article-page .cta-block h2,
+.article-page .cta-block-final h2 {
+    margin-bottom: 0.5rem;
+}
+
+.article-page .cta-block p,
+.article-page .cta-block-final p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.article-page .cta-button,
+.article-page .cta-button-large {
+    display: inline-block;
+    background: var(--theme-primary);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 25px;
+    padding: 0.875rem 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.article-page .cta-button-large {
+    padding: 1.125rem 2.75rem;
+    font-size: 1.0625rem;
+}
+
+.article-page .cta-button:hover,
+.article-page .cta-button-large:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+    color: #fff;
+}
+
+.article-page .cta-subtext {
+    margin: 1rem 0 0;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    opacity: 0.85;
+}
+
+/* Related techniques (aside) */
+.article-page aside {
+    max-width: 760px;
+    margin: 1.5rem auto 0;
+}
+
+.article-page .related-techniques {
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 2rem;
+}
+
+.article-page .related-techniques h3 {
+    margin-bottom: 1rem;
+}
+
+.article-page .related-techniques ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0;
+}
+
+.article-page .related-techniques a {
+    color: var(--theme-secondary);
+    text-decoration: none;
+    text-underline-offset: 2px;
+}
+
+.article-page .related-techniques a:hover {
+    color: var(--text-primary);
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .article-page article {
+        padding: 1.75rem 1.5rem;
+    }
+
+    .article-page h1 {
+        font-size: 1.75rem;
+    }
+
+    .article-page .related-techniques {
+        padding: 1.5rem;
+    }
+}
+
+/* ==========================================================================
+   v2 ADDITIONS — new themes, slots, page systems.
+   Everything above this line is unchanged. Extend, do not redesign.
+   ========================================================================== */
+
+[hidden] {
+    display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   THEME: cyclic sighing (teal / sea)
+   White body text on the lightest stop (#115e59) measures 7.6:1;
+   --text-secondary #99f6e4 on the same stop measures 6.0:1.
+   -------------------------------------------------------------------------- */
+body.theme-sigh {
+    background: linear-gradient(180deg, #042f2e 0%, #134e4a 50%, #115e59 100%);
+    background-attachment: fixed;
+    --text-primary: #ffffff;
+    --text-secondary: #99f6e4;
+    --surface: rgba(255, 255, 255, 0.08);
+    --border: rgba(255, 255, 255, 0.15);
+    --theme-primary: #2dd4bf;
+    --theme-secondary: #ccfbf1;
+    --theme-glow: #2dd4bf;
+    --progress-color: #5eead4;
+}
+
+body.theme-sigh .nature-bg {
+    background: radial-gradient(ellipse at 50% 90%, rgba(45, 212, 191, 0.12) 0%, transparent 60%);
+}
+
+/* --------------------------------------------------------------------------
+   THEME: extended exhale (amber dusk)
+   White body text on the lightest stop (#92400e) measures 7.1:1;
+   --text-secondary #fde68a on the same stop measures 5.7:1.
+   -------------------------------------------------------------------------- */
+body.theme-extended {
+    background: linear-gradient(180deg, #431407 0%, #7c2d12 50%, #92400e 100%);
+    background-attachment: fixed;
+    --text-primary: #ffffff;
+    --text-secondary: #fde68a;
+    --surface: rgba(255, 255, 255, 0.08);
+    --border: rgba(255, 255, 255, 0.15);
+    --theme-primary: #f59e0b;
+    --theme-secondary: #fcd34d;
+    --theme-glow: #f59e0b;
+    --progress-color: #fbbf24;
+}
+
+body.theme-extended .nature-bg {
+    background: radial-gradient(ellipse at 50% 15%, rgba(245, 158, 11, 0.12) 0%, transparent 60%);
+}
+
+/* Neither new theme owns a decorative element layer, so hide them all. */
+body.theme-sigh .natural-element,
+body.theme-extended .natural-element {
+    display: none;
+}
+
+/* Circles ------------------------------------------------------------------ */
+.breathing-circle.technique-sigh {
+    background: radial-gradient(circle at 35% 35%, #ccfbf1 0%, #2dd4bf 55%, #0d9488 100%);
+    --breath-cycle-duration: 9s;
+}
+
+.breathing-circle.technique-extended {
+    background: radial-gradient(circle at 35% 35%, #fef3c7 0%, #fbbf24 55%, #d97706 100%);
+    --breath-cycle-duration: 10s;
+}
+
+/* Cyclic sighing: 2s inhale, 1s top-up inhale, 6s exhale = 9s total */
+@keyframes breathe-sigh {
+    0% {
+        transform: translate(-50%, -50%) scale(0.75);
+        border-radius: 50%;
+    }
+    22.22% { /* 2s / 9s — end of the first inhale */
+        transform: translate(-50%, -50%) scale(1.18);
+        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
+    }
+    33.33% { /* 3s / 9s — end of the short top-up inhale */
+        transform: translate(-50%, -50%) scale(1.3);
+        border-radius: 42% 58% 52% 48% / 48% 52% 48% 52%;
+    }
+    100% { /* 9s / 9s — end of the long exhale */
+        transform: translate(-50%, -50%) scale(0.75);
+        border-radius: 50%;
+    }
+}
+
+/* Extended exhale: 4s inhale, 6s exhale = 10s total */
+@keyframes breathe-extended {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        border-radius: 50%;
+    }
+    40% { /* 4s / 10s — end of inhale */
+        transform: translate(-50%, -50%) scale(1.25);
+        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(0.8);
+        border-radius: 50%;
+    }
+}
+
+.breathing-circle.technique-sigh.active {
+    animation: breathe-sigh 9s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.breathing-circle.technique-extended.active {
+    animation: breathe-extended 10s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* The short top-up inhale in cyclic sighing gets a brief extra glow so the two
+   consecutive inhale phases are visually distinguishable. */
+.breathing-circle.inhale-short {
+    box-shadow: 0 0 90px var(--theme-glow), 0 0 30px rgba(255, 255, 255, 0.35);
+}
+
+/* --------------------------------------------------------------------------
+   Session suppression: no ads and no asks while someone is breathing.
+   -------------------------------------------------------------------------- */
+body.session-active .ad-slot,
+body.session-active [data-ask] {
+    display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   Ad slots. Height is reserved so toggling them measures CLS 0.
+   Allowed on content and comparison pages only, below the fold.
+   -------------------------------------------------------------------------- */
+.ad-slot {
+    min-height: 280px;
+    max-width: 760px;
+    margin: 2.5rem auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    overflow: hidden;
+}
+
+.ad-slot::before {
+    content: 'Advertisement';
+    display: block;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    opacity: 0.55;
+    margin-bottom: 0.5rem;
+}
+
+.ad-slot .adsbygoogle {
+    width: 100%;
+}
+
+.ad-slot--leaderboard {
+    min-height: 90px;
+}
+
+/* --------------------------------------------------------------------------
+   Engine slots. Empty slots take no space until a module fills them.
+   -------------------------------------------------------------------------- */
+[data-slot]:empty {
+    display: none;
+}
+
+.tools-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin: 0 0 1rem;
+}
+
+.tools-row .tool-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.tools-row .tool-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+/* --------------------------------------------------------------------------
+   Post-session card (the Pro agent renders paywall + capture cards in here)
+   -------------------------------------------------------------------------- */
+.post-session-card {
+    position: relative;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 1.75rem 1.75rem 1.5rem;
+    margin: 1.5rem 0 0;
+    text-align: left;
+}
+
+.post-session-card h3 {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    padding-right: 2rem;
+}
+
+.post-session-card p {
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.post-session-card .card-dismiss {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.post-session-card .card-dismiss:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.post-session-card form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+}
+
+.post-session-card input[type='email'],
+.post-session-card input[type='text'] {
+    flex: 1 1 200px;
+    min-width: 0;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.875rem;
+}
+
+.post-session-card input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.75;
+}
+
+.post-session-card button[type='submit'] {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    border: none;
+    background: var(--theme-primary);
+    color: #fff;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post-session-card button[type='submit']:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.post-session-card .form-note {
+    flex: 1 1 100%;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0;
+}
+
+.post-session-card .form-error {
+    flex: 1 1 100%;
+    font-size: 0.8125rem;
+    color: #fecaca;
+    margin: 0.25rem 0 0;
+}
+
+/* --------------------------------------------------------------------------
+   Safety acknowledgement panel (techniques with requiresSafetyAck)
+   -------------------------------------------------------------------------- */
+.safety-ack {
+    display: block;
+    text-align: left;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--theme-primary);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.safety-ack h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.safety-ack p,
+.safety-ack li {
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--text-primary);
+}
+
+.safety-ack ul {
+    margin: 0 0 1rem 1.1rem;
+}
+
+.safety-ack li {
+    margin-bottom: 0.5rem;
+}
+
+.safety-ack .safety-ack-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   Technique pages: timer on top, prose below, switcher strip between.
+   -------------------------------------------------------------------------- */
+.technique-page .main-content {
+    display: block;
+}
+
+.technique-page .breathing-section {
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.technique-page article,
+.technique-page .prose {
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 3rem;
+    max-width: 760px;
+    margin: 2rem auto 0;
+}
+
+.technique-switcher {
+    max-width: 760px;
+    margin: 1.5rem auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.technique-switcher a {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.8125rem;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.technique-switcher a:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px);
+}
+
+.technique-switcher a[aria-current='page'] {
+    background: var(--theme-primary);
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Card grid used by /timer and other hub pages */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.link-card {
+    display: block;
+    padding: 1.25rem;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.link-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-primary);
+}
+
+.link-card strong {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+.link-card span {
+    display: block;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   Support card (replaces the old donation alert dead end)
+   -------------------------------------------------------------------------- */
+.support-card {
+    padding: 2rem;
+    text-align: center;
+}
+
+.support-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.support-card p {
+    color: var(--text-secondary);
+    margin-bottom: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.support-card .support-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.pro-link {
+    display: inline-block;
+    padding: 0.875rem 1.5rem;
+    border-radius: 25px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.pro-link:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-2px);
+}
+
+/* --------------------------------------------------------------------------
+   Screen-reader-only live region
+   -------------------------------------------------------------------------- */
+.live-region {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Focus visibility on every interactive element
+   -------------------------------------------------------------------------- */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible,
+[role='button']:focus-visible {
+    outline: 3px solid var(--theme-primary);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   Kiosk / projector mode
+   -------------------------------------------------------------------------- */
+.breathing-section.kiosk {
+    max-width: none;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+    padding: 2rem;
+}
+
+.breathing-section.kiosk .settings-btn,
+.breathing-section.kiosk .settings-panel,
+.breathing-section.kiosk .controls,
+.breathing-section.kiosk .session-stats,
+.breathing-section.kiosk .progress-bar,
+.breathing-section.kiosk .technique-info,
+.breathing-section.kiosk [data-slot],
+.breathing-section.kiosk .technique-buttons {
+    display: none !important;
+}
+
+.breathing-section.kiosk .breathing-container {
+    width: min(70vh, 70vw);
+    height: min(70vh, 70vw);
+}
+
+.breathing-section.kiosk .breathing-circle {
+    width: min(56vh, 56vw);
+    height: min(56vh, 56vw);
+}
+
+.breathing-section.kiosk [data-role='circle-text'] {
+    font-size: clamp(2rem, 7vw, 5rem);
+    font-weight: 600;
+}
+
+.breathing-section.kiosk [data-role='breathing-text'] {
+    font-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    background: none;
+}
+
+.breathing-section.kiosk [data-role='timer'] {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion: no scale animation anywhere. The phase is carried by
+   colour and opacity instead, which the engine sets via data-phase.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .breathing-circle,
+    .breathing-circle.active,
+    .breathing-circle.technique-sigh.active,
+    .breathing-circle.technique-extended.active {
+        animation: none !important;
+        transform: translate(-50%, -50%) scale(1) !important;
+        transition: opacity 600ms linear, filter 600ms linear !important;
+    }
+
+    .breathing-circle[data-phase='inhale'] {
+        opacity: 1;
+        filter: brightness(1.15);
+    }
+
+    .breathing-circle[data-phase='hold'] {
+        opacity: 0.85;
+        filter: brightness(1);
+    }
+
+    .breathing-circle[data-phase='exhale'] {
+        opacity: 0.6;
+        filter: brightness(0.8);
+    }
+
+    .breathing-aura,
+    .breathing-particles {
+        display: none;
+    }
+
+    .technique-switcher a:hover,
+    .link-card:hover,
+    .post-session-card button[type='submit']:hover,
+    .pro-link:hover {
+        transform: none;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Responsive tidy-up for the new blocks
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    .technique-page article,
+    .technique-page .prose {
+        padding: 1.75rem 1.5rem;
+    }
+
+    .ad-slot {
+        margin: 2rem auto;
+    }
+
+    .post-session-card {
+        padding: 1.5rem 1.25rem 1.25rem;
+    }
+
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   data-role equivalents of the two id-based rules above. The engine no longer
+   uses ids (multiple timers can share a page), so these carry the same styling.
+   -------------------------------------------------------------------------- */
+.circle-text-container [data-role='circle-text'] {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    position: relative;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+[data-role='technique-title'] {
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    letter-spacing: 0.05em;
+}
+
+/* Kiosk styling also applies when the kiosk class lands on an ancestor root. */
+.kiosk .breathing-section {
+    max-width: none;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+    padding: 2rem;
+}
+
+.kiosk .settings-btn,
+.kiosk .settings-panel,
+.kiosk .controls,
+.kiosk .session-stats,
+.kiosk .progress-bar,
+.kiosk .technique-info,
+.kiosk .sidebar,
+.kiosk [data-slot],
+.kiosk .technique-buttons {
+    display: none !important;
+}
+
+.kiosk .breathing-container {
+    width: min(70vh, 70vw);
+    height: min(70vh, 70vw);
+}
+
+.kiosk .breathing-circle {
+    width: min(56vh, 56vw);
+    height: min(56vh, 56vw);
+}
+
+.kiosk .circle-text-container [data-role='circle-text'] {
+    font-size: clamp(2rem, 7vw, 5rem);
+    font-weight: 600;
+}
+
+.kiosk [data-role='breathing-text'] {
+    font-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    background: none;
+}
+
+.kiosk [data-role='timer'] {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+}
+
+/* Two timers side by side (comparison pages) */
+.timer-pair {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.timer-pair .breathing-section {
+    padding: 2rem 1.5rem;
 }

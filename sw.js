@@ -1,0 +1,123 @@
+/*
+ * Service Worker for Help Me Breathe
+ * -----------------------------------------------------------------------------
+ * Strategy:
+ *   - HTML navigations        : network-first, cache as offline fallback, then
+ *                               /offline.html when there is nothing cached
+ *   - same-origin assets      : stale-while-revalidate
+ *   - /api/* and cross-origin : never intercepted, never cached
+ *
+ * Bump CACHE_NAME on every deploy that changes CSS, JS or the app shell.
+ * Changing this file is what triggers the service-worker update.
+ */
+const CACHE_NAME = 'hmb-v2-2026-09-09b';
+const OFFLINE_URL = '/offline.html';
+
+// App shell. Install does NOT fail when one entry 404s (a page can ship later);
+// each URL is fetched independently and failures are skipped.
+const PRECACHE_URLS = [
+  '/',
+  '/timer',
+  '/offline.html',
+  '/css/styles.css',
+  '/js/app.js',
+  '/js/techniques.js',
+  '/js/storage.js',
+  '/js/analytics.js',
+  '/js/entitlements.js',
+  '/js/consent.js',
+  '/js/pro/index.js',
+  '/manifest.json',
+  '/images/icon-192.png',
+  '/images/icon-512.png',
+  '/images/apple-touch-icon.png'
+];
+
+async function precache() {
+  const cache = await caches.open(CACHE_NAME);
+  await Promise.allSettled(
+    PRECACHE_URLS.map(async (url) => {
+      try {
+        const response = await fetch(new Request(url, { cache: 'reload' }));
+        if (response && response.ok) await cache.put(url, response);
+      } catch (error) {
+        // A missing or unreachable entry must never block installation.
+      }
+    })
+  );
+}
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(precache().then(() => self.skipWaiting()));
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim())
+  );
+});
+
+function isCacheable(url) {
+  if (url.origin !== self.location.origin) return false;
+  if (url.pathname.startsWith('/api/')) return false;
+  return true;
+}
+
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  if (request.method !== 'GET') return;
+
+  let url;
+  try {
+    url = new URL(request.url);
+  } catch (error) {
+    return;
+  }
+
+  // Cross-origin (fonts, analytics, ads) and the API go straight to the network.
+  if (!isCacheable(url)) return;
+
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() =>
+          caches
+            .match(request)
+            .then((cached) => cached || caches.match(OFFLINE_URL))
+            .then((cached) => cached || Response.error())
+        )
+    );
+    return;
+  }
+
+  // Same-origin assets: stale-while-revalidate.
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      const networkFetch = fetch(request)
+        .then((response) => {
+          if (response && response.status === 200 && response.type !== 'opaque') {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() => cached);
+      return cached || networkFetch;
+    })
+  );
+});
+
+// Let the page trigger an immediate update.
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
+});

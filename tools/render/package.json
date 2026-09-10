@@ -1,0 +1,22 @@
+{
+  "name": "helpmebreath-render",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Headless capture tool for Help Me Breathe: records short breathing clips and Pinterest stills from /render.html. Lives in its own folder so the site itself stays dependency-free.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "list": "node render-short.mjs --list",
+    "one": "node render-short.mjs --job 0 --out ./out",
+    "videos": "node render-short.mjs --job all --kind video --out ./out",
+    "pins": "node render-short.mjs --job all --kind pin --out ./out",
+    "all": "node render-short.mjs --job all --out ./out",
+    "postinstall": "node -e \"console.log('Next: npx playwright install chromium (skip if the browsers are already installed)')\""
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0"
+  }
+}

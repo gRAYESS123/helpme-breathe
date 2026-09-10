@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "generated": "2026-09-10",
+  "generator": "tools/make-soundscapes.mjs",
+  "license": "Generated procedurally by Help Me Breathe; CC0",
+  "beds": [
+    {
+      "name": "rain",
+      "label": "Rain",
+      "description": "Steady rain with scattered drops.",
+      "files": {
+        "ogg": "/audio/rain.ogg",
+        "m4a": "/audio/rain.m4a"
+      },
+      "durationSec": 60,
+      "loop": true,
+      "license": "Generated procedurally by Help Me Breathe; CC0"
+    },
+    {
+      "name": "ocean",
+      "label": "Ocean",
+      "description": "Slow waves with a ten-second swell.",
+      "files": {
+        "ogg": "/audio/ocean.ogg",
+        "m4a": "/audio/ocean.m4a"
+      },
+      "durationSec": 60,
+      "loop": true,
+      "license": "Generated procedurally by Help Me Breathe; CC0"
+    },
+    {
+      "name": "brown-noise",
+      "label": "Brown noise",
+      "description": "A deep, even hiss with the high end rolled off.",
+      "files": {
+        "ogg": "/audio/brown-noise.ogg",
+        "m4a": "/audio/brown-noise.m4a"
+      },
+      "durationSec": 60,
+      "loop": true,
+      "license": "Generated procedurally by Help Me Breathe; CC0"
+    },
+    {
+      "name": "drone",
+      "label": "Low drone",
+      "description": "A quiet bass hum that drifts slowly.",
+      "files": {
+        "ogg": "/audio/drone.ogg",
+        "m4a": "/audio/drone.m4a"
+      },
+      "durationSec": 60,
+      "loop": true,
+      "license": "Generated procedurally by Help Me Breathe; CC0"
+    },
+    {
+      "name": "forest",
+      "label": "Forest",
+      "description": "Leaves and wind, with a bird now and then.",
+      "files": {
+        "ogg": "/audio/forest.ogg",
+        "m4a": "/audio/forest.m4a"
+      },
+      "durationSec": 60,
+      "loop": true,
+      "license": "Generated procedurally by Help Me Breathe; CC0"
+    },
+    {
+      "name": "night",
+      "label": "Night",
+      "description": "Almost silence, with a slow low pulse.",
+      "files": {
+        "ogg": "/audio/night.ogg",
+        "m4a": "/audio/night.m4a"
+      },
+      "durationSec": 60,
+      "loop": true,
+      "license": "Generated procedurally by Help Me Breathe; CC0"
+    }
+  ],
+  "cues": [
+    {
+      "name": "cue-inhale",
+      "label": "Inhale cue",
+      "description": "A rising tone for the start of an inhale.",
+      "files": {
+        "ogg": "/audio/cue-inhale.ogg",
+        "m4a": "/audio/cue-inhale.m4a"
+      },
+      "durationSec": 1.1,
+      "loop": false,
+      "license": "Generated procedurally by Help Me Breathe; CC0"
+    },
+    {
+      "name": "cue-exhale",
+      "label": "Exhale cue",
+      "description": "A falling tone for the start of an exhale.",
+      "files": {
+        "ogg": "/audio/cue-exhale.ogg",
+        "m4a": "/audio/cue-exhale.m4a"
+      },
+      "durationSec": 1.3,
+      "loop": false,
+      "license": "Generated procedurally by Help Me Breathe; CC0"
+    },
+    {
+      "name": "cue-hold",
+      "label": "Hold cue",
+      "description": "A soft bell for a hold.",
+      "files": {
+        "ogg": "/audio/cue-hold.ogg",
+        "m4a": "/audio/cue-hold.m4a"
+      },
+      "durationSec": 0.9,
+      "loop": false,
+      "license": "Generated procedurally by Help Me Breathe; CC0"
+    }
+  ]
+}

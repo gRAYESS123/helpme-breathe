@@ -1,0 +1,16 @@
+{
+  "name": "helpmebreath",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Help Me Breathe — a static guided-breathing site with a handful of serverless functions. Zero runtime dependencies, no bundler, no framework.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "check": "node tools/site-check.mjs",
+    "sitemap": "node tools/build-sitemap.mjs",
+    "test": "node --test tools/"
+  }
+}

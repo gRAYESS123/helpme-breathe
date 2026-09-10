@@ -1,0 +1,51 @@
+{
+  "name": "Help Me Breathe — Guided Breathing Exercises",
+  "short_name": "Breathe",
+  "description": "Free guided breathing timer with seven patterns: 4-7-8, box breathing, heart coherence, cyclic sighing, extended exhale, triangle and energizing breath.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#1e1b4b",
+  "theme_color": "#8b5cf6",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["health", "lifestyle", "medical"],
+  "icons": [
+    {
+      "src": "/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "4-7-8 breathing",
+      "short_name": "4-7-8",
+      "description": "Open the timer set to 4-7-8 breathing",
+      "url": "/timer?t=478",
+      "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Box breathing",
+      "short_name": "Box",
+      "description": "Open the timer set to box breathing",
+      "url": "/timer?t=box",
+      "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Cyclic sighing",
+      "short_name": "Sighing",
+      "description": "Open the timer set to cyclic sighing",
+      "url": "/timer?t=sigh",
+      "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

@@ -1,0 +1,990 @@
+/* =============================================================================
+   embed/v1/frame.css — styles for the embeddable breathing frame.
+
+   Constraints this file exists to satisfy (AGENT_BRIEF hard rule 14):
+     - ZERO third-party requests. No @import, no font CDN, no remote images.
+       System fonts only. Every colour is literal or a custom property.
+     - Visual parity with the product: the theme colour tokens, the circle
+       gradient, the per-technique breathing keyframes and the kiosk sizing are
+       copied from css/styles.css so the widget looks like Help Me Breathe.
+     - The frame is versioned. Never change v1 in a way that alters an existing
+       embed's layout; ship v2 alongside instead (see docs/EMBED.md).
+
+   Two axes of appearance:
+     1. `body.theme-*`   — the technique's palette, applied by js/app.js.
+     2. `html[data-hmb-surface]` — light or dark page surround. In light mode the
+        card keeps the technique's dark gradient, so every text/background
+        contrast ratio the product already audited is preserved unchanged.
+   ============================================================================= */
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* System font stack — nothing is fetched. */
+    --hmb-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+        Arial, 'Noto Sans', sans-serif;
+
+    /* Neutral fallback palette; every theme below overrides these. */
+    --hmb-gradient: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+    --text-primary: #ffffff;
+    --text-secondary: #c7d2fe;
+    --surface: rgba(255, 255, 255, 0.08);
+    --border: rgba(255, 255, 255, 0.15);
+    --shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.35);
+    --theme-primary: #8b5cf6;
+    --theme-secondary: #c7d2fe;
+    --theme-glow: #8b5cf6;
+    --progress-color: #a78bfa;
+
+    /* Light surround tokens (used only when the surround is light). */
+    --hmb-page-bg: #f1f5f9;
+    --hmb-page-ink: #334155;
+}
+
+/* -----------------------------------------------------------------------------
+   Theme palettes — copied verbatim from css/styles.css, including the contrast
+   corrections noted there. Each also exposes the gradient as --hmb-gradient so
+   the light surround can paint it onto the card instead of the page.
+   -------------------------------------------------------------------------- */
+
+body.theme-478 {
+    --hmb-gradient: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+    --text-primary: #ffffff;
+    --text-secondary: #c7d2fe;
+    --theme-primary: #8b5cf6;
+    --theme-secondary: #c7d2fe;
+    --theme-glow: #8b5cf6;
+    --progress-color: #a78bfa;
+}
+
+body.theme-box {
+    --hmb-gradient: linear-gradient(180deg, #064e3b 0%, #065f46 50%, #047857 100%);
+    --text-primary: #ffffff;
+    --text-secondary: #d1fae5;
+    --theme-primary: #22c55e;
+    --theme-secondary: #a7f3d0;
+    --theme-glow: #22c55e;
+    --progress-color: #6ee7b7;
+}
+
+body.theme-coherent {
+    --hmb-gradient: linear-gradient(180deg, #831843 0%, #9f1239 50%, #be123c 100%);
+    --text-primary: #ffffff;
+    --text-secondary: #ffe4e6;
+    --theme-primary: #ec4899;
+    --theme-secondary: #fecdd3;
+    --theme-glow: #ec4899;
+    --progress-color: #fda4af;
+}
+
+body.theme-triangle {
+    --hmb-gradient: linear-gradient(180deg, #0c4a6e 0%, #075985 50%, #0369a1 100%);
+    --text-primary: #ffffff;
+    --text-secondary: #e0f2fe;
+    --theme-primary: #38bdf8;
+    --theme-secondary: #bae6fd;
+    --theme-glow: #38bdf8;
+    --progress-color: #7dd3fc;
+}
+
+body.theme-wim {
+    --hmb-gradient: linear-gradient(180deg, #7f1d1d 0%, #9a3412 50%, #b45309 100%);
+    --text-primary: #ffffff;
+    --text-secondary: #fff7ed;
+    --theme-primary: #fbbf24;
+    --theme-secondary: #fed7aa;
+    --theme-glow: #fbbf24;
+    --progress-color: #fcd34d;
+}
+
+body.theme-sigh {
+    --hmb-gradient: linear-gradient(180deg, #042f2e 0%, #134e4a 50%, #115e59 100%);
+    --text-primary: #ffffff;
+    --text-secondary: #99f6e4;
+    --theme-primary: #2dd4bf;
+    --theme-secondary: #ccfbf1;
+    --theme-glow: #2dd4bf;
+    --progress-color: #5eead4;
+}
+
+body.theme-extended {
+    --hmb-gradient: linear-gradient(180deg, #431407 0%, #7c2d12 50%, #92400e 100%);
+    --text-primary: #ffffff;
+    --text-secondary: #fde68a;
+    --theme-primary: #f59e0b;
+    --theme-secondary: #fcd34d;
+    --theme-glow: #f59e0b;
+    --progress-color: #fbbf24;
+}
+
+/* -----------------------------------------------------------------------------
+   Page frame
+   -------------------------------------------------------------------------- */
+
+html {
+    background: transparent;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--hmb-font);
+    color: var(--text-primary);
+    background: var(--hmb-gradient);
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    overflow-x: hidden;
+    line-height: 1.5;
+}
+
+.hmb-shell {
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Dark surround (default): the page carries the gradient, the card is glass. */
+.hmb-card {
+    position: relative;
+    background: var(--surface);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 28px 22px 24px;
+    text-align: center;
+    overflow: visible;
+}
+
+/* Light surround: the card keeps the audited dark gradient, the page goes pale.
+   Nothing inside the card changes, so no contrast ratio moves. */
+html[data-hmb-surface='light'] body {
+    background: var(--hmb-page-bg);
+}
+
+html[data-hmb-surface='light'] .hmb-card {
+    background: var(--hmb-gradient);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 40px -12px rgba(15, 23, 42, 0.25);
+}
+
+html[data-hmb-surface='light'] .hmb-attrib a,
+html[data-hmb-surface='light'] .hmb-attrib {
+    color: var(--hmb-page-ink);
+}
+
+/* `auto` follows the host visitor's OS preference. */
+@media (prefers-color-scheme: light) {
+    html[data-hmb-surface='auto'] body {
+        background: var(--hmb-page-bg);
+    }
+
+    html[data-hmb-surface='auto'] .hmb-card {
+        background: var(--hmb-gradient);
+        border-color: rgba(0, 0, 0, 0.08);
+        box-shadow: 0 12px 40px -12px rgba(15, 23, 42, 0.25);
+    }
+
+    html[data-hmb-surface='auto'] .hmb-attrib a,
+    html[data-hmb-surface='auto'] .hmb-attrib {
+        color: var(--hmb-page-ink);
+    }
+}
+
+/* -----------------------------------------------------------------------------
+   Practitioner branding row (white-label only)
+   -------------------------------------------------------------------------- */
+
+.hmb-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    min-height: 1px;
+}
+
+/* A `display` declaration in this file outranks the UA's [hidden] rule, so
+   every element the script toggles with .hidden needs this explicitly. */
+.hmb-brand[hidden],
+.hmb-brand img[hidden] {
+    display: none;
+}
+
+.hmb-brand img {
+    max-height: 34px;
+    max-width: 150px;
+    width: auto;
+    height: auto;
+    display: block;
+    border-radius: 6px;
+}
+
+.hmb-brand-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.01em;
+}
+
+/* -----------------------------------------------------------------------------
+   Headings and copy
+   -------------------------------------------------------------------------- */
+
+.hmb-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.breathing-text {
+    font-size: 1.0625rem;
+    margin: 18px 0 4px;
+    color: var(--text-primary);
+    font-weight: 400;
+    min-height: 1.5em;
+}
+
+.timer {
+    font-size: 1.75rem;
+    font-weight: 300;
+    margin: 10px 0 0;
+    color: var(--text-primary);
+    letter-spacing: 0.1em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* -----------------------------------------------------------------------------
+   Settings
+   -------------------------------------------------------------------------- */
+
+.settings-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease, transform 0.3s ease;
+    font-size: 1.05rem;
+    line-height: 1;
+    color: var(--text-primary);
+}
+
+.settings-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.settings-panel {
+    position: absolute;
+    top: 56px;
+    right: 14px;
+    background: #14162b;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+    z-index: 10;
+    min-width: 190px;
+    text-align: left;
+}
+
+.settings-panel.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.setting-item:last-child {
+    margin-bottom: 0;
+}
+
+.setting-label {
+    font-size: 0.875rem;
+    color: #ffffff;
+}
+
+.toggle-switch {
+    position: relative;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.toggle-switch.active {
+    background: var(--theme-primary);
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #ffffff;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s ease;
+}
+
+.toggle-switch.active::after {
+    transform: translateX(20px);
+}
+
+/* -----------------------------------------------------------------------------
+   The circle — geometry, gradient and per-technique keyframes copied from
+   css/styles.css so the widget breathes exactly like the site.
+   -------------------------------------------------------------------------- */
+
+.breathing-container {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    margin: 18px auto 6px;
+    contain: layout style paint;
+}
+
+.breathing-circle {
+    width: 170px;
+    height: 170px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--theme-secondary) 0%, var(--theme-primary) 70%);
+    box-shadow: 0 0 48px var(--theme-glow);
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+.circle-text-container {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    pointer-events: none;
+    animation: none !important;
+}
+
+.circle-text-container span {
+    font-size: 1.125rem;
+    font-weight: 600;
+    /* Deliberately literal: the circle is a saturated gradient in every theme,
+       so the label is white with a shadow rather than a theme token. The JS
+       swaps it to near-black when a custom accent is too light for white. */
+    color: var(--hmb-circle-ink, #ffffff);
+    text-shadow: var(--hmb-circle-shadow, 0 2px 6px rgba(0, 0, 0, 0.45));
+    white-space: nowrap;
+}
+
+.breathing-aura {
+    position: absolute;
+    inset: -30px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--theme-glow) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 1s ease;
+    pointer-events: none;
+    filter: blur(28px);
+}
+
+.breathing-circle.active ~ .breathing-aura {
+    opacity: 0.28;
+}
+
+/* 4-7-8: 4s in, 7s hold, 8s out = 19s */
+@keyframes hmb-breathe-478 {
+    0% { transform: translate(-50%, -50%) scale(0.7); border-radius: 50%; }
+    21.05% { transform: translate(-50%, -50%) scale(1.3); border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%; }
+    57.89% { transform: translate(-50%, -50%) scale(1.3); border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%; }
+    100% { transform: translate(-50%, -50%) scale(0.7); border-radius: 50%; }
+}
+
+/* Box: 4-4-4-4 = 16s */
+@keyframes hmb-breathe-box {
+    0% { transform: translate(-50%, -50%) scale(0.8); border-radius: 50%; }
+    25% { transform: translate(-50%, -50%) scale(1.2); border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%; }
+    50% { transform: translate(-50%, -50%) scale(1.2); border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%; }
+    75% { transform: translate(-50%, -50%) scale(0.8); border-radius: 55% 45% 50% 50% / 50% 50% 45% 55%; }
+    100% { transform: translate(-50%, -50%) scale(0.8); border-radius: 50%; }
+}
+
+/* Coherence: 5-5 = 10s */
+@keyframes hmb-breathe-coherent {
+    0% { transform: translate(-50%, -50%) scale(0.8); border-radius: 50%; }
+    50% { transform: translate(-50%, -50%) scale(1.2); border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%; }
+    100% { transform: translate(-50%, -50%) scale(0.8); border-radius: 50%; }
+}
+
+/* Triangle: 3-3-3 = 9s */
+@keyframes hmb-breathe-triangle {
+    0% { transform: translate(-50%, -50%) scale(0.8); border-radius: 50%; }
+    33.33% { transform: translate(-50%, -50%) scale(1.2); border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%; }
+    66.67% { transform: translate(-50%, -50%) scale(1.2); border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%; }
+    100% { transform: translate(-50%, -50%) scale(0.8); border-radius: 50%; }
+}
+
+/* Energizing: 2-1 = 3s */
+@keyframes hmb-breathe-wim {
+    0% { transform: translate(-50%, -50%) scale(0.9); border-radius: 50%; }
+    66.67% { transform: translate(-50%, -50%) scale(1.1); border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%; }
+    100% { transform: translate(-50%, -50%) scale(0.9); border-radius: 50%; }
+}
+
+/* Cyclic sighing: 2s in, 1s top-up, 6s out = 9s */
+@keyframes hmb-breathe-sigh {
+    0% { transform: translate(-50%, -50%) scale(0.75); border-radius: 50%; }
+    22.22% { transform: translate(-50%, -50%) scale(1.18); border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%; }
+    33.33% { transform: translate(-50%, -50%) scale(1.3); border-radius: 42% 58% 52% 48% / 48% 52% 48% 52%; }
+    100% { transform: translate(-50%, -50%) scale(0.75); border-radius: 50%; }
+}
+
+/* Extended exhale: 4-6 = 10s */
+@keyframes hmb-breathe-extended {
+    0% { transform: translate(-50%, -50%) scale(0.8); border-radius: 50%; }
+    40% { transform: translate(-50%, -50%) scale(1.25); border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%; }
+    100% { transform: translate(-50%, -50%) scale(0.8); border-radius: 50%; }
+}
+
+/* js/app.js sets animation-duration inline from the technique's cycle length,
+   so only the name and easing belong here. */
+.breathing-circle.technique-478.active { animation: hmb-breathe-478 19s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+.breathing-circle.technique-box.active { animation: hmb-breathe-box 16s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+.breathing-circle.technique-coherent.active { animation: hmb-breathe-coherent 10s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+.breathing-circle.technique-triangle.active { animation: hmb-breathe-triangle 9s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+.breathing-circle.technique-wim.active { animation: hmb-breathe-wim 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+.breathing-circle.technique-sigh.active { animation: hmb-breathe-sigh 9s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+.breathing-circle.technique-extended.active { animation: hmb-breathe-extended 10s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+/* The short top-up inhale in cyclic sighing gets a brief extra glow. */
+.breathing-circle.inhale-short {
+    box-shadow: 0 0 80px var(--theme-glow), 0 0 26px rgba(255, 255, 255, 0.35);
+}
+
+/* -----------------------------------------------------------------------------
+   Progress, session info and stats
+   -------------------------------------------------------------------------- */
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 50px;
+    margin: 16px 0 0;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--progress-color) 0%, rgba(255, 255, 255, 0.4) 50%, var(--progress-color) 100%);
+    border-radius: 50px;
+    width: 0%;
+    transition: width 100ms linear;
+}
+
+.progress-time {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.625rem;
+    color: #ffffff;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.progress-bar:hover .progress-time {
+    opacity: 1;
+}
+
+.session-info {
+    display: none;
+    margin: 14px 0 0;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.session-progress {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.session-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--theme-primary), var(--theme-secondary));
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.session-time-remaining {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    margin-top: 8px;
+}
+
+.session-stats {
+    display: none;
+    justify-content: center;
+    gap: 24px;
+    margin: 14px 0 0;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-value {
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.stat-label {
+    font-size: 0.6875rem;
+    margin-top: 2px;
+}
+
+/* -----------------------------------------------------------------------------
+   Engine slots. PAGE_CONTRACT section 3 requires both containers on any page
+   with a timer; nothing fills them inside a widget (js/pro/index.js is not
+   loaded here), so an empty one must occupy no space.
+   -------------------------------------------------------------------------- */
+
+[data-slot]:empty {
+    display: none;
+}
+
+.tools-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 14px 0 0;
+}
+
+/* -----------------------------------------------------------------------------
+   Controls
+   -------------------------------------------------------------------------- */
+
+.controls {
+    margin: 18px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.control-btn {
+    padding: 12px 22px;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background 0.25s ease, transform 0.25s ease;
+    min-width: 104px;
+    text-align: center;
+}
+
+.control-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.control-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Class mode's own primary action. Hidden until class mode turns it on. */
+.hmb-class-start {
+    display: none;
+    width: 100%;
+    margin: 20px 0 0;
+    padding: 18px 24px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    background: var(--theme-primary);
+    /* Dark ink on the accent. Every built-in theme primary clears 4.5:1 here at
+       this size and weight; the JS flips it to white for a dark custom accent. */
+    color: var(--hmb-btn-ink, #10151f);
+    border: 0;
+    border-radius: 18px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.hmb-class-start:hover {
+    filter: brightness(1.08);
+}
+
+/* -----------------------------------------------------------------------------
+   Safety acknowledgement (energizing breath). Required by hard rule 4.
+   -------------------------------------------------------------------------- */
+
+.safety-ack {
+    margin: 18px 0 0;
+    padding: 16px;
+    text-align: left;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.safety-ack[hidden] {
+    display: none;
+}
+
+.safety-ack h2 {
+    font-size: 0.9375rem;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.safety-ack ul {
+    margin: 0 0 12px 18px;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+}
+
+.safety-ack li {
+    margin-bottom: 4px;
+}
+
+.safety-ack-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* -----------------------------------------------------------------------------
+   Contraindications (hard rule 4). Collapsed by default so it does not crowd a
+   280px card, but always present and never removed by white-labelling.
+   -------------------------------------------------------------------------- */
+
+.hmb-safety {
+    margin: 18px 0 0;
+    text-align: left;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+}
+
+.hmb-safety summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-primary);
+    list-style-position: inside;
+}
+
+.hmb-safety p {
+    margin: 8px 0 0;
+    line-height: 1.55;
+}
+
+.hmb-safety ul {
+    margin: 8px 0 0 18px;
+    line-height: 1.5;
+}
+
+.hmb-safety ul[hidden] {
+    display: none;
+}
+
+.hmb-safety li {
+    margin-bottom: 4px;
+}
+
+.hmb-safety a {
+    color: inherit;
+    border-bottom: 1px solid currentColor;
+    text-decoration: none;
+}
+
+/* -----------------------------------------------------------------------------
+   Attribution. Free-tier embeds always carry it; only a verified Practitioner
+   or Studio licence removes it, and the link is never followed (hard rule 7).
+   -------------------------------------------------------------------------- */
+
+.hmb-attrib {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.hmb-attrib[hidden] {
+    display: none;
+}
+
+.hmb-attrib a {
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.85;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 1px;
+}
+
+.hmb-attrib a:hover {
+    opacity: 1;
+}
+
+/* -----------------------------------------------------------------------------
+   Class mode — legible from the back of a room.
+   -------------------------------------------------------------------------- */
+
+html[data-hmb-mode='class'] .hmb-shell {
+    max-width: 900px;
+}
+
+html[data-hmb-mode='class'] .breathing-container {
+    width: min(360px, 78vw);
+    height: min(360px, 78vw);
+}
+
+html[data-hmb-mode='class'] .breathing-circle {
+    width: min(260px, 56vw);
+    height: min(260px, 56vw);
+}
+
+html[data-hmb-mode='class'] .circle-text-container span {
+    font-size: clamp(1.5rem, 5vw, 2.75rem);
+}
+
+html[data-hmb-mode='class'] .breathing-text {
+    font-size: clamp(1.25rem, 3.6vw, 2rem);
+    font-weight: 500;
+}
+
+html[data-hmb-mode='class'] .hmb-title {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+html[data-hmb-mode='class'] .timer {
+    font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+}
+
+html[data-hmb-mode='class'] .hmb-class-start {
+    display: block;
+}
+
+/* The teacher starts and resumes from the big button, so the engine's own
+   Begin button is redundant in class mode. Pause and Stop stay. */
+html[data-hmb-mode='class'] [data-role='start'] {
+    display: none;
+}
+
+html[data-hmb-mode='class'] .session-stats {
+    display: none !important;
+}
+
+/* -----------------------------------------------------------------------------
+   Kiosk / projector mode. js/app.js adds `.kiosk` to the app root.
+   No `vh` sizing here: the frame reports its own height to the host page and a
+   viewport-relative circle would feed back into that measurement.
+   -------------------------------------------------------------------------- */
+
+.breathing-section.kiosk {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+    padding: 8px;
+}
+
+html[data-hmb-mode='kiosk'] body {
+    padding: 0;
+}
+
+html[data-hmb-mode='kiosk'] .hmb-shell {
+    max-width: none;
+}
+
+.breathing-section.kiosk .settings-btn,
+.breathing-section.kiosk .settings-panel,
+.breathing-section.kiosk .controls,
+.breathing-section.kiosk .session-stats,
+.breathing-section.kiosk .progress-bar,
+.breathing-section.kiosk .session-info,
+.breathing-section.kiosk .hmb-title,
+.breathing-section.kiosk .hmb-safety,
+.breathing-section.kiosk .hmb-brand {
+    display: none !important;
+}
+
+.breathing-section.kiosk .breathing-container {
+    width: min(70vmin, 620px);
+    height: min(70vmin, 620px);
+    margin: 0 auto;
+}
+
+.breathing-section.kiosk .breathing-circle {
+    width: min(52vmin, 460px);
+    height: min(52vmin, 460px);
+}
+
+.breathing-section.kiosk .circle-text-container span {
+    font-size: clamp(2rem, 7vmin, 5rem);
+}
+
+.breathing-section.kiosk [data-role='breathing-text'] {
+    font-size: clamp(1.25rem, 3.5vmin, 2.5rem);
+}
+
+.breathing-section.kiosk [data-role='timer'] {
+    font-size: clamp(1.25rem, 3vmin, 2.25rem);
+}
+
+/* -----------------------------------------------------------------------------
+   Screen-reader live region. In class mode this is the ONLY thing that reads
+   phase names aloud — the frame never calls speechSynthesis.
+   -------------------------------------------------------------------------- */
+
+.live-region {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   The cookie banner belongs to the host site, not to us. js/consent.js is
+   pulled in transitively by js/analytics.js and injects a banner on load; the
+   frame carries no analytics and sets no cookies, so it must never appear.
+   The empty #cookieConsent element in frame.html is what consent.js finds and
+   reuses instead of building its own.
+   -------------------------------------------------------------------------- */
+
+#cookieConsent {
+    display: none !important;
+}
+
+/* -----------------------------------------------------------------------------
+   Focus visibility (hard rule 12)
+   -------------------------------------------------------------------------- */
+
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+[role='button']:focus-visible {
+    outline: 3px solid var(--theme-secondary);
+    outline-offset: 3px;
+    border-radius: 8px;
+}
+
+/* -----------------------------------------------------------------------------
+   Reduced motion: no scaling. The phase is carried by opacity and brightness,
+   which js/app.js drives through the circle's data-phase attribute.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+    .breathing-circle,
+    .breathing-circle.active,
+    .breathing-circle.technique-478.active,
+    .breathing-circle.technique-box.active,
+    .breathing-circle.technique-coherent.active,
+    .breathing-circle.technique-triangle.active,
+    .breathing-circle.technique-wim.active,
+    .breathing-circle.technique-sigh.active,
+    .breathing-circle.technique-extended.active {
+        animation: none !important;
+        transform: translate(-50%, -50%) scale(1) !important;
+        transition: opacity 600ms linear, filter 600ms linear !important;
+    }
+
+    .breathing-circle[data-phase='inhale'] { opacity: 1; filter: brightness(1.15); }
+    .breathing-circle[data-phase='hold'] { opacity: 0.85; filter: brightness(1); }
+    .breathing-circle[data-phase='exhale'] { opacity: 0.6; filter: brightness(0.8); }
+
+    .breathing-aura { display: none; }
+
+    .settings-btn:hover,
+    .control-btn:hover:not(:disabled) {
+        transform: none;
+    }
+}
+
+/* -----------------------------------------------------------------------------
+   Narrow hosts. The widget has to survive a 280px sidebar.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 380px) {
+    body { padding: 8px; }
+
+    .hmb-card { padding: 22px 14px 18px; border-radius: 18px; }
+
+    .breathing-container { width: 190px; height: 190px; }
+
+    .breathing-circle { width: 132px; height: 132px; }
+
+    .circle-text-container span { font-size: 1rem; }
+
+    .control-btn { padding: 10px 16px; min-width: 88px; font-size: 0.8125rem; }
+
+    .timer { font-size: 1.5rem; }
+}

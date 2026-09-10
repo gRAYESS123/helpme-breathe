@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline | Help Me Breathe</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Quicksand', 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            color: #fff;
+            background: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+        }
+        .offline-card { max-width: 420px; }
+        .orb {
+            width: 120px; height: 120px; margin: 0 auto 2rem;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #c7d2fe 0%, #8b5cf6 70%);
+            box-shadow: 0 0 60px #8b5cf6;
+            animation: breathe 8s ease-in-out infinite;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(0.85); }
+            50% { transform: scale(1.1); }
+        }
+        h1 { font-size: 1.75rem; font-weight: 300; margin-bottom: 1rem; letter-spacing: 0.05em; }
+        p { color: #c7d2fe; line-height: 1.6; margin-bottom: 2rem; }
+        a {
+            display: inline-block; padding: 0.875rem 1.75rem;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px; color: #fff; text-decoration: none;
+            font-weight: 500; transition: background 0.3s ease;
+        }
+        a:hover { background: rgba(255, 255, 255, 0.2); }
+        @media (prefers-reduced-motion: reduce) { .orb { animation: none; } }
+    </style>
+</head>
+<body>
+    <div class="offline-card">
+        <div class="orb"></div>
+        <h1>You're offline</h1>
+        <p>No internet connection right now — but you can still take a moment to breathe. Reconnect to load the guided timer.</p>
+        <a href="/">Try again</a>
+    </div>
+</body>
+</html>

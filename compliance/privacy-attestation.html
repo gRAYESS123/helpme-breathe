@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Privacy Attestation — Help Me Breathe</title>
+    <meta name="description" content="A one-page signed attestation: no personal data leaves the browser. What the Help Me Breathe widget does, what it does not do, dated and signed by name.">
+
+    <link rel="canonical" href="https://helpmebreath.com/compliance/privacy-attestation">
+
+    <meta name="author" content="Georges Rayess">
+    <meta name="robots" content="noindex, nofollow">
+
+    <meta property="og:title" content="Privacy Attestation — Help Me Breathe">
+    <meta property="og:description" content="A one-page signed attestation: no personal data leaves the browser. What the Help Me Breathe widget does, what it does not do, dated and signed by name.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://helpmebreath.com/compliance/privacy-attestation">
+    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:site_name" content="Help Me Breathe">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="/css/styles.css" as="style">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/print.css" media="print">
+
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+
+    <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'wait_for_update': 500
+        });
+        gtag('js', new Date());
+        gtag('config', 'G-09WY9JD4YM', {
+            'anonymize_ip': true,
+            'cookie_expires': 63072000
+        });
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://helpmebreath.com/" },
+        { "@type": "ListItem", "position": 2, "name": "For practitioners", "item": "https://helpmebreath.com/for-practitioners" },
+        { "@type": "ListItem", "position": 3, "name": "Privacy attestation", "item": "https://helpmebreath.com/compliance/privacy-attestation" }
+      ]
+    }
+    </script>
+
+    <style>
+        /* The two screen-side rules /css/print.css used to carry. They live
+           here so print.css can load with media="print" and stop blocking the
+           first paint of this page. */
+        .hmb-print-only { display: none !important; }
+        .hmb-page-break { display: none; }
+
+        .doc-sheet { max-width: 820px; }
+
+        .doc-kicker {
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin: 0 0 0.35rem;
+        }
+
+        .doc-meta {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 2rem;
+        }
+
+        .doc-meta dl {
+            display: grid;
+            grid-template-columns: minmax(140px, 200px) 1fr;
+            gap: 0.45rem 1rem;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .doc-meta dt { font-weight: 600; }
+        .doc-meta dd { margin: 0; }
+
+        .doc-callout {
+            border-left: 3px solid var(--theme-primary);
+            padding: 0.5rem 0 0.5rem 1.1rem;
+            margin: 1.25rem 0;
+        }
+
+        .doc-signatures {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .doc-signature {
+            border-top: 1px solid var(--border);
+            padding-top: 0.8rem;
+        }
+
+        .doc-signature h3 { margin-top: 0.4rem; font-size: 1rem; }
+
+        .sig-rule {
+            display: block;
+            border-bottom: 1px solid var(--text-secondary);
+            height: 2.2rem;
+            margin: 1rem 0 0.35rem;
+        }
+
+        .sig-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        .signed-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0.5rem 0 0.15rem;
+        }
+
+        .doc-foot {
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+            padding-top: 0.8rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .doc-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin: 1.5rem 0 0;
+        }
+
+        .doc-btn {
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 0.7rem 1.3rem;
+            border-radius: 999px;
+            border: 1px solid var(--theme-primary);
+            background: var(--theme-primary);
+            color: #ffffff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="article-page compliance-page" data-no-ads="true" data-no-asks="true">
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <div class="container">
+        <header class="hmb-no-print">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/for-practitioners">For practitioners</a></li>
+                    <li>Privacy attestation</li>
+                </ol>
+            </nav>
+            <div class="header-content">
+                <h1>Privacy Attestation</h1>
+                <p class="subtitle">No personal data leaves the browser. One page, dated and signed, for the person who has to ask.</p>
+            </div>
+        </header>
+
+        <main id="main">
+            <article class="doc-sheet doc-body">
+                <p class="doc-kicker hmb-print-only">Help Me Breathe — Privacy Attestation</p>
+
+                <div class="doc-meta">
+                    <dl>
+                        <dt>Document</dt>
+                        <dd>Privacy attestation, version 1.0</dd>
+
+                        <dt>Statement date</dt>
+                        <dd><time datetime="2026-09-09">9 September 2026</time></dd>
+
+                        <dt>Given by</dt>
+                        <dd>Georges Rayess, an individual trading as Help Me Breathe, Lebanon</dd>
+
+                        <dt>Scope</dt>
+                        <dd>The breathing timer at helpmebreath.com, the embedded widget, and co-branded client session links</dd>
+
+                        <dt>Contact</dt>
+                        <dd><a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a></dd>
+                    </dl>
+                </div>
+
+                <section class="doc-section">
+                    <h2>The statement</h2>
+                    <div class="doc-callout">
+                        <p>I attest that the Help Me Breathe breathing timer, the embedded widget and the co-branded client session links collect no personal data about the people who use them, and transmit none to me or to anyone else. There is no account, no client record and no database in which such data could be held.</p>
+                    </div>
+                </section>
+
+                <section class="doc-section">
+                    <h2>What the widget does</h2>
+                    <p>It draws a circle that grows and shrinks on a fixed schedule, counts the phases of a breathing pattern, and optionally plays a tone and vibrates the device at each change. That is the whole product. Everything it does happens inside the browser of the person using it:</p>
+                    <ul>
+                        <li>The breathing pattern is read from a JavaScript file that ships with the page. No pattern is fetched from a server during a session.</li>
+                        <li>Cue tones are generated in the browser with the Web Audio API. No audio file is downloaded and no microphone is opened.</li>
+                        <li>Vibration, where the device supports it, uses the browser's Vibration API.</li>
+                        <li>Settings — chosen technique, session length, sound on or off, vibration on or off — are written to that browser's own local storage under the prefix <code>hmb.</code>. So is a local history of completed sessions, on the main site.</li>
+                        <li>Nothing in that local storage is read by a server, sent in a request, or recoverable by me. Clearing the browser's site data deletes all of it.</li>
+                    </ul>
+                </section>
+
+                <section class="doc-section">
+                    <h2>What the widget does not do</h2>
+                    <ul>
+                        <li>It does not ask for a name, an email address, a date of birth, a health condition or any other detail about the person using it.</li>
+                        <li>It does not create an account, a profile or a client identifier, because there is no account system anywhere in the product.</li>
+                        <li>It does not record what was practised, for how long, or when, anywhere other than that person's own browser.</li>
+                        <li>It sets no cookies of its own.</li>
+                        <li>Inside the embedded widget there are zero third-party requests of any kind: no web fonts, no analytics, no advertising, no tag manager, no tracking pixel, no error-reporting service. The frame loads its own HTML, CSS and one script from helpmebreath.com, and nothing from anywhere else.</li>
+                        <li>Inside a client session link there is no analytics, no advertising, no tag manager, no tracking pixel and no error-reporting service. It does make one third-party request, and it is named in the next section rather than left out of this list.</li>
+                        <li>It does not use a camera, a microphone, location, a heart-rate sensor or any other device sensor.</li>
+                        <li>No data from it is sold, shared for advertising, or used to train any model.</li>
+                    </ul>
+                </section>
+
+                <section class="doc-section">
+                    <h2>Where data does move, stated plainly</h2>
+                    <p>An attestation is only worth reading if it also lists the exceptions. There are four, and none of them concerns what a person practised.</p>
+                    <ul>
+                        <li><strong>Serving the page.</strong> The page has to be fetched over the internet, so the hosting provider's servers see the requesting IP address, the browser's user agent string, the URL and the time, exactly as they would for any website. That is ordinary web serving. It is not analytics, and I do not build profiles from it.</li>
+                        <li><strong>One web font on a client session link.</strong> The page at <code>/s/</code> asks Google Fonts for the Quicksand typeface, so that the link looks like the rest of the site. Google's font servers therefore see the reader's IP address and user agent, as they would for any site using a hosted font. No identifier is sent with it, nothing about the session is included, and the page works normally if the request is blocked. The embedded widget does not do this: it makes no third-party request at all. If a hosted font is a problem for your setting, use the embedded widget rather than a session link.</li>
+                        <li><strong>Analytics on the main site only.</strong> The public pages of helpmebreath.com run Google Analytics 4. Google Consent Mode defaults are set to denied, so nothing is measured until a visitor chooses to accept in the cookie banner. Analytics never runs inside the embedded widget, and never inside a client session link.</li>
+                        <li><strong>The practitioner's own licence email.</strong> If you hold a Practitioner or Studio licence, the merchant of record holds the email address and billing details you gave them at checkout, and I hold your email address and our correspondence. That is data about you, the practitioner — not about anyone you work with.</li>
+                    </ul>
+                    <p>A co-branded client session link carries your name, your chosen pattern, your session length and your message encoded inside the link itself. That is why no server needs to remember it. There is no record on my side of which link was made, who received it, or whether it was opened.</p>
+                </section>
+
+                <section class="doc-section">
+                    <h2>What this attestation is, and is not</h2>
+                    <p>This is a self-attestation. It is my own statement about my own product, given in good faith and accurate on the date above. It is not a third-party audit, not a certification, and not a substitute for one. Nobody independent has verified it.</p>
+                    <p>What you can do instead of taking it on trust: open your browser's network panel on any page of the site, or on a page where the widget is embedded, and watch what is requested. Inside the widget frame you will see the page and its own script, and nothing else. That check takes about a minute and is more convincing than this paragraph.</p>
+                    <p>If this ever stops being true — if a future version of the widget needs to send something — this page gets a new version number and a new date, and licence holders are emailed before the change ships.</p>
+                </section>
+
+                <section class="doc-section">
+                    <h2>Signed</h2>
+                    <div class="doc-signatures">
+                        <div class="doc-signature">
+                            <h3>Given by</h3>
+                            <p class="signed-name">Georges Rayess</p>
+                            <p class="sig-label">An individual trading as Help Me Breathe, Lebanon · <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a></p>
+                            <span class="sig-rule" aria-hidden="true"></span>
+                            <span class="sig-label">Signature</span>
+                            <p class="sig-label">Dated 9 September 2026</p>
+                        </div>
+
+                        <div class="doc-signature">
+                            <h3>Received by (optional)</h3>
+                            <span class="sig-rule" aria-hidden="true"></span>
+                            <span class="sig-label">Name and organisation</span>
+                            <span class="sig-rule" aria-hidden="true"></span>
+                            <span class="sig-label">Date</span>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="doc-actions hmb-no-print">
+                    <button class="doc-btn" type="button" data-role="print">Print this document</button>
+                </div>
+
+                <p class="doc-foot">Help Me Breathe — Privacy attestation v1.0 · 9 September 2026 · helpmebreath.com/compliance/privacy-attestation · Companion documents: <a href="/compliance/dpa">Data Processing Addendum</a> and <a href="/compliance/security-overview">security overview</a>. See also the site <a href="/legal/privacy-policy">privacy policy</a>, which covers the public pages as well as the widget.</p>
+            </article>
+        </main>
+
+        <footer class="footer hmb-no-print">
+            <nav class="footer-nav" aria-label="Practitioner documents">
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/handouts">Client handouts</a>
+                <a href="/compliance/dpa">Data Processing Addendum</a>
+                <a href="/compliance/security-overview">Security overview</a>
+            </nav>
+
+            <div class="legal-links">
+                <a href="/legal/privacy-policy">Privacy Policy</a>
+                <span aria-hidden="true" style="opacity: 0.5">•</span>
+                <a href="/legal/terms-of-service">Terms of Service</a>
+                <span aria-hidden="true" style="opacity: 0.5">•</span>
+                <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
+                <span aria-hidden="true" style="opacity: 0.5">•</span>
+                <a href="mailto:contact@helpmebreath.com">Contact</a>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="/js/consent.js"></script>
+
+    <script type="module">
+        const printButton = document.querySelector('[data-role="print"]');
+        if (printButton) printButton.addEventListener('click', () => window.print());
+    </script>
+</body>
+</html>
