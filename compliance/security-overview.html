@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Security Overview — Help Me Breathe</title>
+    <meta name="description" content="How Help Me Breathe is built and run: architecture, data flows, hosting and TLS, subprocessors, the licence token, accessibility, support and disclosure.">
+
+    <link rel="canonical" href="https://helpmebreath.com/compliance/security-overview">
+
+    <meta name="author" content="Georges Rayess">
+    <meta name="robots" content="noindex, nofollow">
+
+    <meta property="og:title" content="Security Overview — Help Me Breathe">
+    <meta property="og:description" content="How Help Me Breathe is built and run: architecture, data flows, hosting and TLS, subprocessors, the licence token, accessibility, support and disclosure.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://helpmebreath.com/compliance/security-overview">
+    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:site_name" content="Help Me Breathe">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="/css/styles.css" as="style">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/print.css">
+
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+
+    <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'wait_for_update': 500
+        });
+        gtag('js', new Date());
+        gtag('config', 'G-09WY9JD4YM', {
+            'anonymize_ip': true,
+            'cookie_expires': 63072000
+        });
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://helpmebreath.com/" },
+        { "@type": "ListItem", "position": 2, "name": "For practitioners", "item": "https://helpmebreath.com/for-practitioners" },
+        { "@type": "ListItem", "position": 3, "name": "Security overview", "item": "https://helpmebreath.com/compliance/security-overview" }
+      ]
+    }
+    </script>
+
+    <style>
+        .doc-sheet { max-width: 820px; }
+
+        .doc-kicker {
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin: 0 0 0.35rem;
+        }
+
+        .doc-meta {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.1rem 1.3rem;
+            margin-bottom: 2rem;
+        }
+
+        .doc-meta dl {
+            display: grid;
+            grid-template-columns: minmax(140px, 200px) 1fr;
+            gap: 0.45rem 1rem;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .doc-meta dt { font-weight: 600; }
+        .doc-meta dd { margin: 0; }
+
+        .doc-callout {
+            border-left: 3px solid var(--theme-primary);
+            padding: 0.5rem 0 0.5rem 1.1rem;
+            margin: 1.25rem 0;
+        }
+
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: block;
+            overflow-x: auto;
+        }
+
+        .doc-table th,
+        .doc-table td {
+            border: 1px solid var(--border);
+            padding: 0.55rem 0.7rem;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .flow-line {
+            font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.6rem 0.85rem;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+        }
+
+        .doc-foot {
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+            padding-top: 0.8rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .doc-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin: 1.5rem 0 0;
+        }
+
+        .doc-btn {
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 0.7rem 1.3rem;
+            border-radius: 999px;
+            border: 1px solid var(--theme-primary);
+            background: var(--theme-primary);
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .page-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-top: 2.5rem;
+        }
+    </style>
+</head>
+<body class="article-page compliance-page" data-no-ads="true" data-no-asks="true">
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <div class="container">
+        <header class="hmb-no-print">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/for-practitioners">For practitioners</a></li>
+                    <li>Security overview</li>
+                </ol>
+            </nav>
+            <div class="header-content">
+                <h1>Security Overview</h1>
+                <p class="subtitle">Two pages on how this is built, where the data goes, and what a one-person operation can and cannot promise.</p>
+            </div>
+        </header>
+
+        <main id="main">
+            <article class="doc-sheet doc-body">
+                <p class="doc-kicker hmb-print-only">Help Me Breathe — Security Overview · Page 1 of 2</p>
+
+                <div class="doc-meta">
+                    <dl>
+                        <dt>Document</dt>
+                        <dd>Security overview, version 1.0</dd>
+
+                        <dt>Published</dt>
+                        <dd><time datetime="2026-09-09">9 September 2026</time></dd>
+
+                        <dt>Prepared by</dt>
+                        <dd>Georges Rayess, an individual trading as Help Me Breathe, Lebanon</dd>
+
+                        <dt>Scope</dt>
+                        <dd>helpmebreath.com, the embedded widget, client session links, and the licence endpoints</dd>
+
+                        <dt>Security contact</dt>
+                        <dd><a href="mailto:contact@helpmebreath.com?subject=Security">contact@helpmebreath.com</a>, subject line "Security"</dd>
+                    </dl>
+                </div>
+
+                <section class="doc-section">
+                    <h2>1. Architecture</h2>
+                    <p>Help Me Breathe is a static website with a small number of serverless functions attached to it. There is no application server that stays running, no database, no message queue, no cache layer and no admin panel. The attack surface is deliberately close to the smallest one a working product can have.</p>
+                    <ul>
+                        <li><strong>Static pages.</strong> Every page is a plain HTML file built ahead of time and served from a content delivery network. There is no server-side rendering, no template engine and no user input reflected into a page by a server.</li>
+                        <li><strong>Client-side JavaScript.</strong> The timer is native ES modules with no bundler, no framework and no third-party runtime dependencies at all. That means no dependency tree to be compromised through, and nothing to patch when a popular package is hijacked.</li>
+                        <li><strong>Serverless functions.</strong> A handful of endpoints under <code>/api/</code> handle the licence lifecycle and the optional email list. They are stateless, receive a JSON body, and return a JSON response. They are written to the Web standard <code>Request</code>/<code>Response</code> interface, so they can be moved to another host without being rewritten.</li>
+                        <li><strong>Service worker.</strong> A service worker caches the pages and assets so the timer keeps working offline. It caches the application shell only. It never caches an API response and never stores anything about a session.</li>
+                        <li><strong>The embedded widget.</strong> A separate, versioned page under <code>/embed/v1/</code> designed to be put in an iframe on someone else's site. It loads its own HTML, CSS and one script from helpmebreath.com and nothing else, from anywhere. A client session link at <code>/s/</code> is a different page and is not held to that rule — see section 2.</li>
+                    </ul>
+                </section>
+
+                <section class="doc-section">
+                    <h2>2. Data flows</h2>
+                    <p>There are four flows in the whole system. Three of them concern the practitioner. None of them carries client data.</p>
+
+                    <p><strong>A person practises breathing.</strong></p>
+                    <div class="flow-line">browser → CDN: GET /box-breathing → HTML, CSS, JS. Then: nothing.</div>
+                    <p>The session runs entirely in the page. Phase timing, cue tones and vibration are all local. Settings and session history are written to that browser's own local storage under the <code>hmb.</code> prefix and are never read by a server.</p>
+
+                    <p><strong>A client opens a co-branded session link.</strong></p>
+                    <div class="flow-line">browser → CDN: GET /s/?c=&lt;base64url config&gt; → HTML, CSS, JS<br>browser → Google Fonts: the Quicksand typeface. Then: nothing.</div>
+                    <p>The entire configuration — technique, length, practitioner name, message, optional logo URL and licence token — is encoded in the query string, so no server needs to remember it. The page decodes it in the browser. Every decoded field is written with <code>textContent</code> rather than as markup, only <code>https</code> image URLs are accepted, and the payload is length-capped, because this is attacker-controllable input rendered on our own domain.</p>
+                    <p>This page differs from the embedded widget in one respect, and it is listed rather than glossed: it requests the Quicksand typeface from Google Fonts, so Google's font servers see the reader's IP address and user agent. Nothing about the session is sent with that request, and the page works if it is blocked. A practitioner's own logo, if the link carries one, is fetched by the reader's browser from the practitioner's own server. The widget under <code>/embed/v1/</code> makes neither request.</p>
+
+                    <p><strong>A practitioner activates a licence.</strong></p>
+                    <div class="flow-line">browser → POST /api/license { key } → { token }   ·   token stored in localStorage['hmb.license']</div>
+                    <p>The licence key is exchanged for a short-lived signed token. The key is never written to a log, an analytics event or an error report in full.</p>
+
+                    <p><strong>A white-label embed checks its entitlement.</strong></p>
+                    <div class="flow-line">iframe → POST /api/entitlement { token } → { tier, dom? }</div>
+                    <p>The frame asks whether the token is valid for the host page's domain. The response is a tier and, optionally, the list of hostnames the licence covers. If the check fails for any reason, the frame renders the free attributed widget rather than failing open.</p>
+
+                    <div class="doc-callout">
+                        <p>There is no flow in which a client's name, contact details, health information or practice history reaches a server. The <a href="/compliance/privacy-attestation">privacy attestation</a> states this as a signed statement, and the <a href="/compliance/dpa">Data Processing Addendum</a> records it contractually.</p>
+                    </div>
+                </section>
+
+                <section class="doc-section">
+                    <h2>3. Hosting, TLS and headers</h2>
+                    <ul>
+                        <li>The site is hosted on Vercel and served from its content delivery network. Vercel manages the TLS certificates and terminates TLS at the edge; plain HTTP requests are redirected to HTTPS, and <code>www</code> is redirected to the bare domain.</li>
+                        <li>Secrets — the licence signing key, the merchant of record's API key and webhook secret, and the email provider's key — exist only as encrypted environment variables in the hosting platform. They are not in the source repository, which carries a <code>.gitignore</code> entry for local environment files, and they are never logged.</li>
+                        <li>Response headers set at the edge for every path: <code>X-Content-Type-Options: nosniff</code>, <code>Referrer-Policy: strict-origin-when-cross-origin</code>, and <code>Permissions-Policy: camera=(), microphone=(), geolocation=()</code>.</li>
+                        <li><code>X-Frame-Options: DENY</code> is set on every path except the two that are meant to be embedded — the widget under <code>/embed/</code> and the client session link at <code>/s/</code> — which instead carry a <code>Content-Security-Policy</code> with <code>frame-ancestors *</code> because being embeddable is their purpose.</li>
+                        <li>The serverless functions apply best-effort per-address rate limiting, and reject a request body that is larger or differently shaped than expected.</li>
+                        <li>The Provider's accounts with the hosting platform, the domain registrar, the merchant of record and the email provider each use a unique password held in a password manager, with two-factor authentication enabled.</li>
+                    </ul>
+                </section>
+
+                <section class="doc-section">
+                    <h2>4. Subprocessors</h2>
+                    <p>Four, listed with what each one can see. The same list appears in clause 7 of the <a href="/compliance/dpa">Data Processing Addendum</a>, and changes are notified to licence holders at least ten days ahead.</p>
+                    <table class="doc-table">
+                        <caption class="sr-only">Subprocessors and what each can see</caption>
+                        <thead>
+                            <tr><th scope="col">Provider</th><th scope="col">Role</th><th scope="col">Data it can see</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Vercel Inc., United States</td>
+                                <td>Hosting, CDN, serverless runtime</td>
+                                <td>Ordinary request logs: IP address, user agent, URL, timestamp. Vercel publishes its own <a href="https://vercel.com/legal/dpa">Data Processing Addendum</a> and keeps its subprocessor list on its trust centre.</td>
+                            </tr>
+                            <tr>
+                                <td>The merchant of record</td>
+                                <td>Sells the licence as the seller on record, takes payment, handles sales tax and VAT, issues receipts, processes refunds</td>
+                                <td>Your name, email address, billing country, payment method, and any business name or tax identifier you enter. The company named on your receipt is the current merchant of record; this page is updated if it changes.</td>
+                            </tr>
+                            <tr>
+                                <td>Google LLC (Analytics 4 and Google Fonts)</td>
+                                <td>Aggregate visit statistics for the public pages; hosting of the Quicksand typeface used on the public pages and on client session links</td>
+                                <td>Standard analytics data, only after a visitor accepts analytics in the cookie banner. Consent Mode v2 defaults are denied. Analytics never loads inside the widget or a client session link. Separately, Google's font servers see the IP address and user agent of anyone who loads a public page or a client session link, because the Quicksand typeface is hosted there; the embedded widget requests no font.</td>
+                            </tr>
+                            <tr>
+                                <td>The email delivery provider</td>
+                                <td>Delivers licence keys and receipts; hosts the contact mailbox</td>
+                                <td>Your email address and the content of messages between you and the Provider.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Nothing in this list receives client data, because no part of the product collects any.</p>
+                </section>
+
+                <div class="hmb-page-break" aria-hidden="true"></div>
+
+                <p class="doc-kicker hmb-print-only">Help Me Breathe — Security Overview · Page 2 of 2</p>
+                <p class="page-label hmb-no-print">Page two</p>
+
+                <section class="doc-section">
+                    <h2>5. The licence token model</h2>
+                    <p>There are no user accounts, no passwords and no user database. A licence is a signed token, and that design choice is the reason there is no credential store to leak.</p>
+                    <ul>
+                        <li>A licence key is exchanged once, at <code>/api/license</code>, for a token of the form <code>base64url(payload) + "." + base64url(HMAC-SHA256)</code>.</li>
+                        <li>The payload carries a version, the tier, a subject reference, issue and expiry timestamps, a key identifier, an activation count and — for a white-label licence — the list of hostnames it covers. It carries no name, no email address and nothing about anybody's practice.</li>
+                        <li>Signing uses HMAC-SHA256 through the platform's WebCrypto implementation, with a secret held only in the hosting platform's environment. Editing the tier or the expiry inside a stored token invalidates the signature, and the browser drops back to the free tier.</li>
+                        <li>Tokens are short-lived: 30 days for a lifetime licence, 7 days for a subscription. A cancelled subscription therefore expires on its own within a week, with no revocation list to maintain and no action needed from anyone.</li>
+                        <li>A 14-day offline grace period past expiry keeps paid features working with no network, so a practitioner in a room with poor signal is never locked out mid-session.</li>
+                        <li>Activation limits are 25 browsers for a Practitioner licence and 6 for consumer Pro. Studio raises the domain limit to ten rather than the activation count.</li>
+                        <li>A full licence key is never written to a log, an analytics event or an error report.</li>
+                    </ul>
+                </section>
+
+                <section class="doc-section">
+                    <h2>6. Accessibility posture</h2>
+                    <p>Real work has been done here, and no formal conformance claim is made. Both halves of that sentence are deliberate.</p>
+                    <p>What has been done: the timer is fully operable from the keyboard, including starting, pausing, stopping and switching technique; phase changes are announced through an ARIA live region so a screen reader user hears "Inhale for four seconds" rather than nothing; text meets a 4.5:1 contrast ratio against its background, and several of the theme colours were changed specifically to reach it; <code>prefers-reduced-motion</code> is honoured, and with it set the circle changes brightness and opacity instead of animating its scale; there is no flashing content anywhere, at any rate; every page has a skip link, one <code>h1</code>, headings that do not skip levels, and visible focus styles.</p>
+                    <p>What is not claimed: there is no published WCAG 2.2 or EN 301 549 conformance statement, and there will not be one until an independent audit has been paid for and passed. A conformance claim is a legally operative statement, and making one without an audit behind it would be dishonest. If you need a Voluntary Product Accessibility Template or an accessibility conformance report for a procurement process, none exists.</p>
+                    <p>If you hit an accessibility problem, email it to <a href="mailto:contact@helpmebreath.com?subject=Accessibility">contact@helpmebreath.com</a>. Accessibility bugs go to the front of the queue.</p>
+                </section>
+
+                <section class="doc-section">
+                    <h2>7. Support terms</h2>
+                    <ul>
+                        <li><strong>Channel.</strong> Email, at <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. There is no phone line, no live chat and no ticketing portal.</li>
+                        <li><strong>Response time.</strong> Within two business days. In practice it is usually faster, but two business days is the commitment, and it is one person's commitment rather than a rota's.</li>
+                        <li><strong>Hours.</strong> Business days are Monday to Friday, excluding public holidays in Lebanon.</li>
+                        <li><strong>What support covers.</strong> Activation problems, billing and refunds, embed and white-label setup, the handout pack, the compliance documents, and bug reports.</li>
+                        <li><strong>What it does not cover.</strong> Clinical or teaching advice about which pattern to use with whom, custom development, integration work on your own site, or a service level agreement with credits attached to it. None of those exists.</li>
+                        <li><strong>Uptime.</strong> No uptime guarantee is offered. The site is static and served from a CDN, which is about as resilient as a small site gets, and the timer keeps working offline once a page has been visited. But there is no SLA, and claiming one would be a promise the operation cannot keep.</li>
+                        <li><strong>Refunds.</strong> Fourteen days, unconditional, processed by the merchant of record. The full policy is in the <a href="/legal/terms-of-service">terms of service</a>.</li>
+                    </ul>
+                </section>
+
+                <section class="doc-section">
+                    <h2>8. Responsible disclosure</h2>
+                    <p>If you find a security problem, please report it. Email <a href="mailto:contact@helpmebreath.com?subject=Security">contact@helpmebreath.com</a> with "Security" in the subject line, and include enough detail to reproduce it.</p>
+                    <ul>
+                        <li>You will get an acknowledgement within two business days.</li>
+                        <li>You will get an assessment, and a fix or a plan, within fourteen days for anything that puts data or money at risk.</li>
+                        <li>Please give thirty days before publishing, or ninety if the fix needs a subprocessor to act. If a fix is taking longer than that, you will be told why rather than ignored.</li>
+                        <li>Testing against your own browser, your own licence and your own embed is welcome. Please do not run automated scanners against the hosting platform, do not attempt denial of service, and do not access or modify data that is not yours.</li>
+                        <li>There is no bug bounty. There is no budget for one. What there is: a fast, honest reply, credit on this page if you want it, and a fix.</li>
+                    </ul>
+                </section>
+
+                <section class="doc-section">
+                    <h2>9. What this operation does not have</h2>
+                    <p>Listed here so nobody has to ask, and so nobody discovers it after paying.</p>
+                    <ul>
+                        <li>No SOC 2 report, no ISO 27001 certificate, no penetration test report.</li>
+                        <li>No HIPAA Business Associate Agreement. The product is not designed for protected health information and does not receive any.</li>
+                        <li>No single sign-on, no SAML, no SCIM, no admin console, no audit log export.</li>
+                        <li>No completed vendor security questionnaires. These three documents are the answer, and they are the whole answer.</li>
+                        <li>No legal entity, no data protection officer, no security team. One person, in Lebanon, who answers his own email.</li>
+                        <li>No 24/7 on-call, no incident status page, no service level agreement.</li>
+                    </ul>
+                    <p>If any of that is a requirement for you, this is the wrong tool and it is better to know now. If none of it is, you have the whole picture, and the picture is unusually simple: a static site with no database, no accounts and nothing of your clients' in it.</p>
+                </section>
+
+                <div class="doc-actions hmb-no-print">
+                    <button class="doc-btn" type="button" data-role="print">Print this document</button>
+                </div>
+
+                <p class="doc-foot">Help Me Breathe — Security overview v1.0 · Published 9 September 2026 · helpmebreath.com/compliance/security-overview · Companion documents: <a href="/compliance/dpa">Data Processing Addendum</a> and <a href="/compliance/privacy-attestation">privacy attestation</a>. This document describes the system as built on the date above and is updated when the system changes.</p>
+            </article>
+        </main>
+
+        <footer class="footer hmb-no-print">
+            <nav class="footer-nav" aria-label="Practitioner documents">
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/handouts">Client handouts</a>
+                <a href="/compliance/dpa">Data Processing Addendum</a>
+                <a href="/compliance/privacy-attestation">Privacy attestation</a>
+            </nav>
+
+            <div class="legal-links">
+                <a href="/legal/privacy-policy">Privacy Policy</a>
+                <span aria-hidden="true" style="opacity: 0.5">•</span>
+                <a href="/legal/terms-of-service">Terms of Service</a>
+                <span aria-hidden="true" style="opacity: 0.5">•</span>
+                <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
+                <span aria-hidden="true" style="opacity: 0.5">•</span>
+                <a href="mailto:contact@helpmebreath.com">Contact</a>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="/js/consent.js"></script>
+
+    <script type="module">
+        const printButton = document.querySelector('[data-role="print"]');
+        if (printButton) printButton.addEventListener('click', () => window.print());
+    </script>
+</body>
+</html>

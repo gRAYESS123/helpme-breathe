@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en" data-hmb-surface="auto" data-hmb-mode="normal">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Guided Breathing Timer</title>
+    <meta name="description" content="The Help Me Breathe guided breathing timer, rendered for embedding in another site.">
+
+    <!--
+      This document is the inside of an iframe, never a destination. It is
+      noindex, it is Disallowed in robots.txt, and it carries no canonical
+      because the canonical experience lives at https://helpmebreath.com/timer.
+    -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="color-scheme" content="light dark">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+
+    <!--
+      ZERO THIRD-PARTY REQUESTS (AGENT_BRIEF hard rule 14 / FEAT-13).
+      Everything this document loads is same-origin: one stylesheet and the
+      shared engine modules. No web font, no analytics, no ad library, no
+      consent script, no remote image. The only cross-origin request the frame
+      can ever make is a practitioner's own logo, and only after that
+      practitioner's licence has been verified.
+    -->
+    <link rel="stylesheet" href="/embed/v1/frame.css">
+
+    <script>
+    /*
+     * Frame configuration — a classic script so it runs before the deferred
+     * engine modules and before first paint.
+     *
+     * Everything here is validated. Nothing read from the query string reaches
+     * the DOM in this file; the module at the bottom writes the two visible
+     * values (brand, logo) with textContent / setAttribute only.
+     */
+    (function () {
+        'use strict';
+
+        var params = null;
+        try { params = new URLSearchParams(window.location.search); } catch (e) { params = null; }
+
+        function raw(name) {
+            if (!params) return '';
+            try { return String(params.get(name) || ''); } catch (e) { return ''; }
+        }
+
+        /* --- technique: shape check only; js/techniques.js is the real gate --- */
+        var technique = raw('technique').trim();
+        if (!/^[a-z0-9_-]{1,20}$/i.test(technique)) technique = '';
+
+        /* --- duration: whole seconds, or -1 for an unlimited session --- */
+        var duration = null;
+        var durationRaw = raw('duration').trim();
+        if (/^-?\d{1,5}$/.test(durationRaw)) {
+            var n = parseInt(durationRaw, 10);
+            if (n === -1) duration = -1;
+            else if (n >= 30 && n <= 7200) duration = n;
+        }
+
+        /* --- surround theme --- */
+        var theme = raw('theme').trim().toLowerCase();
+        if (theme !== 'light' && theme !== 'dark' && theme !== 'auto') theme = 'auto';
+
+        /* --- accent: six hex digits, with or without the leading # --- */
+        var accent = raw('accent').trim().replace(/^#/, '');
+        if (!/^[0-9a-f]{6}$/i.test(accent)) accent = '';
+
+        /* --- logo: https only, and only rendered after white-label verifies --- */
+        var logo = '';
+        var logoRaw = raw('logo').trim();
+        if (logoRaw && logoRaw.length <= 500) {
+            try {
+                var u = new URL(logoRaw);
+                if (u.protocol === 'https:') logo = u.href;
+            } catch (e) { logo = ''; }
+        }
+
+        /* --- brand: plain text, 40 characters, no control characters --- */
+        var brand = raw('brand').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, 40);
+
+        /* --- sound: an explicit 0 or 1 from the site owner, else no opinion --- */
+        var soundRaw = raw('sound').trim();
+        var sound = soundRaw === '1' ? true : (soundRaw === '0' ? false : null);
+
+        /* --- mode --- */
+        var mode = raw('mode').trim().toLowerCase();
+        if (mode !== 'kiosk' && mode !== 'class') mode = 'normal';
+
+        /* --- white-label token --- */
+        var wl = raw('wl').trim();
+        if (!/^[A-Za-z0-9._~-]{8,4096}$/.test(wl)) wl = '';
+
+        var cfg = {
+            technique: technique,
+            duration: duration,
+            theme: theme,
+            accent: accent,
+            logo: logo,
+            brand: brand,
+            sound: sound,
+            mode: mode,
+            wl: wl
+        };
+        window.HMB_EMBED = cfg;
+
+        var html = document.documentElement;
+        html.setAttribute('data-hmb-surface', theme);
+
+        /*
+         * Class mode is a Practitioner feature. Render it immediately when a
+         * token is present (the common case is a valid one) and let the module
+         * downgrade to normal if verification fails, rather than making every
+         * legitimate class start in the wrong layout.
+         */
+        html.setAttribute('data-hmb-mode', mode === 'class' ? (wl ? 'class' : 'normal') : mode);
+
+        /*
+         * js/app.js resolves ?t= and ?d= ahead of every other source, which is
+         * exactly the precedence an embed needs: the site owner's choice must
+         * beat whatever this browser happened to pick last time. Normalise our
+         * friendly parameter names into the engine's before the modules run.
+         */
+        try {
+            if (params && (technique || duration !== null)) {
+                if (technique) params.set('t', technique);
+                if (duration !== null) params.set('d', String(duration));
+                var query = params.toString();
+                window.history.replaceState(
+                    null, '', window.location.pathname + (query ? '?' + query : '') + window.location.hash
+                );
+            }
+        } catch (e) { /* the data-* fallbacks below still apply */ }
+
+        /*
+         * The site owner's `sound` choice is a first-visit default. If someone
+         * has already used the sound toggle inside this embed, their choice
+         * wins. Storage here is partitioned to the host site by the browser.
+         */
+        if (sound !== null) {
+            try {
+                var stored = window.localStorage.getItem('hmb.settings');
+                var settings = stored ? JSON.parse(stored) : {};
+                if (settings && typeof settings === 'object' && !('sound' in settings)) {
+                    settings.sound = sound;
+                    window.localStorage.setItem('hmb.settings', JSON.stringify(settings));
+                }
+            } catch (e) { /* private mode: the engine's own default applies */ }
+        }
+    }());
+    </script>
+</head>
+
+<body class="theme-478">
+
+<div class="hmb-shell">
+
+    <section class="breathing-section hmb-card"
+             data-breathing-app
+             data-technique="478"
+             data-duration="300"
+             data-lock-technique
+             aria-labelledby="hmb-title">
+
+        <p class="hmb-brand" data-hmb-brand hidden>
+            <img data-hmb-logo alt="Practitioner logo" hidden>
+            <span class="hmb-brand-name" data-hmb-brand-name></span>
+        </p>
+
+        <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings"
+                aria-label="Open settings" aria-expanded="false">⚙️</button>
+
+        <div class="settings-panel" data-role="settings-panel">
+            <div class="setting-item">
+                <span class="setting-label" id="hmb-label-sound">Sound cues</span>
+                <span class="toggle-switch active" data-role="sound-toggle" role="button" tabindex="0"
+                      aria-pressed="true" aria-labelledby="hmb-label-sound"></span>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label" id="hmb-label-vibration">Vibration</span>
+                <span class="toggle-switch active" data-role="vibration-toggle" role="button" tabindex="0"
+                      aria-pressed="true" aria-labelledby="hmb-label-vibration"></span>
+            </div>
+        </div>
+
+        <h1 class="hmb-title" id="hmb-title" data-role="technique-title">Guided breathing</h1>
+
+        <div class="breathing-container">
+            <div class="breathing-circle technique-478" data-role="circle">
+                <span class="circle-text-container"><span data-role="circle-text">Ready</span></span>
+            </div>
+            <div class="breathing-aura" aria-hidden="true"></div>
+        </div>
+
+        <p class="breathing-text" data-role="breathing-text">Press Begin to start your practice</p>
+
+        <div class="progress-bar">
+            <div class="progress-fill" data-role="progress-fill"></div>
+            <div class="progress-time" data-role="progress-time"></div>
+        </div>
+
+        <div class="timer" data-role="timer">00:00</div>
+
+        <div class="session-info" data-role="session-info" style="display: none;">
+            <div class="session-progress">
+                <div class="session-progress-fill" data-role="session-progress-fill"></div>
+            </div>
+            <div class="session-time-remaining" data-role="session-time-remaining"></div>
+        </div>
+
+        <div class="session-stats" data-role="stats" style="display: none;">
+            <span class="stat-item">
+                <span class="stat-value" data-role="breath-count">0</span>
+                <span class="stat-label">Breaths</span>
+            </span>
+            <span class="stat-item">
+                <span class="stat-value" data-role="avg-breath">0s</span>
+                <span class="stat-label">Avg. breath</span>
+            </span>
+            <span class="stat-item">
+                <span class="stat-value" data-role="session-progress">0%</span>
+                <span class="stat-label">Progress</span>
+            </span>
+        </div>
+
+        <div class="tools-row" data-slot="tools"></div>
+
+        <button class="hmb-class-start" type="button" data-hmb-class-start>Start class</button>
+
+        <div class="controls">
+            <button class="control-btn" type="button" data-role="start" data-action="start">Begin Practice</button>
+            <button class="control-btn" type="button" data-role="pause" data-action="pause" disabled>Pause</button>
+            <button class="control-btn" type="button" data-role="stop" data-action="stop" disabled>Stop</button>
+        </div>
+
+        <div class="safety-ack" data-role="safety-ack" hidden>
+            <h2>Read this before you start this pattern</h2>
+            <div data-role="safety-ack-body"></div>
+            <div class="safety-ack-actions">
+                <button class="control-btn" type="button" data-action="safety-ack-confirm">I understand, begin</button>
+                <button class="control-btn" type="button" data-action="safety-ack-cancel">Not now</button>
+            </div>
+        </div>
+
+        <div data-slot="post-session"></div>
+
+        <p class="live-region" data-role="live-region" aria-live="polite" aria-atomic="true"></p>
+    </section>
+
+    <!--
+      Attribution is in the markup, not added by script, so it is present even
+      if JavaScript never runs. It is removed only after /api/entitlement
+      confirms a Practitioner or Studio licence for this domain.
+      The link is rel="nofollow noopener" and there is no configuration,
+      parameter or paid tier that makes it followed (AGENT_BRIEF hard rule 7).
+    -->
+    <p class="hmb-attrib" data-hmb-attrib>
+        <a href="https://helpmebreath.com/?utm_source=embed" target="_blank" rel="nofollow noopener">Powered by Help Me Breathe</a>
+    </p>
+
+</div>
+
+<!--
+  js/analytics.js imports js/consent.js, which injects a cookie banner on load
+  unless it finds this element. The frame has no analytics and sets no cookies,
+  so the banner must never render here; frame.css keeps this element hidden.
+-->
+<div id="cookieConsent" hidden></div>
+
+<script>
+/*
+ * Runs during parsing, so the engine's DOMContentLoaded auto-initialiser sees
+ * the finished attributes. Only same-origin, only validated values.
+ */
+(function () {
+    'use strict';
+    var cfg = window.HMB_EMBED || {};
+    var root = document.querySelector('[data-breathing-app]');
+    if (!root) return;
+
+    if (cfg.technique) root.setAttribute('data-technique', cfg.technique);
+    if (cfg.duration !== null && cfg.duration !== undefined) root.setAttribute('data-duration', String(cfg.duration));
+    if (cfg.mode === 'kiosk') root.setAttribute('data-kiosk', '');
+
+    if (!cfg.accent) return;
+
+    /*
+     * A custom accent replaces the technique's own primary colour. It is set
+     * inline on <body> so it beats the `body.theme-*` rules in frame.css.
+     * The circle's label flips to near-black when the accent is light enough
+     * that white text on it would be unreadable.
+     */
+    var hex = cfg.accent;
+    var r = parseInt(hex.slice(0, 2), 16);
+    var g = parseInt(hex.slice(2, 4), 16);
+    var b = parseInt(hex.slice(4, 6), 16);
+
+    function channel(v) {
+        var c = v / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    }
+    var luminance = 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+
+    function lighten(v) { return Math.round(v + (255 - v) * 0.55); }
+    var soft = 'rgb(' + lighten(r) + ',' + lighten(g) + ',' + lighten(b) + ')';
+    var accent = '#' + hex;
+
+    var style = document.body.style;
+    style.setProperty('--theme-primary', accent);
+    style.setProperty('--theme-glow', accent);
+    style.setProperty('--progress-color', accent);
+    style.setProperty('--theme-secondary', soft);
+    if (luminance > 0.42) {
+        style.setProperty('--hmb-circle-ink', '#10151f');
+        style.setProperty('--hmb-circle-shadow', '0 1px 3px rgba(255,255,255,0.45)');
+    }
+    if (luminance < 0.2) {
+        // A dark accent: the class-mode button needs light ink instead.
+        style.setProperty('--hmb-btn-ink', '#ffffff');
+    }
+}());
+</script>
+
+<script type="module" src="/js/app.js"></script>
+
+<script type="module">
+/*
+ * Frame behaviour that the shared engine does not cover:
+ *   - white-label verification (the only thing that can remove attribution)
+ *   - practitioner branding
+ *   - class mode's Start button
+ *   - the hmb:resize / session postMessage protocol documented in docs/EMBED.md
+ *
+ * It lives inline because embed/v1/breathe.js is the host-page loader and must
+ * stay tiny; a second module file would be a second same-origin request for no
+ * benefit.
+ */
+import { getTechnique } from '/js/techniques.js';
+import { getApp } from '/js/app.js';
+
+const cfg = window.HMB_EMBED || {};
+const root = document.querySelector('[data-breathing-app]');
+const html = document.documentElement;
+
+/* --------------------------------------------------------------- parent link */
+
+/*
+ * Post to the parent's own origin when the browser tells us what it is, and
+ * fall back to '*' when the host page sends no referrer. The payload is a
+ * height and a session state — nothing private — so '*' is safe here.
+ */
+let parentOrigin = '*';
+let referrerHost = '';
+try {
+    if (document.referrer) {
+        const ref = new URL(document.referrer);
+        parentOrigin = ref.origin;
+        referrerHost = ref.host.toLowerCase();
+    }
+} catch { /* opaque or absent referrer */ }
+
+function post(message) {
+    try {
+        if (window.parent && window.parent !== window) window.parent.postMessage(message, parentOrigin);
+    } catch { /* the widget works standalone too */ }
+}
+
+/* ------------------------------------------------------------ resize protocol */
+
+const MAX_HEIGHT = 4000;
+const shell = document.querySelector('.hmb-shell');
+let lastHeight = -1;
+
+function measure() {
+    if (!shell) return 0;
+    const styles = window.getComputedStyle(document.body);
+    const padding = parseFloat(styles.paddingTop || '0') + parseFloat(styles.paddingBottom || '0');
+    return Math.min(MAX_HEIGHT, Math.ceil(shell.getBoundingClientRect().height + padding));
+}
+
+function reportHeight() {
+    /*
+     * Kiosk mode sizes the circle from the viewport, so measuring it and asking
+     * the host to resize would feed back on itself. It reports 0 once, which
+     * breathe.js reads as "leave this iframe the size you gave it".
+     */
+    if (cfg.mode === 'kiosk') {
+        post({ type: 'hmb:resize', height: 0, mode: 'kiosk' });
+        return;
+    }
+    const height = measure();
+    if (height <= 0 || Math.abs(height - lastHeight) < 2) return;
+    lastHeight = height;
+    post({ type: 'hmb:resize', height });
+}
+
+let resizeFrame = 0;
+function scheduleReport() {
+    if (resizeFrame) return;
+    resizeFrame = window.requestAnimationFrame(() => {
+        resizeFrame = 0;
+        reportHeight();
+    });
+}
+
+if (typeof ResizeObserver === 'function' && shell) {
+    new ResizeObserver(scheduleReport).observe(shell);
+} else {
+    window.setInterval(scheduleReport, 1000);
+}
+window.addEventListener('load', scheduleReport);
+window.addEventListener('resize', scheduleReport);
+scheduleReport();
+
+/* --------------------------------------------------------- session broadcast */
+
+for (const name of ['hmb:session-start', 'hmb:session-complete', 'hmb:session-stop']) {
+    document.addEventListener(name, (e) => {
+        const detail = e.detail || {};
+        post({
+            type: name,
+            technique: detail.technique || '',
+            seconds: detail.seconds || 0,
+            breaths: detail.breaths || 0,
+            completed: !!detail.completed,
+        });
+        scheduleReport();
+    });
+}
+document.addEventListener('hmb:phase', scheduleReport);
+
+/* ------------------------------------------------------------------- titling */
+
+const technique = getTechnique(cfg.technique || '') || getTechnique((root && root.getAttribute('data-technique')) || '');
+if (technique) document.title = `${technique.title} — Help Me Breathe`;
+
+/* ------------------------------------------------------------ brand and logo */
+
+const brandRow = document.querySelector('[data-hmb-brand]');
+const brandName = document.querySelector('[data-hmb-brand-name]');
+const brandLogo = document.querySelector('[data-hmb-logo]');
+
+if (cfg.brand && brandRow && brandName) {
+    // textContent, never innerHTML: the value came from a query string.
+    brandName.textContent = cfg.brand;
+    brandRow.hidden = false;
+}
+
+/* -------------------------------------------------- white-label verification */
+
+/**
+ * Ask the server whether this token is a live Practitioner or Studio licence,
+ * and whether it is allowed on the domain we are embedded in.
+ *
+ * Fail closed. Attribution stays unless the answer is an unambiguous yes:
+ * a network error, a timeout, a non-2xx response, a free or pro tier, or a
+ * domain claim that does not include the host page all keep it.
+ *
+ * The verdict is cached in sessionStorage for the life of the tab so a page
+ * with several embeds makes one request, not one per widget.
+ */
+const DENIED = { ok: false };
+
+async function askServer(token) {
+    let response;
+    try {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 4000);
+        response = await fetch('/api/entitlement', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token, host: referrerHost }),
+            signal: controller.signal,
+            credentials: 'omit',
+        });
+        window.clearTimeout(timeout);
+    } catch {
+        // Unreachable API, blocked request or timeout — attribution stays.
+        return DENIED;
+    }
+    if (!response.ok) return DENIED;
+
+    let body;
+    try { body = await response.json(); } catch { return DENIED; }
+    if (!body || typeof body !== 'object' || body.ok === false) return DENIED;
+
+    const payload = (body.payload && typeof body.payload === 'object') ? body.payload : body;
+    const tier = String(payload.tier || '').toLowerCase();
+    if (tier !== 'practitioner' && tier !== 'studio') return DENIED;
+
+    // `dom` is an optional allow-list of hostnames carried on the licence token.
+    const domains = Array.isArray(payload.dom) ? payload.dom.filter(Boolean) : null;
+    if (domains && domains.length) {
+        if (!referrerHost) return DENIED;
+        const allowed = domains.some((entry) => {
+            const claim = String(entry).trim().toLowerCase().replace(/^\*\./, '');
+            if (!claim) return false;
+            return referrerHost === claim || referrerHost.endsWith(`.${claim}`);
+        });
+        if (!allowed) return DENIED;
+    }
+
+    return { ok: true, tier };
+}
+
+async function verifyWhiteLabel(token) {
+    if (!token) return DENIED;
+
+    const cacheKey = `hmb.wl.${token.slice(-24)}`;
+    try {
+        const cached = window.sessionStorage.getItem(cacheKey);
+        if (cached) {
+            const parsed = JSON.parse(cached);
+            if (parsed && typeof parsed === 'object') return parsed;
+        }
+    } catch { /* private mode: verify again, that is all */ }
+
+    const verdict = await askServer(token);
+    try { window.sessionStorage.setItem(cacheKey, JSON.stringify(verdict)); } catch { /* fine */ }
+    return verdict;
+}
+
+function applyWhiteLabel() {
+    const attribution = document.querySelector('[data-hmb-attrib]');
+    if (attribution) attribution.remove();
+
+    if (cfg.logo && brandRow && brandLogo) {
+        brandLogo.setAttribute('src', cfg.logo);
+        brandLogo.setAttribute('alt', cfg.brand ? `${cfg.brand} logo` : 'Practitioner logo');
+        brandLogo.hidden = false;
+        brandRow.hidden = false;
+        brandLogo.addEventListener('error', () => { brandLogo.hidden = true; scheduleReport(); }, { once: true });
+        brandLogo.addEventListener('load', scheduleReport, { once: true });
+    }
+    scheduleReport();
+}
+
+function wireClassMode() {
+    const button = document.querySelector('[data-hmb-class-start]');
+    if (!button || !root) return;
+    button.addEventListener('click', () => {
+        const app = getApp(root);
+        if (app) app.start();
+    });
+    document.addEventListener('hmb:session-start', () => { button.textContent = 'Class running'; button.disabled = true; });
+    document.addEventListener('hmb:session-pause', () => { button.textContent = 'Resume class'; button.disabled = false; });
+    document.addEventListener('hmb:session-stop', () => { button.textContent = 'Start class'; button.disabled = false; });
+    document.addEventListener('hmb:session-complete', () => { button.textContent = 'Start class'; button.disabled = false; });
+}
+
+if (cfg.mode === 'class') wireClassMode();
+
+if (cfg.wl) {
+    verifyWhiteLabel(cfg.wl).then((verdict) => {
+        if (verdict && verdict.ok) {
+            applyWhiteLabel();
+            return;
+        }
+        // Not verified: free frame, attribution intact, and class mode reverts.
+        if (cfg.mode === 'class') html.setAttribute('data-hmb-mode', 'normal');
+        scheduleReport();
+    });
+} else if (cfg.mode === 'class') {
+    html.setAttribute('data-hmb-mode', 'normal');
+}
+</script>
+
+</body>
+</html>

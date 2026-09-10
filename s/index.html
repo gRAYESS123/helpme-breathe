@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Your Breathing Session</title>
+    <meta name="description" content="A guided breathing session prepared for you. Press begin when you are ready.">
+
+    <!--
+      A client session link. Every one of these is unique to one person, so it
+      must never be indexed and must never be shared as a public URL.
+      Configuration lives entirely in the ?c= parameter: there is no database
+      and nothing about the recipient is stored anywhere.
+    -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="/css/styles.css" as="style">
+    <link rel="stylesheet" href="/css/styles.css">
+
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+
+    <script>
+    /*
+     * Decode and validate ?c=<base64url JSON>.
+     *
+     * SECURITY (BUILD_SPEC FEAT-14). Everything in this payload is
+     * attacker-controllable and is rendered on helpmebreath.com's own origin,
+     * so:
+     *   - the encoded payload is length-capped before it is decoded;
+     *   - every field is type-checked, length-capped and stripped of control
+     *     characters here;
+     *   - only https: image URLs survive, and only after a licence check;
+     *   - nothing is ever written with innerHTML. The module at the bottom of
+     *     this page uses textContent and setAttribute only.
+     * A payload that fails any of this sends the visitor to /timer rather than
+     * rendering a half-configured page.
+     */
+    (function () {
+        'use strict';
+
+        var MAX_ENCODED = 2000;
+
+        function bail() {
+            try { window.location.replace('/timer'); } catch (e) { window.location.href = '/timer'; }
+        }
+
+        function clean(value, limit) {
+            if (typeof value !== 'string') return '';
+            var out = '';
+            for (var i = 0; i < value.length && out.length < limit; i++) {
+                var code = value.charCodeAt(i);
+                if (code >= 32 && code !== 127) out += value.charAt(i);
+            }
+            return out.replace(/\s+/g, ' ').trim();
+        }
+
+        function decode(encoded) {
+            var padded = encoded.replace(/-/g, '+').replace(/_/g, '/');
+            while (padded.length % 4) padded += '=';
+            var binary = window.atob(padded);
+            try {
+                var bytes = new Uint8Array(binary.length);
+                for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+            } catch (e) {
+                return binary;
+            }
+        }
+
+        var encoded = '';
+        try {
+            encoded = String(new URLSearchParams(window.location.search).get('c') || '');
+        } catch (e) {
+            encoded = '';
+        }
+
+        if (!encoded || encoded.length > MAX_ENCODED || !/^[A-Za-z0-9_-]+=*$/.test(encoded)) {
+            bail();
+            return;
+        }
+
+        var payload;
+        try {
+            payload = JSON.parse(decode(encoded));
+        } catch (e) {
+            bail();
+            return;
+        }
+        if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+            bail();
+            return;
+        }
+
+        /* --- t: technique key. js/techniques.js is the real gate. --- */
+        var technique = clean(payload.t, 20);
+        if (!/^[a-z0-9_-]{1,20}$/i.test(technique)) technique = '';
+
+        /* --- d: session seconds, or -1 for unlimited --- */
+        var duration = null;
+        var rawDuration = payload.d;
+        if (typeof rawDuration === 'number' || /^-?\d{1,5}$/.test(String(rawDuration || ''))) {
+            var seconds = parseInt(rawDuration, 10);
+            if (seconds === -1) duration = -1;
+            else if (seconds >= 30 && seconds <= 7200) duration = seconds;
+        }
+
+        /* --- n: the practitioner's name --- */
+        var name = clean(payload.n, 60);
+
+        /* --- l: logo, https only, shown only after the licence verifies --- */
+        var logo = '';
+        var rawLogo = clean(payload.l, 500);
+        if (rawLogo) {
+            try {
+                var url = new URL(rawLogo);
+                if (url.protocol === 'https:') logo = url.href;
+            } catch (e) { logo = ''; }
+        }
+
+        /* --- c: accent colour --- */
+        var accent = clean(payload.c, 8).replace(/^#/, '');
+        if (!/^[0-9a-f]{6}$/i.test(accent)) accent = '';
+
+        /* --- m: a short note to the client --- */
+        var message = clean(payload.m, 280);
+
+        /* --- wl: the practitioner's licence token --- */
+        var token = clean(payload.wl, 4096);
+        if (!/^[A-Za-z0-9._~-]{8,4096}$/.test(token)) token = '';
+
+        window.HMB_SESSION = {
+            technique: technique,
+            duration: duration,
+            name: name,
+            logo: logo,
+            accent: accent,
+            message: message,
+            wl: token
+        };
+
+        /*
+         * js/app.js resolves ?t= and ?d= ahead of a saved preference, which is
+         * what a prescribed session needs: the practitioner's choice wins over
+         * whatever this browser last used on the public site.
+         */
+        try {
+            var params = new URLSearchParams(window.location.search);
+            if (technique) params.set('t', technique);
+            if (duration !== null) params.set('d', String(duration));
+            window.history.replaceState(null, '', window.location.pathname + '?' + params.toString());
+        } catch (e) { /* the data-* fallbacks still apply */ }
+    }());
+    </script>
+
+    <style>
+        /* Page-specific co-branding. Uses the existing custom properties. */
+        .session-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        /* A `display` declaration here outranks the UA's [hidden] rule, so the
+           elements the script toggles need it spelled out. */
+        .session-brand[hidden],
+        .session-brand img[hidden],
+        .session-message[hidden] {
+            display: none;
+        }
+
+        .session-brand img {
+            max-height: 56px;
+            max-width: 220px;
+            width: auto;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .session-message {
+            max-width: 46ch;
+            margin: 0.75rem auto 0;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.6;
+        }
+
+        .session-footer {
+            text-align: center;
+            padding: 2rem 1rem 3rem;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
+        .session-footer p { margin-bottom: 0.5rem; }
+
+        .session-footer a { color: inherit; }
+
+        .session-attrib[hidden] { display: none; }
+
+        /* js/consent.js is pulled in transitively by js/analytics.js and injects
+           a cookie banner unless it finds this element. A client session link
+           loads no analytics and sets no cookie, so the banner must not appear;
+           the empty #cookieConsent element below is what consent.js reuses. */
+        #cookieConsent { display: none !important; }
+    </style>
+</head>
+
+<body class="theme-478 technique-page" data-no-ads="true" data-no-asks="true">
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <div class="nature-bg"></div>
+
+    <div class="natural-element star star-1"></div>
+    <div class="natural-element star star-2"></div>
+    <div class="natural-element star star-3"></div>
+    <div class="natural-element star star-4"></div>
+
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <p class="session-brand" data-session-brand hidden>
+                    <img data-session-logo alt="Practitioner logo" hidden>
+                </p>
+                <h1 data-session-heading>A breathing session for you</h1>
+                <p class="subtitle">Find somewhere you will not be interrupted, then press begin.</p>
+                <p class="session-message" data-session-message hidden></p>
+            </div>
+        </header>
+
+        <main id="main">
+            <section class="breathing-section"
+                     data-breathing-app
+                     data-technique="478"
+                     data-duration="300"
+                     data-lock-technique
+                     aria-labelledby="timer-heading">
+
+                <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">⚙️</button>
+
+                <div class="settings-panel" data-role="settings-panel">
+                    <div class="setting-item">
+                        <span class="setting-label" id="label-sound">Sound</span>
+                        <div class="toggle-switch active" data-role="sound-toggle" role="button" tabindex="0" aria-pressed="true" aria-labelledby="label-sound"></div>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label" id="label-vibration">Vibration</span>
+                        <div class="toggle-switch active" data-role="vibration-toggle" role="button" tabindex="0" aria-pressed="true" aria-labelledby="label-vibration"></div>
+                    </div>
+                </div>
+
+                <h2 id="timer-heading" data-role="technique-title">Guided breathing</h2>
+
+                <div class="breathing-container">
+                    <div class="breathing-aura"></div>
+                    <div class="breathing-circle technique-478" data-role="circle">
+                        <div class="circle-text-container">
+                            <span data-role="circle-text">Ready</span>
+                        </div>
+                    </div>
+                    <div class="breathing-particles" aria-hidden="true">
+                        <span class="particle-float"></span>
+                        <span class="particle-float"></span>
+                        <span class="particle-float"></span>
+                        <span class="particle-float"></span>
+                        <span class="particle-float"></span>
+                        <span class="particle-float"></span>
+                    </div>
+                </div>
+
+                <p class="breathing-text" data-role="breathing-text">Press Begin to start your practice</p>
+
+                <div class="session-info" data-role="session-info" style="display: none;">
+                    <div class="session-progress">
+                        <div class="session-progress-fill" data-role="session-progress-fill"></div>
+                    </div>
+                    <div class="session-time-remaining" data-role="session-time-remaining"></div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" data-role="progress-fill"></div>
+                    <div class="progress-time" data-role="progress-time"></div>
+                </div>
+
+                <div class="timer" data-role="timer">00:00</div>
+
+                <div class="session-stats" data-role="stats" style="display: none;">
+                    <div class="stat-item">
+                        <span class="stat-value" data-role="breath-count">0</span>
+                        <span class="stat-label">Breaths</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" data-role="avg-breath">0s</span>
+                        <span class="stat-label">Avg. breath</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" data-role="session-progress">0%</span>
+                        <span class="stat-label">Progress</span>
+                    </div>
+                </div>
+
+                <div class="tools-row" data-slot="tools"></div>
+
+                <div class="controls">
+                    <button class="control-btn" type="button" data-role="start" data-action="start">Begin Practice</button>
+                    <button class="control-btn" type="button" data-role="pause" data-action="pause" disabled>Pause</button>
+                    <button class="control-btn" type="button" data-role="stop" data-action="stop" disabled>Stop</button>
+                </div>
+
+                <div class="safety-ack" data-role="safety-ack" hidden>
+                    <h3>Read this before you start this pattern</h3>
+                    <div data-role="safety-ack-body"></div>
+                    <div class="safety-ack-actions">
+                        <button class="control-btn" type="button" data-action="safety-ack-confirm">I understand, begin</button>
+                        <button class="control-btn" type="button" data-action="safety-ack-cancel">Not now</button>
+                    </div>
+                </div>
+
+                <div data-slot="post-session"></div>
+
+                <div class="technique-info" data-role="technique-info"></div>
+
+                <p class="live-region" data-role="live-region" aria-live="polite" aria-atomic="true"></p>
+            </section>
+        </main>
+
+        <footer class="session-footer">
+            <!--
+              Attribution is in the markup so it survives a JavaScript failure.
+              It is removed only after /api/entitlement confirms a live
+              Practitioner or Studio licence. The link is never followed
+              (AGENT_BRIEF hard rule 7).
+            -->
+            <p class="session-attrib" data-session-attrib>
+                <a href="/?utm_source=session" rel="nofollow noopener">Powered by Help Me Breathe</a>
+            </p>
+            <p>Paced breathing is not medical care and does not replace treatment.
+            Read the <a href="/legal/medical-disclaimer">medical disclaimer</a> and the
+            <a href="/legal/privacy-policy">privacy policy</a>.</p>
+        </footer>
+    </div>
+
+    <div id="cookieConsent" hidden></div>
+
+    <div class="keyboard-hint" data-role="keyboard-hint">
+        Press <kbd>Space</kbd> to start or pause • <kbd>S</kbd> to stop
+    </div>
+
+    <script>
+    /*
+     * Runs during parsing so the engine's auto-initialiser sees the finished
+     * attributes. Validated values only — see the head script.
+     */
+    (function () {
+        'use strict';
+        var cfg = window.HMB_SESSION || {};
+        var root = document.querySelector('[data-breathing-app]');
+        if (!root) return;
+
+        if (cfg.technique) root.setAttribute('data-technique', cfg.technique);
+        if (cfg.duration !== null && cfg.duration !== undefined) root.setAttribute('data-duration', String(cfg.duration));
+
+        if (!cfg.accent) return;
+
+        // Inline on <body> so it beats the `body.theme-*` rules in styles.css.
+        var accent = '#' + cfg.accent;
+        var r = parseInt(cfg.accent.slice(0, 2), 16);
+        var g = parseInt(cfg.accent.slice(2, 4), 16);
+        var b = parseInt(cfg.accent.slice(4, 6), 16);
+        function lighten(v) { return Math.round(v + (255 - v) * 0.55); }
+
+        var style = document.body.style;
+        style.setProperty('--theme-primary', accent);
+        style.setProperty('--theme-glow', accent);
+        style.setProperty('--progress-color', accent);
+        style.setProperty('--theme-secondary', 'rgb(' + lighten(r) + ',' + lighten(g) + ',' + lighten(b) + ')');
+    }());
+    </script>
+
+    <script type="module" src="/js/consent.js"></script>
+    <script type="module" src="/js/app.js"></script>
+
+    <script type="module">
+    /*
+     * Co-branding for the client session link.
+     *
+     * The white-label check below is deliberately NOT the same as the embed
+     * frame's (embed/v1/frame.html). A licence token's optional `dom` claim
+     * restricts the domains a practitioner may white-label an *embed* on; a
+     * client session link is hosted on helpmebreath.com itself, so there is no
+     * embedding host to match and only the tier matters. Both fail closed.
+     */
+    const cfg = window.HMB_SESSION || {};
+
+    const brandRow = document.querySelector('[data-session-brand]');
+    const logo = document.querySelector('[data-session-logo]');
+    const heading = document.querySelector('[data-session-heading]');
+    const message = document.querySelector('[data-session-message]');
+
+    // textContent only. These strings came out of a URL.
+    if (cfg.name && heading) {
+        heading.textContent = `Prepared for you by ${cfg.name}`;
+        document.title = `A breathing session from ${cfg.name}`;
+    }
+
+    if (cfg.message && message) {
+        message.textContent = cfg.message;
+        message.hidden = false;
+    }
+
+    async function verifyPractitioner(token) {
+        if (!token) return false;
+
+        // A separate namespace from the embed frame's `hmb.wl.` verdicts: that
+        // check also weighs the token's domain claim, this one only the tier.
+        const cacheKey = `hmb.wls.${token.slice(-24)}`;
+        try {
+            const cached = window.sessionStorage.getItem(cacheKey);
+            if (cached) return JSON.parse(cached) === true;
+        } catch { /* private mode: just ask again */ }
+
+        let ok = false;
+        try {
+            const controller = new AbortController();
+            const timer = window.setTimeout(() => controller.abort(), 4000);
+            const response = await fetch('/api/entitlement', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token }),
+                signal: controller.signal,
+                credentials: 'omit',
+            });
+            window.clearTimeout(timer);
+            if (response.ok) {
+                const body = await response.json();
+                if (body && typeof body === 'object' && body.ok !== false) {
+                    const payload = (body.payload && typeof body.payload === 'object') ? body.payload : body;
+                    const tier = String(payload.tier || '').toLowerCase();
+                    ok = tier === 'practitioner' || tier === 'studio';
+                }
+            }
+        } catch {
+            // Unreachable API or timeout: stay on the free, attributed page.
+            ok = false;
+        }
+
+        try { window.sessionStorage.setItem(cacheKey, JSON.stringify(ok)); } catch { /* fine */ }
+        return ok;
+    }
+
+    if (cfg.wl) {
+        verifyPractitioner(cfg.wl).then((verified) => {
+            if (!verified) return;
+
+            const attribution = document.querySelector('[data-session-attrib]');
+            if (attribution) attribution.remove();
+
+            if (cfg.logo && logo && brandRow) {
+                logo.setAttribute('src', cfg.logo);
+                logo.setAttribute('alt', cfg.name ? `${cfg.name} logo` : 'Practitioner logo');
+                logo.addEventListener('error', () => { logo.hidden = true; }, { once: true });
+                logo.hidden = false;
+                brandRow.hidden = false;
+            }
+        });
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+/* ==========================================================================
+   css/print.css — paper output for the practitioner surfaces.
+
+   Loaded (all media) by /handouts, /compliance/dpa,
+   /compliance/privacy-attestation and /compliance/security-overview.
+
+   Only two rules apply on screen: `.hmb-print-only` is hidden, and
+   `.hmb-page-break` collapses to nothing. Everything else is inside
+   `@media print`, so this file cannot change how any page looks in a browser.
+
+   The site's theme classes set `--text-primary: #ffffff` on a dark gradient.
+   Printers do not print the gradient, so those tokens have to be reset here or
+   the page comes out white-on-white. That reset is the first thing in the print
+   block and it is deliberate.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- on screen */
+
+.hmb-print-only {
+    display: none !important;
+}
+
+.hmb-page-break {
+    display: none;
+}
+
+/* ------------------------------------------------------------------- paper */
+
+/* No `size` is declared on purpose. Declaring `size: A4` lays the page out at
+   210x297mm even when the person has US Letter (216x279mm) loaded, which either
+   scales the sheet down or pushes the last lines onto a second page. Leaving it
+   out lets the browser use whatever paper the print dialogue selected, and the
+   margins below are comfortable on both. Portrait is the natural orientation
+   for this content and is not forced. */
+@page {
+    margin: 16mm 14mm;
+}
+
+@page :first {
+    margin-top: 12mm;
+}
+
+@media print {
+    /* Reset the theme tokens so dark-gradient pages print as black on white. */
+    :root,
+    html,
+    body,
+    body[class*='theme-'] {
+        --bg-primary: #ffffff !important;
+        --text-primary: #111111 !important;
+        --text-secondary: #444444 !important;
+        --white: #ffffff !important;
+        --surface: #ffffff !important;
+        --border: #b8b8b8 !important;
+        --shadow: none !important;
+        --theme-primary: #333333 !important;
+        --theme-secondary: #666666 !important;
+        --theme-glow: transparent !important;
+        --progress-color: #666666 !important;
+
+        background: #ffffff !important;
+        color: #111111 !important;
+    }
+
+    body {
+        font-family: 'Quicksand', 'Segoe UI', system-ui, sans-serif;
+        font-size: 10.5pt;
+        line-height: 1.5;
+        overflow: visible !important;
+    }
+
+    /* Decoration, navigation and anything interactive is not paper. */
+    .nature-bg,
+    .natural-element,
+    .skip-link,
+    .keyboard-hint,
+    .cookie-consent,
+    .settings-btn,
+    .settings-panel,
+    .controls,
+    .breathing-particles,
+    .breathing-aura,
+    .donation-section,
+    .support-card,
+    .ad-slot,
+    .technique-switcher,
+    .footer-nav,
+    .breadcrumb,
+    .hmb-no-print,
+    [data-no-print] {
+        display: none !important;
+    }
+
+    .hmb-print-only {
+        display: block !important;
+    }
+
+    .container,
+    .main-content,
+    .sheets,
+    main {
+        max-width: none !important;
+        width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* The glass card system: keep the structure, drop the glass. */
+    .article-page article,
+    .article-page .prose,
+    .technique-page .prose,
+    .card,
+    .link-card,
+    .post-session-card,
+    .handout-sheet,
+    .doc-sheet {
+        background: #ffffff !important;
+        backdrop-filter: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        color: #111111 !important;
+    }
+
+    a,
+    a:link,
+    a:visited {
+        color: #111111 !important;
+        text-decoration: underline;
+    }
+
+    /* Print the destination of outbound links inside document bodies only —
+       doing it everywhere turns a handout into a wall of URLs. */
+    .doc-body a[href^='http']::after {
+        content: ' (' attr(href) ')';
+        font-size: 8.5pt;
+        color: #444444;
+        word-break: break-all;
+    }
+
+    h1, h2, h3, h4 {
+        color: #111111 !important;
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    h1 { font-size: 17pt; }
+    h2 { font-size: 13pt; }
+    h3 { font-size: 11.5pt; }
+
+    p, li {
+        orphans: 3;
+        widows: 3;
+    }
+
+    ul, ol {
+        padding-left: 1.1rem;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    /* ------------------------------------------------------- handout sheets */
+
+    .hmb-page-break {
+        display: block;
+        break-after: page;
+        page-break-after: always;
+        height: 0;
+    }
+
+    .handout-sheet {
+        break-inside: avoid-page;
+        break-after: page;
+        page-break-after: always;
+        padding-top: 0 !important;
+    }
+
+    .handout-sheet:last-of-type {
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    .handout-sheet .handout-head {
+        border-bottom: 1.5pt solid #111111;
+        padding-bottom: 4mm;
+        margin-bottom: 5mm;
+    }
+
+    .handout-sheet .handout-pattern {
+        font-size: 12pt;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    .handout-sheet .handout-grid {
+        display: block;
+    }
+
+    .handout-sheet .handout-block {
+        break-inside: avoid;
+        margin-bottom: 5mm;
+    }
+
+    .handout-sheet .handout-cautions {
+        border: 0.8pt solid #111111;
+        padding: 3mm 4mm;
+        break-inside: avoid;
+    }
+
+    .handout-sheet .handout-foot {
+        border-top: 0.8pt solid #999999;
+        padding-top: 3mm;
+        margin-top: 5mm;
+        font-size: 8.5pt;
+        color: #444444 !important;
+        display: flex;
+        justify-content: space-between;
+        gap: 6mm;
+    }
+
+    .practitioner-mark {
+        display: flex !important;
+        align-items: center;
+        gap: 4mm;
+        border-bottom: 0.8pt solid #999999;
+        padding-bottom: 3mm;
+        margin-bottom: 4mm;
+    }
+
+    .practitioner-mark img {
+        max-height: 14mm !important;
+        max-width: 40mm !important;
+    }
+
+    .practitioner-mark .practitioner-mark-name {
+        font-weight: 600;
+        font-size: 11pt;
+    }
+
+    .practitioner-mark .practitioner-mark-line {
+        font-size: 9pt;
+        color: #444444 !important;
+    }
+
+    /* Free-tier watermark. Printed, never shown on screen. An active
+       practitioner licence adds `hmb-licensed` to <body> and removes it. */
+    body.hmb-licensed .print-watermark {
+        display: none !important;
+    }
+
+    .print-watermark {
+        display: block !important;
+        text-align: center;
+        font-size: 8.5pt;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #777777 !important;
+        border-top: 0.5pt solid #cccccc;
+        margin-top: 4mm;
+        padding-top: 2mm;
+    }
+
+    /* --------------------------------------------------- compliance documents */
+
+    .doc-sheet {
+        font-size: 10pt;
+    }
+
+    .doc-meta {
+        border: 0.8pt solid #111111;
+        padding: 3mm 4mm;
+        margin-bottom: 6mm;
+        break-inside: avoid;
+        font-size: 9.5pt;
+    }
+
+    .doc-meta dl {
+        display: grid;
+        grid-template-columns: 42mm 1fr;
+        gap: 1.5mm 4mm;
+        margin: 0;
+    }
+
+    .doc-meta dt {
+        font-weight: 600;
+    }
+
+    .doc-meta dd {
+        margin: 0;
+    }
+
+    .doc-section {
+        break-inside: avoid-page;
+        margin-bottom: 5mm;
+    }
+
+    .doc-section > h2 {
+        margin-top: 0;
+    }
+
+    .doc-callout {
+        border-left: 2pt solid #111111;
+        padding: 2mm 0 2mm 4mm;
+        break-inside: avoid;
+    }
+
+    .doc-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9pt;
+        break-inside: avoid;
+    }
+
+    .doc-table th,
+    .doc-table td {
+        border: 0.5pt solid #999999;
+        padding: 1.5mm 2.5mm;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .doc-signatures {
+        break-inside: avoid;
+        break-before: auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8mm;
+        margin-top: 8mm;
+    }
+
+    .doc-signature {
+        border-top: 0.8pt solid #111111;
+        padding-top: 2mm;
+    }
+
+    .doc-signature .sig-rule {
+        display: block;
+        border-bottom: 0.5pt solid #111111;
+        height: 9mm;
+        margin: 4mm 0 1.5mm;
+    }
+
+    .doc-signature .sig-label {
+        font-size: 8.5pt;
+        color: #444444 !important;
+    }
+
+    .doc-foot {
+        border-top: 0.5pt solid #999999;
+        margin-top: 6mm;
+        padding-top: 2mm;
+        font-size: 8pt;
+        color: #555555 !important;
+    }
+}
