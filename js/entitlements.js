@@ -19,7 +19,8 @@
  *      out of what they bought) and one silent refresh is attempted in the
  *      background: POST /api/entitlement { token, key? }. It never blocks, never
  *      throws, and a failure changes nothing. The same refresh runs inside the
- *      token's last week so it renews before it can lapse at all.
+ *      token's last week — or the second half of its life, whichever is
+ *      shorter — so it renews before it can lapse at all.
  *   5. Past `exp` + 14 days, the tier falls back to free.
  *
  * The buyer's licence key is stored alongside the token at
@@ -39,7 +40,15 @@
 const STORAGE_KEY = 'hmb.license';
 const KEY_STORAGE_KEY = 'hmb.license.key';
 const GRACE_MS = 14 * 24 * 60 * 60 * 1000;
-/** Renew silently once the token is inside its last week, before it can lapse. */
+/**
+ * Renew silently once the token is inside its last week, before it can lapse —
+ * but never earlier than halfway through its own life. `/api/entitlement`
+ * rechecks on `min(7 days, half the token's lifetime)`, and a 7-day
+ * subscription token is *always* inside its last week, so a flat 7-day rule
+ * here would fire a refresh on every single page load for every subscriber and
+ * get the cheap "same token back" answer every time. Matching the server's
+ * arithmetic means the request only goes out when it can actually do something.
+ */
 const RENEW_BEFORE_MS = 7 * 24 * 60 * 60 * 1000;
 const TIERS = ['free', 'pro', 'practitioner', 'studio'];
 
@@ -197,10 +206,19 @@ function refreshFromStorage() {
  * refresh and expires on its own when the grace window runs out — no revocation
  * list, no owner action.
  */
+function renewWindowMs(payload, expMs) {
+  const iat = Number(payload && payload.iat) || 0;
+  const iatMs = iat > 1e11 ? iat : iat * 1000;
+  const lifetime = iatMs > 0 && expMs > iatMs ? expMs - iatMs : 0;
+  if (!lifetime) return RENEW_BEFORE_MS;
+  return Math.min(RENEW_BEFORE_MS, Math.floor(lifetime / 2));
+}
+
 function maybeSilentRefresh() {
   if (refreshAttempted) return;
   if (!state.token) return;
-  const due = state.grace || (state.exp > 0 && Date.now() > state.exp - RENEW_BEFORE_MS);
+  const window_ = renewWindowMs(state.payload, state.exp);
+  const due = state.grace || (state.exp > 0 && Date.now() > state.exp - window_);
   if (!due) return;
   if (!hasWindow || typeof fetch !== 'function') return;
   if (typeof navigator !== 'undefined' && navigator.onLine === false) return;

@@ -91,8 +91,13 @@ const OPTIONAL_ENV = [
   'MOR_API_PASSWORD',
 ];
 
-/** Refreshes are cheap and frequent; the limit only exists to stop a runaway loop. */
-const limiter = createLimiter({ name: 'entitlement', limit: 60, windowMs: 60 * 1000 });
+/**
+ * Refreshes are cheap and frequent; the limit only exists to stop a runaway loop.
+ * It is deliberately generous because a whole office behind one NAT address, or a
+ * busy practitioner site with several embeds, shares a bucket — and a 429 here
+ * would put the attribution line back on a paying customer's widget.
+ */
+const limiter = createLimiter({ name: 'entitlement', limit: 120, windowMs: 60 * 1000 });
 
 /**
  * Where a token sits relative to its expiry and the offline grace window.
@@ -236,7 +241,9 @@ export async function POST(request) {
     }
 
     const provider = getProvider(providerName());
-    const lookup = await provider.lookup(key, { env: providerEnv, isProd: isProduction() });
+    // `sub` rides along so the adapter can name the caller in a log line without
+    // ever handling the key itself (AGENT_BRIEF section 2 rule 9).
+    const lookup = await provider.lookup(key, { env: providerEnv, isProd: isProduction(), sub });
 
     if (!lookup.ok) {
       console.warn('[entitlement] recheck failed', { sub, provider: provider.id, reason: lookup.reason });

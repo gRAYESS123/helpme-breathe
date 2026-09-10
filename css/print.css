@@ -1,28 +1,19 @@
 /* ==========================================================================
    css/print.css — paper output for the practitioner surfaces.
 
-   Loaded (all media) by /handouts, /compliance/dpa,
-   /compliance/privacy-attestation and /compliance/security-overview.
+   Loaded with media="print" by /handouts, /compliance/dpa,
+   /compliance/privacy-attestation and /compliance/security-overview, so it
+   never blocks the first paint of those pages.
 
-   Only two rules apply on screen: `.hmb-print-only` is hidden, and
-   `.hmb-page-break` collapses to nothing. Everything else is inside
-   `@media print`, so this file cannot change how any page looks in a browser.
+   The two rules those pages need on SCREEN (`.hmb-print-only` hidden and
+   `.hmb-page-break` collapsed) live in each page's own <style> block, because
+   a media="print" sheet is not applied on screen at all.
 
    The site's theme classes set `--text-primary: #ffffff` on a dark gradient.
    Printers do not print the gradient, so those tokens have to be reset here or
    the page comes out white-on-white. That reset is the first thing in the print
    block and it is deliberate.
    ========================================================================== */
-
-/* ---------------------------------------------------------------- on screen */
-
-.hmb-print-only {
-    display: none !important;
-}
-
-.hmb-page-break {
-    display: none;
-}
 
 /* ------------------------------------------------------------------- paper */
 
@@ -131,13 +122,27 @@
         text-decoration: underline;
     }
 
-    /* Print the destination of outbound links inside document bodies only —
-       doing it everywhere turns a handout into a wall of URLs. */
+    /* Print the destination of links inside document bodies only — doing it
+       everywhere turns a handout into a wall of URLs. Root-relative links get
+       the host prefixed, because "see the privacy attestation" on a signed
+       paper copy has to be findable by someone holding only the paper. */
     .doc-body a[href^='http']::after {
         content: ' (' attr(href) ')';
         font-size: 8.5pt;
         color: #444444;
         word-break: break-all;
+    }
+
+    .doc-body a[href^='/']::after {
+        content: ' (helpmebreath.com' attr(href) ')';
+        font-size: 8.5pt;
+        color: #444444;
+        word-break: break-all;
+    }
+
+    /* mailto: links are already readable as their own text. */
+    .doc-body a[href^='mailto:']::after {
+        content: none;
     }
 
     h1, h2, h3, h4 {
@@ -293,8 +298,13 @@
         margin: 0;
     }
 
+    /* Deliberately NOT `break-inside: avoid`. Several clauses of the DPA and
+       of the security overview are longer than one sheet, and a block that
+       cannot fit is broken by the browser anyway — after it has pushed a
+       blank half-page ahead of itself. The pieces that genuinely must stay
+       whole (the meta box, the tables, the callouts, the signature blocks)
+       carry their own avoid rules, and headings carry `break-after: avoid`. */
     .doc-section {
-        break-inside: avoid-page;
         margin-bottom: 5mm;
     }
 

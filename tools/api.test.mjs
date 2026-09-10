@@ -878,6 +878,67 @@ test('paddle: a failed ledger write is reported but never throws', async () => {
   assert.equal(activation.activations, 1, 'the count still moves so the token is honest');
 });
 
+test('providers never put a full licence key in a log line', async () => {
+  // AGENT_BRIEF section 2 rule 9. For both rails the order id IS the key the
+  // buyer pastes, so a failed ledger write must name `sub` and nothing else.
+  const FS_ORDER = 'abcDEFgHiJklM1N-3OP9q';
+  const captured = [];
+  const realWarn = console.warn;
+  console.warn = (...args) => {
+    captured.push(JSON.stringify(args));
+  };
+
+  try {
+    const paddleCtx = {
+      env: paddleEnv(),
+      isProd: true,
+      sub: 'abc123def456',
+      fetchImpl: stubFetch({
+        [`GET /transactions/${TXN}?include=customer,adjustments`]: { body: paddleTransaction() },
+        [`PATCH /customers/${CTM}`]: { status: 403, body: { error: { code: 'forbidden' } } },
+      }),
+    };
+    const paddleLooked = await paddleProvider.lookup(TXN, paddleCtx);
+    await paddleProvider.recordActivation(paddleLooked.record, { domains: [] }, paddleCtx);
+
+    // …and with no customer on the transaction, the other warning path.
+    const noCustomerCtx = {
+      env: paddleEnv(),
+      isProd: true,
+      sub: 'abc123def456',
+      fetchImpl: stubFetch({
+        [`GET /transactions/${TXN}?include=customer,adjustments`]: {
+          body: paddleTransaction({ customer: null, customer_id: null }),
+        },
+      }),
+    };
+    const orphan = await paddleProvider.lookup(TXN, noCustomerCtx);
+    orphan.record.ref.customerId = null;
+    await paddleProvider.recordActivation(orphan.record, { domains: [] }, noCustomerCtx);
+
+    const fsCtx = {
+      env: fastspringEnv(),
+      isProd: true,
+      sub: 'abc123def456',
+      fetchImpl: stubFetch({
+        [`GET /orders/${FS_ORDER}`]: { body: fastspringOrder() },
+        'POST /orders': { status: 401, body: { error: 'unauthorized' } },
+      }),
+    };
+    const fsLooked = await fastspringProvider.lookup(FS_ORDER, fsCtx);
+    await fastspringProvider.recordActivation(fsLooked.record, { domains: [] }, fsCtx);
+  } finally {
+    console.warn = realWarn;
+  }
+
+  assert.ok(captured.length >= 3, 'the warning paths actually ran');
+  for (const line of captured) {
+    assert.ok(!line.includes(TXN), `a Paddle transaction id reached a log line: ${line}`);
+    assert.ok(!line.includes(FS_ORDER), `a FastSpring order id reached a log line: ${line}`);
+    assert.ok(line.includes('abc123def456'), `the log line should name sub instead: ${line}`);
+  }
+});
+
 test('paddle: refunds, chargebacks, cancellations and unpaid orders are all refused', async () => {
   const cases = [
     [{ adjustments: [{ action: 'refund', status: 'approved' }] }, 'refunded'],

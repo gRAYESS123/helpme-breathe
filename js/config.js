@@ -44,6 +44,14 @@
  *    of a dead link. Nothing to configure. This is what ships until step A or B
  *    is done, so the buttons are never broken.
  *
+ *    ONE THING TO KNOW BEFORE YOU SEND TRAFFIC TO /pro: that page carries
+ *    Product + Offer structured data with availability "InStock", which is what
+ *    lets a search engine show the price. While this stays on 'waitlist',
+ *    nothing can actually be bought, so the markup is describing an offer that
+ *    is not open yet. Finish step A or B before you point search traffic, ads
+ *    or a launch post at /pro — or edit the JSON-LD in pro.html to say
+ *    https://schema.org/PreOrder until you do.
+ *
  * Sandbox testing: set `sandbox: true` to point Paddle at its sandbox
  * environment. Set it back to false before taking real money.
  */

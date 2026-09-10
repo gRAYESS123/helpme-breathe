@@ -7,7 +7,7 @@
  *      `[data-slot="post-session"]` on the THIRD completed session, once ever
  *      (flag `hmb.paywall.shown`), and is dismissible forever. Never on a first
  *      or second session, never mid-session, never on a page carrying
- *      `<body data-no-asks="true">`.
+ *      `<body data-no-asks="true">`, and never to someone who has already paid.
  *
  *   2. The feature card. `requirePro('presets')` in js/entitlements.js
  *      dispatches `hmb:paywall` with `{ feature }`; this module answers with a
@@ -22,6 +22,7 @@
 import { completedSessionCount, getFlag, setFlag } from '../storage.js';
 import { track, EVENTS } from '../analytics.js';
 import { PRICES, CHECKOUT } from '../config.js';
+import { isPro } from '../entitlements.js';
 
 const FLAG_SHOWN = 'paywall.shown';
 const OFFER_SESSION = 3;
@@ -140,6 +141,9 @@ function onSessionComplete(event) {
   const detail = event.detail || {};
   if (detail.completed !== true) return;
   if (asksBlocked()) return;
+  // Someone who already paid must never be sold to again. The flag is left
+  // alone so the offer is still there if they ever drop back to free.
+  if (isPro()) return;
   if (getFlag(FLAG_SHOWN) === true) return;
   if (completedSessionCount() !== OFFER_SESSION) return;
 
@@ -200,6 +204,9 @@ function featureSlot() {
 
 function showFeatureCard(feature) {
   if (asksBlocked()) return;
+  // `requirePro()` only dispatches when the visitor is free, but this module
+  // must not depend on that being the only source of the event.
+  if (isPro()) return;
   const key = String(feature || '').trim() || 'pro';
   if (shownFeatures.has(key)) return;
 

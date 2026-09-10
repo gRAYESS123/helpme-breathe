@@ -39,7 +39,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/print.css">
+    <link rel="stylesheet" href="/css/print.css" media="print">
 
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
@@ -76,6 +76,12 @@
     </script>
 
     <style>
+        /* The two screen-side rules /css/print.css used to carry. They live
+           here so print.css can load with media="print" and stop blocking the
+           first paint of this page. */
+        .hmb-print-only { display: none !important; }
+        .hmb-page-break { display: none; }
+
         /* Page-local layout. Existing tokens only; no new colours. */
         .tool-panel {
             background: var(--surface);
@@ -1031,7 +1037,11 @@
         fillProfileInputs();
         renderSheets();
         wire();
-        buildLink();
+        /* Assume free until the entitlements module says otherwise. initGate()
+           imports dynamically, so without this the five branding fields would
+           be typeable and the upsell card hidden for the first few frames on a
+           free visit — a gate that arrives late is not a gate. */
+        setLicensed(false);
         initGate();
     </script>
 </body>

@@ -23,6 +23,14 @@
   },
 
   {
+    "file": "images/og/timer.jpg",
+    "size": [1200, 630],
+    "theme": "478",
+    "kicker": "GUIDED TIMER · SEVEN PATTERNS",
+    "title_lines": ["Breathing Timer"],
+    "sub_lines": ["Pick a pattern, pick a length,", "and follow the circle"]
+  },
+  {
     "file": "images/og/box-breathing.jpg",
     "size": [1200, 630],
     "theme": "box",
@@ -31,11 +39,19 @@
     "sub_lines": ["Equal counts in, hold, out, hold", "— with a free guided timer"]
   },
   {
-    "file": "images/og/coherent-breathing.jpg",
+    "file": "images/og/4-7-8-breathing.jpg",
+    "size": [1200, 630],
+    "theme": "478",
+    "kicker": "4-7-8 · IN FOUR, HOLD SEVEN, OUT EIGHT",
+    "title_lines": ["4-7-8 Breathing", "Timer"],
+    "sub_lines": ["A slow pattern for the", "2 a.m. wake-up"]
+  },
+  {
+    "file": "images/og/heart-coherence-breathing.jpg",
     "size": [1200, 630],
     "theme": "coherent",
     "kicker": "HEART COHERENCE · 5-5",
-    "title_lines": ["Coherent", "Breathing"],
+    "title_lines": ["Heart Coherence", "Breathing"],
     "sub_lines": ["Six slow breaths a minute,", "guided step by step"]
   },
   {
@@ -47,20 +63,36 @@
     "sub_lines": ["A simple three-count rhythm", "you can use anywhere"]
   },
   {
-    "file": "images/og/energizing-breathing.jpg",
+    "file": "images/og/energizing-breath.jpg",
     "size": [1200, 630],
     "theme": "wim",
-    "kicker": "ENERGIZING BREATH · 2-1",
-    "title_lines": ["Energizing", "Breathing"],
-    "sub_lines": ["Faster, rhythmic breaths for", "a morning lift"]
+    "kicker": "ENERGIZING BREATH · SEATED ONLY",
+    "title_lines": ["Energizing", "Breath"],
+    "sub_lines": ["A faster rhythm — read the", "safety notes first"]
   },
   {
-    "file": "images/og/breathing-exercises-for-anxiety.jpg",
+    "file": "images/og/cyclic-sighing.jpg",
     "size": [1200, 630],
-    "theme": "triangle",
+    "theme": "sigh",
+    "kicker": "CYCLIC SIGHING · 2-1-6",
+    "title_lines": ["Cyclic Sighing"],
+    "sub_lines": ["Two breaths in, one long", "breath out"]
+  },
+  {
+    "file": "images/og/extended-exhale-breathing.jpg",
+    "size": [1200, 630],
+    "theme": "extended",
+    "kicker": "EXTENDED EXHALE · 4-6",
+    "title_lines": ["Extended Exhale", "Breathing"],
+    "sub_lines": ["Breathe out longer than", "you breathe in"]
+  },
+  {
+    "file": "images/og/breathing-exercises-anxiety.jpg",
+    "size": [1200, 630],
+    "theme": "478",
     "kicker": "GUIDED EXERCISES",
-    "title_lines": ["Breathing", "for Anxious Moments"],
-    "sub_lines": ["Five slow-breathing techniques", "with a free guided timer"]
+    "title_lines": ["Breathing for", "Anxious Moments"],
+    "sub_lines": ["Five slow patterns with a free", "guided timer on the page"]
   },
   {
     "file": "images/og/breathing-exercises-for-sleep.jpg",
@@ -71,19 +103,249 @@
     "sub_lines": ["Wind down with slow, guided", "breaths before bed"]
   },
   {
-    "file": "images/og/pro.jpg",
+    "file": "images/og/breathing-exercises-for-panic-attacks.jpg",
     "size": [1200, 630],
-    "theme": "neutral",
-    "kicker": "GO DEEPER",
-    "title_lines": ["Help Me Breathe Pro"],
-    "sub_lines": ["Every technique, longer sessions", "and offline practice"]
+    "theme": "sigh",
+    "kicker": "GUIDED EXERCISES",
+    "title_lines": ["Breathing for", "Panic Attacks"],
+    "sub_lines": ["Something steady to follow", "in the first minute"]
+  },
+  {
+    "file": "images/og/breathing-exercises-for-focus.jpg",
+    "size": [1200, 630],
+    "theme": "box",
+    "kicker": "GUIDED EXERCISES",
+    "title_lines": ["Breathing", "for Focus"],
+    "sub_lines": ["Short patterns for the gap", "between two tasks"]
+  },
+  {
+    "file": "images/og/breathing-exercises-for-high-blood-pressure.jpg",
+    "size": [1200, 630],
+    "theme": "coherent",
+    "kicker": "SLOW BREATHING · THE EVIDENCE",
+    "title_lines": ["Breathing and", "Blood Pressure"],
+    "sub_lines": ["What the research shows —", "and what it does not"]
+  },
+  {
+    "file": "images/og/box-breathing-vs-4-7-8.jpg",
+    "size": [1200, 630],
+    "theme": "478",
+    "kicker": "SIDE BY SIDE",
+    "title_lines": ["Box Breathing", "vs 4-7-8"],
+    "sub_lines": ["Two timers on one page,", "so you can try both"]
+  },
+  {
+    "file": "images/og/breathing-apps-compared.jpg",
+    "size": [1200, 630],
+    "theme": "coherent",
+    "kicker": "COMPARISON · 2026",
+    "title_lines": ["Breathing Apps", "Compared"],
+    "sub_lines": ["Free and paid, feature by", "feature, with real prices"]
+  },
+  {
+    "file": "images/og/science.jpg",
+    "size": [1200, 630],
+    "theme": "coherent",
+    "kicker": "THE EVIDENCE",
+    "title_lines": ["The Science of", "Slow Breathing"],
+    "sub_lines": ["Primary sources, plain language", "and honest limits"]
   },
   {
     "file": "images/og/about.jpg",
     "size": [1200, 630],
-    "theme": "neutral",
+    "theme": "478",
     "kicker": "ABOUT",
     "title_lines": ["About Help", "Me Breathe"],
     "sub_lines": ["Free breathing tools, built by", "one person who needed them"]
+  },
+  {
+    "file": "images/og/pro.jpg",
+    "size": [1200, 630],
+    "theme": "478",
+    "kicker": "GO DEEPER",
+    "title_lines": ["Help Me Breathe Pro"],
+    "sub_lines": ["Custom patterns, streaks and", "soundscapes — one payment"]
+  },
+  {
+    "file": "images/og/for-practitioners.jpg",
+    "size": [1200, 630],
+    "theme": "box",
+    "kicker": "FOR PRACTITIONERS",
+    "title_lines": ["Tools for Therapists", "and Coaches"],
+    "sub_lines": ["White-label embeds, client links", "and a commercial licence"]
+  },
+  {
+    "file": "images/og/embed.jpg",
+    "size": [1200, 630],
+    "theme": "478",
+    "kicker": "FREE WIDGET",
+    "title_lines": ["Embed a Breathing", "Timer on Your Site"],
+    "sub_lines": ["One line of HTML and zero", "third-party requests"]
+  },
+  {
+    "file": "images/og/handouts.jpg",
+    "size": [1200, 630],
+    "theme": "box",
+    "kicker": "PRINTABLE",
+    "title_lines": ["Breathing Handouts", "for Clients"],
+    "sub_lines": ["Print-ready cards for each", "of the seven patterns"]
+  },
+  {
+    "file": "images/og/medical-disclaimer.jpg",
+    "size": [1200, 630],
+    "theme": "neutral",
+    "kicker": "PLEASE READ",
+    "title_lines": ["Medical", "Disclaimer"],
+    "sub_lines": ["What this site is, and what", "it is not"]
+  },
+  {
+    "file": "images/og/privacy-policy.jpg",
+    "size": [1200, 630],
+    "theme": "neutral",
+    "kicker": "PRIVACY",
+    "title_lines": ["Privacy Policy"],
+    "sub_lines": ["What is stored, what is not,", "and who can see it"]
+  },
+  {
+    "file": "images/og/terms-of-service.jpg",
+    "size": [1200, 630],
+    "theme": "neutral",
+    "kicker": "TERMS",
+    "title_lines": ["Terms of Service"],
+    "sub_lines": ["Plain terms and an unconditional", "14-day refund"]
+  },
+
+  {
+    "file": "images/og/coherent-breathing.jpg",
+    "size": [1200, 630],
+    "theme": "coherent",
+    "kicker": "HEART COHERENCE · 5-5",
+    "title_lines": ["Coherent", "Breathing"],
+    "sub_lines": ["Six slow breaths a minute,", "guided step by step"]
+  },
+  {
+    "file": "images/og/energizing-breathing.jpg",
+    "size": [1200, 630],
+    "theme": "wim",
+    "kicker": "ENERGIZING BREATH · SEATED ONLY",
+    "title_lines": ["Energizing", "Breathing"],
+    "sub_lines": ["A faster rhythm — read the", "safety notes first"]
+  },
+  {
+    "file": "images/og/breathing-exercises-for-anxiety.jpg",
+    "size": [1200, 630],
+    "theme": "478",
+    "kicker": "GUIDED EXERCISES",
+    "title_lines": ["Breathing for", "Anxious Moments"],
+    "sub_lines": ["Five slow patterns with a free", "guided timer on the page"]
+  },
+
+  {
+    "file": "images/pins/4-7-8-breathing.jpg",
+    "size": [1000, 1500],
+    "layout": "pin",
+    "theme": "478",
+    "kicker": "4-7-8 BREATHING",
+    "title_lines": ["In for four.", "Hold for seven.", "Out for eight."],
+    "sub_lines": ["A free guided timer", "counts it for you"]
+  },
+  {
+    "file": "images/pins/box-breathing.jpg",
+    "size": [1000, 1500],
+    "layout": "pin",
+    "theme": "box",
+    "kicker": "BOX BREATHING",
+    "title_lines": ["Four in.", "Four hold.", "Four out."],
+    "sub_lines": ["One round is sixteen seconds"]
+  },
+  {
+    "file": "images/pins/heart-coherence-breathing.jpg",
+    "size": [1000, 1500],
+    "layout": "pin",
+    "theme": "coherent",
+    "kicker": "COHERENT BREATHING",
+    "title_lines": ["Five seconds in.", "Five seconds out."],
+    "sub_lines": ["Six slow breaths a minute,", "with nothing held"]
+  },
+  {
+    "file": "images/pins/triangle-breathing.jpg",
+    "size": [1000, 1500],
+    "layout": "pin",
+    "theme": "triangle",
+    "kicker": "TRIANGLE BREATHING",
+    "title_lines": ["Three in.", "Three hold.", "Three out."],
+    "sub_lines": ["Nine seconds. That is", "the whole thing."]
+  },
+  {
+    "file": "images/pins/energizing-breath.jpg",
+    "size": [1000, 1500],
+    "layout": "pin",
+    "theme": "wim",
+    "kicker": "ENERGIZING BREATH",
+    "title_lines": ["A faster rhythm", "for a slow morning"],
+    "sub_lines": ["Sit or lie down first.", "Never in water."]
+  },
+  {
+    "file": "images/pins/cyclic-sighing.jpg",
+    "size": [1000, 1500],
+    "layout": "pin",
+    "theme": "sigh",
+    "kicker": "CYCLIC SIGHING",
+    "title_lines": ["Two breaths in.", "One long breath out."],
+    "sub_lines": ["The sigh your body", "already knows"]
+  },
+  {
+    "file": "images/pins/extended-exhale-breathing.jpg",
+    "size": [1000, 1500],
+    "layout": "pin",
+    "theme": "extended",
+    "kicker": "EXTENDED EXHALE",
+    "title_lines": ["Breathe out longer", "than you breathe in"],
+    "sub_lines": ["Four counts in, six counts out"]
+  },
+  {
+    "file": "images/pins/breathing-exercises-anxiety.jpg",
+    "size": [1000, 1500],
+    "layout": "pin",
+    "theme": "478",
+    "kicker": "FOR ANXIOUS MOMENTS",
+    "title_lines": ["One slow minute", "when anxiety spikes"],
+    "sub_lines": ["Five patterns, free,", "no account"]
+  },
+  {
+    "file": "images/pins/breathing-exercises-for-sleep.jpg",
+    "size": [1000, 1500],
+    "layout": "pin",
+    "theme": "478",
+    "kicker": "FOR SLEEP",
+    "title_lines": ["Ten slow breaths", "before you close", "your eyes"],
+    "sub_lines": ["Free guided timer,", "works offline"]
+  },
+  {
+    "file": "images/pins/breathing-exercises-for-panic-attacks.jpg",
+    "size": [1000, 1500],
+    "layout": "pin",
+    "theme": "sigh",
+    "kicker": "FOR PANIC",
+    "title_lines": ["Something steady", "to follow in the", "first minute"],
+    "sub_lines": ["Crisis lines are listed", "at the top of the page"]
+  },
+  {
+    "file": "images/pins/breathing-exercises-for-focus.jpg",
+    "size": [1000, 1500],
+    "layout": "pin",
+    "theme": "box",
+    "kicker": "FOR FOCUS",
+    "title_lines": ["A four-count reset", "without leaving", "your desk"],
+    "sub_lines": ["One round is sixteen seconds"]
+  },
+  {
+    "file": "images/pins/breathing-exercises-for-high-blood-pressure.jpg",
+    "size": [1000, 1500],
+    "layout": "pin",
+    "theme": "coherent",
+    "kicker": "SLOW BREATHING",
+    "title_lines": ["Ten slow minutes,", "twice a day"],
+    "sub_lines": ["What the evidence shows —", "and what it does not"]
   }
 ]

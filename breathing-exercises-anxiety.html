@@ -158,10 +158,10 @@
         },
         {
           "@type": "Question",
-          "name": "How often should I practise?",
+          "name": "How often should I practice?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Five minutes once a day is a reasonable target, at a fixed time rather than only when you feel bad. Practising when you are calm is what makes the pattern available when you are not, because you are not trying to learn a new skill during the worst moment of your week. If a daily habit feels like too much, three times a week is still worth doing."
+            "text": "Five minutes once a day is a reasonable target, at a fixed time rather than only when you feel bad. Practicing when you are calm is what makes the pattern available when you are not, because you are not trying to learn a new skill during the worst moment of your week. If a daily habit feels like too much, three times a week is still worth doing."
           }
         },
         {
@@ -222,19 +222,21 @@
         }
 
         .article-page .crisis-card a {
-            color: var(--theme-secondary);
+            color: var(--text-primary);
             text-decoration: underline;
+            text-decoration-thickness: 1px;
             text-underline-offset: 3px;
         }
 
         .article-page .crisis-card a:hover,
         .article-page .crisis-card a:focus-visible {
-            color: var(--text-primary);
+            color: var(--theme-secondary);
+            text-decoration-thickness: 2px;
         }
 
         .article-page .crisis-card .crisis-note {
             font-size: 0.875rem;
-            color: var(--text-secondary);
+            color: var(--text-primary);
             margin: 0;
         }
 
@@ -306,8 +308,8 @@
                 <ul>
                     <li><strong>Anywhere</strong> — <a href="https://findahelpline.com" target="_blank" rel="noopener noreferrer">Find a Helpline</a>. The International Association for Suicide Prevention describes it as "a global directory that connects people to free and confidential support" and says you can find verified helplines in over 150 countries through it. Pick the country you are in and it lists the services that answer there. If that link will not open for you, the <a href="https://www.iasp.info/crisis-centres-helplines/" target="_blank" rel="noopener noreferrer">IASP crisis centres page</a> points to the same directory.</li>
                     <li><strong>United States</strong> — call or text <a href="tel:988">988</a>, the 988 Suicide &amp; Crisis Lifeline. It is available 24/7/365, and conversations are free and confidential. A chat option is linked from <a href="https://988lifeline.org/" target="_blank" rel="noopener noreferrer">988lifeline.org</a>.</li>
-                    <li><strong>United Kingdom and Ireland</strong> — call <a href="https://www.samaritans.org/" target="_blank" rel="noopener noreferrer">Samaritans</a> free on <a href="tel:116123">116 123</a>, day or night, 365 days a year. The same number works in the Republic of Ireland.</li>
-                    <li><strong>Australia</strong> — call <a href="https://www.lifeline.org.au/" target="_blank" rel="noopener noreferrer">Lifeline</a> on <a href="tel:131114">13 11 14</a> or text 0477 13 11 14. Crisis support is available 24 hours a day.</li>
+                    <li><strong>United Kingdom and Ireland</strong> — call <a href="https://www.samaritans.org/" target="_blank" rel="noopener noreferrer">Samaritans</a> free on <a href="tel:116123">116 123</a>, day or night, 365 days a year. The same freephone number answers in the Republic of Ireland — see <a href="https://www.samaritans.org/ireland/samaritans-ireland/" target="_blank" rel="noopener noreferrer">Samaritans Ireland</a>.</li>
+                    <li><strong>Australia</strong> — call <a href="https://www.lifeline.org.au/" target="_blank" rel="noopener noreferrer">Lifeline</a> on <a href="tel:131114">13 11 14</a>, or text <a href="sms:0477131114">0477 13 11 14</a>. Crisis support is available 24 hours a day.</li>
                     <li><strong>Lebanon</strong> — call <a href="https://embracelebanon.org/" target="_blank" rel="noopener noreferrer">Embrace Lifeline</a> on <a href="tel:1564">1564</a>. Free, confidential and available 24/7.</li>
                 </ul>
                 <p class="crisis-note">If someone's life is in immediate danger, call your local emergency number instead.</p>
@@ -335,7 +337,7 @@
                         <label class="setting-label" for="session-duration">Session length</label>
                         <select id="session-duration" class="duration-select" data-role="duration-select">
                             <option value="180">3 minutes</option>
-                            <option value="300" selected>5 minutes</option>
+                            <option value="300">5 minutes</option>
                             <option value="600">10 minutes</option>
                             <option value="900">15 minutes</option>
                             <option value="1200">20 minutes</option>
@@ -413,7 +415,7 @@
 
                 <div data-slot="post-session"></div>
 
-                <h3 class="sr-only" id="technique-picker-heading">Choose a slower pattern</h3>
+                <h3 class="sr-only" id="technique-picker-heading">Choose a different breathing pattern</h3>
                 <div class="technique-buttons" data-role="technique-buttons" role="group" aria-labelledby="technique-picker-heading">
                     <button class="technique-btn active" type="button" data-action="select-technique" data-technique="478" aria-pressed="true">🌙 4-7-8</button>
                     <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false">🌅 Extended Exhale</button>
@@ -443,7 +445,7 @@
             <!-- ============ PROSE ============ -->
             <article class="prose">
                 <section>
-                    <h2>Breathing when you feel anxious</h2>
+                    <h2>Breathing to calm down when you feel anxious</h2>
                     <p class="lead">Anxiety speeds your breathing up before you notice it has happened. Slowing it back down on purpose, with a breath out that is longer than the breath in, is one of the few useful things you can do in thirty seconds, anywhere, without anyone else knowing you are doing it.</p>
                     <p>When you are anxious, breathing usually becomes faster, shallower and higher in the chest. That is a normal part of the body preparing for something, not a fault in you. The awkward part is that fast, shallow breathing produces sensations of its own — a tight chest, tingling fingers, a light head, a heart you can suddenly feel — and those sensations read as more evidence that something is wrong. The worry feeds the breathing and the breathing feeds the worry. Pacing your breath on purpose interrupts that loop at the one point in it you can actually reach with a decision.</p>
                     <p>The timer above is set to 4-7-8: in for four seconds, hold for seven, out for eight. That works out at a little over three breaths a minute, and the out-breath is twice as long as the in-breath. If the hold feels unpleasant — and for a lot of anxious people it does — use the buttons under the timer to switch to extended exhale or cyclic sighing. Neither of those holds the breath at all, and neither is a lesser version of the practice. Nothing on this page asks you to stay with the pattern it opened on.</p>
@@ -451,8 +453,8 @@
 
                 <section>
                     <h2>Why the exhale is the long part</h2>
-                    <p>Your heart rate is not steady across a single breath. It rises slightly as you breathe in and falls again as you breathe out. That rise and fall is called respiratory sinus arrhythmia, and it is the visible edge of the way the vagus nerve modulates the heart from one second to the next. Making the out-breath the long part of the cycle means spending more of each breath in the half where that brake is being applied. It is the reason nearly every calming pattern people have arrived at, in very different traditions and centuries apart, ends up with a long exhale rather than a long inhale.</p>
-                    <p>Slowing down also matters on its own. Reviews of paced breathing generally treat anything under ten breaths a minute as slow breathing, against a typical adult resting rate of roughly twelve to twenty. A pattern like 4-7-8, or a plain five seconds in and five seconds out, puts you well inside that band without you having to measure your own rate or think about it. The counting does the work. That is really all a guided timer is for: it holds the count so your attention does not have to, which is a genuine relief when your attention is the thing that is misbehaving.</p>
+                    <p>Your heart rate is not steady across a single breath. It rises slightly as you breathe in and falls again as you breathe out. That rise and fall is called respiratory sinus arrhythmia, and <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6137615/" target="_blank" rel="noopener noreferrer">Zaccaro and colleagues' 2018 systematic review of slow breathing</a> in <em>Frontiers in Human Neuroscience</em> describes it as an index of the parasympathetic side of the nervous system — the calming side — writing that "RSA on its side is consistently considered a robust index of parasympathetic activity". Making the out-breath the long part of the cycle means spending more of each breath in the half where the heart is slowing rather than speeding up. That is the usual explanation for why calming patterns tend to be built around a long exhale rather than a long inhale, and it is a plausible mechanism rather than a settled one: what the trials actually measure is how people say they feel, not what any one nerve did.</p>
+                    <p>Slowing down matters on its own too, and this is the better-evidenced half of the story. The same review draws the line for the whole category at "slow breathing techniques (&lt;10 breaths/minute)" — against a typical adult resting rate of roughly twelve to twenty — and reports that these techniques "promote autonomic changes increasing Heart Rate Variability and Respiratory Sinus Arrhythmia paralleled by Central Nervous System (CNS) activity modifications". It also notes that "HRV modulation is highly dependent on the respiration frequency, increasing along with the slowing of breath", which is the plain-language reason a pattern is built around a count rather than left to feel. A pattern like 4-7-8, at a little over three breaths a minute, or a plain five seconds in and five seconds out at six, puts you well inside that band without you having to measure your own rate or think about it. The counting does the work. That is really all a guided timer is for: it holds the count so your attention does not have to, which is a genuine relief when your attention is the thing that is misbehaving. The <a href="/science">research page</a> sets out what this literature does and does not establish.</p>
                 </section>
 
                 <section>
@@ -487,6 +489,7 @@
 
                 <section>
                     <h2>When to use it, and when not to</h2>
+                    <p>Breathing is a small tool, and as anxiety relief goes it has one practical advantage: it is available wherever you already are, with nothing to arrange and nobody to ask.</p>
                     <p>It fits well in the twenty minutes before something you are dreading — a call, an interview, a scan, a conversation you have been putting off. It fits at three in the morning when you are awake and your mind has started making lists. It fits in a waiting room, in a parked car before you go in, or after an argument when your body is still running on adrenaline and the argument itself is over. It also works best when it is not reserved for emergencies: a five-minute session at a fixed point in the day is how the pattern becomes something your body already knows, rather than a new skill you are trying to learn at the worst possible moment.</p>
                     <p>There are times to reach for something else. In the middle of a full panic attack, a seven-second hold is usually the wrong instruction, and a page written for that specific situation will serve you better — read <a href="/breathing-exercises-for-panic-attacks">breathing exercises for panic attacks</a> instead. If you notice you are using breathing exercises to avoid a situation entirely, rather than to get through it, that is worth mentioning to a therapist, because avoidance is the mechanism that keeps anxiety in place. And if breathing has quietly turned into a ritual you must complete a set number of times or something bad will happen, that is a different problem and a timer will not fix it.</p>
                 </section>
@@ -495,9 +498,9 @@
                     <h2>Who should be careful with the hold</h2>
                     <p>4-7-8 contains a seven-second breath-hold, and breath-holds are not for everyone. This is not a scary-warning formality — please read it.</p>
                     <ul>
-                        <li>Speak to a clinician before practising breath-holds if you are pregnant, or if you live with a cardiovascular condition, uncontrolled high blood pressure, epilepsy, a respiratory condition such as asthma or COPD, glaucoma, or you have had surgery recently.</li>
+                        <li>Speak to a clinician before practicing breath-holds if you are pregnant, or if you live with a cardiovascular condition, uncontrolled high blood pressure, epilepsy, a respiratory condition such as asthma or COPD, glaucoma, or you have had surgery recently.</li>
                         <li>If you live with panic attacks, the air hunger from a hold can feel like the beginning of one. Use extended exhale or cyclic sighing instead, both of which are on the buttons above and hold nothing.</li>
-                        <li>Practise sitting or lying down. Never while driving, cycling, on a ladder or in water.</li>
+                        <li>Practice sitting or lying down. Never while driving, cycling, on a ladder or in water.</li>
                         <li>Stop if you feel dizzy, light-headed, tingly or short of breath, and go back to breathing normally. Feeling worse is a reason to stop, not a reason to push through.</li>
                         <li>If a pattern leaves you gasping at the end of the exhale, the pattern is too long for you today. Shorten it. There is nothing to be gained from finishing the count.</li>
                     </ul>
@@ -505,8 +508,8 @@
 
                 <section>
                     <h2>What the evidence shows</h2>
-                    <p>Honestly: modest, real, and not a cure. A 2018 systematic review of slow breathing in <em>Frontiers in Human Neuroscience</em> defined the category as "slow breathing techniques (&lt;10 breath per minute)" and reported that across the studies it covered, slow breathing was associated with "increased comfort, relaxation, pleasantness, vigor and alertness, and reduced symptoms of arousal, anxiety, depression, anger, and confusion", alongside autonomic changes that increase heart rate variability. A 2023 randomised controlled trial in <em>Cell Reports Medicine</em> compared three five-minute daily breathwork patterns against an equal amount of mindfulness meditation over a month and concluded that "Cyclic sighing is most effective at improving mood and reducing respiratory rate" — the pattern in that trial with the longest, most deliberate exhale. And a 2023 meta-analysis of randomised controlled trials in <em>Scientific Reports</em> found a small-to-medium effect of breathwork on self-reported anxiety (Hedges' <em>g</em> = −0.32), while noting that "Most studies were deemed as being at moderate risk of bias" and that its authors "urge caution and advocate for nuanced research approaches with low risk-of-bias study designs". So: a real but small-to-medium effect on how anxious people say they feel, drawn from a literature that is not yet as clean as anyone would like. That is a good reason to give five minutes of it a try, and not a reason to change anything else you are doing about your anxiety.</p>
-                    <p>Two things that paragraph deliberately does not say. It does not say breathing treats an anxiety disorder — none of those papers tested that, and this timer makes no such claim. And it does not say one pattern is right for you. The trial that favoured cyclic sighing measured group averages over a month; you are one person on one afternoon, and the pattern you can actually stay with for five minutes is the one that will do you the most good.</p>
+                    <p>Honestly: modest, real, and not a cure. The 2018 review quoted further up reported that across the studies it covered, slow breathing was associated with "increased comfort, relaxation, pleasantness, vigor and alertness, and reduced symptoms of arousal, anxiety, depression, anger, and confusion" — a list of self-reported states, gathered from small studies using several different protocols. Balban and colleagues' 2023 randomized controlled trial in <em>Cell Reports Medicine</em> put 108 people through 28 days of five-minute daily practice — three different breathwork patterns against an equal amount of mindfulness meditation — and reported that "Cyclic sighing is most effective at improving mood and reducing respiratory rate". That was the pattern in the trial with the longest, most deliberate exhale. And Fincham and colleagues' 2023 meta-analysis of randomized controlled trials in <em>Scientific Reports</em> found, across twenty trials measuring anxiety, "a significant small-medium between-group ES in favour of breathwork, <em>g</em> = − 0.32", while noting that "Most studies were deemed as being at moderate risk of bias" and that its authors "urge caution and advocate for nuanced research approaches with low risk-of-bias study designs to avoid a miscalibration between hype and evidence". So: a real but small-to-medium effect on how anxious people say they feel, drawn from a literature that is not yet as clean as anyone would like. That is a good reason to give five minutes of it a try, and not a reason to change anything else you are doing about your anxiety.</p>
+                    <p>Two things that paragraph deliberately does not say. It does not say breathing treats an anxiety disorder — none of those papers tested that, and this timer makes no such claim. And it does not say one pattern is right for you. The trial that favored cyclic sighing measured group averages over a month; you are one person on one afternoon, and the pattern you can actually stay with for five minutes is the one that will do you the most good.</p>
                     <p class="sources">Sources: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6137615/" target="_blank" rel="noopener noreferrer">Zaccaro et al., <em>Frontiers in Human Neuroscience</em>, 2018</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9873947/" target="_blank" rel="noopener noreferrer">Balban et al., <em>Cell Reports Medicine</em>, 2023</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9828383/" target="_blank" rel="noopener noreferrer">Fincham et al., <em>Scientific Reports</em>, 2023</a></p>
                 </section>
 
@@ -534,8 +537,8 @@
                     </div>
 
                     <div class="faq-item">
-                        <h3>How often should I practise?</h3>
-                        <p>Five minutes once a day is a reasonable target, at a fixed time rather than only when you feel bad. Practising when you are calm is what makes the pattern available when you are not, because you are not trying to learn a new skill during the worst moment of your week. If a daily habit feels like too much, three times a week is still worth doing.</p>
+                        <h3>How often should I practice?</h3>
+                        <p>Five minutes once a day is a reasonable target, at a fixed time rather than only when you feel bad. Practicing when you are calm is what makes the pattern available when you are not, because you are not trying to learn a new skill during the worst moment of your week. If a daily habit feels like too much, three times a week is still worth doing.</p>
                     </div>
 
                     <div class="faq-item">

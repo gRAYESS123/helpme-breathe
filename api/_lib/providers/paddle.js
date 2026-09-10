@@ -202,7 +202,7 @@ export const paddleProvider = {
   /**
    * Verify a key against Paddle and read the activation ledger.
    * @param {string} key the Paddle transaction id
-   * @param {{env:Record<string,string>, fetchImpl?:Function, isProd?:boolean}} ctx
+   * @param {{env:Record<string,string>, fetchImpl?:Function, isProd?:boolean, sub?:string}} ctx
    */
   async lookup(key, ctx) {
     const transactionId = String(key || '').trim();
@@ -288,7 +288,7 @@ export const paddleProvider = {
    *
    * @param {object} record from lookup()
    * @param {{domains?:string[]}} input
-   * @param {{env:Record<string,string>, fetchImpl?:Function}} ctx
+   * @param {{env:Record<string,string>, fetchImpl?:Function, sub?:string}} ctx
    * @returns {Promise<{ok:boolean, activations:number, domains:string[], reason?:string}>}
    */
   async recordActivation(record, input, ctx) {
@@ -297,8 +297,11 @@ export const paddleProvider = {
     const customerId = record.ref && record.ref.customerId;
 
     if (!customerId) {
+      // `sub` (a one-way hash of the key) is the only identifier that may be
+      // logged — AGENT_BRIEF section 2 rule 9. A Paddle transaction id IS the
+      // licence key the buyer pastes, so it must never reach a log line.
       console.warn('[paddle] no customer on transaction; activation not recorded', {
-        order: record.orderId,
+        sub: (ctx && ctx.sub) || null,
       });
       return { ok: false, activations, domains, reason: 'no_customer' };
     }
@@ -331,7 +334,7 @@ export const paddleProvider = {
       console.warn(
         '[paddle] could not write the activation ledger. Check that the API key has ' +
           'customer.write permission, otherwise activation caps will not be enforced.',
-        { order: record.orderId, status: result.status },
+        { sub: (ctx && ctx.sub) || null, status: result.status },
       );
       return { ok: false, activations, domains, reason: 'ledger_write_failed' };
     }

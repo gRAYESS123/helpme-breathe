@@ -174,7 +174,12 @@ export async function POST(request) {
     const provider = getProvider(providerName());
     const sub = await subFor(valid.key);
 
-    const lookup = await provider.lookup(valid.key, { env: providerEnv, isProd });
+    // `sub` travels with the adapter context so an adapter can log a caller
+    // without ever touching the key itself (AGENT_BRIEF section 2 rule 9: a
+    // Paddle transaction id or a FastSpring order id IS the licence key).
+    const providerCtx = { env: providerEnv, isProd, sub };
+
+    const lookup = await provider.lookup(valid.key, providerCtx);
     if (!lookup.ok) {
       console.warn('[license] rejected', { sub, provider: provider.id, reason: lookup.reason });
       const status =
@@ -242,7 +247,7 @@ export async function POST(request) {
     const activation = await provider.recordActivation(
       record,
       { domains: requestedDomains },
-      { env: providerEnv },
+      providerCtx,
     );
     if (!activation.ok) {
       // A ledger write failure must not strand a paying customer. The token is

@@ -412,6 +412,17 @@
     flex: 0 0 auto;
 }
 
+/* The activation card on /pro/thanks leads with an <h2> so the heading order
+   after the page <h1> does not skip a level. Give it the same weight the card's
+   own <h3> gets in css/styles.css rather than the page's article-scale h2. */
+.post-session-card h2 {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem;
+    padding-right: 2rem;
+}
+
 .post-session-card .form-error.form-success {
     color: var(--text-primary);
 }

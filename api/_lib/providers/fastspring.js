@@ -215,7 +215,7 @@ export const fastspringProvider = {
 
   /**
    * @param {string} key the FastSpring order id
-   * @param {{env:Record<string,string>, fetchImpl?:Function, isProd?:boolean}} ctx
+   * @param {{env:Record<string,string>, fetchImpl?:Function, isProd?:boolean, sub?:string}} ctx
    */
   async lookup(key, ctx) {
     const orderId = String(key || '').trim();
@@ -277,7 +277,7 @@ export const fastspringProvider = {
   /**
    * @param {object} record
    * @param {{domains?:string[]}} input
-   * @param {{env:Record<string,string>, fetchImpl?:Function}} ctx
+   * @param {{env:Record<string,string>, fetchImpl?:Function, sub?:string}} ctx
    * @returns {Promise<{ok:boolean, activations:number, domains:string[], reason?:string}>}
    */
   async recordActivation(record, input, ctx) {
@@ -313,7 +313,7 @@ export const fastspringProvider = {
       console.warn(
         '[fastspring] could not write the activation ledger. Check that the API ' +
           'credentials may update orders, otherwise activation caps will not be enforced.',
-        { order: record.orderId, status: result.status },
+        { sub: (ctx && ctx.sub) || null, status: result.status },
       );
       return { ok: false, activations, domains, reason: 'ledger_write_failed' };
     }

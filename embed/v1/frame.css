@@ -715,6 +715,51 @@ html[data-hmb-surface='light'] .hmb-attrib {
 }
 
 /* -----------------------------------------------------------------------------
+   Contraindications (hard rule 4). Collapsed by default so it does not crowd a
+   280px card, but always present and never removed by white-labelling.
+   -------------------------------------------------------------------------- */
+
+.hmb-safety {
+    margin: 18px 0 0;
+    text-align: left;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+}
+
+.hmb-safety summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-primary);
+    list-style-position: inside;
+}
+
+.hmb-safety p {
+    margin: 8px 0 0;
+    line-height: 1.55;
+}
+
+.hmb-safety ul {
+    margin: 8px 0 0 18px;
+    line-height: 1.5;
+}
+
+.hmb-safety ul[hidden] {
+    display: none;
+}
+
+.hmb-safety li {
+    margin-bottom: 4px;
+}
+
+.hmb-safety a {
+    color: inherit;
+    border-bottom: 1px solid currentColor;
+    text-decoration: none;
+}
+
+/* -----------------------------------------------------------------------------
    Attribution. Free-tier embeds always carry it; only a verified Practitioner
    or Studio licence removes it, and the link is never followed (hard rule 7).
    -------------------------------------------------------------------------- */
@@ -821,6 +866,7 @@ html[data-hmb-mode='kiosk'] .hmb-shell {
 .breathing-section.kiosk .progress-bar,
 .breathing-section.kiosk .session-info,
 .breathing-section.kiosk .hmb-title,
+.breathing-section.kiosk .hmb-safety,
 .breathing-section.kiosk .hmb-brand {
     display: none !important;
 }

@@ -521,7 +521,10 @@ data-logo="https://your-site.example/logo.png"</code></pre>
                     advertising library, no web font, no cookie. The widget stores your visitor's sound
                     preference in browser storage that modern browsers partition to your site, and that value
                     never leaves the device. If your privacy notice lists embedded third parties, the honest entry
-                    is that a breathing timer is loaded from helpmebreath.com and sets no cookies.</p>
+                    is that a breathing timer is loaded from helpmebreath.com and sets no cookies. There is
+                    exactly one exception, and it is one you would have to switch on yourself: a Practitioner
+                    licence with a <code>data-logo</code> attribute fetches that image from the address you gave,
+                    once the licence has been verified.</p>
 
                     <p><strong>It sizes itself.</strong> The frame measures its own content and posts the height
                     to your page; the loader listens for that message and adjusts the iframe. The message is only
@@ -606,9 +609,12 @@ data-logo="https://your-site.example/logo.png"</code></pre>
                 <section>
                     <h2>A note on what this is</h2>
                     <p>A breathing timer is a paced-breathing tool, not medical care, and putting one on your site
-                    does not make it one. Nothing here treats, cures or replaces treatment for any condition, and
-                    the patterns that involve holding the breath or breathing quickly carry contraindications that
-                    the timer shows before the first session. Please read the
+                    does not make it one. Nothing here treats, cures or replaces treatment for any condition. The
+                    widget carries its own safety block — a "Before you start" panel listing the
+                    contraindications for whichever pattern you configured, plus a link to our disclaimer — and a
+                    Practitioner licence does not remove it: white-labelling takes our name off the widget, not
+                    the health warning. The energizing pattern additionally asks for a one-tap acknowledgement
+                    before its first session. Please read the
                     <a href="/legal/medical-disclaimer">medical disclaimer</a> before you embed this on a page
                     that gives health advice.</p>
                 </section>
@@ -703,7 +709,7 @@ data-logo="https://your-site.example/logo.png"</code></pre>
 
     const MODE_HINTS = {
         normal: 'A timer sized to your page. Everyone can use this.',
-        kiosk: 'Fills the space you give it, starts on load and loops. Set the iframe height yourself for this one.',
+        kiosk: 'Fills the space you give it, starts on load and loops. Set the iframe height yourself for this one, and post the safety notes near the screen — kiosk mode hides everything except the circle.',
         class: 'Oversized phase text for a projector. Needs a Practitioner licence — the preview below falls back to normal until a licence token is added.',
     };
 

@@ -73,8 +73,13 @@ import {
 The token is `base64url(payloadJSON) + '.' + base64url(HMAC-SHA256)` with
 payload `{ v, tier, sub, iat, exp, kid, act, dom? }`; `exp` is in seconds.
 
-1. **Before `exp`** — the payload's tier applies. Inside the token's last week a
-   silent refresh runs so it renews before it can lapse.
+1. **Before `exp`** — the payload's tier applies. Inside the token's last week —
+   or the second half of its life, whichever is shorter — a silent refresh runs
+   so it renews before it can lapse. That arithmetic mirrors `/api/entitlement`,
+   which rechecks on `min(7 days, half the token's lifetime)`: a subscription
+   token lives exactly 7 days, so a flat "last week" rule on the client would
+   fire a pointless refresh on every page load and always get the same token
+   back.
 2. **Past `exp`, inside 14 days** — the tier is *kept*, and one silent refresh is
    attempted: `POST /api/entitlement { token, key? }`. It runs on an idle
    callback, it never blocks anything, it never throws, and a failure changes
@@ -209,7 +214,7 @@ are reissued.
 | `js/pro/index.js` | Entry point. Injects `css/pro.css` once, wires the paywall and capture, initialises the per-instance tools on every `hmb:ready`, imports `js/checkout.js`, and dynamically imports `./soundscapes.js` inside try/catch so a missing audio module can never break a page. |
 | `js/pro/patterns.js` | "Custom pattern": four sliders (0–30s, at least one of inhale/exhale non-zero), a live plain-words preview, **Run** (free), **Save preset** and **Copy share link** (Pro). Presets live at `hmb.presets` as `[{id,name,inhale,hold1,exhale,hold2}]`, with rename and delete. On `/timer` it reads `?p=4-7-8-0&name=…` and applies it, for anyone. |
 | `js/pro/streaks.js` | "Your practice": current and longest streak, total minutes, sessions this week, a 12-week heatmap with an aria-label per day, a per-technique breakdown, and CSV export via a Blob. Free sees the last seven days plus a blurred heatmap and a Pro badge. |
-| `js/pro/paywall.js` | The offer card on the third completed session (once ever, flag `hmb.paywall.shown`, dismissible forever), and the inline feature card driven by `hmb:paywall`. Never mid-session — a feature card raised during a session waits until it ends. Never on `data-no-asks` pages. |
+| `js/pro/paywall.js` | The offer card on the third completed session (once ever, flag `hmb.paywall.shown`, dismissible forever), and the inline feature card driven by `hmb:paywall`. Never mid-session — a feature card raised during a session waits until it ends. Never on `data-no-asks` pages, and never to a visitor who is already `isPro()`. |
 | `js/pro/capture.js` | The post-session printable offer: email + consent → `POST /api/subscribe { email, technique, source, consent: true }`. Once ever (`hmb.capture.shown`), never on `data-no-asks` pages, and never on the same completion as the offer card — the offer wins and the capture waits for the next one. Exports `renderCaptureCard(container, options)` so checkout's waitlist reuses it — `title`, `message`, `submitLabel`, `consentLabel`, `note` and `successMessage` are overridable, because a consent line has to describe the email actually being agreed to, and `markShown` (default: only for `source: 'post-session'`) decides whether that card spends the once-ever budget. |
 | `js/pro/night.js` | Night-mode toggle (Pro): `body.night` from `css/pro.css`, plus `navigator.wakeLock` while a session runs. Persisted at `hmb.night` — module preferences live as flags because `storage.saveSettings()` deliberately keeps only the four engine settings. |
 | `css/pro.css` | Panels, sliders, heatmap, night mode, the offer and capture cards (extending `.post-session-card`), and the `/pro` page furniture. |
@@ -251,6 +256,10 @@ email address, a licence key or any free-text input.
   practice; it never removes any of it.
 - No offer appears before the third completed session, and no offer appears
   twice.
+- No offer of any kind is shown to someone who has already paid. `paywall.js`
+  checks `isPro()` on both paths; the `hmb.paywall.shown` flag is deliberately
+  left unset in that case, so the offer is still available if a licence ever
+  lapses back to free.
 - No ask of any kind renders while `body.session-active` — `css/styles.css`
   hides `[data-ask]` during a session, and these modules do not try to work
   around that.
@@ -260,5 +269,9 @@ email address, a licence key or any free-text input.
   only in the request body of `/api/license` (activation) and
   `/api/entitlement` (the silent refresh, which needs the key because the
   token carries only a one-way hash of it).
-- 14-day unconditional refund, stated on `/pro`, in the terms, and reachable
-  from checkout.
+- 14-day unconditional refund, stated on `/pro` and reachable from checkout.
+  **Pending:** `legal/terms-of-service.html` is still the pre-v2 file and
+  carries no refund clause, so `/pro` states the promise in its own words and
+  links the terms for the rest of the small print rather than claiming the
+  clause is already there. Once the Legal agent adds the 14-day clause, `/pro`
+  can say so outright again.

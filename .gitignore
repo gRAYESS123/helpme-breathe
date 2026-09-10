@@ -12,3 +12,6 @@ Thumbs.db
 docs/private/
 # Local secrets
 *.secret
+tools/render/node_modules/
+tools/render/out/
+audio/*.wav

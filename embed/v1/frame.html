@@ -247,6 +247,24 @@
 
         <div data-slot="post-session"></div>
 
+        <!--
+          Hard rule 4: every breath-hold or fast-breathing pattern carries an
+          explicit contraindication block. Four of the seven patterns hold the
+          breath and one is a fast pattern, so the widget cannot rely on the
+          host page to say this. The list is filled from the technique's own
+          `contraindications` array by the module below; the static sentence
+          stands on its own if scripting never runs. It is deliberately NOT
+          inside the attribution element, so white-labelling cannot remove it.
+        -->
+        <details class="hmb-safety" data-hmb-safety>
+            <summary>Before you start</summary>
+            <p>Paced breathing is a self-care practice, not medical care. It does not treat or
+            replace treatment for any condition.</p>
+            <ul data-hmb-safety-list hidden></ul>
+            <p><a href="https://helpmebreath.com/legal/medical-disclaimer" target="_blank"
+                  rel="nofollow noopener">Full safety notes</a></p>
+        </details>
+
         <p class="live-region" data-role="live-region" aria-live="polite" aria-atomic="true"></p>
     </section>
 
@@ -437,6 +455,38 @@ document.addEventListener('hmb:phase', scheduleReport);
 const technique = getTechnique(cfg.technique || '') || getTechnique((root && root.getAttribute('data-technique')) || '');
 if (technique) document.title = `${technique.title} — Help Me Breathe`;
 
+/* ------------------------------------------------------- contraindications */
+
+/*
+ * Hard rule 4. The engine only reveals `[data-role="safety-ack"]` for patterns
+ * that require an acknowledgement (today just the energizing breath), but four
+ * of the seven hold the breath, so the widget states the contraindications for
+ * whichever pattern it is running. Filled from the technique's own array with
+ * textContent, and re-filled if the engine resolves a different pattern than
+ * the query string asked for.
+ */
+const safetyList = document.querySelector('[data-hmb-safety-list]');
+
+function renderContraindications(key) {
+    if (!safetyList) return;
+    const t = getTechnique(key || '');
+    const lines = t && Array.isArray(t.contraindications) ? t.contraindications : [];
+    safetyList.replaceChildren();
+    for (const line of lines) {
+        const li = document.createElement('li');
+        li.textContent = line;
+        safetyList.appendChild(li);
+    }
+    safetyList.hidden = lines.length === 0;
+    scheduleReport();
+}
+
+renderContraindications(technique ? technique.key : '');
+for (const name of ['hmb:ready', 'hmb:technique-change']) {
+    document.addEventListener(name, (e) => renderContraindications((e.detail || {}).technique));
+}
+document.querySelector('[data-hmb-safety]')?.addEventListener('toggle', scheduleReport);
+
 /* ------------------------------------------------------------ brand and logo */
 
 const brandRow = document.querySelector('[data-hmb-brand]');
@@ -510,16 +560,32 @@ async function verifyWhiteLabel(token) {
     if (!token) return DENIED;
 
     const cacheKey = `hmb.wl.${token.slice(-24)}`;
+
+    /*
+     * A yes is cached for the life of the tab. A no is cached for 60 seconds
+     * only: it still stops a page with six widgets making six requests, but it
+     * does not let one unlucky timeout keep a paying practitioner attributed
+     * until they close the tab.
+     */
+    const DENY_TTL_MS = 60 * 1000;
     try {
         const cached = window.sessionStorage.getItem(cacheKey);
         if (cached) {
             const parsed = JSON.parse(cached);
-            if (parsed && typeof parsed === 'object') return parsed;
+            if (parsed && typeof parsed === 'object') {
+                if (parsed.ok) return parsed;
+                if (Date.now() - Number(parsed.at || 0) < DENY_TTL_MS) return DENIED;
+            }
         }
     } catch { /* private mode: verify again, that is all */ }
 
     const verdict = await askServer(token);
-    try { window.sessionStorage.setItem(cacheKey, JSON.stringify(verdict)); } catch { /* fine */ }
+    try {
+        window.sessionStorage.setItem(
+            cacheKey,
+            JSON.stringify(verdict.ok ? verdict : { ok: false, at: Date.now() }),
+        );
+    } catch { /* fine */ }
     return verdict;
 }
 

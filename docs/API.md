@@ -181,14 +181,25 @@ because the provider was unreachable. Either way `ok: true` means "use it".
 **Response — 200, not valid**
 
 ```json
-{ "ok": false, "reason": "expired" }
+{ "ok": false, "reason": "bad_signature" }
 ```
 
-A well-formed request always gets a 200; the verdict is in `ok`. Only a
-malformed body (400) or a flood (429) gets a non-200. `reason` is one of
-`missing_token`, `missing`, `malformed`, `bad_signature`, `bad_payload`,
-`bad_version`, `kid_mismatch`, `expired`, `refresh_required`, `key_mismatch`,
-`pack_only`, `provider_unavailable`, or any provider reason from the table above.
+A well-formed request always gets a 200; the verdict is in `ok`. Only a missing
+or malformed body (400) or a flood (429) gets a non-200. `reason` is one of
+`missing_token`, `malformed`, `bad_signature`, `bad_payload`, `bad_version`,
+`kid_mismatch`, `refresh_required`, `key_mismatch`, `pack_only`,
+`provider_unavailable`, or any provider reason from the table above.
+
+Note what is *not* in that list: a plain `expired`. The token is verified with
+`allowExpired`, because an expired token is still a question worth answering —
+an expired token with a `key` gets a real recheck and usually a brand-new token,
+and an expired token without one gets `refresh_required` plus `graceEnds`. The
+clock alone never decides.
+
+More than 120 refreshes a minute from one client IP gets a 429. The limit is
+deliberately generous: an office behind one NAT address, or a busy practitioner
+site with several embeds on a page, shares a bucket, and a 429 here would put the
+attribution line back on a paying customer's widget.
 
 A provider outage while the token is still valid answers `ok: true` with
 `stale: true`. Once the token has expired, an outage inside the offline grace
@@ -350,8 +361,12 @@ Nothing outside `api/_lib/providers/` names a payment company. `lookup()` must
 return a `record` of `{ provider, orderId, sku, tier, live, status,
 subscriptionStatus, activations, maxActivations, maxDomains, domains, ref }`;
 `ref` is for whatever provider-internal ids `recordActivation` needs to write
-back. `ctx` is `{ env, fetchImpl, isProd }` — always call through `ctx.fetchImpl`
-when it is present, which is how the test suite runs offline.
+back. `ctx` is `{ env, fetchImpl, isProd, sub }` — always call through
+`ctx.fetchImpl` when it is present, which is how the test suite runs offline.
+`ctx.sub` is the 12-character hash of the licence key and is the **only**
+identifier an adapter may log: for both Paddle and FastSpring the order id *is*
+the licence key the buyer pastes, so `record.orderId` must never appear in a log
+line.
 
 The email seam works the same way: `api/_lib/email/index.js`, adapter with
 `id`, `requiredEnv` and `subscribe(contact, ctx)`, then `EMAIL_PROVIDER`.
@@ -518,7 +533,10 @@ careless script; it is not a security control.
 **Secrets never leave the server.** `EMAIL_API_KEY` and `MOR_API_KEY` are used
 only in outbound request headers. Nothing logs a full licence key, a full email
 address or any environment value: keys are logged as `sub`, addresses as a
-12-character hash prefix, and `/api/health` returns booleans.
+12-character hash prefix, and `/api/health` returns booleans. This matters more
+than it looks, because on both rails the *order id* is the licence key — so
+`record.orderId` is as sensitive as the key itself and never reaches a log line.
+Provider adapters get `ctx.sub` for exactly this reason, and a test enforces it.
 
 **Everything is `no-store`.** No API response should ever sit in a CDN or a
 browser cache.
@@ -537,7 +555,7 @@ which defeats the purpose of rotating.
 ## Local development and testing
 
 ```bash
-node --test tools/api.test.mjs      # 73 tests, no network, no env needed
+node --test tools/api.test.mjs      # 74 tests, no network, no env needed
 node --check api/license.js         # and every other file under api/
 node tools/keygen.mjs               # prints a secret, writes nothing
 npm test                            # runs everything under tools/
@@ -548,7 +566,10 @@ signature), `kid` mismatch after rotation, the grace-window arithmetic, the rate
 limiter, CORS behaviour on both policies, `requireEnv` in production versus
 development, product-id mapping for both providers with a mocked `fetch`
 (including refunds, chargebacks, cancelled subscriptions, sandbox keys in
-production and ledger writes), and every branch of subscribe validation.
+production and ledger writes), and every branch of subscribe validation. One
+test exists purely to hold a hard rule in place: it captures `console.warn`
+while both adapters fail a ledger write and asserts that no order id — which on
+both rails *is* the licence key — ever appears in the output.
 
 Provider adapters take `fetchImpl` on their context, which is how the tests run
 offline. `MOR_API_BASE` and `EMAIL_API_BASE` point the adapters at a stub host.

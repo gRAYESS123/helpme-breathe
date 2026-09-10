@@ -117,6 +117,23 @@ Class mode never speaks. Phase names reach the room visually and reach a screen
 reader through `[data-role="live-region"]`; the frame calls no speech API. A
 timer that talks over a teacher is worse than one that does not.
 
+### The safety block is not optional
+
+Four of the seven patterns hold the breath and one is a fast pattern, and hard
+rule 4 says every one of those carries an explicit contraindication block. The
+host page cannot be relied on to provide it, so the frame carries its own:
+`<details class="hmb-safety">`, collapsed by default, holding one static
+sentence ("Paced breathing is a self-care practice, not medical care…"), the
+running technique's own `contraindications` array rendered with `textContent`,
+and a link to `/legal/medical-disclaimer`.
+
+It sits **outside** `[data-hmb-attrib]`, so white-labelling removes the
+attribution and never the safety copy — a licence buys the removal of our name,
+not the removal of a health warning. `/s/` carries the same block for the same
+reason. Kiosk mode hides it along with the rest of the chrome, because a signage
+screen has no reader; that is the one place the host is responsible for posting
+it. Opening the block fires a resize report, so the host iframe grows to fit.
+
 ---
 
 ## 4. White-label verification
@@ -155,9 +172,13 @@ The **only** thing that removes the attribution footer.
    - `dom` is absent or empty, **or** it contains the referrer host. A claim
      matches the host itself and any subdomain of it, and a leading `*.` is
      stripped before comparison.
-5. The verdict — positive **or** negative — is cached in `sessionStorage` under
-   `hmb.wl.<last 24 chars of the token>` for the life of the tab, so a page with
-   several widgets makes one request. `/s/` caches its own verdict under
+5. The verdict is cached in `sessionStorage` under
+   `hmb.wl.<last 24 chars of the token>`, so a page with several widgets makes
+   one request rather than one per widget. A **yes** (`{ok: true, tier}`) is
+   kept for the life of the tab. A **no** (`{ok: false, at: <ms>}`) is honoured
+   for 60 seconds only — long enough to deduplicate the widgets on one page,
+   short enough that a single timeout does not keep a paying practitioner
+   attributed until they close the tab. `/s/` caches its own verdict under
    `hmb.wls.<last 24 chars>`: it is a different question (tier only, no domain
    claim) and a different value shape, so it gets a different key.
 
@@ -375,10 +396,11 @@ node tools/site-check.mjs            # no ERROR may mention an embed file
 grep -nEi "https?://" embed/v1/frame.html embed/v1/frame.css
 ```
 
-That last grep must return only the attribution link, the SVG namespace in the
-favicon data URI and comments — anything else is a third-party request and a
-hard-rule violation. Check the byte size of the loader too: it is budgeted at
-under 3 KB uncompressed.
+That last grep must return only two `href`s to helpmebreath.com (the attribution
+link and the medical-disclaimer link — both user-initiated navigations, neither a
+subresource), the SVG namespace inside the favicon data URI, and comments.
+Anything else is a third-party request and a hard-rule violation. Check the byte
+size of the loader too: it is budgeted at under 3 KB uncompressed.
 
 Then load, by hand:
 

@@ -161,8 +161,13 @@
             margin-top: 0;
         }
 
-        .prose .note-block p:last-child {
+        .prose .note-block p:last-child,
+        .prose .note-block ul:last-child {
             margin-bottom: 0;
+        }
+
+        .prose .note-block ul li {
+            margin-bottom: 0.65rem;
         }
 
         .prose .review-note {
@@ -243,7 +248,7 @@
 
                     <p>Most of the tools that do this job are wrapped in something else — a subscription, a sign-up wall, an onboarding quiz, a notification habit, an app you have to install before you can try it. None of that makes the breathing work better. It is there because a subscription business needs it to be there.</p>
 
-                    <p>So the shape of this site is deliberate. Every breathing technique is free and always will be. You can use it without an account, without an email address, and offline once the page has loaded once. Your settings and session history stay in your own browser and are never sent anywhere. If you want to put the timer on your own website, you can <a href="/embed">embed it</a> for free.</p>
+                    <p>So the shape of this site is deliberate. Every breathing technique is free and always will be. You can use it without an account, without an email address, and offline once the page has loaded once. Your settings and your session history are written to your own browser's storage and are never uploaded to a server, so nobody here can read them back. If you accept analytics, the site counts anonymous events — a page view, which technique was picked, whether a session finished — and the <a href="/legal/privacy-policy">privacy policy</a> lists exactly what is counted and what never is. If you want to put the timer on your own website, you can <a href="/embed">embed it</a> for free.</p>
 
                     <p>Something has to pay for the domain, the hosting and the hours, and the section below says plainly what that is. But it is not the timer, and it is never the seven techniques.</p>
                 </section>
@@ -315,7 +320,7 @@
                     <div class="steps-container">
                         <div class="step">
                             <h3>Practitioner licences</h3>
-                            <p>Therapists, coaches, teachers and clinics who use the timer with clients can buy a <a href="/for-practitioners">practitioner licence</a> at $99 a year, or a studio licence at $199 a year. It grants commercial use, a white-label embed, co-branded client links, printable handouts and the paperwork an employer or an IT department asks for. This is the part of the business meant to keep the site alive.</p>
+                            <p>Therapists, coaches, teachers and clinics who use the timer with clients can buy a <a href="/for-practitioners">practitioner licence</a> at $99 a year, or a studio licence at $199 a year. It grants commercial use, a white-label embed, co-branded client links, printable handouts, and three signable documents — a data processing addendum, a privacy attestation and a short security overview. It is not an enterprise product and it will not clear a procurement review; the practitioner page says exactly where that stops, before you buy. This is the part of the business meant to keep the site alive.</p>
                         </div>
                         <div class="step">
                             <h3>Pro, a one-time unlock</h3>
@@ -337,7 +342,13 @@
 
                     <div class="note-block">
                         <h3>Things this site does not do</h3>
-                        <p>It does not sell or rent your personal data. There are no accounts, no passwords and no profile of your practice sitting on a server: your settings and your session history stay in your own browser. Analytics and advertising are handled by the third parties named in the <a href="/legal/privacy-policy">privacy policy</a>, they run only after you have accepted them, and they are switched off entirely on the crisis pages. It runs no sponsored reviews and takes no payment for a ranking or a mention. Payments run through a merchant of record, who is the seller for the transaction and issues your receipt, so card details never touch this site. Every paid product carries an unconditional fourteen-day refund: ask inside fourteen days and you get the whole amount back without being asked why.</p>
+                        <ul>
+                            <li>It does not sell or rent your personal data. There are no accounts and no passwords, so no profile of your practice is held anywhere under your name: your settings and your session history stay in your own browser.</li>
+                            <li>It does not measure you before you agree to it. Analytics and advertising come from the third parties named in the <a href="/legal/privacy-policy">privacy policy</a>, and neither is allowed to measure anything until you have accepted it. Two clarifications, because both can be read the wrong way round. If you decline, ads on the pages that carry them still appear, but as non-personalised ads that read and write no advertising identifiers. And anonymous analytics does still run on the anxiety and panic pages, with consent, because it is how I find out which safety pages people actually reach.</li>
+                            <li>It does not run sponsored reviews, and it takes no payment for a ranking or a mention.</li>
+                            <li>It does not touch your card details. Payments run through a merchant of record, who is the seller for the transaction and issues your receipt.</li>
+                            <li>It does not keep the money if you change your mind. Every paid product carries an unconditional fourteen-day refund: ask inside fourteen days and you get the whole amount back without being asked why. That promise is written into the <a href="/legal/terms-of-service">terms of service</a>.</li>
+                        </ul>
                     </div>
                 </section>
 

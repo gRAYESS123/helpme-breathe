@@ -26,7 +26,11 @@
  *   subscriptionStatus, ref  // ref holds provider-internal ids the adapter needs to write back
  * }
  *
- * ctx = { env, fetchImpl, isProd }
+ * ctx = { env, fetchImpl, isProd, sub }
+ *
+ * `sub` is the first 12 hex characters of sha256(licence key). It is the ONLY
+ * identifier an adapter may put in a log line: for both Paddle and FastSpring the
+ * order id IS the licence key, so `record.orderId` must never be logged.
  */
 
 import { paddleProvider } from './paddle.js';

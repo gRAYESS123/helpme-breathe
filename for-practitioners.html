@@ -457,10 +457,8 @@
                     <p class="cta-subtext">Fourteen-day unconditional refund. Payment is handled by our merchant of record, who is the seller on record for the transaction and issues your receipt.</p>
 
                     <div class="checkout-fallback" data-role="checkout-fallback" tabindex="-1" hidden>
-                        <p><strong>Checkout is not open yet.</strong> The licence is real and the price is real — $99 a year for Practitioner, $199 for Studio — but the payment provider is still being set up. Email <a href="mailto:contact@helpmebreath.com?subject=Practitioner%20licence">contact@helpmebreath.com</a> with the word <em>practitioner</em> and you will be told the day it opens, at the price on this page. If a short form appears below, that does the same thing.</p>
+                        <p><strong>Checkout is not open yet.</strong> The licence is real and the price is real — $99 a year for Practitioner, $199 for Studio — but the payment provider is still being set up. Email <a href="mailto:contact@helpmebreath.com?subject=Practitioner%20licence">contact@helpmebreath.com</a> with the word <em>practitioner</em> and you will be told the day it opens, at the price on this page. There is no sign-up form on this page: the email is the whole mechanism.</p>
                     </div>
-
-                    <div data-checkout-slot></div>
                 </section>
 
                 <section>
@@ -623,12 +621,24 @@
     <script type="module">
         /* Checkout wiring for this page.
          *
-         * js/checkout.js belongs to the Pro agent and may not exist yet, so the
-         * import is dynamic and wrapped. When it is missing, or when checkout is
-         * not configured, the visible fallback note is revealed instead of a
-         * dead button. This page does not load /js/pro/index.js, so there is no
-         * second listener to double-fire; the global guard covers the case where
-         * a future module adds one.
+         * PAGE_CONTRACT section 7 forbids an email capture form on
+         * /for-practitioners, and <body> here carries data-no-asks="true". So
+         * this page must NEVER reach js/checkout.js's shared waitlist card: it
+         * renders a capture form, and its copy is written for the $19 Pro tier
+         * ("founding members get Pro for $14"), which would contradict the $99
+         * and $199 prices printed a few lines above it.
+         *
+         * The rule below is therefore: ask js/config.js what checkout would
+         * actually do; hand the click to js/checkout.js only when a real
+         * payment flow is configured, and otherwise reveal this page's own
+         * static note, which is a mailto and not a form. The detached
+         * `container` is the second belt: if a provider script is blocked,
+         * checkout.js falls back to its waitlist card internally, and that card
+         * has to land somewhere off-page rather than on this one.
+         *
+         * This page does not load /js/pro/index.js, so there is no second
+         * listener to double-fire; the shared window.__hmbCheckoutBound flag
+         * covers a future module that adds one.
          */
         if (!window.__hmbCheckoutBound) {
             window.__hmbCheckoutBound = true;
@@ -642,18 +652,19 @@
                 }
             };
 
-            const showFallback = (moveFocus) => {
+            const showFallback = () => {
                 const note = document.querySelector('[data-role="checkout-fallback"]');
                 if (!note) return;
                 note.hidden = false;
-                // Only steal focus when the note is the whole answer. When
-                // checkout.js rendered a waitlist card it scrolls itself into
-                // view, and fighting that scroll is worse than not focusing.
-                if (!moveFocus) return;
+                try {
+                    note.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } catch {
+                    /* scrolling is a nicety, not a requirement */
+                }
                 try {
                     note.focus();
                 } catch {
-                    /* focus() is a nicety, not a requirement */
+                    /* so is focus() */
                 }
             };
 
@@ -667,24 +678,26 @@
                 const sku = button.dataset.sku === 'studio' ? 'studio' : 'practitioner';
 
                 try {
-                    const module = await import('/js/checkout.js');
-                    if (module && typeof module.checkout === 'function') {
-                        // checkout.js fires checkout_open itself, so this page
-                        // does not, and it dedupes repeat clicks on one SKU.
-                        const result = await module.checkout(sku, {
-                            trigger: button,
-                            placement: 'for-practitioners',
-                        });
-                        // A waitlist result means payment is not configured yet:
-                        // show the practitioner-specific wording above the card.
-                        if (!result || result.mode === 'waitlist' || result.ok === false) showFallback(false);
-                        return;
+                    const { resolvedMode } = await import('/js/config.js');
+                    if (resolvedMode(sku) !== 'waitlist') {
+                        const module = await import('/js/checkout.js');
+                        if (module && typeof module.checkout === 'function') {
+                            /* checkout.js fires checkout_open itself, so this
+                               page does not, and it dedupes repeat clicks. */
+                            const result = await module.checkout(sku, {
+                                trigger: button,
+                                container: document.createElement('div'),
+                                placement: 'for-practitioners',
+                            });
+                            if (result && result.ok !== false && result.mode !== 'waitlist') return;
+                        }
                     }
                 } catch {
-                    /* fall through to the visible note below */
+                    /* config or checkout missing: the note below is the answer */
                 }
-                report('checkout_open', { sku });
-                showFallback(true);
+
+                report('checkout_open', { sku, mode: 'waitlist', placement: 'for-practitioners' });
+                showFallback();
             });
         }
     </script>
