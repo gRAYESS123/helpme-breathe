@@ -122,9 +122,9 @@ function buildBanner() {
   // accepting. See docs/BRAND.md — the cookie banner is not a persuasion
   // surface.
   el.innerHTML = [
-    '<p>We can set analytics cookies to see which pages help people, and advertising cookies on article pages. ',
-    'Choose &ldquo;Essential only&rdquo; and neither is set — the timer works exactly the same. ',
-    'Read the <a href="/legal/privacy-policy">Privacy Policy</a>.</p>',
+    '<p>We can set an analytics cookie to see which pages help people, and advertising cookies on article pages. ',
+    'Choose &ldquo;Essential only&rdquo; and neither is set; the timer works exactly the same. ',
+    '<a href="/legal/privacy-policy">Privacy Policy</a>.</p>',
     '<div class="cookie-buttons">',
     '<button type="button" class="cookie-btn secondary" data-action="consent-essential">Essential only</button>',
     '<button type="button" class="cookie-btn" data-action="consent-all">Accept all</button>',

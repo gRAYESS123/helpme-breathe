@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
     <title>Breathing Exercises for Focus — Free Guided Timer</title>
     <meta name="description" content="A two-minute box breathing timer for your desk. Press Begin, follow the circle, then start the work. Free, no sign-up, and it works offline.">
@@ -229,7 +230,11 @@
                      aria-labelledby="timer-heading">
 
                 <div class="app-bar">
-                    <h2 id="timer-heading" data-role="technique-title">Box breathing</h2>
+                    <div class="technique-head">
+                        <p class="technique-eyebrow" data-role="technique-eyebrow"></p>
+                        <h2 id="timer-heading" data-role="technique-title">Box breathing</h2>
+                        <p class="pattern-line" data-role="pattern-line"></p>
+                    </div>
                     <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
                             <circle cx="12" cy="12" r="3.2"/>
@@ -263,9 +268,9 @@
 
                 <div class="breathing-container">
                     <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
-                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
-                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
-                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                        <circle class="ring-track" cx="160" cy="160" r="150"/>
+                        <circle class="ring-live" cx="160" cy="160" r="150"/>
+                        <circle class="ring-bridge" cx="160" cy="160" r="150"/>
                     </svg>
                     <div class="breathing-circle technique-box" data-role="circle">
                         <span class="circle-notch" aria-hidden="true"></span>
@@ -307,8 +312,6 @@
                     </div>
                 </div>
 
-                <!-- SLOT: Pro tools -->
-                <div class="tools-row" data-slot="tools"></div>
 
                 <div class="controls">
                     <button class="control-btn" type="button" data-role="start" data-action="start">Begin Practice</button>
@@ -327,6 +330,9 @@
 
                 <!-- SLOT: post-session cards -->
                 <div data-slot="post-session"></div>
+
+                <!-- SLOT: Pro tools (custom pattern, your practice, soundscapes, night mode) -->
+                <div class="tools-row" data-slot="tools"></div>
 
                 <div class="technique-info" data-role="technique-info"></div>
 
@@ -521,8 +527,8 @@
                     which Help Me Breathe has its own icon and keeps running offline.</p>
 
                     <p>If the two-minute reset turns into something you want to watch build,
-                    <a href="/pro">Pro</a> adds streaks and a twelve-week heatmap for one payment rather than a
-                    subscription.</p>
+                    <a href="/pro">the plan</a> adds streaks and a twelve-week heatmap. Three days free,
+                    then $10 a month or $100 a year.</p>
 
                     <p>Everything on this page stays free either way, and every other pattern and session length
                     lives on the <a href="/timer">all timers</a> page.</p>
@@ -594,7 +600,7 @@
                     <li><a href="/cyclic-sighing">Cyclic sighing timer</a> — a double inhale and a long, slow release, with no breath-hold anywhere in it. The one to reach for when the holds are the problem.</li>
                     <li><a href="/timer">All breathing timers</a> — every pattern and every session length in one place.</li>
                     <li><a href="/science">What the research actually says</a> — the papers behind the claims on this site, with what they do and do not show.</li>
-                    <li><a href="/pro">Help Me Breathe Pro</a> — streaks, a twelve-week heatmap, custom patterns and no ads, for one payment.</li>
+                    <li><a href="/pro">The Help Me Breathe plan</a> — streaks, a twelve-week heatmap, custom patterns and no ads, for $10 a month or $100 a year.</li>
                 </ul>
             </aside>
 

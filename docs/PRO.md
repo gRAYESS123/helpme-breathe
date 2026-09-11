@@ -8,8 +8,40 @@ them:
 | `js/entitlements.js` | who the visitor is (`free` / `pro` / `practitioner` / `studio`) |
 | `js/config.js` | who takes the money |
 
-If you change merchant of record, you edit `js/config.js`. If you change what a
-tier unlocks, you edit the module that owns that feature. Nothing else moves.
+If you change merchant of record, you edit `js/config.js`. If you change what
+the plan unlocks, you edit the module that owns that feature. Nothing else moves.
+
+---
+
+## 0. What is for sale (owner decision, 2026-09-11)
+
+**One plan, everything included, for individuals and practitioners alike.**
+
+| What | Price | What it covers |
+|---|---|---|
+| Free | $0 | The timer, every technique, every duration, the embeddable widget with attribution. No account needed |
+| The plan, monthly | $10/month (US list) | Everything, including the practitioner features: commercial use, white-label embed, client links, class mode, handouts, compliance pack |
+| The plan, yearly | $100/year (US list) | The same plan, billed once a year |
+
+Billed in advance and renewing automatically until cancelled; tax is added at
+checkout by the merchant of record. A **3-day free trial** needs a card, does not
+charge it during the trial, and charges the price shown at checkout when the
+3 days end unless the customer cancels first. Cancelling takes two clicks from the
+account page. **One free trial per person.** 14-day unconditional refund by email.
+
+**An account is for one person or one household.** Sign-in is an email link or a
+Google account; there are no passwords.
+
+There are no tiers, no lifetime unlock, no licence keys, no device activations and
+no domain counts. The merchant of record is not chosen yet, and **nothing on the
+site may name a provider** — write "a merchant of record". The Paddle specifics in
+section 2 are a worked example of one provider's integration, kept because the
+research is still good, not a commitment to it.
+
+**Sections 1 and 2 below still describe the licence-key model.**
+`js/entitlements.js`, `js/checkout.js` and the server API are being rebuilt
+against this offer. This section is authoritative on what is sold; those sections
+are a record of how the retired model worked.
 
 ---
 
@@ -121,7 +153,7 @@ checkout('practitioner');
 Or, from any page, with no JavaScript of its own:
 
 ```html
-<button type="button" data-action="checkout" data-sku="lifetime">Unlock Pro — $19</button>
+<button type="button" data-action="checkout" data-sku="monthly">Start the free trial — $10 a month</button>
 ```
 
 `js/checkout.js` installs one delegated click handler on `document`, so any page
@@ -138,7 +170,9 @@ module then does not add a second listener. As a belt-and-braces measure,
 `checkout()` also collapses repeat calls for the same SKU inside 1.2 seconds, so
 one click can never open two checkouts or send two `checkout_open` events.
 
-SKUs: `lifetime`, `monthly`, `practitioner`, `studio`, `pack`.
+SKUs: `monthly` and `yearly` — the one plan, billed either way. `lifetime`,
+`practitioner`, `studio` and `pack` are retired with the tiers and must not come
+back.
 
 ### The three modes
 
@@ -146,7 +180,7 @@ SKUs: `lifetime`, `monthly`, `practitioner`, `studio`, `pack`.
 
 | Mode | What a click does |
 |---|---|
-| `waitlist` | Renders the founding-member email capture card — "Checkout opens soon — founding members get Pro for $14". **This is the default, so a button is never dead.** |
+| `waitlist` | Renders the email capture card — "Checkout opens soon". **This is the default, so a button is never dead.** No price promise and no founding offer: there is one price, and it is $10 a month or $100 a year. |
 | `link` | Opens `CHECKOUT.urls[sku]` (a hosted payment link) in a new tab. |
 | `paddle` | Opens Paddle Billing's overlay checkout using `CHECKOUT.priceIds[sku]`. |
 
@@ -156,8 +190,9 @@ rather than breaking.
 
 ### Configuring it (the owner's job, once)
 
-**Hosted links (simplest).** Create the five products at the merchant of record,
-paste each hosted payment link into `CHECKOUT.urls`, set every product's success
+**Hosted links (simplest).** Create the two products — the monthly plan and the
+yearly plan, each with the 3-day card-required trial — at the merchant of record,
+paste each hosted payment link into `CHECKOUT.urls`, set both products' success
 URL to `https://helpmebreath.com/pro/thanks`, and set `mode: 'link'`.
 
 **Paddle Billing overlay.** Verified against developer.paddle.com on 2026-09-09:
@@ -201,9 +236,9 @@ Two consequences we build for:
    and update `api/_lib/providers/` (API agent's territory).
 4. Redeploy.
 
-No feature file, no page and no gate changes. Existing lifetime tokens keep
-working until they expire, and the offline grace path covers the gap while keys
-are reissued.
+No feature file, no page and no gate changes. Existing tokens keep working until
+they expire, and the offline grace path covers the gap while subscriptions are
+moved across.
 
 ---
 
@@ -270,8 +305,7 @@ email address, a licence key or any free-text input.
   `/api/entitlement` (the silent refresh, which needs the key because the
   token carries only a one-way hash of it).
 - 14-day unconditional refund, stated on `/pro` and reachable from checkout.
-  **Pending:** `legal/terms-of-service.html` is still the pre-v2 file and
-  carries no refund clause, so `/pro` states the promise in its own words and
-  links the terms for the rest of the small print rather than claiming the
-  clause is already there. Once the Legal agent adds the 14-day clause, `/pro`
-  can say so outright again.
+  `legal/terms-of-service.html` now carries it as section 10, "The 14-day refund
+  policy", so `/pro` can say so outright and link straight to it. Section 5 of
+  the same page carries the automatic-renewal block and the trial-to-paid block;
+  `/pro` must show the same two disclosures, in the same words, before checkout.

@@ -3,16 +3,17 @@
    css/styles.css — the whole design system for the site.
 
    Reading order
-     1  :root — day tokens, the seven technique rim/fill pairs, legacy aliases
+     1  :root — day tokens, the seven technique inks, motion and geometry
      2  @media (prefers-color-scheme: dark) — night tokens, guarded by :not(.day)
      3  body.night — the manual night override (wins over the media query)
-     4  Base, type scale, links, focus, utilities
-     5  Site header, footer, cookie banner
-     6  The breathing screen
-     7  Article / prose system, callouts, tables, pricing, ad slot
-     8  Utilities and legacy shims
-     9  prefers-reduced-motion — targeted, never a blanket transition kill
-    10  Print basics
+     4  Base, type scale, links, focus, layout shells
+     5  Site header, footer, consent bar
+     6  The breathing screen — the mark, alive
+     7  Home page blocks
+     8  Article / prose system, callouts, tables, cards, pricing, ad slot
+     9  Utilities and legacy shims, responsive
+    10  prefers-reduced-motion — targeted, never a blanket transition kill
+    11  Print basics
 
    Rules this file keeps to (docs/BRAND.md is the public statement of them):
      - Every colour is a token. No component defines a colour that exists only
@@ -23,6 +24,8 @@
      - No gradients, no blur filters, no glow, no shadowed type, no emoji.
      - Newsreader for display; IBM Plex Sans for anything a person operates.
        The moment a line of type is clickable, it is sans.
+     - One object moves: the disc. The ring around it fills with the breath.
+       Everything else holds still.
    ========================================================================== */
 
 /* ==========================================================================
@@ -37,18 +40,19 @@
     --graphite: #575F58; /* muted text                                       */
     --rule: #E3DCCC;    /* decorative hairline ONLY — never a control edge   */
     --edge: #83887E;    /* control outlines: buttons, inputs, toggles, pills */
-    --track: #DFD8C7;   /* progress trough, input wells                      */
+    --track: #DFD8C7;   /* progress trough, input wells, the ring's rail     */
     --green: #0F5136;   /* primary: Begin, links, focus ring, active nav     */
-    --chalk: #FFFFFF;   /* ink on primary                                    */
+    --chalk: #FFFFFF;   /* ink on primary, and the phase word on the disc    */
     --clay: #8A4B24;    /* commerce accent — paid surfaces only              */
     --ok: #1B6B45;
     --warn: #7E5406;
     --bad: #A32721;
 
-    /* ---- the seven technique pairs (day) ----
-       RIM carries every text and control duty (>= 5.3:1 on paper).
-       FILL is the circle interior: L* 80.3, ~1.50:1 on paper. Decoration,
-       never a boundary. Hue angles are documented in docs/BRAND.md. */
+    /* ---- the seven technique inks (day) ----
+       RIM is the technique's ink: the disc, the live arc, the eyebrow, the
+       pill dot. Every rim clears 5.3:1 on paper and 4.5:1 under --chalk.
+       FILL is a pale wash of the same ink, kept for the heatmap and for
+       surfaces that want a tint (never a boundary). */
     --rim-478: #33407F;      --fill-478: #C5C5E0;
     --rim-box: #6E3C69;      --fill-box: #DABFD6;
     --rim-coherent: #8C2F49; --fill-coherent: #E5BDC4;
@@ -70,16 +74,27 @@
     --fs-small: 0.8125rem;  /* 13px                                          */
     --fs-body: 1rem;
 
+    /* ---- motion: one voice for the interface, the inhale curve ---- */
+    --dur-tap: 160ms;
+    --dur: 240ms;
+    --dur-slow: 400ms;
+    --ease-ui: cubic-bezier(.33, 0, .20, 1);
+
     /* ---- geometry ---- */
     --radius: 8px;
     --radius-pill: 999px;
     --hit: 44px;            /* minimum rendered control height               */
-    --measure: 68ch;
-    --page: 62rem;
+    --measure: 66ch;
+    --page: 66rem;
 
-    /* the breathing stage; the circle is 81.25% of it */
-    --stage: 320px;
-    --pacer-c: 704;         /* 2 * pi * 112, the pacing ring's circumference  */
+    /* The breathing stage. The ring is drawn at r=150 on a 320 grid; the disc
+       is 81.25% of the stage at full inhale, so 20 grid units of paper always
+       separate the disc from the ring. */
+    --stage: 380px;
+    --ring-c: 942.48;       /* 2 * pi * 150                                   */
+    --ring-arc: 816.81;     /* 312 degrees — the ring, minus the 48deg gap    */
+    --ring-gap: 125.66;     /* 48 degrees — the gap, bridged during a hold    */
+    --pacer-c: 942.48;      /* legacy alias                                   */
 }
 
 /* ==========================================================================
@@ -104,9 +119,8 @@
         --warn: #E0B25C;
         --bad: #F0918A;
 
-        /* The rim carries the hue at night. Every fill collapses to the one
-           dark surface value — a dark ground cannot carry seven tints, and a
-           light filled disc at 2 a.m. is a torch in the face. */
+        /* At night the ink lightens and the disc carries it as a pale wash
+           with dark type on top; the fills collapse to the surface value. */
         --rim-478: #93A2E8;      --fill-478: #1E2426;
         --rim-box: #D59CCB;      --fill-box: #1E2426;
         --rim-coherent: #F2909F; --fill-coherent: #1E2426;
@@ -186,9 +200,10 @@ html {
    against whichever token set is active on the body element. The old names are
    kept so that every page not yet converted still renders. */
 body {
-    /* the live technique pair — body.theme-* swaps these two */
+    /* the live technique ink — body.theme-* swaps these */
     --rim: var(--rim-478);
     --fill: var(--fill-478);
+    --disc-ink: var(--chalk);
 
     /* legacy aliases (do not use in new work) */
     --bg-primary: var(--paper);
@@ -228,20 +243,23 @@ body.theme-wim { --rim: var(--rim-wim); --fill: var(--fill-wim); }
 
 h1, h2 {
     font-family: var(--display);
-    font-weight: 500;
-    letter-spacing: -0.012em;
-    line-height: 1.16;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.12;
     color: var(--ink);
+    text-wrap: balance;
 }
 
 h1 {
-    font-size: clamp(1.6rem, 1.15rem + 1.6vw, 2.25rem);
-    margin: 0 0 0.5rem;
+    font-size: clamp(2rem, 1.35rem + 2.4vw, 3.25rem);
+    margin: 0 0 0.75rem;
 }
 
 h2 {
-    font-size: clamp(1.3rem, 1.05rem + 0.9vw, 1.6rem);
-    margin: 2rem 0 0.75rem;
+    font-size: clamp(1.5rem, 1.2rem + 1.1vw, 2rem);
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 2.5rem 0 0.85rem;
 }
 
 h3, h4, h5, h6 {
@@ -249,10 +267,11 @@ h3, h4, h5, h6 {
     font-weight: 600;
     line-height: 1.35;
     color: var(--ink);
+    text-wrap: balance;
 }
 
-h3 { font-size: 1.0625rem; margin: 1.5rem 0 0.5rem; }
-h4 { font-size: 0.9375rem; margin: 1.25rem 0 0.4rem; }
+h3 { font-size: 1.1875rem; margin: 1.75rem 0 0.5rem; }
+h4 { font-size: 1rem; margin: 1.25rem 0 0.4rem; }
 h5, h6 { font-size: var(--fs-small); margin: 1rem 0 0.35rem; }
 
 p { margin: 0 0 1rem; }
@@ -309,6 +328,13 @@ img[loading="lazy"] { opacity: 1; }
     border-radius: 3px;
 }
 
+/* A press reads as instant: no transition, one pixel of travel, ink edge. */
+:where(button, .btn, .control-btn, .technique-btn, .tool-btn, .cookie-btn,
+       .checkout-btn, .cta-button, .cta-button-large, .link-card, .settings-btn,
+       .nav-toggle, .pro-btn, .technique-switcher a):active:not(:disabled) {
+    transform: translateY(1px);
+}
+
 .skip-link {
     position: absolute;
     left: -9999px;
@@ -333,20 +359,20 @@ img[loading="lazy"] { opacity: 1; }
     width: 100%;
     max-width: var(--page);
     margin: 0 auto;
-    padding: 0 1.25rem 3rem;
+    padding: 0 1.5rem 3rem;
 }
 
+/* The home page used to split into a timer column and a sidebar. The timer is
+   the page now; the class stays for any page that still carries it. */
 .main-content {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 19rem;
-    gap: 1.75rem;
-    align-items: start;
+    display: block;
 }
 
 .sidebar {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+    margin-top: 2rem;
 }
 
 header .header-content {
@@ -354,15 +380,17 @@ header .header-content {
 }
 
 .subtitle {
-    font-size: 1.0625rem;
-    line-height: 1.6;
+    font-family: var(--display);
+    font-size: 1.25rem;
+    line-height: 1.5;
     color: var(--graphite);
-    max-width: 56ch;
+    max-width: 48ch;
     margin: 0;
+    text-wrap: pretty;
 }
 
 /* ==========================================================================
-   5 — SITE HEADER, FOOTER, COOKIE BANNER
+   5 — SITE HEADER, FOOTER, CONSENT BAR
    ========================================================================== */
 
 .site-header {
@@ -376,8 +404,8 @@ header .header-content {
     width: 100%;
     max-width: var(--page);
     margin: 0 auto;
-    padding: 0 1.25rem;
-    min-height: 60px;
+    padding: 0 1.5rem;
+    min-height: 64px;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -386,7 +414,7 @@ header .header-content {
 .lockup {
     display: inline-flex;
     align-items: center;
-    gap: 0.6rem;      /* stroke width x 4 at the header's 26px mark */
+    gap: 0.65rem;      /* stroke width x 4 at the header's 28px mark */
     text-decoration: none;
     color: var(--ink);
     padding: 0.5rem 0;
@@ -397,8 +425,8 @@ header .header-content {
 
 .lockup-mark {
     display: block;
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     color: var(--green);
     flex: 0 0 auto;
 }
@@ -406,7 +434,7 @@ header .header-content {
 .wordmark {
     font-family: var(--display);
     font-weight: 500;
-    font-size: 1.0625rem;
+    font-size: 1.125rem;
     letter-spacing: -0.012em;
     line-height: 1;
     white-space: nowrap;
@@ -416,12 +444,12 @@ header .header-content {
 .site-nav {
     display: flex;
     align-items: center;
-    gap: 1.15rem;
+    gap: 1.35rem;
     margin-left: auto;
 }
 
 .site-nav a {
-    font-size: var(--fs-small);
+    font-size: 0.875rem;
     font-weight: 500;
     color: var(--graphite);
     text-decoration: none;
@@ -435,7 +463,7 @@ header .header-content {
 }
 
 .site-nav a[aria-current="page"] {
-    color: var(--green);
+    color: var(--ink);
     border-bottom-color: var(--green);
 }
 
@@ -472,7 +500,7 @@ header .header-content {
         background: var(--leaf);
         border-bottom: 1px solid var(--rule);
         box-shadow: var(--shadow-lift);
-        padding: 0.25rem 1.25rem 0.75rem;
+        padding: 0.25rem 1.5rem 0.75rem;
     }
 
     .site-nav.is-open { display: flex; }
@@ -495,8 +523,8 @@ header .header-content {
 
 .footer {
     border-top: 1px solid var(--ink);
-    margin-top: 3rem;
-    padding: 2rem 0 0;
+    margin-top: 4rem;
+    padding: 2.25rem 0 0;
     font-size: var(--fs-small);
     color: var(--graphite);
 }
@@ -505,13 +533,13 @@ header .header-content {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
     gap: 1.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 2.25rem;
 }
 
 .footer-nav {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.45rem;
 }
 
 .footer-nav h2,
@@ -522,22 +550,22 @@ header .header-content {
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--graphite);
-    margin: 0 0 0.35rem;
+    margin: 0 0 0.4rem;
 }
 
 .footer a {
-    color: var(--graphite);
+    color: var(--ink);
     text-decoration: none;
 }
 
 .footer a:hover {
-    color: var(--ink);
+    color: var(--green);
     text-decoration: underline;
 }
 
 .footer-byline {
     border-top: 1px solid var(--rule);
-    padding-top: 1rem;
+    padding-top: 1.1rem;
     margin-bottom: 0.75rem;
     color: var(--graphite);
     max-width: var(--measure);
@@ -548,7 +576,7 @@ header .header-content {
 .legal-links {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem 1rem;
+    gap: 0.4rem 1.1rem;
     padding: 0.5rem 0 1.5rem;
     font-size: var(--fs-micro);
 }
@@ -561,24 +589,28 @@ header .header-content {
     padding-bottom: 0.75rem;
 }
 
-/* ------------------------------------------------------ cookie banner ----- */
+/* -------------------------------------------------------- consent bar ----- */
 
+/* A full-width bar along the bottom edge, not a card over the timer. It is
+   never shown while a session runs, and it leaves the breathing screen alone
+   on a phone because it takes the bottom edge, not the middle of the page. */
 #cookieConsent {
     position: fixed;
-    left: 1rem;
-    right: 1rem;
-    bottom: 1rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 60;
-    max-width: 34rem;
-    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 2rem;
+    padding: 0.9rem max(1.5rem, calc((100% - var(--page)) / 2 + 1.5rem));
     background: var(--leaf);
-    border: 1px solid var(--edge);
-    border-radius: var(--radius);
+    border-top: 1px solid var(--rule);
     box-shadow: var(--shadow-lift);
-    padding: 1rem 1.15rem;
     opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 240ms ease, transform 240ms ease;
+    transform: translateY(100%);
+    transition: opacity var(--dur) var(--ease-ui), transform var(--dur) var(--ease-ui);
     pointer-events: none;
 }
 
@@ -588,11 +620,15 @@ header .header-content {
     pointer-events: auto;
 }
 
+body.session-active #cookieConsent { display: none; }
+
 #cookieConsent p {
+    flex: 1 1 26rem;
     font-size: var(--fs-small);
-    line-height: 1.6;
+    line-height: 1.55;
     color: var(--ink);
-    margin: 0 0 0.85rem;
+    margin: 0;
+    max-width: 62ch;
 }
 
 #cookieConsent a { color: var(--green); }
@@ -601,13 +637,15 @@ header .header-content {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+    flex: 0 0 auto;
+    margin-left: auto;
 }
 
 /* Decline is listed first and carries exactly the same weight as Accept. */
 .cookie-btn {
-    flex: 1 1 9rem;
+    flex: 1 1 auto;
     min-height: var(--hit);
-    padding: 0.6rem 1rem;
+    padding: 0.55rem 1.1rem;
     font-family: var(--ui);
     font-size: var(--fs-small);
     font-weight: 500;
@@ -626,49 +664,91 @@ header .header-content {
     border-color: var(--edge);
 }
 
+@media (max-width: 640px) {
+    #cookieConsent { padding: 0.85rem 1rem 1rem; gap: 0.65rem; }
+    .cookie-buttons { width: 100%; margin-left: 0; }
+    .cookie-btn { flex: 1 1 8rem; }
+}
+
 /* ==========================================================================
    6 — THE BREATHING SCREEN
+   The disc is the technique's ink. The ring around it is the mark: a thin
+   rail with a 48deg gap at twelve o'clock. The live arc fills the rail on the
+   in-breath, drains on the out-breath, and a short bridge closes the gap for
+   as long as you hold. One object moves; everything else holds still.
    ========================================================================== */
 
 .breathing-section {
     position: relative;
-    background: var(--leaf);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sheet);
-    padding: 0 1.25rem 1.75rem;
     text-align: center;
-    margin: 0 0 1.75rem;
+    padding: 0.75rem 0 1.5rem;
+    margin: 0 0 2rem;
 }
 
-/* The app bar: technique title left, settings gear right, hairline beneath.
-   It sits directly under the site header so the two read as one header stack.
-   The gear stays inside the app root because the engine scopes every
-   [data-role] lookup to that root and a page may carry two timers. */
+/* The app bar: technique head centred, the gear pinned to the right. The gear
+   stays inside the app root because the engine scopes every [data-role]
+   lookup to that root and a page may carry two timers. */
 .app-bar {
+    position: relative;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    min-height: 54px;
-    margin: 0 -1.25rem 1.5rem;
-    padding: 0.5rem 1.25rem;
-    border-bottom: 1px solid var(--rule);
-    text-align: left;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: var(--hit);
+    max-width: 44rem;
+    padding: 0 3.5rem;
+    margin: 0 auto 0.25rem;
 }
+
+/* Under an article header the timer needs air above the technique name. */
+.article-page .breathing-section,
+.technique-page .breathing-section { margin-top: 2.25rem; }
+
+.technique-head {
+    display: grid;
+    gap: 0.2rem;
+    justify-items: center;
+}
+
+.technique-eyebrow {
+    font-family: var(--ui);
+    font-size: var(--fs-micro);
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--rim);
+    margin: 0;
+    transition: color var(--dur-slow) var(--ease-ui);
+}
+
+.technique-eyebrow:empty { display: none; }
 
 [data-role="technique-title"],
 .app-bar h2 {
     font-family: var(--display);
-    font-weight: 500;
-    font-size: 1.25rem;
-    letter-spacing: -0.012em;
+    font-weight: 400;
+    font-size: clamp(1.75rem, 1.35rem + 1.5vw, 2.375rem);
+    letter-spacing: -0.015em;
+    line-height: 1.1;
     margin: 0;
     color: var(--ink);
 }
 
+.pattern-line {
+    font-family: var(--ui);
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    color: var(--graphite);
+    margin: 0.1rem 0 0;
+}
+
+.pattern-line:empty { display: none; }
+
 .settings-btn {
-    flex: 0 0 auto;
+    position: absolute;
+    right: 0;
+    top: 0;
     width: var(--hit);
     height: var(--hit);
     display: inline-flex;
@@ -690,10 +770,10 @@ header .header-content {
 .settings-panel {
     display: none;
     position: absolute;
-    top: 3.6rem;
-    right: 1.25rem;
+    top: calc(var(--hit) + 1.35rem);
+    right: 0;
     z-index: 30;
-    width: min(20rem, calc(100% - 2.5rem));
+    width: min(20rem, 100%);
     background: var(--leaf);
     border: 1px solid var(--edge);
     border-radius: var(--radius);
@@ -731,7 +811,7 @@ header .header-content {
     background: var(--leaf);
     border: 1px solid var(--edge);
     cursor: pointer;
-    transition: background-color 200ms ease, border-color 200ms ease;
+    transition: background-color var(--dur) var(--ease-ui), border-color var(--dur) var(--ease-ui);
 }
 
 /* The track is 30px so it reads as a printed switch, but the thing you can
@@ -751,7 +831,7 @@ header .header-content {
     height: 22px;
     border-radius: 50%;
     background: var(--edge);
-    transition: transform 200ms ease, background-color 200ms ease;
+    transition: transform var(--dur) var(--ease-ui), background-color var(--dur) var(--ease-ui);
 }
 
 .toggle-switch.active {
@@ -786,14 +866,11 @@ header .header-content {
 
 .breathing-container {
     position: relative;
-    width: min(var(--stage), 78vw);
+    width: min(var(--stage), 82vw);
     aspect-ratio: 1 / 1;
-    margin: 1.5rem auto 1.25rem;
+    margin: 1.5rem auto 1rem;
 }
 
-/* Two fixed dotted calipers: the outer marks full inhale, the inner marks full
-   exhale. The live circle travels between them. The third ring is the
-   reduced-motion pacer and is hidden unless that preference is set. */
 .breathing-guides {
     position: absolute;
     inset: 0;
@@ -804,28 +881,70 @@ header .header-content {
     pointer-events: none;
 }
 
-.caliper {
+.ring-track,
+.ring-live,
+.ring-bridge {
     fill: none;
-    stroke: var(--edge);
-    stroke-width: 1;
-    stroke-dasharray: 2 5;
-    /* These two marks say where full inhale and full exhale are, so they have
-       to be visible. At 0.5 the stroke collapsed to ~1.9:1 on leaf, and even
-       0.9 fell to 2.79:1 on --paper (which is the kiosk ground). No opacity:
-       --edge is already the faintest value allowed on a boundary, and a
-       1px 2-5 dash reads as a caliper without being dimmed further. */
-    opacity: 1;
+    stroke-linecap: butt;
+    transform-origin: 50% 50%;
 }
 
-.pacer-ring {
-    fill: none;
-    stroke: var(--rim);
-    stroke-width: 3;
-    stroke-linecap: butt;
-    transform: rotate(-90deg);
-    transform-origin: 50% 50%;
-    visibility: hidden;
+/* The rail: a full turn minus the 48deg gap, starting 24deg past twelve. */
+.ring-track {
+    stroke: var(--track);
+    stroke-width: 2.5;
+    stroke-dasharray: var(--ring-arc) var(--ring-c);
+    transform: rotate(-66deg);
 }
+
+/* The live arc: drawn on the rail, from the gap's right edge, clockwise. The
+   engine sets --ring-from / --ring-to at every phase boundary, so the arc
+   fills on an in-breath, drains on an out-breath and stays put on a hold. */
+.ring-live {
+    stroke: var(--rim);
+    stroke-width: 3.5;
+    stroke-dasharray: var(--ring-arc) var(--ring-c);
+    stroke-dashoffset: var(--ring-arc);
+    transform: rotate(-66deg);
+    animation-duration: var(--phase-duration, 4s);
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+    transition: stroke var(--dur-slow) var(--ease-ui);
+}
+
+[data-phase="inhale"] .ring-live { animation-name: hmb-ring-i; }
+[data-phase="hold"] .ring-live { animation-name: hmb-ring-h; }
+[data-phase="exhale"] .ring-live { animation-name: hmb-ring-e; }
+[data-phase="topup"] .ring-live { animation-name: hmb-ring-t; }
+
+/* A paused session freezes the gauge where it is, like the disc. */
+[data-paused] .ring-live { animation-play-state: paused; }
+
+/* Four names, one shape: consecutive phases never share a kind, which is
+   what makes the arc restart at every boundary. */
+@keyframes hmb-ring-i { from { stroke-dashoffset: var(--ring-from, 816.81); } to { stroke-dashoffset: var(--ring-to, 0); } }
+@keyframes hmb-ring-h { from { stroke-dashoffset: var(--ring-from, 0); } to { stroke-dashoffset: var(--ring-to, 0); } }
+@keyframes hmb-ring-e { from { stroke-dashoffset: var(--ring-from, 0); } to { stroke-dashoffset: var(--ring-to, 816.81); } }
+@keyframes hmb-ring-t { from { stroke-dashoffset: var(--ring-from, 0); } to { stroke-dashoffset: var(--ring-to, 0); } }
+
+/* The gap closes while the pattern holds, so the ring completes itself for as
+   long as you hold your breath, and reopens when the hold ends. */
+.ring-bridge {
+    stroke: var(--rim);
+    stroke-width: 3.5;
+    stroke-dasharray: var(--ring-gap) var(--ring-c);
+    transform: rotate(-114deg);
+    opacity: 0;
+    transition: opacity 240ms linear, stroke var(--dur-slow) var(--ease-ui);
+}
+
+[data-phase="hold"] .ring-bridge { opacity: 1; }
+
+/* Legacy guide marks from the first Paper and Ink build. Pages converted to
+   the ring carry none of these; anything still carrying them shows nothing. */
+.caliper,
+.pacer-ring { display: none; }
 
 .breathing-circle {
     position: absolute;
@@ -834,13 +953,13 @@ header .header-content {
     width: 81.25%;
     height: 81.25%;
     border-radius: 50%;
-    background: var(--fill);
-    border: 3px solid var(--rim);
+    background: var(--rim);
+    border: 0;
     transform: translate(-50%, -50%) scale(0.72);
     z-index: 0;
     display: grid;
     place-items: center;
-    transition: background-color 400ms ease, border-color 400ms ease;
+    transition: background-color var(--dur-slow) var(--ease-ui);
     animation-duration: 10s;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
@@ -850,32 +969,13 @@ header .header-content {
 
 .breathing-circle.active { animation-play-state: running; }
 
-/* The notch at twelve o'clock is the mark's gap: a bar in the page ground laid
-   over the rim. It closes while the pattern holds, so the ring completes
-   itself for as long as you hold your breath. */
-.circle-notch {
-    position: absolute;
-    top: -3px;
-    left: 50%;
-    width: 34%;
-    height: 3px;
-    transform: translateX(-50%);
-    z-index: 1;
-    background: var(--leaf);
-    opacity: 1;
-    pointer-events: none;
-    transition: opacity 240ms linear;
-}
+/* The gap now lives on the ring, not on the disc. The span stays in the
+   markup for every page; it draws nothing. */
+.circle-notch { display: none; }
 
-/* The gap closes while the pattern holds, so the ring completes itself for as
-   long as you hold your breath, and reopens when the hold ends. Symmetric, and
-   it needs no knowledge of which phase came before. */
-[data-phase="hold"] .circle-notch { opacity: 0; }
-
-/* The phase word sits OUTSIDE the circle, so it never scales with it and stays
-   the largest, steadiest thing on the screen. (Pages still carrying the old
-   nesting — the container inside the circle — centre correctly too, because
-   the circle is a centring grid.) */
+/* The phase word sits OUTSIDE the disc's scaling box, so it never scales and
+   stays the largest, steadiest thing on the screen. It is set in the disc's
+   ink colour because it always lands on the disc. */
 .circle-text-container {
     position: absolute;
     inset: 0;
@@ -891,15 +991,14 @@ header .header-content {
 
 .breathing-circle > .circle-text-container { position: static; inset: auto; }
 
-/* The phase word is the largest type on this screen. */
 .phase-word,
 .circle-text-container [data-role="circle-text"] {
     font-family: var(--display);
-    font-weight: 500;
-    font-size: clamp(1.9rem, 1.3rem + 2.2vw, 2.5rem);
+    font-weight: 400;
+    font-size: clamp(1.9rem, 1.3rem + 2.2vw, 2.625rem);
     line-height: 1.05;
     letter-spacing: -0.012em;
-    color: var(--ink);
+    color: var(--disc-ink);
     white-space: nowrap;
 }
 
@@ -911,8 +1010,8 @@ header .header-content {
     font-size: 1rem;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.06em;
-    color: var(--graphite);
+    letter-spacing: 0.08em;
+    color: var(--disc-ink);
 }
 
 /* Phase-word cross-fade, 160ms, opacity only. A distinct animation name per
@@ -1006,17 +1105,19 @@ header .header-content {
 /* ------------------------------------------------------- the read-outs --- */
 
 .breathing-text {
-    font-size: 0.9375rem;
-    line-height: 1.6;
+    font-family: var(--display);
+    font-size: 1.125rem;
+    line-height: 1.5;
     color: var(--graphite);
     margin: 0 auto 1.25rem;
     max-width: 40ch;
     min-height: 3em;
+    text-wrap: balance;
 }
 
 .session-info {
-    max-width: 26rem;
-    margin: 0 auto 0.75rem;
+    max-width: 24rem;
+    margin: 0 auto 0.5rem;
 }
 
 .session-progress {
@@ -1029,59 +1130,36 @@ header .header-content {
 .session-progress-fill {
     height: 100%;
     width: 0%;
-    /* --graphite, not --edge: the fill has to read against --track, and
-       #83887E on #DFD8C7 is only 2.55:1. --graphite clears 5.42:1 in day and
-       4.44:1 at night, so the session's progress is legible in both. */
-    background: var(--graphite);
-    transition: width 300ms linear;
+    background: var(--rim);
+    transition: width 300ms linear, background-color var(--dur-slow) var(--ease-ui);
 }
 
 .session-time-remaining {
-    margin-top: 0.4rem;
+    margin-top: 0.45rem;
     font-size: var(--fs-micro);
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--graphite);
 }
 
-.progress-bar {
-    position: relative;
-    height: 4px;
-    max-width: 26rem;
-    margin: 1.5rem auto 1.9rem;
-    background: var(--track);
-    border-radius: var(--radius-pill);
-}
+/* The per-phase bar is redundant now that the ring carries the phase. It
+   stays in the markup for the engine; it draws nothing. */
+.progress-bar { display: none; }
 
-.progress-fill {
-    height: 100%;
-    width: 0%;
-    background: var(--rim);
-    border-radius: var(--radius-pill);
-    transition: width 100ms linear, background-color 400ms ease;
-}
+.progress-fill { width: 0%; }
 
-.progress-time {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 0.35rem;
-    font-size: var(--fs-micro);
-    font-variant-numeric: tabular-nums;
-    letter-spacing: 0.08em;
-    color: var(--graphite);
-}
+.progress-time { display: none; }
 
 .timer {
     font-family: var(--ui);
-    font-size: 1.75rem;
-    font-weight: 500;
+    font-size: 2.5rem;
+    font-weight: 400;
     font-variant-numeric: tabular-nums;
     font-feature-settings: 'tnum' 1;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.04em;
     color: var(--ink);
-    margin: 0 0 0.25rem;
+    margin: 0.25rem 0 0.15rem;
     line-height: 1.1;
 }
 
@@ -1089,7 +1167,7 @@ header .header-content {
     display: flex;
     justify-content: center;
     gap: 2.25rem;
-    margin: 1rem 0 0.5rem;
+    margin: 0.75rem 0 0.5rem;
 }
 
 .stat-item {
@@ -1108,7 +1186,7 @@ header .header-content {
 
 .stat-label {
     font-size: var(--fs-micro);
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--graphite);
 }
@@ -1124,8 +1202,8 @@ header .header-content {
 }
 
 .control-btn {
-    min-height: var(--hit);
-    padding: 0.7rem 1.35rem;
+    min-height: 48px;
+    padding: 0.7rem 1.5rem;
     font-family: var(--ui);
     font-size: 0.9375rem;
     font-weight: 500;
@@ -1134,7 +1212,7 @@ header .header-content {
     border: 1px solid var(--edge);
     border-radius: var(--radius);
     cursor: pointer;
-    transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+    transition: background-color var(--dur-tap) var(--ease-ui), border-color var(--dur-tap) var(--ease-ui), color var(--dur-tap) var(--ease-ui);
 }
 
 .control-btn:hover:not(:disabled) { border-color: var(--ink); }
@@ -1145,6 +1223,7 @@ header .header-content {
     border-color: var(--green);
     color: var(--chalk);
     font-weight: 600;
+    padding-inline: 1.85rem;
 }
 
 .control-btn[data-role="start"]:hover:not(:disabled) {
@@ -1180,7 +1259,7 @@ header .header-content {
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.5rem;
-    margin: 1.5rem 0 0;
+    margin: 1.75rem 0 0;
 }
 
 .technique-btn {
@@ -1189,7 +1268,7 @@ header .header-content {
     align-items: center;
     gap: 0.5rem;
     min-height: var(--hit);
-    padding: 0.6rem 1rem;
+    padding: 0.6rem 1.05rem;
     font-family: var(--ui);
     font-size: var(--fs-small);
     font-weight: 500;
@@ -1198,7 +1277,7 @@ header .header-content {
     border: 1px solid var(--edge);
     border-radius: var(--radius-pill);
     cursor: pointer;
-    transition: border-color 200ms ease, background-color 200ms ease;
+    transition: border-color var(--dur) var(--ease-ui), background-color var(--dur) var(--ease-ui);
 }
 
 .technique-btn::before {
@@ -1225,7 +1304,7 @@ header .header-content {
 
 .technique-btn.active { font-weight: 600; }
 
-/* Each pill wears its own technique's rim, not the page's current one. */
+/* Each pill wears its own technique's ink, not the page's current one. */
 .technique-btn[data-technique="478"]::before { background: var(--rim-478); }
 .technique-btn[data-technique="box"]::before { background: var(--rim-box); }
 .technique-btn[data-technique="coherent"]::before { background: var(--rim-coherent); }
@@ -1249,43 +1328,61 @@ header .header-content {
 .technique-btn.active[data-technique="wim"] { border-color: var(--rim-wim); }
 .technique-btn.active[data-technique="wim"]::after { border-color: var(--rim-wim); }
 
+/* The active pill also sits in a faint wash of its own ink, where the browser
+   can mix one. The doubled border carries the state on its own without it. */
+@supports (background: color-mix(in srgb, red 8%, white)) {
+    .technique-btn.active[data-technique="478"] { background: color-mix(in srgb, var(--rim-478) 9%, var(--leaf)); }
+    .technique-btn.active[data-technique="box"] { background: color-mix(in srgb, var(--rim-box) 9%, var(--leaf)); }
+    .technique-btn.active[data-technique="coherent"] { background: color-mix(in srgb, var(--rim-coherent) 9%, var(--leaf)); }
+    .technique-btn.active[data-technique="sigh"] { background: color-mix(in srgb, var(--rim-sigh) 9%, var(--leaf)); }
+    .technique-btn.active[data-technique="extended"] { background: color-mix(in srgb, var(--rim-extended) 9%, var(--leaf)); }
+    .technique-btn.active[data-technique="triangle"] { background: color-mix(in srgb, var(--rim-triangle) 9%, var(--leaf)); }
+    .technique-btn.active[data-technique="wim"] { background: color-mix(in srgb, var(--rim-wim) 9%, var(--leaf)); }
+}
+
 /* ------------------------------------------------------------ tools row -- */
 
+/* The Pro tools sit under the pills as a quieter row of small pills, a step
+   down in weight from the technique choice above them. */
 .tools-row {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0;
-    margin: 1.5rem 0 0;
+    gap: 0.5rem;
+    margin: 1.25rem auto 0;
+    padding-top: 1.25rem;
     border-top: 1px solid var(--rule);
+    max-width: 44rem;
 }
 
-.tools-row:empty { border-top: 0; }
+.tools-row:empty { display: none; }
 
 .tools-row .tool-btn {
-    min-height: var(--hit);
-    padding: 0.75rem 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 40px;
+    padding: 0.5rem 0.95rem;
     font-family: var(--ui);
     font-size: var(--fs-small);
     font-weight: 500;
     color: var(--graphite);
-    background: none;
-    border: 0;
-    border-right: 1px solid var(--rule);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius-pill);
     cursor: pointer;
 }
 
-.tools-row .tool-btn:last-child { border-right: 0; }
+.tools-row .tool-btn:hover { color: var(--ink); border-color: var(--ink); }
 
-.tools-row .tool-btn:hover { color: var(--ink); }
-
-.tools-row .tool-btn.is-on { color: var(--ink); font-weight: 600; }
+.tools-row .tool-btn.is-on { color: var(--ink); border-color: var(--ink); font-weight: 600; }
 
 /* ------------------------------------------------- safety acknowledgement */
 
 .safety-ack {
-    margin: 1.5rem 0 0;
-    padding: 1.1rem 1.25rem;
+    max-width: 40rem;
+    margin: 1.5rem auto 0;
+    padding: 1.1rem 1.35rem;
     text-align: left;
     background: var(--leaf);
     border: 1px solid var(--edge);
@@ -1316,8 +1413,9 @@ header .header-content {
 
 .post-session-card {
     position: relative;
-    margin: 1.5rem 0 0;
-    padding: 1.25rem;
+    max-width: 40rem;
+    margin: 1.5rem auto 0;
+    padding: 1.35rem 1.5rem;
     text-align: left;
     background: var(--leaf);
     border: 1px solid var(--rule);
@@ -1327,9 +1425,10 @@ header .header-content {
 
 .post-session-card h3,
 .post-session-card h2 {
-    font-family: var(--ui);
-    font-size: 1.0625rem;
-    font-weight: 600;
+    font-family: var(--display);
+    font-size: 1.375rem;
+    font-weight: 500;
+    letter-spacing: -0.012em;
     color: var(--ink);
     margin: 0 0 0.5rem;
     padding-right: 2.5rem;
@@ -1352,7 +1451,7 @@ header .header-content {
     align-items: center;
     justify-content: center;
     font-family: var(--ui);
-    font-size: var(--fs-small);
+    font-size: 1.125rem;
     color: var(--graphite);
     background: none;
     border: 0;
@@ -1421,13 +1520,15 @@ header .header-content {
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
-    margin: 1rem 0 0;
+    max-width: 40rem;
+    margin: 1rem auto 0;
     padding: 0.75rem 1rem;
     font-size: var(--fs-small);
     color: var(--graphite);
     background: var(--leaf);
     border: 1px solid var(--rule);
     border-radius: var(--radius);
+    text-align: left;
 }
 
 .night-hint-dismiss {
@@ -1450,20 +1551,37 @@ body.session-active .night-hint { display: none; }
 
 /* ------------------------------------------------------- technique info -- */
 
+/* What the pattern is and who should be careful, set as a ruled note under
+   the timer rather than a card inside a card. */
 .technique-info {
-    margin: 1.75rem 0 0;
-    padding: 1.25rem;
+    max-width: 40rem;
+    margin: 2rem auto 0;
+    padding: 0.25rem 0 0.25rem 1.35rem;
     text-align: left;
-    background: var(--leaf);
-    border: 1px solid var(--rule);
-    border-top: 3px solid var(--rim);
-    border-radius: var(--radius);
-    transition: border-top-color 400ms ease;
+    border-left: 3px solid var(--rim);
+    transition: border-color var(--dur-slow) var(--ease-ui);
 }
 
-.technique-info h3 { margin: 0 0 0.5rem; font-size: 1.0625rem; }
+.technique-info h3 {
+    font-family: var(--display);
+    font-size: 1.375rem;
+    font-weight: 500;
+    letter-spacing: -0.012em;
+    margin: 0 0 0.4rem;
+}
 
-.technique-info p { margin: 0; font-size: var(--fs-small); line-height: 1.7; color: var(--graphite); }
+.technique-info p { margin: 0; font-size: 0.9375rem; line-height: 1.7; color: var(--graphite); }
+
+/* Inside the ruled note the cautions keep only their warning rule, so the
+   note does not become a box inside a box. */
+.technique-info .technique-cautions {
+    margin: 1.1rem 0 0;
+    padding: 0.15rem 0 0.15rem 1rem;
+    background: transparent;
+    border: 0;
+    border-left: 3px solid var(--warn);
+    border-radius: 0;
+}
 
 /* ---------------------------------------------------------- keyboard ----- */
 
@@ -1482,7 +1600,7 @@ body.session-active .night-hint { display: none; }
     box-shadow: var(--shadow-lift);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 300ms ease, transform 300ms ease;
+    transition: opacity var(--dur-slow) var(--ease-ui), transform var(--dur-slow) var(--ease-ui);
 }
 
 .keyboard-hint.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -1504,6 +1622,7 @@ body.session-active .night-hint { display: none; }
     flex-direction: column;
     justify-content: center;
     padding: 2rem 1.25rem;
+    margin: 0;
 }
 
 .kiosk .app-bar,
@@ -1525,14 +1644,10 @@ body.session-active .night-hint { display: none; }
 }
 
 .kiosk [data-role="timer"],
-.breathing-section.kiosk [data-role="timer"] { font-size: 2.75rem; }
-
-/* Kiosk lays the circle on the page ground, so the gap is cut in that. */
-.kiosk .circle-notch,
-.breathing-section.kiosk .circle-notch { background: var(--paper); }
+.breathing-section.kiosk [data-role="timer"] { font-size: 3.25rem; }
 
 .kiosk [data-role="breathing-text"],
-.breathing-section.kiosk [data-role="breathing-text"] { font-size: 1.125rem; }
+.breathing-section.kiosk [data-role="breathing-text"] { font-size: 1.375rem; }
 
 /* --------------------------------------------------------- two timers ---- */
 
@@ -1542,10 +1657,17 @@ body.session-active .night-hint { display: none; }
 .timer-pair {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
-    gap: 1.25rem;
+    gap: 1.5rem;
 }
 
-.timer-pair .breathing-section { margin-bottom: 0; }
+.timer-pair .breathing-section {
+    margin-bottom: 0;
+    padding: 1rem 1.25rem 1.5rem;
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    --stage: 300px;
+}
 
 /* A comparison page carries two timers of different techniques. The shared
    `--rim` / `--fill` pair comes from `body.theme-*`, which can only ever name
@@ -1560,7 +1682,118 @@ body.session-active .night-hint { display: none; }
 [data-breathing-app][data-technique="wim"] { --rim: var(--rim-wim); --fill: var(--fill-wim); }
 
 /* ==========================================================================
-   7 — ARTICLE / PROSE SYSTEM
+   7 — HOME PAGE BLOCKS
+   ========================================================================== */
+
+.hero {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 2.75rem 0 0.5rem;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: clamp(2.25rem, 1.5rem + 3vw, 3.75rem);
+    line-height: 1.06;
+    margin-bottom: 0.9rem;
+}
+
+.hero .subtitle {
+    margin: 0 auto;
+}
+
+/* Three short paths into the guides, set as a ruled row rather than cards. */
+.pathways {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 0;
+    margin: 3rem 0 0;
+    border-top: 1px solid var(--ink);
+}
+
+.pathway {
+    display: block;
+    padding: 1.35rem 1.35rem 1.5rem 0;
+    text-decoration: none;
+    color: var(--ink);
+    border-bottom: 1px solid var(--rule);
+}
+
+.pathway:hover { text-decoration: none; }
+
+.pathway .pathway-label {
+    display: block;
+    font-family: var(--ui);
+    font-size: var(--fs-micro);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--graphite);
+    margin-bottom: 0.5rem;
+}
+
+.pathway strong {
+    display: block;
+    font-family: var(--display);
+    font-size: 1.375rem;
+    font-weight: 500;
+    letter-spacing: -0.012em;
+    line-height: 1.25;
+    margin-bottom: 0.35rem;
+}
+
+.pathway:hover strong { color: var(--green); text-decoration: underline; text-underline-offset: 0.15em; text-decoration-thickness: 1px; }
+
+.pathway span:not(.pathway-label) {
+    display: block;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--graphite);
+}
+
+/* The plan, stated once on the home page, in the commerce voice. */
+.plan-band {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 2rem 3rem;
+    align-items: center;
+    margin: 3.5rem 0 0;
+    padding: 2.5rem 0;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule);
+}
+
+.plan-band h2 { margin: 0 0 0.75rem; }
+
+.plan-band p { color: var(--graphite); margin: 0; max-width: 52ch; }
+
+.plan-band-price {
+    text-align: left;
+}
+
+.plan-band-price .price-figure {
+    font-size: 2.75rem;
+}
+
+.plan-band-price .price-period {
+    font-size: var(--fs-small);
+    margin: 0.2rem 0 1rem;
+}
+
+.plan-band-price .checkout-btn { width: auto; padding-inline: 1.5rem; }
+
+.plan-band-price .plan-note {
+    font-size: var(--fs-small);
+    color: var(--graphite);
+    margin: 0.85rem 0 0;
+}
+
+@media (max-width: 720px) {
+    .plan-band { grid-template-columns: 1fr; gap: 1.5rem; }
+}
+
+/* ==========================================================================
+   8 — ARTICLE / PROSE SYSTEM
    ========================================================================== */
 
 .article-page article,
@@ -1570,10 +1803,10 @@ body.session-active .night-hint { display: none; }
 }
 
 .technique-page .prose,
-.article-page .prose { margin-top: 2rem; }
+.article-page .prose { margin-top: 2.5rem; }
 
 .article-page article section,
-.prose section { margin: 0 0 2.25rem; }
+.prose section { margin: 0 0 2.5rem; }
 
 .article-page article p,
 .article-page .prose p,
@@ -1581,6 +1814,7 @@ body.session-active .night-hint { display: none; }
     font-size: 1.0625rem;
     line-height: 1.75;
     color: var(--ink);
+    text-wrap: pretty;
 }
 
 .article-page article li,
@@ -1597,17 +1831,20 @@ body.session-active .night-hint { display: none; }
 .prose .lead {
     font-family: var(--display);
     font-weight: 400;
-    font-size: 1.25rem;
-    line-height: 1.5;
+    font-size: 1.375rem;
+    line-height: 1.45;
     letter-spacing: -0.008em;
-    color: var(--ink);
+    color: var(--graphite);
     margin: 0 0 1.25rem;
+    text-wrap: pretty;
 }
+
+.prose section .lead { color: var(--ink); }
 
 /* ------------------------------------------------- article header block -- */
 
 .article-header {
-    padding: 2rem 0 0;
+    padding: 2.5rem 0 0;
     max-width: var(--measure);
     margin: 0 auto;
 }
@@ -1620,9 +1857,9 @@ body.session-active .night-hint { display: none; }
     gap: 0.35rem;
     list-style: none;
     padding: 0;
-    margin: 0 0 0.85rem;
+    margin: 0 0 1rem;
     font-size: var(--fs-micro);
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--graphite);
 }
@@ -1647,9 +1884,9 @@ body.session-active .night-hint { display: none; }
     align-items: baseline;
     justify-content: space-between;
     gap: 0.5rem 1.5rem;
-    margin: 1.25rem 0 2rem;
-    padding: 0.75rem 0;
-    border-top: 1px solid var(--rule);
+    margin: 1.5rem 0 2rem;
+    padding: 0.85rem 0;
+    border-top: 1px solid var(--ink);
     border-bottom: 1px solid var(--rule);
     font-size: var(--fs-small);
     color: var(--graphite);
@@ -1671,25 +1908,38 @@ body.session-active .night-hint { display: none; }
 
 .steps-container {
     display: grid;
-    gap: 1rem;
-    margin: 1.25rem 0;
+    gap: 0;
+    margin: 1.5rem 0;
+    counter-reset: step;
+    border-top: 1px solid var(--ink);
 }
 
 .step {
-    padding: 1.1rem 1.25rem;
-    background: var(--leaf);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius);
+    position: relative;
+    padding: 1.25rem 0 1.35rem 3rem;
+    border-bottom: 1px solid var(--rule);
+    counter-increment: step;
 }
 
-.step h3 { margin: 0 0 0.35rem; font-size: 1rem; }
+.step::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 1.3rem;
+    font-family: var(--display);
+    font-size: 1.375rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--graphite);
+    font-variant-numeric: tabular-nums;
+}
+
+.step h3 { margin: 0 0 0.35rem; font-size: 1.0625rem; }
 
 .step p { margin: 0; font-size: 0.9375rem; color: var(--graphite); }
 
 /* --------------------------------------------------------------- FAQ ----- */
 
-/* The homepage's visible FAQ and contraindication block. It sits outside
-   .main-content so it is not pulled into the timer grid. */
 /* One tap from the top of a crisis-safe page to the timer. It sits under the
    article header so the crisis block is still the first thing in the main
    content, and it is a control, so it is sans and it clears 44px. */
@@ -1715,14 +1965,18 @@ body.session-active .night-hint { display: none; }
 .breathing-section[id] { scroll-margin-top: 4.5rem; }
 
 .home-faq {
-    margin: 2.5rem auto 0;
+    margin: 3.5rem auto 0;
     max-width: var(--measure);
 }
 
+.home-faq > h2 { margin-top: 0; }
+
 .faq-item {
-    padding: 1.1rem 0;
+    padding: 1.2rem 0;
     border-bottom: 1px solid var(--rule);
 }
+
+.faq-item:first-of-type { border-top: 1px solid var(--ink); }
 
 .faq-item:last-child { border-bottom: 0; }
 
@@ -1745,7 +1999,7 @@ body.session-active .night-hint { display: none; }
 }
 .technique-cautions li:last-child { margin-bottom: 0; }
 
-.faq-item h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+.faq-item h3 { margin: 0 0 0.4rem; font-size: 1.0625rem; }
 
 .faq-item p { margin: 0; font-size: 1rem; color: var(--graphite); }
 
@@ -1953,6 +2207,9 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
     color: var(--graphite);
 }
 
+.data-table thead th,
+.article-page thead th { border-bottom-color: var(--ink); }
+
 .data-table td.num,
 .data-table .num {
     font-variant-numeric: tabular-nums;
@@ -1966,7 +2223,7 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
     border: 1px solid var(--rule);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sheet);
-    padding: 1.25rem;
+    padding: 1.5rem;
     text-align: left;
 }
 
@@ -1983,7 +2240,7 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
-    padding: 1rem 1.15rem;
+    padding: 1.1rem 1.25rem;
     background: var(--leaf);
     /* A link-card is a control you click, so its boundary is --edge. */
     border: 1px solid var(--edge);
@@ -2051,9 +2308,10 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
 .technique-switcher {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 0.5rem;
-    margin: 0 0 2rem;
-    padding: 1rem 0;
+    margin: 0 0 2.5rem;
+    padding: 1.25rem 0;
     border-top: 1px solid var(--rule);
     border-bottom: 1px solid var(--rule);
 }
@@ -2062,7 +2320,7 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
     display: inline-flex;
     align-items: center;
     min-height: var(--hit);
-    padding: 0.4rem 0.95rem;
+    padding: 0.4rem 1rem;
     font-size: var(--fs-small);
     font-weight: 500;
     color: var(--graphite);
@@ -2083,10 +2341,8 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
 .related-techniques,
 .article-page .related-techniques {
     margin: 2rem 0;
-    padding: 1.25rem;
-    background: var(--leaf);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius);
+    padding: 1.25rem 0 0;
+    border-top: 1px solid var(--ink);
 }
 
 .related-techniques h3 { margin: 0 0 0.6rem; }
@@ -2099,8 +2355,8 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
 
 .cta-block,
 .cta-block-final {
-    margin: 2rem 0;
-    padding: 1.5rem;
+    margin: 2.5rem 0;
+    padding: 2rem 1.5rem;
     text-align: center;
     background: var(--leaf);
     border: 1px solid var(--rule);
@@ -2118,8 +2374,8 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: var(--hit);
-    padding: 0.7rem 1.5rem;
+    min-height: 48px;
+    padding: 0.7rem 1.6rem;
     font-family: var(--ui);
     font-size: 0.9375rem;
     font-weight: 600;
@@ -2181,14 +2437,8 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
     background: var(--track);
 }
 
-/* The featured column's header cell is taller than the other three because it
-   carries the flag. Padding the head cells that lack a flag keeps all four
-   checkout buttons on one baseline. */
 .pricing-matrix thead th:not(.col-featured) { padding-top: 2.1rem; }
 
-/* The cells are bottom-aligned, so a one-line label and a three-line label
-   would leave the four buttons ragged along the top. Reserving three lines
-   makes every header button the same box whatever its label says. */
 .pricing-matrix thead .checkout-btn {
     min-height: calc(3 * 1.35em + 1.2rem + 2px);
 }
@@ -2208,9 +2458,9 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
     display: block;
     font-family: var(--display);
     font-weight: 500;
-    font-size: 1.6rem;
+    font-size: 1.75rem;
     line-height: 1.1;
-    letter-spacing: -0.012em;
+    letter-spacing: -0.015em;
     font-variant-numeric: tabular-nums;
     color: var(--clay);
 }
@@ -2240,14 +2490,11 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: var(--hit);
-    padding: 0.6rem 1rem;
+    min-height: 48px;
+    padding: 0.65rem 1.25rem;
     font-family: var(--ui);
-    font-size: var(--fs-small);
+    font-size: 0.9375rem;
     font-weight: 600;
-    /* Explicit, because a <button> defaults to `normal` and an <a> inherits the
-       page's. Without it the pricing matrix's four header buttons — one link,
-       three buttons — measure differently and sit ragged. */
     line-height: 1.35;
     text-align: center;
     color: var(--chalk);
@@ -2268,12 +2515,6 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
 
 .checkout-btn--secondary:hover { color: var(--ink); background: var(--leaf); border-color: var(--ink); }
 
-/* Below 44rem the five-column matrix cannot fit a phone, so it scrolls. A
-   scroller that starts on "Free" hides the column the page is actually about,
-   so the row becomes a flex row and the columns are re-ordered: feature label,
-   Practitioner, Pro, Studio, Free. The featured column is then the first thing
-   in view, and the rest is one short swipe away. Widths are fixed here because
-   the table layout algorithm no longer aligns the columns for us. */
 @media (max-width: 44rem) {
     .pricing-matrix {
         display: block;
@@ -2305,6 +2546,9 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
         flex: 0 0 9rem;
         width: auto;
         order: 0;
+        position: sticky;
+        left: 0;
+        background: var(--paper);
     }
 
     .pricing-matrix tr > *:nth-child(4) { order: 1; }
@@ -2361,7 +2605,7 @@ body[data-tier="practitioner"] .ad-slot,
 body[data-tier="studio"] .ad-slot { display: none; }
 
 /* ==========================================================================
-   8 — UTILITIES AND LEGACY SHIMS
+   9 — UTILITIES, LEGACY SHIMS, RESPONSIVE
    ========================================================================== */
 
 .sr-only {
@@ -2442,43 +2686,45 @@ body[data-tier="studio"] .ad-slot { display: none; }
 
 /* ------------------------------------------------------------ responsive - */
 
-@media (max-width: 900px) {
-    .main-content {
-        grid-template-columns: minmax(0, 1fr);
-    }
-}
-
 @media (max-width: 640px) {
     .container { padding: 0 1rem 2.5rem; }
 
-    .breathing-section { padding: 0 1rem 1.5rem; }
+    .site-header-inner { padding: 0 1rem; }
 
-    .app-bar { margin: 0 -1rem 0.85rem; padding: 0.5rem 1rem; }
+    .hero { padding-top: 2rem; }
+
+    .breathing-section { padding: 0.5rem 0 1.25rem; }
+
+    .app-bar { padding: 0 3rem; }
 
     /* Vertical rhythm on a phone: every rem between the top of the app bar and
-       the Begin button is a rem a distressed visitor has to scroll past. The
-       stage, the instruction line and the stats each give some back without
-       changing the design — the calipers still frame the circle and the
-       instruction line still reserves its two lines so nothing reflows. */
-    .breathing-container { margin: 0.9rem auto 0.75rem; width: min(var(--stage), 72vw); }
+       the Begin button is a rem a distressed visitor has to scroll past. */
+    .breathing-container { margin: 1rem auto 0.75rem; width: min(var(--stage), 74vw); }
 
-    .breathing-text { margin-bottom: 0.75rem; min-height: 2.4em; }
+    .breathing-text { margin-bottom: 0.75rem; min-height: 2.4em; font-size: 1.0625rem; }
 
-    .session-stats { margin: 0.65rem 0 0.35rem; }
+    .timer { font-size: 2.125rem; }
+
+    .session-stats { margin: 0.65rem 0 0.35rem; gap: 1.5rem; }
 
     .controls { margin-top: 1rem; }
 
-    .settings-panel { right: 1rem; top: 3.4rem; }
+    /* Three equal thirds, so Begin, Pause and Stop sit on one row. */
+    .controls { flex-wrap: nowrap; gap: 0.5rem; }
 
-    .session-stats { gap: 1.5rem; }
+    .controls .control-btn { flex: 1 1 0; min-width: 0; padding-inline: 0.5rem; }
 
-    .controls .control-btn { flex: 1 1 8rem; }
+    .control-btn[data-role="start"] { padding-inline: 0.5rem; }
+
+    .settings-panel { right: 0; }
 
     .article-meta { flex-direction: column; align-items: flex-start; }
 
     .article-dates { text-align: left; }
 
     .pricing-matrix { min-width: 32rem; }
+
+    .footer { margin-top: 3rem; }
 }
 
 @media (max-width: 380px) {
@@ -2488,43 +2734,22 @@ body[data-tier="studio"] .ad-slot { display: none; }
 }
 
 /* ==========================================================================
-   9 — REDUCED MOTION
-   Targeted, never blanket. The pacing metaphor changes; nothing a person needs
-   is removed. Audio and vibration cues are not touched by this media query.
+   10 — REDUCED MOTION
+   Targeted, never blanket. The disc holds one size; the ring still fills and
+   drains with the breath because a linear sweep on a thin line is the cue a
+   person asked to keep, not the vestibular trigger they asked to lose. Audio
+   and vibration cues are not touched by this media query.
    ========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
-    /* The circle holds one size. */
+    /* The disc holds one size. */
     .breathing-circle {
         animation: none !important;
         transform: translate(-50%, -50%) scale(0.86) !important;
     }
 
-    /* The pace is carried by a ring drawn around the circle's circumference
-       over the phase duration, linearly. js/app.js sets --phase-duration at
-       every phase boundary; the four animation names guarantee a restart. */
-    .pacer-ring {
-        visibility: visible;
-        stroke-dasharray: var(--pacer-c);
-        stroke-dashoffset: var(--pacer-c);
-        animation-duration: var(--phase-duration, 4s);
-        animation-timing-function: linear;
-        animation-fill-mode: forwards;
-        animation-iteration-count: 1;
-    }
-
-    [data-phase="inhale"] .pacer-ring { animation-name: hmb-pace-i; }
-    [data-phase="hold"] .pacer-ring { animation-name: hmb-pace-h; }
-    [data-phase="exhale"] .pacer-ring { animation-name: hmb-pace-e; }
-    [data-phase="topup"] .pacer-ring { animation-name: hmb-pace-t; }
-
-    @keyframes hmb-pace-i { to { stroke-dashoffset: 0; } }
-    @keyframes hmb-pace-h { to { stroke-dashoffset: 0; } }
-    @keyframes hmb-pace-e { to { stroke-dashoffset: 0; } }
-    @keyframes hmb-pace-t { to { stroke-dashoffset: 0; } }
-
-    /* The notch still opens and closes — instantly. */
-    .circle-notch { transition: none; }
+    /* The bridge still opens and closes — instantly. */
+    .ring-bridge { transition: none; }
 
     /* The progress bar still advances; js/app.js quantises it to whole
        seconds under this preference, so no easing is wanted here. */
@@ -2539,15 +2764,25 @@ body[data-tier="studio"] .ad-slot { display: none; }
     .toggle-switch,
     .toggle-switch::after,
     .technique-info,
+    .technique-eyebrow,
+    .ring-live,
     .breathing-circle {
         transition: none;
     }
 
-    .keyboard-hint { transition: opacity 300ms ease; }
+    :where(button, .btn, .control-btn, .technique-btn, .tool-btn, .cookie-btn,
+           .checkout-btn, .cta-button, .cta-button-large, .link-card, .settings-btn,
+           .nav-toggle, .pro-btn, .technique-switcher a):active:not(:disabled) {
+        transform: none;
+    }
+
+    #cookieConsent { transition: opacity var(--dur) linear; transform: none; }
+
+    .keyboard-hint { transition: opacity 300ms linear; }
 }
 
 /* ==========================================================================
-   10 — PRINT BASICS
+   11 — PRINT BASICS
    The practitioner surfaces load css/print.css for the full treatment; this is
    the floor so that any page prints legibly.
    ========================================================================== */
@@ -2569,6 +2804,7 @@ body[data-tier="studio"] .ad-slot { display: none; }
         --clay: #111111;
         --rim: #444444;
         --fill: #FFFFFF;
+        --disc-ink: #FFFFFF;
         --shadow-sheet: none;
         --shadow-lift: none;
         background: #FFFFFF;
@@ -2589,6 +2825,7 @@ body[data-tier="studio"] .ad-slot { display: none; }
     .ad-slot,
     .support-card,
     .donation-section,
+    .plan-band,
     #cookieConsent,
     [data-slot],
     [data-no-print] {

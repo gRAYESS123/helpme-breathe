@@ -35,7 +35,7 @@
       IBM Plex Sans; frame.css uses the fallback stacks instead. No analytics,
       no ad library, no consent script, no remote image. The only cross-origin
       request the frame can ever make is a practitioner's own logo, and only
-      after that practitioner's licence has been verified.
+      after that practitioner's white-label key has been verified.
     -->
     <link rel="stylesheet" href="/embed/v1/frame.css">
 
@@ -316,7 +316,7 @@
     <!--
       Attribution is in the markup, not added by script, so it is present even
       if JavaScript never runs. It is removed only after /api/entitlement
-      confirms a Practitioner or Studio licence for this domain.
+      confirms a white-label key for this domain.
       The link is rel="nofollow noopener" and there is no configuration,
       parameter or paid tier that makes it followed (AGENT_BRIEF hard rule 7).
     -->
@@ -629,8 +629,8 @@ if (cfg.brand && brandRow && brandName) {
 /* -------------------------------------------------- white-label verification */
 
 /**
- * Ask the server whether this token is a live Practitioner or Studio licence,
- * and whether it is allowed on the domain we are embedded in.
+ * Ask the server whether this token belongs to a live subscription with the
+ * white-label right, and whether it is allowed on the domain we are embedded in.
  *
  * Fail closed. Attribution stays unless the answer is an unambiguous yes:
  * a network error, a timeout, a non-2xx response, a free or pro tier, a MISSING

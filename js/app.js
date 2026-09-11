@@ -232,6 +232,29 @@ function phaseState(phase) {
   return phaseKind(phase);
 }
 
+/**
+ * stroke-dashoffset of an empty ring, in the ring's own units. Must match
+ * --ring-arc in css/styles.css (312 degrees of a circle with r=150).
+ */
+const RING_EMPTY = 816.81;
+
+/**
+ * The pattern in words, for the line under the technique name:
+ * "In 4 · Hold 7 · Out 8". Cyclic sighing's short second inhale reads as
+ * "In 2 · Sip 1 · Out 6". Seconds are shown as written in the technique.
+ */
+function patternLine(phases) {
+  if (!Array.isArray(phases) || !phases.length) return '';
+  const parts = [];
+  for (const phase of phases) {
+    const kind = phaseState(phase);
+    const label = kind === 'inhale' ? 'In' : kind === 'exhale' ? 'Out' : kind === 'topup' ? 'Sip' : 'Hold';
+    const seconds = Number(phase && phase.duration) || 0;
+    parts.push(`${label} ${Number.isInteger(seconds) ? seconds : seconds.toFixed(1)}`);
+  }
+  return parts.join(' · ');
+}
+
 /* ========================================================================== *
  * createBreathingApp
  * ========================================================================== */
@@ -293,6 +316,8 @@ export function createBreathingApp(rootEl, options = {}) {
     avgBreath: q('avg-breath'),
     sessionProgress: q('session-progress'),
     techniqueTitle: q('technique-title'),
+    techniqueEyebrow: q('technique-eyebrow'),
+    patternLine: q('pattern-line'),
     techniqueInfo: q('technique-info'),
     settingsBtn: q('settings-btn'),
     settingsPanel: q('settings-panel'),
@@ -331,6 +356,8 @@ export function createBreathingApp(rootEl, options = {}) {
   let resetTimer = null;
   /** CSS classes currently applied to the circle from the running phase. */
   let phaseClasses = [];
+  // Where the ring gauge stands right now: RING_EMPTY (an empty rail) or 0 (full).
+  let ringLevel = RING_EMPTY;
 
   /* ------------------------------------------------------------- rendering */
 
@@ -384,6 +411,15 @@ export function createBreathingApp(rootEl, options = {}) {
     const kind = phaseState(phase);
     rootEl.dataset.phase = kind;
     rootEl.style.setProperty('--phase-duration', `${Number(phase && phase.duration) || 0}s`);
+    // The ring around the disc is a breath gauge: it fills on an in-breath,
+    // drains on an out-breath and stays where it is through a hold. CSS reads
+    // the two ends of each sweep from these properties (stroke-dashoffset in
+    // the ring's own units: RING_EMPTY is an empty rail, 0 is a full one).
+    const from = ringLevel;
+    if (kind === 'inhale' || kind === 'topup') ringLevel = 0;
+    else if (kind === 'exhale') ringLevel = RING_EMPTY;
+    rootEl.style.setProperty('--ring-from', String(from));
+    rootEl.style.setProperty('--ring-to', String(ringLevel));
     if (!el.circle) return;
     for (const cls of phaseClasses) el.circle.classList.remove(cls);
     phaseClasses = String((phase && phase.class) || '')
@@ -397,6 +433,10 @@ export function createBreathingApp(rootEl, options = {}) {
   function clearPhaseClasses() {
     delete rootEl.dataset.phase;
     rootEl.style.removeProperty('--phase-duration');
+    rootEl.style.removeProperty('--ring-from');
+    rootEl.style.removeProperty('--ring-to');
+    delete rootEl.dataset.paused;
+    ringLevel = RING_EMPTY;
     if (!el.circle) return;
     for (const cls of phaseClasses) el.circle.classList.remove(cls);
     phaseClasses = [];
@@ -422,6 +462,8 @@ export function createBreathingApp(rootEl, options = {}) {
   function renderTechniqueCopy() {
     const t = state.technique;
     setText(el.techniqueTitle, t.name);
+    setText(el.techniqueEyebrow, t.shortName || t.title || '');
+    setText(el.patternLine, patternLine(state.phases));
     if (el.techniqueInfo && !el.techniqueInfo.hasAttribute('data-static')) {
       el.techniqueInfo.replaceChildren();
       const h3 = document.createElement('h3');
@@ -772,6 +814,7 @@ export function createBreathingApp(rootEl, options = {}) {
     state.paused = false;
     state.phaseAnchor = t;
     state.sessionAnchor = t;
+    delete rootEl.dataset.paused;
     if (el.circle) {
       el.circle.classList.add('active');
       restartCircleAnimation();
@@ -798,6 +841,8 @@ export function createBreathingApp(rootEl, options = {}) {
     state.sessionCarry += (t - state.sessionAnchor) / 1000;
     state.paused = true;
     stopTicker();
+    // The ring gauge reads this to freeze its sweep alongside the disc.
+    rootEl.dataset.paused = '';
     if (el.circle) el.circle.classList.remove('active');
     setText(el.breathingText, 'Paused — press Begin to continue');
     announce('Paused');

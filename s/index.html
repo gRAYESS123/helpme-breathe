@@ -274,7 +274,7 @@
     <!--
       PERSISTENT SITE HEADER (docs/PAGE_CONTRACT.md section 2).
 
-      A verified Practitioner or Studio licence removes everything marked
+      A verified white-label key removes everything marked
       data-session-chrome, along with the attribution line in the footer:
       white-labelling takes our name off the page. It never touches the safety
       block or the medical-disclaimer line, which stay on every version.
@@ -317,7 +317,11 @@
                      aria-labelledby="timer-heading">
 
                 <div class="app-bar">
-                    <h2 id="timer-heading" data-role="technique-title">Guided breathing</h2>
+                    <div class="technique-head">
+                        <p class="technique-eyebrow" data-role="technique-eyebrow"></p>
+                        <h2 id="timer-heading" data-role="technique-title">Guided breathing</h2>
+                        <p class="pattern-line" data-role="pattern-line"></p>
+                    </div>
                     <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
                             <circle cx="12" cy="12" r="3.2"/>
@@ -341,9 +345,9 @@
 
                 <div class="breathing-container">
                     <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
-                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
-                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
-                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                        <circle class="ring-track" cx="160" cy="160" r="150"/>
+                        <circle class="ring-live" cx="160" cy="160" r="150"/>
+                        <circle class="ring-bridge" cx="160" cy="160" r="150"/>
                     </svg>
                     <div class="breathing-circle technique-478" data-role="circle">
                         <span class="circle-notch" aria-hidden="true"></span>
@@ -429,7 +433,7 @@
             <!--
               Attribution is in the markup so it survives a JavaScript failure.
               It is removed only after /api/entitlement confirms a live
-              Practitioner or Studio licence. The link is never followed
+              white-label key. The link is never followed
               (AGENT_BRIEF hard rule 7).
             -->
             <p class="session-attrib" data-session-attrib>

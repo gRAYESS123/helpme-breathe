@@ -261,24 +261,45 @@ Pages reference `/favicon.svg`, `/favicon-32.png`, `/favicon-16.png` and
 
 ## 5. The breathing object
 
-The circle is the mark, running.
+The circle is the mark, running. Two objects, one idea (revised 2026-09-11,
+after the owner rejected the first build's pale disc and dotted calipers):
 
-- A **ring**: 3px rim in the technique's rim colour, with a light fill.
-- A **notch** at twelve o'clock — a small bar in the surface colour laid over
-  the rim — is the mark's gap. When the pattern reaches a **hold** the notch
-  fades out over 240ms, so the ring completes itself for as long as you are
-  holding your breath, and reopens over 240ms when the hold ends.
-- Two fixed **dotted caliper rings** sit around the live circle: the outer marks
-  a full inhale, the inner marks a full exhale. The live circle travels between
-  them. On the 320-unit stage they are at r=136 and r=100; the circle is 260
-  units across and scales between 0.72 and 1.00.
+- The **disc** is the technique's ink: a solid circle filled with `--rim`,
+  no border, 260 units across on the 320-unit stage, scaling between 0.72 and
+  1.00 with the breath. The phase word sits on it in `--disc-ink` (`--chalk`
+  in both modes: white type on a deep ink by day, dark type on a pale wash by
+  night).
+- The **ring** around it is the mark itself, drawn at r=150 on the same stage
+  as three SVG circles:
+  - `.ring-track`, the rail: 2.5px in `--track`, a full turn minus the 48°
+    gap, which starts 24° past twelve o'clock (`rotate(-66deg)`, dasharray
+    816.81 / 942.48).
+  - `.ring-live`, the gauge: 3.5px in `--rim` on the same rail. It **fills
+    clockwise on an in-breath, drains on an out-breath and stays where it is
+    through a hold**. `js/app.js` publishes `--ring-from` and `--ring-to`
+    (stroke-dashoffset values: 816.81 is empty, 0 is full) at every phase
+    boundary; four animation names, one per phase kind, restart the sweep.
+  - `.ring-bridge`, the gap: 3.5px in `--rim` over the 48° at twelve o'clock,
+    opacity 0. On a **hold** it fades in over 240ms, so the ring completes
+    itself for as long as you are holding your breath, and fades out when the
+    hold ends.
+- Above the stage: the technique's short name as an eyebrow in `--rim`
+  (`data-role="technique-eyebrow"`), the technique name in Newsreader
+  (`data-role="technique-title"`) and the pattern in words
+  (`data-role="pattern-line"`, "In 4 · Hold 7 · Out 8"). The gear sits to the
+  right of that block, inside the app root.
 - The **phase word** is the largest text on the screen — Newsreader, larger than
   the timer digits — with a per-second count beneath it (`Inhale` / `3`). Both
-  sit outside the scaled circle so they never shrink with it.
-- During a hold the circle is **still**, with a 0.4% drift so the frame never
-  reads as a crashed tab. The progress bar keeps moving.
+  sit outside the scaled disc so they never shrink with it.
+- During a hold the disc is **still**, with a 0.4% drift so the frame never
+  reads as a crashed tab. The gauge holds its level; the bridge is closed.
+- The per-phase progress bar is gone from view (the ring carries the phase);
+  the session bar and the remaining time sit under the instruction line.
 - **Begin is disabled while a session runs. Pause is the primary control during
-  a session. Stop is secondary.**
+  a session. Stop is secondary.** On a phone the three controls are equal
+  thirds on one row.
+- The `.circle-notch` span and the `.caliper` / `.pacer-ring` classes are
+  legacy: still in the markup contract, they draw nothing.
 
 ---
 
@@ -293,7 +314,8 @@ Scale is the whole animation.
 | Hold | still (0.4% drift) |
 | Cyclic sighing top-up | overshoots to 1.08 |
 | Phase word | cross-fade, 160ms, opacity only |
-| Notch | 240ms linear, opacity only |
+| Ring gauge | `stroke-dashoffset`, linear, over the phase duration, from `--ring-from` to `--ring-to` |
+| Ring bridge | 240ms linear, opacity only |
 | Technique switch | the accent tokens cross-fade over 400ms; the page ground never moves |
 
 Each pattern has its own keyframe block whose percentages are that pattern's
@@ -310,15 +332,14 @@ has to carry the canonical value. Change a phase duration in
 transition kill** — the old blanket rule murdered the phase cross-fade, which is
 the one cue a person actually needs.
 
-- The circle holds one size (scale 0.86) and its scale animation is off.
-- The pace is carried by a ring drawn around the circle's circumference via
-  `stroke-dashoffset`, linear, over the phase duration. `js/app.js` publishes
-  `--phase-duration` on the app root at each boundary, and four animation names
-  (one per phase kind) guarantee the ring restarts every time.
+- The disc holds one size (scale 0.86) and its scale animation is off.
+- The pace is carried by the ring gauge, which is the same object everyone
+  else sees: a thin line filling linearly is the cue a person asked to keep,
+  not the vestibular trigger they asked to lose.
 - The numeric count still ticks.
-- The progress bar still advances, in whole-second steps (`js/app.js` quantises
+- The session bar still advances, in whole-second steps (`js/app.js` quantises
   it under this preference).
-- The notch still opens and closes — instantly.
+- The bridge still opens and closes — instantly.
 - **Audio and vibration cues are exempt.** They are not motion.
 
 ---

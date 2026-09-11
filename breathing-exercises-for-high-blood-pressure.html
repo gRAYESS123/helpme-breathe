@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
     <title>Breathing Exercises and Blood Pressure — What the Evidence Shows</title>
     <meta name="description" content="What the research does and does not show about slow breathing and high blood pressure, with a free 10-minute coherent breathing timer. Not a treatment.">
@@ -285,7 +286,11 @@
                      aria-labelledby="timer-heading">
 
                 <div class="app-bar">
-                    <h2 id="timer-heading" data-role="technique-title">Slow breathing at six breaths a minute</h2>
+                    <div class="technique-head">
+                        <p class="technique-eyebrow" data-role="technique-eyebrow"></p>
+                        <h2 id="timer-heading" data-role="technique-title">Slow breathing at six breaths a minute</h2>
+                        <p class="pattern-line" data-role="pattern-line"></p>
+                    </div>
                     <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
                             <circle cx="12" cy="12" r="3.2"/>
@@ -318,9 +323,9 @@
 
                 <div class="breathing-container">
                     <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
-                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
-                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
-                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                        <circle class="ring-track" cx="160" cy="160" r="150"/>
+                        <circle class="ring-live" cx="160" cy="160" r="150"/>
+                        <circle class="ring-bridge" cx="160" cy="160" r="150"/>
                     </svg>
                     <div class="breathing-circle technique-coherent" data-role="circle">
                         <span class="circle-notch" aria-hidden="true"></span>
@@ -362,8 +367,6 @@
                     </div>
                 </div>
 
-                <!-- SLOT: Pro tools -->
-                <div class="tools-row" data-slot="tools"></div>
 
                 <div class="controls">
                     <button class="control-btn" type="button" data-role="start" data-action="start">Begin Practice</button>
@@ -382,6 +385,9 @@
 
                 <!-- SLOT: post-session cards -->
                 <div data-slot="post-session"></div>
+
+                <!-- SLOT: Pro tools (custom pattern, your practice, soundscapes, night mode) -->
+                <div class="tools-row" data-slot="tools"></div>
 
                 <div class="technique-info" data-role="technique-info"></div>
 

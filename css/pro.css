@@ -459,6 +459,147 @@ body.night .ad-slot {
 }
 
 /* --------------------------------------------------------------------------
+   /pro — the plan
+   One card, two intervals, everything listed once. --clay is the commerce
+   accent and this is a commerce page, so the price and the button wear it.
+   -------------------------------------------------------------------------- */
+.plan {
+    display: grid;
+    grid-template-columns: minmax(0, 23rem) minmax(0, 1fr);
+    gap: 2.5rem 3.5rem;
+    align-items: start;
+    margin: 0.5rem 0 3rem;
+}
+
+.plan-card {
+    position: sticky;
+    top: 1.5rem;
+    padding: 1.5rem;
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sheet);
+    text-align: left;
+}
+
+.plan-toggle {
+    display: flex;
+    margin: 0 0 1.35rem;
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.plan-interval {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    min-height: 52px;
+    padding: 0.5rem 0.75rem;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--graphite);
+    background: var(--leaf);
+    border: 0;
+    cursor: pointer;
+}
+
+.plan-interval + .plan-interval { border-left: 1px solid var(--edge); }
+
+.plan-interval:hover { color: var(--ink); }
+
+.plan-interval.is-active {
+    color: var(--chalk);
+    background: var(--ink);
+    font-weight: 600;
+}
+
+.plan-save {
+    font-size: var(--fs-micro);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+}
+
+.plan-price { margin: 0 0 1rem; }
+
+.plan-price .price-figure {
+    font-size: 3.25rem;
+    line-height: 1;
+}
+
+.plan-price .price-period {
+    font-size: var(--fs-small);
+    margin-top: 0.35rem;
+}
+
+.plan-trial {
+    margin: 0 0 1.25rem;
+    padding: 0.85rem 1rem;
+    font-size: var(--fs-small);
+    line-height: 1.6;
+    color: var(--graphite);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--clay);
+    border-radius: var(--radius);
+}
+
+.plan-trial strong { color: var(--ink); }
+
+.plan-card .checkout-btn { font-size: 1rem; min-height: 52px; }
+
+.plan-fine {
+    margin: 0.85rem 0 0;
+    font-size: var(--fs-micro);
+    line-height: 1.6;
+    color: var(--graphite);
+}
+
+.plan-included > h2 { margin-top: 0.25rem; }
+
+.plan-included > p { color: var(--graphite); max-width: 52ch; }
+
+.included-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.25rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 0 2.5rem;
+    border-top: 1px solid var(--ink);
+}
+
+.included-list li {
+    margin: 0;
+    padding: 0.85rem 0 0.9rem;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+}
+
+.included-list li strong {
+    display: block;
+    font-family: var(--ui);
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.15rem;
+}
+
+.included-list li span {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--graphite);
+}
+
+@media (max-width: 800px) {
+    .plan { grid-template-columns: 1fr; gap: 2rem; }
+    .plan-card { position: static; }
+}
+
+/* --------------------------------------------------------------------------
    /pro and /pro/thanks page furniture
    -------------------------------------------------------------------------- */
 .pro-page .founding-counter {
