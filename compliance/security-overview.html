@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
     <title>Security Overview — Help Me Breathe</title>
-    <meta name="description" content="How Help Me Breathe is built and run: architecture, data flows, hosting and TLS, subprocessors, the licence token, accessibility, support and disclosure.">
+    <meta name="description" content="How Help Me Breathe is built and run: architecture, data flows, hosting and TLS, subprocessors, accounts and tokens, accessibility, support and disclosure.">
 
     <link rel="canonical" href="https://helpmebreath.com/compliance/security-overview">
 
@@ -14,7 +15,7 @@
 
     <!-- Open Graph -->
     <meta property="og:title" content="Security Overview — Help Me Breathe">
-    <meta property="og:description" content="How Help Me Breathe is built and run: architecture, data flows, hosting and TLS, subprocessors, the licence token, accessibility, support and disclosure.">
+    <meta property="og:description" content="How Help Me Breathe is built and run: architecture, data flows, hosting and TLS, subprocessors, accounts and tokens, accessibility, support and disclosure.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpmebreath.com/compliance/security-overview">
     <meta property="og:image" content="https://helpmebreath.com/images/og/security-overview.jpg">
@@ -23,7 +24,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Security Overview — Help Me Breathe">
-    <meta name="twitter:description" content="How Help Me Breathe is built and run: architecture, data flows, hosting and TLS, subprocessors, the licence token, accessibility, support and disclosure.">
+    <meta name="twitter:description" content="How Help Me Breathe is built and run: architecture, data flows, hosting and TLS, subprocessors, accounts and tokens, accessibility, support and disclosure.">
     <meta name="twitter:image" content="https://helpmebreath.com/images/og/security-overview.jpg">
 
     <!-- Favicon: the ring with a gap. No emoji anywhere. -->
@@ -284,7 +285,7 @@
                         <dd>Georges Rayess, an individual trading as Help Me Breathe, Lebanon</dd>
 
                         <dt>Scope</dt>
-                        <dd>helpmebreath.com, the embedded widget, client session links, and the licence endpoints</dd>
+                        <dd>helpmebreath.com, the embedded widget, client session links, and the account and subscription endpoints</dd>
 
                         <dt>Security contact</dt>
                         <dd><a href="mailto:contact@helpmebreath.com?subject=Security">contact@helpmebreath.com</a>, subject line "Security"</dd>
@@ -293,11 +294,11 @@
 
                 <section class="doc-section">
                     <h2>1. Architecture</h2>
-                    <p>Help Me Breathe is a static website with a small number of serverless functions attached to it. There is no application server that stays running, no database, no message queue, no cache layer and no admin panel. The attack surface is deliberately close to the smallest one a working product can have.</p>
+                    <p>Help Me Breathe is a static website with a small number of serverless functions attached to it. There is no application server that stays running, no message queue, no cache layer and no admin panel. The only personal data stored anywhere is a subscriber's own account record — an email address, a sign-in identity, a plan and its dates. The attack surface is deliberately close to the smallest one a working product can have.</p>
                     <ul>
                         <li><strong>Static pages.</strong> Every page is a plain HTML file built ahead of time and served from a content delivery network. There is no server-side rendering, no template engine and no user input reflected into a page by a server.</li>
                         <li><strong>Client-side JavaScript.</strong> The timer is native ES modules with no bundler, no framework and no third-party runtime dependencies at all. That means no dependency tree to be compromised through, and nothing to patch when a popular package is hijacked.</li>
-                        <li><strong>Serverless functions.</strong> A handful of endpoints under <code>/api/</code> handle the licence lifecycle and the optional email list. They are stateless, receive a JSON body, and return a JSON response. They are written to the Web standard <code>Request</code>/<code>Response</code> interface, so they can be moved to another host without being rewritten.</li>
+                        <li><strong>Serverless functions.</strong> A handful of endpoints under <code>/api/</code> handle sign-in, the subscription lifecycle and the optional email list. They receive a JSON body and return a JSON response. They are written to the Web standard <code>Request</code>/<code>Response</code> interface, so they can be moved to another host without being rewritten.</li>
                         <li><strong>Service worker.</strong> A service worker caches the pages and assets so the timer keeps working offline. It caches the application shell only. It never caches an API response and never stores anything about a session.</li>
                         <li><strong>The embedded widget.</strong> A separate, versioned page under <code>/embed/v1/</code> designed to be put in an iframe on someone else's site. It loads its own HTML, CSS and one script from helpmebreath.com and nothing else, from anywhere. A client session link at <code>/s/</code> is a different page and is not held to that rule — see section 2.</li>
                     </ul>
@@ -313,16 +314,16 @@
 
                     <p><strong>A client opens a co-branded session link.</strong></p>
                     <div class="flow-line">browser → CDN: GET /s/?c=&lt;base64url config&gt; → HTML, CSS, JS<br>browser → Google Fonts: the site's typefaces. Then: nothing.</div>
-                    <p>The entire configuration — technique, length, practitioner name, message, optional logo URL and licence token — is encoded in the query string, so no server needs to remember it. The page decodes it in the browser. Every decoded field is written with <code>textContent</code> rather than as markup, only <code>https</code> image URLs are accepted, and the payload is length-capped, because this is attacker-controllable input rendered on our own domain.</p>
+                    <p>The entire configuration — technique, length, practitioner name, message, optional logo URL and subscription token — is encoded in the query string, so no server needs to remember it. The page decodes it in the browser. Every decoded field is written with <code>textContent</code> rather than as markup, only <code>https</code> image URLs are accepted, and the payload is length-capped, because this is attacker-controllable input rendered on our own domain.</p>
                     <p>This page differs from the embedded widget in one respect, and it is listed rather than glossed: it requests the site's typefaces from Google Fonts, so Google's font servers see the reader's IP address and user agent. Nothing about the session is sent with that request, and the page works if it is blocked. A practitioner's own logo, if the link carries one, is fetched by the reader's browser from the practitioner's own server. The widget under <code>/embed/v1/</code> makes neither request.</p>
 
-                    <p><strong>A practitioner activates a licence.</strong></p>
-                    <div class="flow-line">browser → POST /api/license { key } → { token }   ·   token stored in localStorage['hmb.license']</div>
-                    <p>The licence key is exchanged for a short-lived signed token. The key is never written to a log, an analytics event or an error report in full.</p>
+                    <p><strong>A subscriber signs in.</strong></p>
+                    <div class="flow-line">browser → sign-in request { email } → a one-time link by email, or a Google sign-in   ·   a short-lived signed token kept by the browser</div>
+                    <p>There is no password at any point. A one-time email link, or a Google account, is exchanged for a short-lived signed token. An email address is never written to a log, an analytics event or an error report in full.</p>
 
                     <p><strong>A white-label embed checks its entitlement.</strong></p>
-                    <div class="flow-line">iframe → POST /api/entitlement { token, host } → { tier, dom? }</div>
-                    <p>The frame asks whether the token is a live Practitioner or Studio licence, and sends the hostname of the page it is embedded in. The response is a tier and the list of hostnames the licence covers. The server refuses a token whose list does not include the host it was asked about, and the frame checks the same thing again before it changes anything on screen. A licence that carries no hostnames cannot white-label at all: the hostnames are fixed when the licence is activated, so a key copied out of a public page's source is of no use on a site that is not on the list. If the check fails for any reason — an unreachable server, a lapsed licence, a domain that is not covered — the frame renders the free attributed widget rather than failing open.</p>
+                    <div class="flow-line">iframe → entitlement check { token, host } → { active, host allowed }</div>
+                    <p>The frame asks whether the token belongs to an active subscription, and sends the hostname of the page it is embedded in. The server answers for that hostname and no other, and the frame checks the same answer again before it changes anything on screen, so a token copied out of a public page's source is of no use on a site it was not issued for. If the check fails for any reason — an unreachable server, a lapsed subscription, a hostname that is not covered — the frame renders the free attributed widget rather than failing open.</p>
 
                     <div class="doc-callout">
                         <p>There is no flow in which a client's name, contact details, health information or practice history reaches a server. The <a href="/compliance/privacy-attestation">privacy attestation</a> states this as a signed statement, and the <a href="/compliance/dpa">Data Processing Addendum</a> records it contractually.</p>
@@ -333,7 +334,7 @@
                     <h2>3. Hosting, TLS and headers</h2>
                     <ul>
                         <li>The site is hosted on Vercel and served from its content delivery network. Vercel manages the TLS certificates and terminates TLS at the edge; plain HTTP requests are redirected to HTTPS, and <code>www</code> is redirected to the bare domain.</li>
-                        <li>Secrets — the licence signing key, the merchant of record's API key and webhook secret, and the email provider's key — exist only as encrypted environment variables in the hosting platform. They are not in the source repository, which carries a <code>.gitignore</code> entry for local environment files, and they are never logged.</li>
+                        <li>Secrets — the token signing key, the merchant of record's API key and webhook secret, and the email provider's key — exist only as encrypted environment variables in the hosting platform. They are not in the source repository, which carries a <code>.gitignore</code> entry for local environment files, and they are never logged.</li>
                         <li>Response headers set at the edge for every path: <code>X-Content-Type-Options: nosniff</code>, <code>Referrer-Policy: strict-origin-when-cross-origin</code>, and <code>Permissions-Policy: camera=(), microphone=(), geolocation=()</code>.</li>
                         <li><code>X-Frame-Options: DENY</code> is set on every path except the two that are meant to be embedded — the widget under <code>/embed/</code> and the client session link at <code>/s/</code> — which instead carry a <code>Content-Security-Policy</code> with <code>frame-ancestors *</code> because being embeddable is their purpose.</li>
                         <li>The serverless functions apply best-effort per-address rate limiting, and reject a request body that is larger or differently shaped than expected.</li>
@@ -343,7 +344,7 @@
 
                 <section class="doc-section">
                     <h2>4. Subprocessors</h2>
-                    <p>Four, listed with what each one can see. The same list appears in clause 7 of the <a href="/compliance/dpa">Data Processing Addendum</a>, and changes are notified to licence holders at least ten days ahead.</p>
+                    <p>Four, listed with what each one can see. The same list appears in clause 7 of the <a href="/compliance/dpa">Data Processing Addendum</a>, and changes are notified to subscribers at least ten days ahead.</p>
                     <div class="table-scroll">
                         <table class="doc-table">
                             <caption class="sr-only">Subprocessors and what each can see</caption>
@@ -358,7 +359,7 @@
                                 </tr>
                                 <tr>
                                     <td>The merchant of record</td>
-                                    <td>Sells the licence as the seller on record, takes payment, handles sales tax and VAT, issues receipts, processes refunds</td>
+                                    <td>Sells the subscription as the seller on record, takes payment, handles sales tax and VAT, issues receipts, processes refunds</td>
                                     <td>Your name, email address, billing country, payment method, and any business name or tax identifier you enter. The company named on your receipt is the current merchant of record; this page is updated if it changes.</td>
                                 </tr>
                                 <tr>
@@ -368,7 +369,7 @@
                                 </tr>
                                 <tr>
                                     <td>The email delivery provider</td>
-                                    <td>Delivers licence keys and receipts; hosts the contact mailbox</td>
+                                    <td>Delivers sign-in links and receipts; hosts the contact mailbox</td>
                                     <td>Your email address and the content of messages between you and the Provider.</td>
                                 </tr>
                             </tbody>
@@ -379,20 +380,20 @@
 
                 <div class="hmb-page-break" aria-hidden="true"></div>
 
-                <p class="doc-kicker hmb-print-only">Help Me Breathe — Security Overview · Part 2 of 2 · licence model, accessibility, support, disclosure</p>
+                <p class="doc-kicker hmb-print-only">Help Me Breathe — Security Overview · Part 2 of 2 · accounts and tokens, accessibility, support, disclosure</p>
                 <p class="page-label hmb-no-print">Part two</p>
 
                 <section class="doc-section">
-                    <h2>5. The licence token model</h2>
-                    <p>There are no user accounts, no passwords and no user database. A licence is a signed token, and that design choice is the reason there is no credential store to leak.</p>
+                    <h2>5. Accounts and the subscription token</h2>
+                    <p>There are no passwords. Signing in is a one-time email link or a Google account, so there is no credential store to leak. An account holds an email address, the sign-in identities used, the date it was created, the plan with its status and period dates, and the payment provider's subscription and customer identifiers. What the browser holds is a signed token, and that design choice is the reason a stolen token ages out on its own.</p>
                     <ul>
-                        <li>A licence key is exchanged once, at <code>/api/license</code>, for a token of the form <code>base64url(payload) + "." + base64url(HMAC-SHA256)</code>.</li>
-                        <li>The payload carries a version, the tier, a subject reference, issue and expiry timestamps, a key identifier, an activation count and — for a white-label licence — the list of hostnames it covers. It carries no name, no email address and nothing about anybody's practice.</li>
-                        <li>Signing uses HMAC-SHA256 through the platform's WebCrypto implementation, with a secret held only in the hosting platform's environment. The signature is verified on the server, at <code>/api/license</code> and <code>/api/entitlement</code>, and that is what protects the things worth protecting: removing the attribution from a white-label embed, and the co-branded client session link. Be clear about what this does not do. In the browser the stored token is decoded but not verified, so the tier shown in one person's own browser is a convenience rather than a security boundary, and someone editing their own stored data can turn on the local Pro conveniences without paying. That is a deliberate trade in a product with no accounts and no user database: the alternative is a login, which would mean holding credentials for everyone. Anything a practitioner actually sells &mdash; white-label attribution removal, class mode, co-branded links &mdash; is decided by the server, not by the browser.</li>
-                        <li>Tokens are short-lived: 30 days for a lifetime licence, 7 days for a subscription. A cancelled subscription therefore expires on its own within a week, with no revocation list to maintain and no action needed from anyone.</li>
-                        <li>A 14-day offline grace period past expiry keeps paid features working with no network, so a practitioner in a room with poor signal is never locked out mid-session.</li>
-                        <li>Activation limits are 25 browsers for a Practitioner licence and 6 for consumer Pro. Studio raises the domain limit to ten rather than the activation count.</li>
-                        <li>A full licence key is never written to a log, an analytics event or an error report. Where a merchant of record returns a buyer to the site with the key in the address bar, the page removes it from the URL before anything else runs, and the analytics configuration is pinned to the path so a query string cannot reach it.</li>
+                        <li>A sign-in is exchanged for a token of the form <code>base64url(payload) + "." + base64url(HMAC-SHA256)</code>.</li>
+                        <li>The payload carries a version, a subject reference, issue and expiry timestamps, and whether the subscription is active. It carries no name, no email address, no card data and nothing about anybody's practice.</li>
+                        <li>Signing uses HMAC-SHA256 through the platform's WebCrypto implementation, with a secret held only in the hosting platform's environment. The signature is verified on the server, and that is what protects the things worth protecting: removing the attribution from a white-label embed, and the co-branded client session link. Be clear about what this does not do. In the browser the stored token is decoded but not verified, so what a person sees unlocked in their own browser is a convenience rather than a security boundary, and someone editing their own stored data can turn on the local conveniences without paying. Anything a practitioner actually sells &mdash; white-label attribution removal, class mode, co-branded links &mdash; is decided by the server, not by the browser.</li>
+                        <li>Tokens are short-lived: 14 days. A cancelled subscription therefore expires on its own within a fortnight, with no revocation list to maintain and no action needed from anyone.</li>
+                        <li>That 14-day life doubles as an offline grace period, so paid features keep working with no network and a practitioner in a room with poor signal is never locked out mid-session.</li>
+                        <li>An account is for one person or one household. There is no device count and no domain count to administer, and no activation ledger to keep.</li>
+                        <li>A sign-in link is single use and short-lived. Where a sign-in or a checkout returns someone to the site with a token in the address bar, the page removes it from the URL before anything else runs, and the analytics configuration is pinned to the path so a query string cannot reach it.</li>
                     </ul>
                 </section>
 
@@ -424,7 +425,7 @@
                         <li>You will get an acknowledgement within two business days.</li>
                         <li>You will get an assessment, and a fix or a plan, within fourteen days for anything that puts data or money at risk.</li>
                         <li>Please give thirty days before publishing, or ninety if the fix needs a subprocessor to act. If a fix is taking longer than that, you will be told why rather than ignored.</li>
-                        <li>Testing against your own browser, your own licence and your own embed is welcome. Please do not run automated scanners against the hosting platform, do not attempt denial of service, and do not access or modify data that is not yours.</li>
+                        <li>Testing against your own browser, your own account and your own embed is welcome. Please do not run automated scanners against the hosting platform, do not attempt denial of service, and do not access or modify data that is not yours.</li>
                         <li>There is no bug bounty. There is no budget for one. What there is: a fast, honest reply, credit on this page if you want it, and a fix.</li>
                     </ul>
                 </section>
@@ -440,7 +441,7 @@
                         <li>No legal entity, no data protection officer, no security team. One person, in Lebanon, who answers his own email.</li>
                         <li>No 24/7 on-call, no incident status page, no service level agreement.</li>
                     </ul>
-                    <p>If any of that is a requirement for you, this is the wrong tool and it is better to know now. If none of it is, you have the whole picture, and the picture is unusually simple: a static site with no database, no accounts and nothing of your clients' in it.</p>
+                    <p>If any of that is a requirement for you, this is the wrong tool and it is better to know now. If none of it is, you have the whole picture, and the picture is unusually simple: a static site whose only stored personal data is your own account record, with nothing of your clients' in it.</p>
                 </section>
 
                 <div class="doc-actions hmb-no-print">
