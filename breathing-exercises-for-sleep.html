@@ -26,13 +26,16 @@
     <meta name="twitter:description" content="A ten-minute guided 4-7-8 wind-down you can run in bed. Free timer, no sign-up, plus what to do when your mind will not stop racing.">
     <meta name="twitter:image" content="https://helpmebreath.com/images/og/breathing-exercises-for-sleep.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,8 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!--
       Google Consent Mode v2 — copy verbatim, do not reorder. The DENIED
@@ -183,25 +186,28 @@
 <body class="theme-478 article-page technique-page">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element leaf leaf-3"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element ripple ripple-3"></div>
-    <div class="natural-element cloud cloud-1"></div>
-    <div class="natural-element sun-ray sun-ray-1"></div>
-    <div class="natural-element sun-ray sun-ray-2"></div>
-    <div class="natural-element sun-ray sun-ray-3"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides" aria-current="page">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
@@ -209,9 +215,11 @@
                     <li>Breathing for sleep</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Breathing Exercises for Sleep</h1>
-                <p class="subtitle">A ten-minute guided wind-down you can start right now, in bed, with the lights already off.</p>
+            <h1>Breathing Exercises for Sleep</h1>
+            <p class="lead">A ten-minute guided wind-down you can start right now, in bed, with the lights already off.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Published 2026-09-09 &middot; Updated 2026-09-09</p>
             </div>
         </header>
 
@@ -223,7 +231,15 @@
                      data-duration="600"
                      aria-labelledby="timer-heading">
 
-                <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">⚙️</button>
+                <div class="app-bar">
+                    <h2 id="timer-heading" data-role="technique-title">4-7-8 breathing</h2>
+                    <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+                            <circle cx="12" cy="12" r="3.2"/>
+                            <path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
+                        </svg>
+                    </button>
+                </div>
 
                 <div class="settings-panel" data-role="settings-panel">
                     <div class="setting-item">
@@ -247,22 +263,18 @@
                     </div>
                 </div>
 
-                <h2 id="timer-heading" data-role="technique-title">4-7-8 breathing</h2>
-
                 <div class="breathing-container">
-                    <div class="breathing-aura"></div>
+                    <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
+                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
+                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                    </svg>
                     <div class="breathing-circle technique-478" data-role="circle">
-                        <div class="circle-text-container">
-                            <span data-role="circle-text">Ready</span>
-                        </div>
+                        <span class="circle-notch" aria-hidden="true"></span>
                     </div>
-                    <div class="breathing-particles" aria-hidden="true">
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
+                    <div class="circle-text-container">
+                        <span class="phase-word" data-role="circle-text">Ready</span>
+                        <span class="phase-count" data-role="phase-count"></span>
                     </div>
                 </div>
 
@@ -297,6 +309,7 @@
                     </div>
                 </div>
 
+                <!-- SLOT: Pro tools -->
                 <div class="tools-row" data-slot="tools"></div>
 
                 <div class="controls">
@@ -314,6 +327,7 @@
                     </div>
                 </div>
 
+                <!-- SLOT: post-session cards -->
                 <div data-slot="post-session"></div>
 
                 <div class="technique-info" data-role="technique-info"></div>
@@ -323,13 +337,13 @@
 
             <!-- ============ TECHNIQUE SWITCHER ============ -->
             <nav class="technique-switcher" aria-label="Other breathing timers">
-                <a href="/4-7-8-breathing">🌙 4-7-8</a>
-                <a href="/box-breathing">🌿 Box</a>
-                <a href="/heart-coherence-breathing">💗 Coherence</a>
-                <a href="/cyclic-sighing">🌊 Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">🌅 Extended exhale</a>
-                <a href="/triangle-breathing">☁️ Triangle</a>
-                <a href="/energizing-breath">☀️ Energizing</a>
+                <a href="/4-7-8-breathing">4-7-8</a>
+                <a href="/box-breathing">Box</a>
+                <a href="/heart-coherence-breathing">Coherence</a>
+                <a href="/cyclic-sighing">Cyclic sighing</a>
+                <a href="/extended-exhale-breathing">Extended exhale</a>
+                <a href="/triangle-breathing">Triangle</a>
+                <a href="/energizing-breath">Energizing</a>
                 <a href="/timer">All timers</a>
             </nav>
 
@@ -395,16 +409,18 @@
 
                 <section>
                     <h2>Before you try the hold: who should be careful</h2>
-                    <p>4-7-8 contains a seven-second breath hold. For most healthy adults that is unremarkable, but a hold is not automatically harmless, and this pattern is not the right starting point for everyone. Skip the hold entirely, or check with a clinician first, if any of the following apply to you.</p>
-                    <ul>
-                        <li>You are pregnant.</li>
-                        <li>You have a cardiovascular condition, an arrhythmia, or uncontrolled high blood pressure.</li>
-                        <li>You have epilepsy or another seizure disorder.</li>
-                        <li>You have asthma, COPD, or another respiratory condition, especially if you are having a bad week with it.</li>
-                        <li>You have had surgery recently, or you have raised intraocular pressure or glaucoma.</li>
-                        <li>You live with panic disorder, or breath-holding reliably triggers panic for you. Air hunger is a common panic trigger, and a hold can start the exact spiral you are trying to leave.</li>
-                    </ul>
-                    <p>If any of those describe you, the fix is simple and costs you nothing: use four counts in and six counts out with no hold at all. You keep the long exhale, which is the part that does the work, and you lose the part that carries the risk. Open the technique list from <a href="/timer">all timers</a> and pick a pattern without a hold. Stop and breathe normally if you feel dizzy, lightheaded or short of breath at any point — that is a signal, not a hurdle to push through.</p>
+                    <div class="callout callout--caution">
+                        <p>4-7-8 contains a seven-second breath hold. For most healthy adults that is unremarkable, but a hold is not automatically harmless, and this pattern is not the right starting point for everyone. Skip the hold entirely, or check with a clinician first, if any of the following apply to you.</p>
+                        <ul>
+                            <li>You are pregnant.</li>
+                            <li>You have a cardiovascular condition, an arrhythmia, or uncontrolled high blood pressure.</li>
+                            <li>You have epilepsy or another seizure disorder.</li>
+                            <li>You have asthma, COPD, or another respiratory condition, especially if you are having a bad week with it.</li>
+                            <li>You have had surgery recently, or you have raised intraocular pressure or glaucoma.</li>
+                            <li>You live with panic disorder, or breath-holding reliably triggers panic for you. Air hunger is a common panic trigger, and a hold can start the exact spiral you are trying to leave.</li>
+                        </ul>
+                        <p>If any of those describe you, the fix is simple and costs you nothing: use four counts in and six counts out with no hold at all. You keep the long exhale, which is the part that does the work, and you lose the part that carries the risk. Open the technique list from <a href="/timer">all timers</a> and pick a pattern without a hold. Stop and breathe normally if you feel dizzy, lightheaded or short of breath at any point — that is a signal, not a hurdle to push through.</p>
+                    </div>
                 </section>
 
                 <section>
@@ -460,47 +476,56 @@
                 </section>
             </article>
 
-            <div class="ad-slot" data-ad-slot="in-content-1" aria-hidden="true"></div>
+            <!-- Single in-content ad unit, below the prose. Hidden during a session by CSS. -->
+            <aside class="ad-slot" data-ad-slot="in-content-1" role="complementary" aria-label="Advertisement"></aside>
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">Extended exhale</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About and products">
-                <a href="/science">What the research says</a>
-                <a href="/about">About</a>
-                <a href="/pro">Pro</a>
-                <a href="/for-practitioners">For practitioners</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>

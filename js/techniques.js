@@ -16,11 +16,17 @@
  * A technique object is:
  *   {
  *     key, slug, name, shortName, emoji, title,
- *     theme, circleClass,
+ *     theme, circleClass, rim, fill,
  *     phases: [{ name, duration, class, text, frequency }],
  *     description, benefits[], contraindications[],
  *     requiresSafetyAck, sources[]
  *   }
+ *
+ * `emoji` is retained as an empty string: the brand carries no emoji, but the
+ * field stays so that nothing reading it breaks. `rim` and `fill` are the
+ * technique's day accent pair; the site itself uses the CSS tokens
+ * (--rim-<key> / --fill-<key>) and only surfaces that cannot read the
+ * stylesheet — the render harness, a white-label embed — should read these.
  *
  * `sources` is intentionally empty here. Page agents own citations: a claim is
  * only allowed on a page where the author opened and quoted the source.
@@ -41,16 +47,18 @@ export const TECHNIQUES = {
   478: {
     key: '478',
     slug: '4-7-8-breathing',
-    name: '🌙 Deep Sleep',
+    name: 'Deep Sleep',
     shortName: '4-7-8',
-    emoji: '🌙',
-    title: 'Deep Sleep & Relaxation',
+    emoji: '',
+    rim: '#33407F',
+    fill: '#C5C5E0',
+    title: '4-7-8 breathing',
     theme: 'theme-478',
     circleClass: 'technique-478',
     phases: [
-      { name: 'Inhale', duration: 4, class: 'inhale', text: 'Breathe in slowly, filling with moonlight...', frequency: 174.61 },
-      { name: 'Hold', duration: 7, class: 'hold', text: 'Hold gently, let the calm settle in...', frequency: SILENT },
-      { name: 'Exhale', duration: 8, class: 'exhale', text: 'Release completely, drift into peace...', frequency: 130.81 },
+      { name: 'Inhale', duration: 4, class: 'inhale', text: 'Breathe in slowly through your nose', frequency: 174.61 },
+      { name: 'Hold', duration: 7, class: 'hold', text: 'Hold, without straining', frequency: SILENT },
+      { name: 'Exhale', duration: 8, class: 'exhale', text: 'Let it out slowly through your mouth', frequency: 130.81 },
     ],
     description:
       'A slow four-count inhale, a seven-count hold, then a long eight-count exhale. The long exhale is what makes it feel restful, which is why people reach for it at bedtime.',
@@ -73,17 +81,19 @@ export const TECHNIQUES = {
   box: {
     key: 'box',
     slug: 'box-breathing',
-    name: '🌿 Focus & Grounding',
+    name: 'Focus & Grounding',
     shortName: 'Box',
-    emoji: '🌿',
-    title: 'Earth Connection & Mental Clarity',
+    emoji: '',
+    rim: '#6E3C69',
+    fill: '#DABFD6',
+    title: 'Box breathing',
     theme: 'theme-box',
     circleClass: 'technique-box',
     phases: [
-      { name: 'Inhale', duration: 4, class: 'inhale', text: "Draw in earth's grounding energy...", frequency: 146.83 },
-      { name: 'Hold', duration: 4, class: 'hold', text: 'Feel rooted and centered...', frequency: SILENT },
-      { name: 'Exhale', duration: 4, class: 'exhale', text: 'Release with steady control...', frequency: 110 },
-      { name: 'Hold', duration: 4, class: 'hold', text: 'Rest in perfect stillness...', frequency: SILENT },
+      { name: 'Inhale', duration: 4, class: 'inhale', text: 'Breathe in for four', frequency: 146.83 },
+      { name: 'Hold', duration: 4, class: 'hold', text: 'Hold for four', frequency: SILENT },
+      { name: 'Exhale', duration: 4, class: 'exhale', text: 'Breathe out for four', frequency: 110 },
+      { name: 'Hold', duration: 4, class: 'hold', text: 'Stay empty for four', frequency: SILENT },
     ],
     description:
       'Four equal counts: in, hold, out, hold. The even rhythm is easy to remember and easy to keep, which is why it is taught for situations where you need to stay steady.',
@@ -106,15 +116,17 @@ export const TECHNIQUES = {
   coherent: {
     key: 'coherent',
     slug: 'heart-coherence-breathing',
-    name: '💗 Heart Coherence',
+    name: 'Heart Coherence',
     shortName: 'Coherence',
-    emoji: '💗',
-    title: 'Heart Rhythm & Emotional Flow',
+    emoji: '',
+    rim: '#8C2F49',
+    fill: '#E5BDC4',
+    title: 'Heart coherence breathing',
     theme: 'theme-coherent',
     circleClass: 'technique-coherent',
     phases: [
-      { name: 'Inhale', duration: 5, class: 'inhale', text: 'Breathe love into your heart...', frequency: 220 },
-      { name: 'Exhale', duration: 5, class: 'exhale', text: 'Send gratitude flowing outward...', frequency: 164.81 },
+      { name: 'Inhale', duration: 5, class: 'inhale', text: 'Breathe in for five', frequency: 220 },
+      { name: 'Exhale', duration: 5, class: 'exhale', text: 'Breathe out for five', frequency: 164.81 },
     ],
     description:
       'Five seconds in, five seconds out — six breaths a minute, with no holds. It is the slowest pattern here that most people can keep up comfortably for a long stretch.',
@@ -131,10 +143,12 @@ export const TECHNIQUES = {
   sigh: {
     key: 'sigh',
     slug: 'cyclic-sighing',
-    name: '🌊 Cyclic Sighing',
+    name: 'Cyclic Sighing',
     shortName: 'Cyclic sighing',
-    emoji: '🌊',
-    title: 'Double Inhale & Long Exhale',
+    emoji: '',
+    rim: '#125A62',
+    fill: '#A2CFD5',
+    title: 'Cyclic sighing',
     theme: 'theme-sigh',
     circleClass: 'technique-sigh',
     phases: [
@@ -157,10 +171,12 @@ export const TECHNIQUES = {
   extended: {
     key: 'extended',
     slug: 'extended-exhale-breathing',
-    name: '🌅 Extended Exhale',
+    name: 'Extended Exhale',
     shortName: 'Extended exhale',
-    emoji: '🌅',
-    title: 'Longer Out-Breath, No Holds',
+    emoji: '',
+    rim: '#7A5310',
+    fill: '#D8C4AD',
+    title: 'Extended exhale breathing',
     theme: 'theme-extended',
     circleClass: 'technique-extended',
     phases: [
@@ -182,16 +198,18 @@ export const TECHNIQUES = {
   triangle: {
     key: 'triangle',
     slug: 'triangle-breathing',
-    name: '☁️ Quick Calm',
+    name: 'Quick Calm',
     shortName: 'Triangle',
-    emoji: '☁️',
-    title: 'Sky Breath & Instant Peace',
+    emoji: '',
+    rim: '#2C5273',
+    fill: '#B5C9E2',
+    title: 'Triangle breathing',
     theme: 'theme-triangle',
     circleClass: 'technique-triangle',
     phases: [
-      { name: 'Inhale', duration: 3, class: 'inhale', text: 'Breathe in fresh clarity...', frequency: 261.63 },
-      { name: 'Hold', duration: 3, class: 'hold', text: 'Float in peaceful pause...', frequency: SILENT },
-      { name: 'Exhale', duration: 3, class: 'exhale', text: 'Let go like a soft breeze...', frequency: 196 },
+      { name: 'Inhale', duration: 3, class: 'inhale', text: 'Breathe in for three', frequency: 261.63 },
+      { name: 'Hold', duration: 3, class: 'hold', text: 'Hold for three', frequency: SILENT },
+      { name: 'Exhale', duration: 3, class: 'exhale', text: 'Breathe out for three', frequency: 196 },
     ],
     description:
       'Three counts in, three held, three out. Short cycles and one number to remember, which is why it is often the pattern taught to children.',
@@ -214,15 +232,17 @@ export const TECHNIQUES = {
   wim: {
     key: 'wim',
     slug: 'energizing-breath',
-    name: '☀️ Energizing Breath',
+    name: 'Energizing Breath',
     shortName: 'Energizing',
-    emoji: '☀️',
-    title: 'Fast Rhythmic Breathing',
+    emoji: '',
+    rim: '#993A20',
+    fill: '#E4BFB4',
+    title: 'Energizing breath',
     theme: 'theme-wim',
     circleClass: 'technique-wim',
     phases: [
-      { name: 'Inhale', duration: 2, class: 'inhale', text: 'Draw in solar energy...', frequency: 329.63 },
-      { name: 'Exhale', duration: 1, class: 'exhale', text: 'Release with power...', frequency: 246.94 },
+      { name: 'Inhale', duration: 2, class: 'inhale', text: 'Breathe in fully', frequency: 329.63 },
+      { name: 'Exhale', duration: 1, class: 'exhale', text: 'Let it go', frequency: 246.94 },
     ],
     description:
       'Fast, rhythmic breathing: a two-second inhale and a one-second release, repeated. This is a stimulating pattern, not a calming one — it is the opposite of everything else here.',
@@ -264,6 +284,20 @@ export const CIRCLE_CLASSES = TECHNIQUE_ORDER.map((k) => TECHNIQUES[k].circleCla
 export function getTechnique(key) {
   if (key == null) return null;
   return Object.prototype.hasOwnProperty.call(TECHNIQUES, String(key)) ? TECHNIQUES[String(key)] : null;
+}
+
+/**
+ * True when a technique holds the breath or speeds it up, and therefore needs a
+ * visible contraindication block wherever it can be selected (hard rule 4).
+ * The three gentle patterns share GENTLE_NOTE, which is a comfort note rather
+ * than a contraindication list, so they answer false.
+ * @param {string|object} technique a key or a technique object
+ * @returns {boolean}
+ */
+export function needsCautionBlock(technique) {
+  const t = typeof technique === 'string' ? getTechnique(technique) : technique;
+  if (!t || !Array.isArray(t.contraindications) || !t.contraindications.length) return false;
+  return t.contraindications[0] !== GENTLE_NOTE[0];
 }
 
 /** Extra URL paths that should resolve to a technique but are not its own slug. */

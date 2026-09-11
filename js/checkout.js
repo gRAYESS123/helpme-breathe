@@ -93,7 +93,63 @@ function openLink(sku) {
 
 /* ---------------------------------------------------------------- waitlist */
 
-const WAITLIST_MESSAGE = 'Checkout opens soon — founding members get Pro for $14';
+/**
+ * The waitlist card, per SKU.
+ *
+ * It used to be one hardcoded string about the $14 founding Pro offer, served
+ * for every SKU — so the Practitioner and Studio buttons on /pro and /embed
+ * promised the wrong product at the wrong price, a few lines under a matrix
+ * printing $99 and $199. The founding line is now shown only where it is true:
+ * the lifetime SKU, and only while there are founding places left.
+ *
+ * @param {string} sku
+ * @returns {{title:string, message:string, consentLabel:string, note:string, successMessage:string}}
+ */
+function waitlistCopy(sku) {
+  const label = SKU_LABELS[sku] || 'Help Me Breathe Pro';
+  const price = PRICES[sku];
+
+  if (sku === 'practitioner' || sku === 'studio') {
+    return {
+      title: `Tell me when the ${label} opens`,
+      message: `Checkout opens soon — the ${label} is $${price} a year`,
+      consentLabel:
+        ` Email me once when the ${label} opens. You can unsubscribe from any email, and the address is used for nothing else.`,
+      note: 'One email to confirm, then one when checkout opens. Nothing else.',
+      successMessage:
+        'You are on the list. Confirm the address from the email that just went out and you will hear from us the day checkout opens.',
+    };
+  }
+
+  if (sku === 'pack') {
+    return {
+      title: 'Tell me when the Protocol Pack opens',
+      message: `Checkout opens soon — the Protocol Pack is $${price}, and it is included free with Pro`,
+      consentLabel:
+        ' Email me once when the Protocol Pack opens. You can unsubscribe from any email, and the address is used for nothing else.',
+      note: 'One email to confirm, then one when checkout opens. Nothing else.',
+      successMessage:
+        'You are on the list. Confirm the address from the email that just went out and you will hear from us the day checkout opens.',
+    };
+  }
+
+  const founding = sku === 'lifetime' && CHECKOUT.founding && CHECKOUT.founding.cap > 0;
+  const message = founding
+    ? `Checkout opens soon — founding members get Pro for $${PRICES.founding}`
+    : sku === 'monthly'
+      ? `Checkout opens soon — Pro monthly is $${price} a month`
+      : `Checkout opens soon — Pro is $${price}, one payment`;
+
+  return {
+    title: 'Tell me when Pro opens',
+    message,
+    consentLabel:
+      ' Email me once when Pro opens. You can unsubscribe from any email, and the address is used for nothing else.',
+    note: 'One email to confirm, then one when checkout opens. Nothing else.',
+    successMessage:
+      'You are on the list. Confirm the address from the email that just went out and you will hear from us the day checkout opens.',
+  };
+}
 
 function waitlistContainer(trigger, container) {
   const doc = typeof document !== 'undefined' ? document : null;
@@ -115,7 +171,10 @@ function waitlistContainer(trigger, container) {
   if (trigger && trigger.parentNode) {
     const host = doc.createElement('div');
     host.className = 'checkout-waitlist-host';
-    const anchor = trigger.closest('.pricing-card, .cta-block, section, p') || trigger;
+    // `.table-scroll` first: a checkout button now lives in a pricing-matrix
+    // header cell, and a card dropped inside the table would be invalid markup.
+    const anchor =
+      trigger.closest('.table-scroll, .pricing-card, .cta-block, section, p') || trigger;
     anchor.parentNode.insertBefore(host, anchor.nextSibling);
     return host;
   }
@@ -131,20 +190,19 @@ function waitlistContainer(trigger, container) {
 async function openWaitlist(sku, trigger, target) {
   const container = waitlistContainer(trigger, target);
   if (!container) return { ok: false, mode: 'waitlist', sku, error: 'no-container' };
+  const copy = waitlistCopy(sku);
   try {
     const mod = await import('./pro/capture.js');
     mod.renderCaptureCard(container, {
       // /api/subscribe accepts a slug source; this keeps the SKU signal without
       // adding a field the endpoint would ignore.
       source: `waitlist:${sku}`,
-      message: WAITLIST_MESSAGE,
-      title: 'Tell me when Pro opens',
+      message: copy.message,
+      title: copy.title,
       submitLabel: 'Keep me posted',
-      consentLabel:
-        ' Email me once when Pro opens. You can unsubscribe from any email, and the address is used for nothing else.',
-      note: 'One email to confirm, then one when checkout opens. Nothing else.',
-      successMessage:
-        'You are on the list. Confirm the address from the email that just went out and you will hear from us the day checkout opens.',
+      consentLabel: copy.consentLabel,
+      note: copy.note,
+      successMessage: copy.successMessage,
     });
   } catch {
     // capture.js missing or blocked: say so plainly rather than doing nothing.
@@ -153,9 +211,9 @@ async function openWaitlist(sku, trigger, target) {
     card.className = 'post-session-card';
     card.setAttribute('data-ask', 'waitlist');
     const heading = document.createElement('h3');
-    heading.textContent = 'Tell me when Pro opens';
+    heading.textContent = copy.title;
     const body = document.createElement('p');
-    body.textContent = `${WAITLIST_MESSAGE}. Email contact@helpmebreath.com and you are on the list.`;
+    body.textContent = `${copy.message}. Email contact@helpmebreath.com and you are on the list.`;
     card.append(heading, body);
     container.appendChild(card);
   }

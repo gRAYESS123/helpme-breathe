@@ -17,22 +17,25 @@
     <meta property="og:description" content="Box breathing or 4-7-8? Run both timers here for three minutes each, then compare pattern, pace, holds and best time of day in one honest table.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://helpmebreath.com/box-breathing-vs-4-7-8">
-    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/box-breathing-vs-4-7-8.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Box Breathing vs 4-7-8: Which Should You Use?">
     <meta name="twitter:description" content="Box breathing or 4-7-8? Run both timers here for three minutes each, then compare pattern, pace, holds and best time of day in one honest table.">
-    <meta name="twitter:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/box-breathing-vs-4-7-8.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,10 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate.
+         Loaded without blocking render; display=swap prevents invisible text. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -95,7 +100,7 @@
       "@type": "Article",
       "headline": "Box Breathing vs 4-7-8: Which Should You Use?",
       "description": "A side-by-side comparison of box breathing and 4-7-8 breathing, with a working timer for each pattern, a difference table, and an honest read of the evidence.",
-      "image": "https://helpmebreath.com/images/og-breathing-timer.jpg",
+      "image": "https://helpmebreath.com/images/og/box-breathing-vs-4-7-8.jpg",
       "datePublished": "2026-09-09",
       "dateModified": "2026-09-09",
       "inLanguage": "en-US",
@@ -181,151 +186,89 @@
     </script>
 
     <style>
-        /* Page-scoped styling for the comparison page. Uses the existing
-           custom properties only, so every theme keeps working. */
-        .timer-pair .breathing-section {
-            max-width: none;
-            margin: 0;
-        }
+        /* Page-scoped rules for the two-timer comparison page.
+           Tokens only, no colour defined inside a media or .night block:
+           the token sets already flip. See docs/PAGE_CONTRACT.md 13a. */
 
-        .timer-pair .breathing-section h2 {
-            font-size: 1.25rem;
-        }
+        /* The per-timer accent pair and the narrow-viewport stacking now live
+           in css/styles.css section 6, keyed off [data-breathing-app]. */
+        .timer-pair .breathing-section { max-width: none; margin: 0; }
+        .timer-pair .app-bar h2 { font-size: 1rem; }
 
         .pair-intro {
-            max-width: 760px;
+            max-width: var(--measure);
             margin: 0 auto 1.5rem;
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: var(--fs-small);
             line-height: 1.7;
-        }
-
-        .table-wrap {
-            overflow-x: auto;
-            margin: 1.5rem 0;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .compare-table {
-            width: 100%;
-            min-width: 480px;
-            border-collapse: collapse;
-            font-size: 0.9375rem;
-            line-height: 1.6;
-        }
-
-        .compare-table caption {
-            caption-side: bottom;
-            padding-top: 0.75rem;
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-            text-align: left;
-        }
-
-        .compare-table th,
-        .compare-table td {
-            padding: 0.75rem 0.85rem;
-            text-align: left;
-            vertical-align: top;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .compare-table thead th {
-            font-weight: 600;
-            color: var(--text-primary);
-            border-bottom: 2px solid var(--border);
-        }
-
-        .compare-table tbody th {
-            font-weight: 500;
-            color: var(--text-secondary);
-            white-space: nowrap;
-        }
-
-        .compare-table tbody tr:last-child th,
-        .compare-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .article-page .how-steps {
-            margin: 1rem 0 1rem 1.25rem;
-            padding: 0;
-        }
-
-        .article-page .how-steps li {
-            margin-bottom: 0.6rem;
-            padding-left: 0.35rem;
-            line-height: 1.75;
-        }
-
-        .pick-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-
-        .pick-card {
-            padding: 1.25rem;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .pick-card h3 {
-            margin-bottom: 0.6rem;
-        }
-
-        .pick-card ul {
-            margin: 0 0 0 1.1rem;
-        }
-
-        .pick-card li {
-            margin-bottom: 0.4rem;
+            color: var(--graphite);
         }
 
         .pair-label {
-            margin: -0.4rem 0 0.75rem;
+            margin: 0 0 1rem;
             text-align: center;
-            font-size: 0.9375rem;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-family: var(--ui);
+            font-size: var(--fs-small);
+            font-weight: 500;
+            color: var(--graphite);
         }
 
-        .source-list {
-            font-size: 0.875rem;
-            line-height: 1.65;
-            color: var(--text-secondary);
+        /* The pattern table keeps its columns readable inside .table-scroll. */
+        .table-scroll .data-table { min-width: 30rem; }
+
+        .data-table caption {
+            caption-side: bottom;
+            padding-top: 0.75rem;
+            font-family: var(--ui);
+            font-size: var(--fs-small);
+            line-height: 1.6;
+            color: var(--graphite);
+            text-align: left;
         }
 
-        .source-list li {
-            margin-bottom: 0.75rem;
+        .data-table th[scope="row"] {
+            font-size: var(--fs-small);
+            text-transform: none;
+            letter-spacing: 0;
+            color: var(--ink);
+            padding-right: 0.85rem;
         }
+
+        .pick-card ul { margin-bottom: 0; }
+
+        .pick-card li {
+            font-size: var(--fs-small);
+            line-height: 1.6;
+            color: var(--graphite);
+        }
+
+        .source-list { list-style: none; padding-left: 0; margin: 0; }
     </style>
 </head>
 <body class="theme-478 article-page technique-page" data-lock-theme>
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element leaf leaf-3"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element ripple ripple-3"></div>
-    <div class="natural-element cloud cloud-1"></div>
-    <div class="natural-element sun-ray sun-ray-1"></div>
-    <div class="natural-element sun-ray sun-ray-2"></div>
-    <div class="natural-element sun-ray sun-ray-3"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides" aria-current="page">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
@@ -333,9 +276,11 @@
                     <li>Box breathing vs 4-7-8</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Box Breathing vs 4-7-8: Which Should You Use?</h1>
-                <p class="subtitle">Both timers are live below. Run three minutes of each and let your body cast the deciding vote.</p>
+            <h1>Box Breathing vs 4-7-8: Which Should You Use?</h1>
+            <p class="lead">Both timers are live below. Run three minutes of each and let your body cast the deciding vote.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Published 2026-09-09 &middot; Updated 2026-09-09</p>
             </div>
         </header>
 
@@ -354,7 +299,15 @@
                          data-lock-theme
                          aria-labelledby="timer-heading-box">
 
-                    <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open box breathing settings" aria-expanded="false">⚙️</button>
+                    <div class="app-bar">
+                        <h2 id="timer-heading-box" data-role="technique-title">Box breathing</h2>
+                        <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open box breathing settings" aria-expanded="false">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+                                <circle cx="12" cy="12" r="3.2"/>
+                                <path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
+                            </svg>
+                        </button>
+                    </div>
 
                     <div class="settings-panel" data-role="settings-panel">
                         <div class="setting-item">
@@ -378,23 +331,20 @@
                         </div>
                     </div>
 
-                    <h2 id="timer-heading-box" data-role="technique-title">Box breathing</h2>
                     <p class="pair-label">Box breathing · in 4, hold 4, out 4, hold 4</p>
 
                     <div class="breathing-container">
-                        <div class="breathing-aura"></div>
+                        <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+                            <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
+                            <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
+                            <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                        </svg>
                         <div class="breathing-circle technique-box" data-role="circle">
-                            <div class="circle-text-container">
-                                <span data-role="circle-text">Ready</span>
-                            </div>
+                            <span class="circle-notch" aria-hidden="true"></span>
                         </div>
-                        <div class="breathing-particles" aria-hidden="true">
-                            <span class="particle-float"></span>
-                            <span class="particle-float"></span>
-                            <span class="particle-float"></span>
-                            <span class="particle-float"></span>
-                            <span class="particle-float"></span>
-                            <span class="particle-float"></span>
+                        <div class="circle-text-container">
+                            <span class="phase-word" data-role="circle-text">Ready</span>
+                            <span class="phase-count" data-role="phase-count"></span>
                         </div>
                     </div>
 
@@ -462,7 +412,15 @@
                          data-lock-theme
                          aria-labelledby="timer-heading-478">
 
-                    <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open 4-7-8 breathing settings" aria-expanded="false">⚙️</button>
+                    <div class="app-bar">
+                        <h2 id="timer-heading-478" data-role="technique-title">4-7-8 breathing</h2>
+                        <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open 4-7-8 breathing settings" aria-expanded="false">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+                                <circle cx="12" cy="12" r="3.2"/>
+                                <path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
+                            </svg>
+                        </button>
+                    </div>
 
                     <div class="settings-panel" data-role="settings-panel">
                         <div class="setting-item">
@@ -486,23 +444,20 @@
                         </div>
                     </div>
 
-                    <h2 id="timer-heading-478" data-role="technique-title">4-7-8 breathing</h2>
                     <p class="pair-label">4-7-8 breathing · in 4, hold 7, out 8</p>
 
                     <div class="breathing-container">
-                        <div class="breathing-aura"></div>
+                        <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+                            <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
+                            <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
+                            <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                        </svg>
                         <div class="breathing-circle technique-478" data-role="circle">
-                            <div class="circle-text-container">
-                                <span data-role="circle-text">Ready</span>
-                            </div>
+                            <span class="circle-notch" aria-hidden="true"></span>
                         </div>
-                        <div class="breathing-particles" aria-hidden="true">
-                            <span class="particle-float"></span>
-                            <span class="particle-float"></span>
-                            <span class="particle-float"></span>
-                            <span class="particle-float"></span>
-                            <span class="particle-float"></span>
-                            <span class="particle-float"></span>
+                        <div class="circle-text-container">
+                            <span class="phase-word" data-role="circle-text">Ready</span>
+                            <span class="phase-count" data-role="phase-count"></span>
                         </div>
                     </div>
 
@@ -564,13 +519,13 @@
 
             <!-- ============ TECHNIQUE SWITCHER ============ -->
             <nav class="technique-switcher" aria-label="Other breathing timers">
-                <a href="/4-7-8-breathing">🌙 4-7-8</a>
-                <a href="/box-breathing">🌿 Box</a>
-                <a href="/heart-coherence-breathing">💗 Coherence</a>
-                <a href="/cyclic-sighing">🌊 Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">🌅 Extended exhale</a>
-                <a href="/triangle-breathing">☁️ Triangle</a>
-                <a href="/energizing-breath">☀️ Energizing</a>
+                <a href="/4-7-8-breathing">4-7-8</a>
+                <a href="/box-breathing">Box</a>
+                <a href="/heart-coherence-breathing">Coherence</a>
+                <a href="/cyclic-sighing">Cyclic sighing</a>
+                <a href="/extended-exhale-breathing">Extended exhale</a>
+                <a href="/triangle-breathing">Triangle</a>
+                <a href="/energizing-breath">Energizing</a>
                 <a href="/timer">All timers</a>
             </nav>
 
@@ -587,8 +542,8 @@
                 <section>
                     <h2>The two patterns side by side</h2>
                     <p>The counts look similar written down. In practice the two feel quite different, because the shape of the cycle is different and so is the amount of it you spend holding still.</p>
-                    <div class="table-wrap">
-                        <table class="compare-table">
+                    <div class="table-scroll" tabindex="0" role="region" aria-label="Pattern comparison table, scrollable">
+                        <table class="data-table">
                             <caption>Both patterns as the timers on this page run them. Counts are in seconds.</caption>
                             <thead>
                                 <tr>
@@ -726,18 +681,21 @@
                     <p>Honestly: less than the internet implies, and almost nothing that separates these two patterns. The only trial we could find that put them head to head is Marchant and colleagues (2025), who compared square breathing — the same 4-4-4-4 pattern this page calls box breathing — with 4-7-8 and with slow breathing at six breaths a minute in 84 college students. Their opening line is blunt: "Square and 4-7-8 breathing are popularly promoted by psychotherapists but have little empirical support." Their result did not favour either of the famous patterns: "Breathing at 6 bpm increased HRV measures more than square or 4-7-8 breathing with small to medium effects," and none of the conditions produced a meaningful change in blood pressure or mood in that single session.</p>
                     <p>Box breathing also appeared as one arm of Balban and colleagues (2023), who had people do five minutes a day of one of three breathwork protocols for a month and compared them with mindfulness meditation. Box breathing was not the winner there either; the authors report that "breathwork, especially the exhale-focused cyclic sighing, produces greater improvement in mood (p &lt; 0.05) and reduction in respiratory rate (p &lt; 0.05) compared with mindfulness meditation." For 4-7-8 specifically, Vierra and colleagues (2022) measured 43 healthy adults aged 19 to 25 before and after three sets of six 4-7-8 cycles. The heart rate variability shift they describe — "low- and very-low-frequency powers significantly decreased" — turned up in the rested control group rather than in the sleep-deprived one, and their own conclusion is carefully hedged: 4-7-8 breathing control "can help participants improve their HRV and BP, particularly in those without sleep deprivation." What both groups did share was simpler: "Both groups had significantly decreased HR and systolic BP (p &lt; 0.05)." Those are immediate, small, single-session physiological shifts in healthy young people, not evidence of a treatment for anything.</p>
                     <p>The broader picture is kinder. A systematic review by Zaccaro and colleagues (2018) found that "Slow breathing techniques promote autonomic changes increasing Heart Rate Variability and Respiratory Sinus Arrhythmia," which is the general effect both of these patterns are borrowing. What the literature supports is slow breathing. What it does not support is the idea that one branded count beats another. So choose on comfort, and read our fuller summary of <a href="/science">what the research says</a> if you want the caveats in one place.</p>
-                    <ul class="source-list">
-                        <li>Marchant J, Khazan I, Cressman M, Steffen P. Comparing the Effects of Square, 4-7-8, and 6 Breaths-per-Minute Breathing Conditions on Heart Rate Variability, CO2 Levels, and Mood. <em>Applied Psychophysiology and Biofeedback</em>, 2025;50(2):261–276. <a href="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&amp;id=39864026&amp;rettype=abstract&amp;retmode=text" target="_blank" rel="noopener noreferrer">PubMed abstract (plain text)</a> &middot; PMID 39864026 &middot; doi:10.1007/s10484-025-09688-z</li>
-                        <li>Balban MY, Neri E, Kogon MM, Weed L, Nouriani B, Jo B, Holl G, Zeitzer JM, Spiegel D, Huberman AD. Brief structured respiration practices enhance mood and reduce physiological arousal. <em>Cell Reports Medicine</em>, 2023;4:100895. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9873947/" target="_blank" rel="noopener noreferrer">Full text</a></li>
-                        <li>Vierra J, Boonla O, Prasertsri P. Effects of sleep deprivation and 4-7-8 breathing control on heart rate variability, blood pressure, blood glucose, and endothelial function in healthy young adults. <em>Physiological Reports</em>, 2022;10(13):e15389. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9277512/" target="_blank" rel="noopener noreferrer">Full text</a></li>
-                        <li>Zaccaro A, Piarulli A, Laurino M, Garbella E, Menicucci D, Neri B, Gemignani A. How Breath-Control Can Change Your Life: A Systematic Review on Psycho-Physiological Correlates of Slow Breathing. <em>Frontiers in Human Neuroscience</em>, 2018. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6137615/" target="_blank" rel="noopener noreferrer">Full text</a></li>
-                    </ul>
+                    <div class="citations">
+                        <h3>Sources</h3>
+                        <ul class="source-list">
+                            <li>Marchant J, Khazan I, Cressman M, Steffen P. Comparing the Effects of Square, 4-7-8, and 6 Breaths-per-Minute Breathing Conditions on Heart Rate Variability, CO2 Levels, and Mood. <em>Applied Psychophysiology and Biofeedback</em>, 2025;50(2):261–276. <a href="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&amp;id=39864026&amp;rettype=abstract&amp;retmode=text" target="_blank" rel="noopener noreferrer">PubMed abstract (plain text)</a> &middot; PMID 39864026 &middot; doi:10.1007/s10484-025-09688-z</li>
+                            <li>Balban MY, Neri E, Kogon MM, Weed L, Nouriani B, Jo B, Holl G, Zeitzer JM, Spiegel D, Huberman AD. Brief structured respiration practices enhance mood and reduce physiological arousal. <em>Cell Reports Medicine</em>, 2023;4:100895. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9873947/" target="_blank" rel="noopener noreferrer">Full text</a></li>
+                            <li>Vierra J, Boonla O, Prasertsri P. Effects of sleep deprivation and 4-7-8 breathing control on heart rate variability, blood pressure, blood glucose, and endothelial function in healthy young adults. <em>Physiological Reports</em>, 2022;10(13):e15389. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9277512/" target="_blank" rel="noopener noreferrer">Full text</a></li>
+                            <li>Zaccaro A, Piarulli A, Laurino M, Garbella E, Menicucci D, Neri B, Gemignani A. How Breath-Control Can Change Your Life: A Systematic Review on Psycho-Physiological Correlates of Slow Breathing. <em>Frontiers in Human Neuroscience</em>, 2018. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6137615/" target="_blank" rel="noopener noreferrer">Full text</a></li>
+                        </ul>
+                    </div>
                 </section>
 
                 <section>
                     <h2>Pick this if…</h2>
-                    <div class="pick-grid">
-                        <div class="pick-card">
+                    <div class="card-grid">
+                        <div class="card pick-card">
                             <h3>Pick box breathing</h3>
                             <ul>
                                 <li>You want something for daytime, not bedtime.</li>
@@ -747,7 +705,7 @@
                                 <li>You need to teach it to someone in thirty seconds.</li>
                             </ul>
                         </div>
-                        <div class="pick-card">
+                        <div class="card pick-card">
                             <h3>Pick 4-7-8</h3>
                             <ul>
                                 <li>You are aiming at sleep, or at the hour before it.</li>
@@ -817,47 +775,55 @@
                 </section>
             </article>
 
-            <div class="ad-slot" data-ad-slot="in-content-1" aria-hidden="true"></div>
+            <aside class="ad-slot" data-ad-slot="in-content-1" role="complementary" aria-label="Advertisement"></aside>
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">Extended exhale</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About and products">
-                <a href="/science">What the research says</a>
-                <a href="/about">About</a>
-                <a href="/pro">Pro</a>
-                <a href="/for-practitioners">For practitioners</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>

@@ -71,7 +71,7 @@ invalid value is discarded and the default applies. Nothing invalid is ever
 | `technique` | a key from `js/techniques.js` (`478`, `box`, `coherent`, `sigh`, `extended`, `triangle`, `wim`) | `478` | Shape-checked in the head script, resolved for real by `getTechnique()`. The frame is always `data-lock-technique`: there is no pattern switcher inside a widget. |
 | `duration` | whole seconds, 30–7200, or `-1` for unlimited | `300` | Passed to the engine as `?d=`, which outranks a saved preference — the site owner's choice wins. |
 | `theme` | `auto` \| `light` \| `dark` | `auto` | The **surround**, not the pattern's palette. See §3. |
-| `accent` | six hex digits, `#` optional | the pattern's own colour | Replaces `--theme-primary`, `--theme-glow` and `--progress-color`. |
+| `accent` | six hex digits, `#` optional | the pattern's own rim colour | Sets `--rim` — the circle's ring, the progress fill and the reduced-motion pacer — and forces `--fill` to `var(--leaf)` so the phase word keeps its contrast whatever colour is chosen. Nothing checks that an arbitrary hex clears 3:1 on either ground. |
 | `logo` | an `https:` URL, ≤ 500 chars | none | **Rendered only after white-label verification.** The one cross-origin request the frame can make, and only for a verified licence. |
 | `brand` | plain text, ≤ 40 chars | none | Free tier. Written with `textContent`; control characters are stripped. Does not remove attribution. |
 | `sound` | `0` \| `1` | the engine's default (on) | A *first-visit* default. If the visitor has already used the sound toggle in this embed, their choice stands. |
@@ -85,13 +85,13 @@ treated as absent — which means the free, attributed widget.
 
 ## 3. Modes and the surround theme
 
-**`theme` controls the surround only.** The card that holds the timer always
-keeps the pattern's own dark gradient, because those seven gradients are where
-the site's contrast ratios were measured (see the contrast notes in
-`css/styles.css`). `theme=light` paints the *page around the card* pale;
-`theme=dark` paints it with the same gradient; `theme=auto` follows the
-visitor's `prefers-color-scheme`. No text/background pair inside the card
-changes between the three.
+**`theme` picks which token set the frame runs on.** There are no gradients
+anywhere in the widget: the circle is a ring in the technique's rim colour with
+a light interior, on a leaf card, on a paper ground. `theme=light` uses the day
+token set (warm paper ground, leaf card); `theme=dark` uses the night set (dark
+ground, dark circle interior, a light rim and a bone phase word); `theme=auto`
+follows the visitor's `prefers-color-scheme`. Every pair inside the card is a
+token, so all three surrounds carry the same measured contrast.
 
 **`mode=normal`** — a timer sized to the host page. Reports its height (§5).
 
@@ -409,5 +409,7 @@ Then load, by hand:
 - `/embed/v1/frame?mode=kiosk&technique=box` — autostart, loop, no controls.
 - `/s/?c=<a payload you encoded yourself>` and `/s/?c=nonsense` — the second
   must land on `/timer`.
-- Any of the above with `prefers-reduced-motion: reduce` — the circle must stop
-  scaling and change brightness instead.
+- Any of the above with `prefers-reduced-motion: reduce` — the circle must hold
+  one size (scale 0.86) while a ring drawn around its circumference by
+  `stroke-dashoffset` carries the pace; the per-second count still ticks and the
+  notch still opens and closes instantly.

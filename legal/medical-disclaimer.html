@@ -17,22 +17,25 @@
     <meta property="og:description" content="Help Me Breathe is not medical advice and treats no condition. Who should avoid breath-holds and fast breathing, when to stop, and where to get help.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://helpmebreath.com/legal/medical-disclaimer">
-    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/medical-disclaimer.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Medical Disclaimer">
     <meta name="twitter:description" content="Help Me Breathe is not medical advice and treats no condition. Who should avoid breath-holds and fast breathing, when to stop, and where to get help.">
-    <meta name="twitter:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/medical-disclaimer.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,8 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -111,127 +114,53 @@
     </script>
 
     <style>
-        /* Page-scoped: the crisis block and the contraindication list. */
-        .crisis-block {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--theme-primary);
-            border-radius: 20px;
-            padding: 1.75rem 2rem;
-            margin: 0 auto 2rem;
-            max-width: 760px;
-            backdrop-filter: blur(20px);
-        }
+        /* `main > .crisis-block` is now constrained to the reading measure in
+           css/styles.css section 7. */
 
-        .crisis-block h2 {
-            font-size: 1.375rem;
-            font-weight: 600;
-            margin: 0 0 0.75rem;
-            color: var(--text-primary);
-        }
-
-        .crisis-block p {
-            color: var(--text-secondary);
-            line-height: 1.75;
-            margin-bottom: 1rem;
-        }
-
-        .crisis-list {
-            list-style: none;
-            margin: 0 0 1rem;
-            padding: 0;
-        }
-
-        .crisis-list li {
-            color: var(--text-secondary);
-            line-height: 1.7;
-            margin-bottom: 0.75rem;
-            padding-left: 1rem;
-            border-left: 2px solid var(--border);
-        }
-
-        .crisis-list strong,
-        .crisis-block strong {
-            color: var(--text-primary);
-        }
-
-        .crisis-list a,
-        .crisis-block a {
-            color: var(--theme-secondary);
-            text-decoration: underline;
-            text-underline-offset: 2px;
-        }
-
-        .crisis-list a:hover,
-        .crisis-block a:hover {
-            color: var(--text-primary);
-        }
-
-        .crisis-note {
-            margin-bottom: 0;
-            font-size: 0.9375rem;
-        }
-
-        .prose .warning-block {
-            border: 1px solid var(--border);
-            border-left: 3px solid var(--theme-primary);
-            border-radius: 14px;
-            padding: 1.25rem 1.5rem;
-            margin: 1.5rem 0;
-            background: rgba(255, 255, 255, 0.04);
-        }
-
-        .prose .warning-block h3 {
-            margin-top: 0;
-        }
-
-        .prose .warning-block p:last-child,
-        .prose .warning-block ul:last-child {
-            margin-bottom: 0;
-        }
-
-        .prose .reference-list {
-            list-style: none;
-            margin-left: 0;
-            padding-left: 0;
-        }
-
-        .prose .reference-list li {
-            margin-bottom: 1rem;
-            padding-left: 1.1rem;
-            border-left: 2px solid var(--border);
-            font-size: 0.9375rem;
-        }
-
-        .prose .updated-note {
-            font-size: 0.9375rem;
-            opacity: 0.9;
-        }
-
-        @media (max-width: 768px) {
-            .crisis-block {
-                padding: 1.35rem 1.25rem;
-                border-radius: 16px;
-            }
+        /* Quiet date lines, with the dates in tabular figures. */
+        .prose .page-note {
+            font-size: var(--fs-small);
+            color: var(--graphite);
+            font-variant-numeric: tabular-nums;
         }
     </style>
 </head>
 <body class="theme-478 article-page" data-no-ads="true" data-no-asks="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
                     <li>Medical disclaimer</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Medical Disclaimer</h1>
-                <p class="subtitle">What this site is, what it is not, who should be careful, and when to stop.</p>
+            <h1>Medical Disclaimer</h1>
+            <p class="lead">What this site is, what it is not, who should be careful, and when to stop.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Last updated <time datetime="2026-09-09">9 September 2026</time>. Published by Georges Rayess, an individual.</p>
             </div>
         </header>
 
@@ -239,20 +168,18 @@
             <section class="crisis-block" aria-labelledby="crisis-heading">
                 <h2 id="crisis-heading">If you need a person right now</h2>
                 <p>A breathing timer is not a substitute for someone on the other end of a line. If you are thinking about suicide, if you have hurt yourself, or if you are frightened of what you might do next, contact one of these first. They are free, they are confidential, and trained people answer them.</p>
-                <ul class="crisis-list">
+                <ul>
                     <li><strong>Anywhere in the world</strong> — the International Association for Suicide Prevention keeps a page of <a href="https://www.iasp.info/crisis-centres-helplines/" target="_blank" rel="noopener noreferrer">crisis centres and helplines</a>. It points to Find A Helpline, which it describes as <q>a global directory that connects people to free and confidential support</q>: choose your country at <a href="https://www.findahelpline.com/i/iasp" target="_blank" rel="noopener noreferrer">findahelpline.com</a> and it lists the services that answer there.</li>
                     <li><strong>United States</strong> — call or text <strong>988</strong>, the 988 Suicide &amp; Crisis Lifeline. Its own site states that <q>The 988 Lifeline is available 24/7/365</q> and that <q>Your conversations are free and confidential.</q> <a href="https://988lifeline.org/" target="_blank" rel="noopener noreferrer">988lifeline.org</a></li>
                     <li><strong>United Kingdom and Ireland</strong> — Samaritans on <strong>116 123</strong>. In their words: <q>Whatever you're going through, call us free any time, from any phone, on 116 123.</q> <a href="https://www.samaritans.org/how-we-can-help/contact-samaritan/" target="_blank" rel="noopener noreferrer">samaritans.org</a></li>
                     <li><strong>Australia</strong> — Lifeline on <strong>13 11 14</strong>, described on their crisis support page as <q>Free and confidential help for anyone in Australia who is feeling overwhelmed, in emotional distress, or thinking about suicide</q>, available 24/7. <a href="https://www.lifeline.org.au/crisis-support/" target="_blank" rel="noopener noreferrer">lifeline.org.au</a></li>
                     <li><strong>Lebanon</strong> — call <strong>1564</strong>, which Embrace names <q>The National Lifeline for Emotional Support and Suicide Prevention</q>. Embrace runs it with the National Mental Health Programme and its page lists the line as free, confidential and answered 24/7. <a href="https://embracelebanon.org/" target="_blank" rel="noopener noreferrer">embracelebanon.org</a></li>
                 </ul>
-                <p class="crisis-note">If you or someone near you is in immediate physical danger, call your local emergency number instead of waiting.</p>
+                <p>If you or someone near you is in immediate physical danger, call your local emergency number instead of waiting.</p>
             </section>
 
             <article class="prose">
                 <section>
-                    <p class="updated-note">Last updated <time datetime="2026-09-09">9 September 2026</time>. Published by Georges Rayess, an individual.</p>
-
                     <p class="lead">Help Me Breathe is a breathing timer and a set of plain-language pages. It is not medical advice, it is not a medical device, and it does not treat, cure, diagnose, prevent or manage any condition. Nothing on this site is a substitute for care from a qualified professional who knows your history, and nothing here should ever be used to justify changing, delaying or stopping treatment that a clinician has prescribed.</p>
 
                     <p>The site is published by one individual, Georges Rayess, who is not a clinician and holds no medical qualification. No doctor, nurse, psychologist or therapist has reviewed these pages. The <a href="/about">about page</a> says so in more detail, along with the editorial rules the site follows.</p>
@@ -275,7 +202,7 @@
 
                     <p>Breathing faster than your body needs lowers the carbon dioxide in your blood. A StatPearls review of hypocarbia states that <q>Decreased PaCO2 leads to respiratory alkalosis and cerebral vasoconstriction, which reduces cerebral blood flow and oxygen delivery</q>, and that <q>Neurologic manifestations such as lightheadedness, paresthesias, and syncope may occur in acute cases.</q> In plain terms: fast breathing can make you dizzy, make your hands and face tingle, and in some people make you faint. None of that is a sign the practice is working. It is a sign to stop.</p>
 
-                    <div class="warning-block">
+                    <div class="callout callout--caution">
                         <h3>Do not practise breath-holds or fast breathing without asking a clinician first if any of these apply to you</h3>
                         <ul>
                             <li><strong>Pregnancy.</strong> Breath-holds and deliberate over-breathing change your blood gases, and pregnancy is not the time to experiment with that. Stay with gentle, unforced slow breathing unless your midwife or obstetrician tells you otherwise.</li>
@@ -308,13 +235,13 @@
 
                     <p>Two rules on this page have no exceptions.</p>
 
-                    <div class="warning-block">
+                    <div class="callout callout--caution">
                         <h3>Never practise breath-holds in or near water</h3>
                         <p>Not in a pool, not in the sea, not in a bath, not in the shower, and not while lying at the water's edge. Holding your breath after breathing quickly is the mechanism behind shallow water blackout. The StatPearls chapter on it records that the American Red Cross, the YMCA and USA Swimming have renamed the condition <q>hypoxic blackout</q> and describe it as <q>the loss of consciousness in the underwater swimmer or diver, during an apnea submersion preceded by hyperventilation, where alternative causes of unconsciousness have been excluded.</q></p>
                         <p>The reason it kills people who feel fine is that the warning signal is switched off. A review of drowning cases in New York State, published in the CDC's <em>Morbidity and Mortality Weekly Report</em>, explains that <q>Hyperventilation or breath-holding before diving or swimming decreases the body's stores of CO2 and partial pressure of carbon dioxide (PCO2), delaying the cerebral response to come to the surface to breathe.</q> You do not feel the urge to breathe, and then you are unconscious, without any struggle that a lifeguard could see.</p>
                     </div>
 
-                    <div class="warning-block">
+                    <div class="callout callout--caution">
                         <h3>Never use this site while driving or operating machinery</h3>
                         <p>Do not use the timer while driving, cycling, riding, operating machinery, working at height, near traffic, on stairs, or anywhere that becoming light-headed or closing your eyes would put you or anyone else in danger. Pull over and park first. The same applies to any place where a faint would mean a fall.</p>
                     </div>
@@ -338,17 +265,17 @@
                     <p>The site is provided as it is, without any warranty. Information here may be incomplete, may become out of date, and may be corrected without notice. To the fullest extent the law allows, the publisher accepts no liability for any loss, injury or harm arising from the use of this site or from reliance on anything published on it. Nothing on this page limits any liability that cannot lawfully be limited. The full terms are in the <a href="/legal/terms-of-service">terms of service</a>, and what data the site does and does not collect is set out in the <a href="/legal/privacy-policy">privacy policy</a>.</p>
                 </section>
 
-                <section id="sources">
+                <section class="citations" id="sources">
                     <h2>Sources cited on this page</h2>
 
-                    <ul class="reference-list">
+                    <ol>
                         <li>Krishnaprasadh D, Sharma S. <em>Hypocarbia.</em> StatPearls, NCBI Bookshelf. <a href="https://www.ncbi.nlm.nih.gov/books/NBK493167/" target="_blank" rel="noopener noreferrer">ncbi.nlm.nih.gov/books/NBK493167</a> — quoted for the effect of low carbon dioxide on cerebral blood flow and for the symptoms of acute hypocapnia.</li>
                         <li>Albuja AC, Ighodaro ET, Khan GQ. <em>Absence Seizure.</em> StatPearls, NCBI Bookshelf. <a href="https://www.ncbi.nlm.nih.gov/books/NBK499867/" target="_blank" rel="noopener noreferrer">ncbi.nlm.nih.gov/books/NBK499867</a> — quoted for hyperventilation being used clinically to provoke seizure activity during EEG.</li>
                         <li>Bart RM, Murray BP, Lau H. <em>Shallow Water Blackout.</em> StatPearls, NCBI Bookshelf. <a href="https://www.ncbi.nlm.nih.gov/books/NBK554620/" target="_blank" rel="noopener noreferrer">ncbi.nlm.nih.gov/books/NBK554620</a> — quoted for the definition of the condition that the chapter records from the American Red Cross, the YMCA and USA Swimming, who renamed it hypoxic blackout.</li>
                         <li>Boyd C, Levy A, McProud T, Huang L, Raneses E, Olson C. <em>Fatal and Nonfatal Drowning Outcomes Related to Dangerous Underwater Breath-Holding Behaviors — New York State, 1988–2011.</em> MMWR, 22 May 2015. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4584570/" target="_blank" rel="noopener noreferrer">pmc.ncbi.nlm.nih.gov/articles/PMC4584570</a> — quoted for why hyperventilation before submersion delays the urge to surface.</li>
                         <li>Kim YW, Lee DH, Lim HB, Oh B-L, Kim YK, Girard MJA, Mari JM, Park KH, Jeoung JW (2019). <em>Age-Dependent Variation of Lamina Cribrosa Displacement During the Standardized Valsalva Maneuver.</em> Scientific Reports. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6491605/" target="_blank" rel="noopener noreferrer">pmc.ncbi.nlm.nih.gov/articles/PMC6491605</a> — quoted for the measured rise in intraocular pressure during a Valsalva manoeuvre in 63 healthy volunteers without glaucoma. A relaxed breath-hold is not a Valsalva manoeuvre, so this measures a harder effort than the practice on this site and is cited as the nearest evidence found, not as a measurement of breathing practice.</li>
                         <li>Crisis line details were taken from each service's own page: <a href="https://988lifeline.org/" target="_blank" rel="noopener noreferrer">988lifeline.org</a>, <a href="https://www.samaritans.org/how-we-can-help/contact-samaritan/" target="_blank" rel="noopener noreferrer">samaritans.org</a>, <a href="https://www.lifeline.org.au/crisis-support/" target="_blank" rel="noopener noreferrer">lifeline.org.au</a>, <a href="https://embracelebanon.org/" target="_blank" rel="noopener noreferrer">embracelebanon.org</a>, and the <a href="https://www.iasp.info/crisis-centres-helplines/" target="_blank" rel="noopener noreferrer">IASP crisis centres page</a>.</li>
-                    </ul>
+                    </ol>
                 </section>
 
                 <section id="contact">
@@ -356,46 +283,55 @@
 
                     <p>This page is written and maintained by Georges Rayess, an individual, and is reviewed at least every six months. If you believe something on it is wrong, unclear or unsafe, please write to <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and quote the sentence. Safety corrections are the fastest thing on this site to get changed.</p>
 
-                    <p class="updated-note">Last updated <time datetime="2026-09-09">9 September 2026</time> · Next review by <time datetime="2027-03-09">9 March 2027</time></p>
+                    <p class="page-note">Last updated <time datetime="2026-09-09">9 September 2026</time> &middot; Next review by <time datetime="2027-03-09">9 March 2027</time></p>
                 </section>
             </article>
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">Extended exhale</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About">
-                <a href="/science">What the research says</a>
-                <a href="/about">About</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About the site">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>
@@ -403,5 +339,6 @@
 
     <script type="module" src="/js/consent.js"></script>
     <script type="module" src="/js/app.js"></script>
+    <script type="module" src="/js/pro/index.js"></script>
 </body>
 </html>

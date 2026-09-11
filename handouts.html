@@ -17,22 +17,25 @@
     <meta property="og:description" content="Seven printable one-page breathing handouts to give clients, plus a builder for co-branded session links. Free to print; practitioners add their own name.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpmebreath.com/handouts">
-    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/handouts.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Printable Breathing Handouts for Clients">
     <meta name="twitter:description" content="Seven printable one-page breathing handouts to give clients, plus a builder for co-branded session links. Free to print; practitioners add their own name.">
-    <meta name="twitter:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/handouts.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. No emoji anywhere. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE: font origins + render-critical CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,8 +44,9 @@
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/print.css" media="print">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -76,25 +80,41 @@
     </script>
 
     <style>
-        /* The two screen-side rules /css/print.css used to carry. They live
-           here so print.css can load with media="print" and stop blocking the
-           first paint of this page. */
+        /* Page-local layout for /handouts.
+           Paper and Ink rules: every colour is a token; nothing is defined only
+           inside a media query or a .night block; --rule is a decorative
+           hairline and --edge is the boundary of anything a person operates.
+           css/print.css owns the paper side of .handout-* and .practitioner-*;
+           these are the screen rules only. */
+
+        /* The two screen-side rules /css/print.css cannot carry, because a
+           media="print" sheet is not applied on screen at all. */
         .hmb-print-only { display: none !important; }
         .hmb-page-break { display: none; }
 
-        /* Page-local layout. Existing tokens only; no new colours. */
-        .tool-panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 1.75rem;
-            margin: 1.5rem auto 0;
+        /* The no-JavaScript note renders straight into <main>, so it is held
+           to the same measure as the panels below it. */
+        noscript .callout {
             max-width: 760px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .tool-panel h2 {
-            margin-top: 0;
+        /* ------------------------------------------------------ tool panels */
+
+        .tool-panel {
+            max-width: 760px;
+            margin: 1.5rem auto 0;
+            padding: 1.5rem;
+            background: var(--leaf);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sheet);
         }
+
+        .tool-panel h2 { margin-top: 0; }
+
+        .tool-panel p { font-size: 0.9375rem; }
 
         .field-grid {
             display: grid;
@@ -111,49 +131,69 @@
 
         .field label,
         .field .field-title {
-            font-size: 0.85rem;
+            font-family: var(--ui);
+            font-size: var(--fs-small);
             font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .field .field-hint {
-            font-weight: 400;
+            color: var(--ink);
         }
 
         .field input,
         .field select,
         .field textarea {
-            font-family: inherit;
-            font-size: 0.95rem;
-            padding: 0.6rem 0.8rem;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: var(--white);
-            color: #1e293b;
+            font-family: var(--ui);
+            font-size: 0.9375rem;
+            min-height: var(--hit);
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--edge);
+            border-radius: var(--radius);
+            background: var(--paper);
+            color: var(--ink);
+        }
+
+        .field input[type="color"] {
+            padding: 0.3rem;
+            cursor: pointer;
         }
 
         .field input:disabled,
         .field select:disabled,
         .field textarea:disabled {
-            opacity: 0.55;
+            color: var(--graphite);
+            background: var(--track);
             cursor: not-allowed;
         }
 
         .field .field-hint {
-            font-size: 0.78rem;
-            color: var(--text-secondary);
+            font-family: var(--ui);
+            font-size: var(--fs-micro);
+            font-weight: 400;
+            color: var(--graphite);
+        }
+
+        .field label.field-hint {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            min-height: var(--hit);
+            font-weight: 400;
+            color: var(--graphite);
+        }
+
+        .field label.field-hint input[type="checkbox"] {
+            min-height: 0;
+            width: 1.1rem;
+            height: 1.1rem;
+            padding: 0;
+            accent-color: var(--green);
         }
 
         .field-error {
-            font-size: 0.8rem;
-            color: #b91c1c;
-            background: #fee2e2;
-            border-radius: 8px;
-            padding: 0.35rem 0.6rem;
-        }
-
-        .field-error[hidden] {
-            display: none;
+            font-size: var(--fs-small);
+            color: var(--bad);
+            background: var(--leaf);
+            border: 1px solid var(--bad);
+            border-radius: var(--radius);
+            padding: 0.45rem 0.65rem;
         }
 
         .tool-actions {
@@ -163,48 +203,32 @@
             margin-top: 1.25rem;
         }
 
-        .tool-btn {
-            font-family: inherit;
-            font-size: 0.95rem;
+        .panel-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: var(--hit);
+            padding: 0.6rem 1.25rem;
+            font-family: var(--ui);
+            font-size: 0.9375rem;
             font-weight: 600;
-            padding: 0.75rem 1.4rem;
-            border-radius: 999px;
-            border: 1px solid var(--theme-primary);
-            background: var(--theme-primary);
-            color: #ffffff;
+            color: var(--chalk);
+            background: var(--green);
+            border: 1px solid var(--green);
+            border-radius: var(--radius);
             cursor: pointer;
+            text-decoration: none;
         }
 
-        .tool-btn.tool-btn-secondary {
-            background: transparent;
-            color: var(--text-primary);
+        .panel-btn:hover { background: var(--ink); border-color: var(--ink); }
+
+        .panel-btn--quiet {
+            color: var(--ink);
+            background: var(--leaf);
+            border-color: var(--edge);
         }
 
-        .tool-btn:hover,
-        .tool-btn:focus-visible {
-            opacity: 0.92;
-        }
-
-        .upsell {
-            border: 1px dashed var(--border);
-            border-radius: 14px;
-            padding: 1rem 1.2rem;
-            margin-top: 1.25rem;
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .upsell h3 {
-            margin: 0 0 0.4rem;
-            font-size: 1rem;
-        }
-
-        .upsell p {
-            margin: 0 0 0.6rem;
-        }
-
-        .upsell[hidden] {
-            display: none;
-        }
+        .panel-btn--quiet:hover { color: var(--ink); background: var(--leaf); border-color: var(--ink); }
 
         .link-output {
             display: flex;
@@ -217,118 +241,25 @@
         .link-output input {
             flex: 1 1 320px;
             min-width: 0;
-            font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-            font-size: 0.8rem;
-            padding: 0.6rem 0.8rem;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: var(--white);
-            color: #1e293b;
+            min-height: var(--hit);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: var(--fs-small);
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--edge);
+            border-radius: var(--radius);
+            background: var(--paper);
+            color: var(--ink);
         }
 
         .copy-status {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            min-height: 1.2em;
             display: block;
             margin-top: 0.5rem;
+            min-height: 1.2em;
+            font-size: var(--fs-small);
+            color: var(--graphite);
         }
 
-        /* ---------------------------------------------------- handout sheets */
-        .sheets {
-            max-width: 760px;
-            margin: 2rem auto 0;
-        }
-
-        .handout-sheet {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 1.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .handout-head h3 {
-            margin: 0 0 0.35rem;
-            font-size: 1.4rem;
-        }
-
-        .handout-pattern {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin: 0.25rem 0;
-        }
-
-        .handout-cycle {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin: 0;
-        }
-
-        .handout-block {
-            margin-top: 1.25rem;
-        }
-
-        .handout-block h4 {
-            margin: 0 0 0.5rem;
-            font-size: 1rem;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-        }
-
-        .handout-block ol,
-        .handout-block ul {
-            margin: 0;
-            padding-left: 1.2rem;
-        }
-
-        .handout-block li {
-            margin-bottom: 0.35rem;
-        }
-
-        .handout-cautions {
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 0.9rem 1.1rem;
-        }
-
-        .handout-foot {
-            margin-top: 1.25rem;
-            padding-top: 0.9rem;
-            border-top: 1px solid var(--border);
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            justify-content: space-between;
-        }
-
-        .practitioner-mark {
-            display: flex;
-            align-items: center;
-            gap: 0.9rem;
-            padding-bottom: 0.9rem;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .practitioner-mark img {
-            max-height: 48px;
-            max-width: 140px;
-            width: auto;
-        }
-
-        .practitioner-mark-name {
-            font-weight: 600;
-        }
-
-        .practitioner-mark-line {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
+        /* --------------------------------------------------- handout sheets */
 
         .sheets-heading {
             max-width: 760px;
@@ -344,38 +275,167 @@
         }
 
         .sheet-toc a {
-            font-size: 0.85rem;
-            padding: 0.4rem 0.9rem;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            background: var(--surface);
+            display: inline-flex;
+            align-items: center;
+            min-height: var(--hit);
+            padding: 0.35rem 1rem;
+            font-family: var(--ui);
+            font-size: var(--fs-small);
+            color: var(--ink);
+            background: var(--leaf);
+            border: 1px solid var(--edge);
+            border-radius: var(--radius-pill);
             text-decoration: none;
-            color: var(--text-primary);
         }
 
-        .no-js-note {
+        .sheet-toc a:hover { border-color: var(--ink); }
+
+        .sheets {
             max-width: 760px;
-            margin: 1.5rem auto 0;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 1rem 1.2rem;
-            background: var(--surface);
+            margin: 2rem auto 0;
+        }
+
+        .handout-sheet {
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--leaf);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sheet);
+        }
+
+        /* The mark on a free sheet is the ring itself. A licensed sheet swaps
+           it for the practitioner's own logo and name, and js/pro removes the
+           printed watermark, so nothing of ours is left on their paper. */
+        .house-mark,
+        .practitioner-mark {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 0.85rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .house-mark-ring {
+            width: 22px;
+            height: 22px;
+            flex: 0 0 auto;
+            color: var(--green);
+        }
+
+        .house-mark-name {
+            font-family: var(--display);
+            font-weight: 500;
+            font-size: 1rem;
+            letter-spacing: -0.012em;
+            color: var(--ink);
+        }
+
+        .practitioner-mark img {
+            max-height: 48px;
+            max-width: 140px;
+            width: auto;
+        }
+
+        .practitioner-mark-name {
+            font-family: var(--ui);
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .practitioner-mark-line {
+            font-size: var(--fs-small);
+            color: var(--graphite);
+        }
+
+        .handout-head h3 {
+            margin: 0 0 0.35rem;
+            font-family: var(--display);
+            font-weight: 500;
+            font-size: 1.4rem;
+            letter-spacing: -0.012em;
+        }
+
+        .handout-pattern {
+            margin: 0.25rem 0;
+            font-family: var(--ui);
+            font-size: 1.0625rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            color: var(--ink);
+        }
+
+        .handout-cycle {
+            margin: 0;
+            font-size: var(--fs-small);
+            font-variant-numeric: tabular-nums;
+            color: var(--graphite);
+        }
+
+        .handout-block { margin-top: 1.25rem; }
+
+        .handout-block h4 {
+            margin: 0 0 0.5rem;
+            font-size: var(--fs-micro);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--graphite);
+        }
+
+        .handout-block ol,
+        .handout-block ul {
+            margin: 0;
+            padding-left: 1.2rem;
+        }
+
+        .handout-block li { margin-bottom: 0.35rem; }
+
+        .handout-cautions {
+            padding: 0.9rem 1.1rem;
+            border: 1px solid var(--rule);
+            border-left: 3px solid var(--warn);
+            border-radius: var(--radius);
+        }
+
+        .handout-foot {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+            padding-top: 0.9rem;
+            border-top: 1px solid var(--rule);
+            font-size: var(--fs-small);
+            color: var(--graphite);
         }
     </style>
 </head>
 <body class="theme-box article-page" data-no-ads="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element cloud cloud-1"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners" aria-current="page">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header class="hmb-no-print">
+        <header class="article-header hmb-no-print">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
@@ -383,9 +443,11 @@
                     <li>Client handouts</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Printable Breathing Handouts for Clients</h1>
-                <p class="subtitle">Seven one-page sheets — pattern, steps, when to use it, what to be careful about. Print what you need, put your own name on top.</p>
+            <h1>Printable Breathing Handouts for Clients</h1>
+            <p class="lead">Seven one-page sheets — pattern, steps, when to use it, what to be careful about. Print what you need, put your own name on top.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Published 2026-09-09 &middot; Updated 2026-09-10</p>
             </div>
         </header>
 
@@ -397,8 +459,9 @@
             </article>
 
             <noscript>
-                <div class="no-js-note">
-                    <p><strong>The handout sheets need JavaScript.</strong> The seven sheets are built in your browser from the same pattern data the timers use, so there is only ever one version of the truth. Turn JavaScript on for this page and they will appear. Every technique page — for example <a href="/box-breathing">box breathing</a> — carries the same steps and cautions as ordinary text.</p>
+                <div class="callout">
+                    <h3>The handout sheets need JavaScript</h3>
+                    <p>The seven sheets are built in your browser from the same pattern data the timers use, so there is only ever one version of the truth. Turn JavaScript on for this page and they will appear. Every technique page — for example <a href="/box-breathing">box breathing</a> — carries the same steps and cautions as ordinary text.</p>
                 </div>
             </noscript>
 
@@ -427,20 +490,20 @@
                     </div>
                     <div class="field">
                         <label for="p-accent">Accent colour</label>
-                        <input type="color" id="p-accent" data-p-field="accent" value="#22c55e">
+                        <input type="color" id="p-accent" data-p-field="accent" value="#0F5136">
                         <span class="field-hint">Used on the client session links you build below.</span>
                     </div>
                 </div>
 
-                <div class="upsell" data-role="upsell" data-ask="handout-branding" hidden>
+                <div class="callout" data-role="upsell" data-ask="handout-branding" hidden>
                     <h3>These fields need a practitioner licence</h3>
                     <p>You can read, print and use every sheet on this page for free, today, for your own practice — that is not going to change. Adding your own name, logo and contact line to the printed sheets, and taking the Help Me Breathe line off the bottom, is part of the $99/year practitioner licence.</p>
                     <p><a href="/for-practitioners">See what the practitioner licence includes</a>, or <a href="/pro">unlock Pro</a> if you only want the personal features.</p>
                 </div>
 
                 <div class="tool-actions">
-                    <button class="tool-btn" type="button" data-role="print">Print the sheets</button>
-                    <button class="tool-btn tool-btn-secondary" type="button" data-role="clear-practitioner">Clear these fields</button>
+                    <button class="panel-btn" type="button" data-role="print">Print the sheets</button>
+                    <button class="panel-btn panel-btn--quiet" type="button" data-role="clear-practitioner">Clear these fields</button>
                 </div>
                 <span class="copy-status" data-role="save-status" role="status"></span>
             </section>
@@ -480,8 +543,8 @@
                 <div class="link-output">
                     <label class="sr-only" for="b-output">Generated client link</label>
                     <input type="text" id="b-output" data-role="b-output" readonly value="">
-                    <button class="tool-btn" type="button" data-role="b-copy">Copy link</button>
-                    <button class="tool-btn tool-btn-secondary" type="button" data-role="b-open">Open it</button>
+                    <button class="panel-btn" type="button" data-role="b-copy">Copy link</button>
+                    <button class="panel-btn panel-btn--quiet" type="button" data-role="b-open">Open it</button>
                 </div>
                 <span class="copy-status" data-role="b-status" role="status"></span>
                 <p class="field-error" data-role="b-error" role="alert" hidden></p>
@@ -529,39 +592,58 @@
         </main>
 
         <footer class="footer hmb-no-print">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About and products">
-                <a href="/about">About</a>
-                <a href="/pro">Pro</a>
-                <a href="/for-practitioners">For practitioners</a>
-                <a href="/embed">Embed the timer</a>
-                <a href="/science">What the research says</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>
     </div>
 
     <script type="module" src="/js/consent.js"></script>
+    <script type="module" src="/js/app.js"></script>
 
     <script type="module">
         /* ------------------------------------------------------------------
@@ -574,6 +656,12 @@
          *
          * The gate is isPractitioner() from /js/entitlements.js. It disables the
          * name block and keeps the print watermark; it never hides a sheet.
+         *
+         * Branding on a sheet: a free sheet wears the Help Me Breathe ring —
+         * the mark itself, drawn as SVG, never an emoji or an image file. A
+         * licensed sheet swaps that block for the practitioner's own logo and
+         * name, and css/print.css drops the watermark, so nothing of ours is
+         * left on their paper.
          * ------------------------------------------------------------------ */
 
         import { TECHNIQUES, TECHNIQUE_ORDER, cycleSeconds } from '/js/techniques.js';
@@ -581,9 +669,15 @@
 
         const PROFILE_KEY = 'practitioner';
         const PROFILE_FIELDS = ['name', 'role', 'contact', 'logo', 'accent'];
-        const DEFAULT_PROFILE = { name: '', role: '', contact: '', logo: '', accent: '#22c55e' };
+        const DEFAULT_PROFILE = { name: '', role: '', contact: '', logo: '', accent: '#0F5136' };
         const MAX_LINK_LENGTH = 1800;
         const SITE = 'https://helpmebreath.com';
+        const SVG_NS = 'http://www.w3.org/2000/svg';
+
+        /* The mark, from docs/BRAND.md section 4: a ring of radius 40 on a
+           100-unit grid, stroke 9, butt caps, with a 48-degree gap at twelve
+           o'clock. Identical path to the one in the site header. */
+        const RING_PATH = 'M66.27 13.46 A40 40 0 1 1 33.73 13.46';
 
         const profile = { ...DEFAULT_PROFILE };
         let licensed = false;
@@ -596,6 +690,21 @@
             if (className) node.className = className;
             if (text !== undefined && text !== null) node.textContent = String(text);
             return node;
+        }
+
+        function ringMark(className) {
+            const svg = document.createElementNS(SVG_NS, 'svg');
+            svg.setAttribute('viewBox', '0 0 100 100');
+            svg.setAttribute('aria-hidden', 'true');
+            svg.setAttribute('focusable', 'false');
+            if (className) svg.setAttribute('class', className);
+            const path = document.createElementNS(SVG_NS, 'path');
+            path.setAttribute('d', RING_PATH);
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', 'currentColor');
+            path.setAttribute('stroke-width', '9');
+            svg.appendChild(path);
+            return svg;
         }
 
         /* ------------------------------------------------------------ profile */
@@ -747,6 +856,14 @@
             return wrap;
         }
 
+        /** The free sheet's masthead: the ring, then the wordmark. */
+        function houseMark() {
+            const wrap = make('div', 'house-mark');
+            wrap.appendChild(ringMark('house-mark-ring'));
+            wrap.appendChild(make('span', 'house-mark-name', 'Help Me Breathe'));
+            return wrap;
+        }
+
         function buildSheet(technique) {
             const sheet = make('section', 'handout-sheet');
             sheet.id = `sheet-${technique.key}`;
@@ -757,7 +874,7 @@
             sheet.appendChild(markSlot);
 
             const head = make('div', 'handout-head');
-            const heading = make('h3', null, `${technique.emoji} ${technique.shortName} — ${technique.title}`);
+            const heading = make('h3', null, `${technique.shortName} — ${technique.title}`);
             heading.id = headingId;
             head.appendChild(heading);
             head.appendChild(make('p', 'handout-pattern', patternLine(technique)));
@@ -813,7 +930,7 @@
                 if (!technique) continue;
                 host.appendChild(buildSheet(technique));
                 if (toc) {
-                    const link = make('a', null, `${technique.emoji} ${technique.shortName}`);
+                    const link = make('a', null, technique.shortName);
                     link.href = `#sheet-${technique.key}`;
                     toc.appendChild(link);
                 }
@@ -825,7 +942,9 @@
             const slots = document.querySelectorAll('.handout-sheet .mark-slot');
             for (const slot of slots) {
                 slot.textContent = '';
-                const mark = practitionerMark();
+                /* Licensed and named: their mark. Licensed and blank: nothing,
+                   which is what white-label means. Not licensed: our ring. */
+                const mark = practitionerMark() || (licensed ? null : houseMark());
                 if (mark) slot.appendChild(mark);
             }
         }
@@ -957,7 +1076,7 @@
                 if (!technique) continue;
                 const option = document.createElement('option');
                 option.value = technique.key;
-                option.textContent = `${technique.emoji} ${technique.shortName} — ${technique.title}`;
+                option.textContent = `${technique.shortName} — ${technique.title}`;
                 select.appendChild(option);
             }
             select.value = 'extended';

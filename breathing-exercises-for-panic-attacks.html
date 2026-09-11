@@ -17,22 +17,25 @@
     <meta property="og:description" content="A free guided long-exhale breathing timer for panic attacks, with crisis helplines, 5-4-3-2-1 grounding, and honest notes on breath-holds.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://helpmebreath.com/breathing-exercises-for-panic-attacks">
-    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/breathing-exercises-for-panic-attacks.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Breathing Exercises for Panic Attacks — Free Guided Timer">
     <meta name="twitter:description" content="A free guided long-exhale breathing timer for panic attacks, with crisis helplines, 5-4-3-2-1 grounding, and honest notes on breath-holds.">
-    <meta name="twitter:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/breathing-exercises-for-panic-attacks.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,8 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -95,7 +98,7 @@
       "@type": "Article",
       "headline": "Breathing Exercises for Panic Attacks",
       "description": "A free guided long-exhale breathing timer for panic attacks, with crisis helplines, 5-4-3-2-1 grounding, and honest notes on breath-holds.",
-      "image": "https://helpmebreath.com/images/og-breathing-timer.jpg",
+      "image": "https://helpmebreath.com/images/og/breathing-exercises-for-panic-attacks.jpg",
       "datePublished": "2026-09-09",
       "dateModified": "2026-09-09",
       "inLanguage": "en",
@@ -125,7 +128,7 @@
       "@type": "HowTo",
       "name": "How to do long-exhale breathing during a panic attack",
       "description": "Cyclic sighing: two seconds in through the nose, a one-second top-up, then a slow six-second exhale through the mouth. No breath-holds.",
-      "image": "https://helpmebreath.com/images/og-breathing-timer.jpg",
+      "image": "https://helpmebreath.com/images/og/breathing-exercises-for-panic-attacks.jpg",
       "totalTime": "PT3M",
       "estimatedCost": { "@type": "MonetaryAmount", "currency": "USD", "value": "0" },
       "supply": [
@@ -203,122 +206,40 @@
     </script>
 
     <style>
-        /* Page-scoped: crisis block and the in-page pattern switcher.
-           Uses the existing custom properties only — no new colours. */
-        .crisis-block {
-            max-width: 760px;
-            margin: 0 auto 1.5rem;
-            padding: 1.75rem 2rem;
-            border-radius: 24px;
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--theme-primary);
-            box-shadow: var(--shadow);
-            text-align: left;
-        }
-
-        .crisis-block h2 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.75rem;
-        }
-
-        .crisis-block p {
-            font-size: 0.9375rem;
-            line-height: 1.7;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-        }
-
-        .crisis-list {
-            list-style: none;
-            margin: 0 0 1rem;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .crisis-list li {
-            font-size: 0.9375rem;
-            line-height: 1.6;
-            color: var(--text-primary);
-            padding-left: 0.9rem;
-            border-left: 2px solid var(--border);
-        }
-
-        .crisis-list a,
-        .crisis-block a {
-            color: var(--text-primary);
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
-
-        .crisis-list a:hover,
-        .crisis-block a:hover {
-            color: var(--theme-secondary);
-        }
-
-        .crisis-note {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-bottom: 0;
-        }
-
-        .pattern-switch {
-            margin: 2rem 0 0;
-            padding: 1.5rem;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border);
-            text-align: left;
-        }
-
-        .pattern-switch h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .pattern-switch p {
-            font-size: 0.875rem;
-            line-height: 1.65;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        @media (max-width: 640px) {
-            .crisis-block {
-                padding: 1.5rem 1.25rem;
-            }
+        /* Page-local: the one line the shared crisis component does not cover.
+           Tokens only; nothing here is defined inside a media or .night block. */
+        .crisis-block .crisis-note {
+            margin: 0.9rem 0 0;
+            font-size: var(--fs-small);
+            color: var(--graphite);
         }
     </style>
 </head>
 <body class="theme-sigh article-page technique-page" data-no-ads="true" data-no-asks="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element leaf leaf-3"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element ripple ripple-3"></div>
-    <div class="natural-element cloud cloud-1"></div>
-    <div class="natural-element sun-ray sun-ray-1"></div>
-    <div class="natural-element sun-ray sun-ray-2"></div>
-    <div class="natural-element sun-ray sun-ray-3"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides" aria-current="page">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
@@ -326,18 +247,22 @@
                     <li>Breathing for panic attacks</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Breathing Exercises for Panic Attacks</h1>
-                <p class="subtitle">A long-exhale pattern, a grounding exercise, and the phone numbers that matter. No ads on this page, nothing to buy, nothing to sign up for.</p>
+            <h1>Breathing Exercises for Panic Attacks</h1>
+            <p class="lead">A long-exhale pattern, a grounding exercise, and the phone numbers that matter. No ads on this page, nothing to buy, nothing to sign up for.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Published 2026-09-09 &middot; Updated 2026-09-09</p>
             </div>
         </header>
+
+            <p class="jump-to-timer"><a href="#timer">Start the timer now</a></p>
 
         <main id="main">
             <!-- ============ CRISIS BLOCK — always above the timer ============ -->
             <section class="crisis-block" aria-labelledby="crisis-heading">
                 <h2 id="crisis-heading">If you need a person right now</h2>
                 <p>A timer is not a substitute for someone on the other end of a line. If you are thinking about suicide, if you have hurt yourself, or if you are frightened of what you might do next, contact one of these before you do anything else. They are free, they are confidential, and they are answered by trained people.</p>
-                <ul class="crisis-list">
+                <ul>
                     <li><strong>Anywhere in the world</strong> — <a href="https://findahelpline.com" target="_blank" rel="noopener noreferrer">Find A Helpline</a>. Choose your country and it lists the services that answer there, by phone, text or chat. The International Association for Suicide Prevention describes it as <a href="https://www.iasp.info/crisis-centres-helplines/" target="_blank" rel="noopener noreferrer">"a global directory that connects people to free and confidential support"</a>, with verified helplines in over 150 countries.</li>
                     <li><strong>United States</strong> — call or text <strong>988</strong>, the 988 Suicide &amp; Crisis Lifeline. It is <a href="https://988lifeline.org/" target="_blank" rel="noopener noreferrer">"available 24/7/365"</a>, and your conversations are free and confidential.</li>
                     <li><strong>United Kingdom and Ireland</strong> — call <strong>116 123</strong> for Samaritans, who say you can <a href="https://www.samaritans.org/how-we-can-help/contact-samaritan/" target="_blank" rel="noopener noreferrer">"call us free any time, from any phone, on 116 123"</a>. It is free from landlines and mobiles, and you do not need credit on your plan.</li>
@@ -348,13 +273,21 @@
             </section>
 
             <!-- ============ TIMER ============ -->
-            <section class="breathing-section"
+            <section class="breathing-section" id="timer"
                      data-breathing-app
                      data-technique="sigh"
                      data-duration="180"
                      aria-labelledby="timer-heading">
 
-                <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">⚙️</button>
+                <div class="app-bar">
+                    <h2 id="timer-heading" data-role="technique-title">Cyclic Sighing</h2>
+                    <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+                            <circle cx="12" cy="12" r="3.2"/>
+                            <path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
+                        </svg>
+                    </button>
+                </div>
 
                 <div class="settings-panel" data-role="settings-panel">
                     <div class="setting-item">
@@ -378,22 +311,18 @@
                     </div>
                 </div>
 
-                <h2 id="timer-heading" data-role="technique-title">🌊 Cyclic Sighing</h2>
-
                 <div class="breathing-container">
-                    <div class="breathing-aura"></div>
+                    <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
+                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
+                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                    </svg>
                     <div class="breathing-circle technique-sigh" data-role="circle">
-                        <div class="circle-text-container">
-                            <span data-role="circle-text">Ready</span>
-                        </div>
+                        <span class="circle-notch" aria-hidden="true"></span>
                     </div>
-                    <div class="breathing-particles" aria-hidden="true">
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
+                    <div class="circle-text-container">
+                        <span class="phase-word" data-role="circle-text">Ready</span>
+                        <span class="phase-count" data-role="phase-count"></span>
                     </div>
                 </div>
 
@@ -428,6 +357,7 @@
                     </div>
                 </div>
 
+                <!-- Pro modules inject their buttons here. Empty = zero height. -->
                 <div class="tools-row" data-slot="tools"></div>
 
                 <div class="controls">
@@ -445,19 +375,20 @@
                     </div>
                 </div>
 
+                <!-- Crisis-safe page: this slot stays empty. data-no-asks keeps it that way. -->
                 <div data-slot="post-session"></div>
 
-                <div class="pattern-switch">
+                <div class="callout">
                     <h3 id="pattern-switch-heading">Change the pattern</h3>
                     <p>Nothing here is hidden or locked. This page opens on cyclic sighing rather than on whatever you last used elsewhere on the site, and it will never load itself with a breath-hold or fast-breathing pattern on your behalf, because those are the patterns this page argues against during an attack. If another rhythm is the one you already know, pick it — the choice you make here is yours and it takes one tap. The last four in the list contain holds or faster breathing, so read the section on breath-holds below before you use them during an attack.</p>
                     <div class="technique-buttons" data-role="technique-buttons" role="group" aria-labelledby="pattern-switch-heading">
-                        <button class="technique-btn active" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="true" aria-describedby="desc-sigh">🌊 Cyclic Sighing</button>
-                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false" aria-describedby="desc-extended">🌅 Extended Exhale</button>
-                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="false" aria-describedby="desc-coherent">💗 Heart Coherence</button>
-                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="478" aria-pressed="false" aria-describedby="desc-478">🌙 Deep Sleep</button>
-                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false" aria-describedby="desc-box">🌿 Focus &amp; Grounding</button>
-                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false" aria-describedby="desc-triangle">☁️ Quick Calm</button>
-                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="wim" aria-pressed="false" aria-describedby="desc-wim">☀️ Energizing Breath</button>
+                        <button class="technique-btn active" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="true" aria-describedby="desc-sigh">Cyclic Sighing</button>
+                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false" aria-describedby="desc-extended">Extended Exhale</button>
+                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="false" aria-describedby="desc-coherent">Heart Coherence</button>
+                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="478" aria-pressed="false" aria-describedby="desc-478">Deep Sleep</button>
+                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false" aria-describedby="desc-box">Focus &amp; Grounding</button>
+                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false" aria-describedby="desc-triangle">Quick Calm</button>
+                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="wim" aria-pressed="false" aria-describedby="desc-wim">Energizing Breath</button>
                     </div>
                     <div id="desc-sigh" class="sr-only">Cyclic sighing: two seconds in, a one-second top-up, six seconds out. No holds.</div>
                     <div id="desc-extended" class="sr-only">Extended exhale: four seconds in, six seconds out. No holds.</div>
@@ -475,13 +406,13 @@
 
             <!-- ============ TECHNIQUE SWITCHER ============ -->
             <nav class="technique-switcher" aria-label="Other breathing timers">
-                <a href="/4-7-8-breathing">🌙 4-7-8</a>
-                <a href="/box-breathing">🌿 Box</a>
-                <a href="/heart-coherence-breathing">💗 Coherence</a>
-                <a href="/cyclic-sighing">🌊 Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">🌅 Extended exhale</a>
-                <a href="/triangle-breathing">☁️ Triangle</a>
-                <a href="/energizing-breath">☀️ Energizing</a>
+                <a href="/4-7-8-breathing">4-7-8</a>
+                <a href="/box-breathing">Box</a>
+                <a href="/heart-coherence-breathing">Coherence</a>
+                <a href="/cyclic-sighing">Cyclic sighing</a>
+                <a href="/extended-exhale-breathing">Extended exhale</a>
+                <a href="/triangle-breathing">Triangle</a>
+                <a href="/energizing-breath">Energizing</a>
                 <a href="/timer">All timers</a>
             </nav>
 
@@ -538,9 +469,9 @@
                     <p>The clinical literature is unusually clear about the shape of it. The <em>StatPearls</em> clinical review of panic disorder, hosted on the National Library of Medicine's Bookshelf, states that <a href="https://www.ncbi.nlm.nih.gov/books/NBK430973/" target="_blank" rel="noopener noreferrer">"Panic attacks are defined by the Diagnostic and Statistical Manual of Mental Health Disorders (DSM) as 'an abrupt surge of intense fear or discomfort' reaching a peak within minutes."</a> A 2023 narrative review in <em>Frontiers in Psychiatry</em> lists what arrives with it: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9924294/" target="_blank" rel="noopener noreferrer">"PAs are characterized by multiple physical symptoms including a pounding or racing heart, sweating, dyspnea, weakness or dizziness, feeling hot or cold chills, tingling or numbness in the hands, chest pain, or stomach pain."</a> Add a sense of unreality and the fear that you are losing control or dying, and you have most of what people describe.</p>
                     <p>Two things follow from that definition that are worth holding onto.</p>
                     <p><strong>It peaks within minutes.</strong> Whatever this feels like, it has a shape, and the steepest part of that shape is short. It does not build forever. Part of what makes an attack so frightening is the belief that it will keep escalating until something breaks, and the definition itself says otherwise.</p>
-                    <p><strong>The symptoms are not the thing you are afraid they are.</strong> That same review puts patient education at the center of treatment: <a href="https://www.ncbi.nlm.nih.gov/books/NBK430973/" target="_blank" rel="noopener noreferrer">"The patient needs a thorough education on the disorder and understands that the symptoms are not life-threatening."</a> A racing heart during an attack is not a heart attack. Feeling unable to get a full breath is not the same as not getting enough air. The sensations are real and they are horrible, and they are not evidence of the emergency your body is insisting is happening.</p>
+                    <p><strong>The symptoms are not the thing you are afraid they are.</strong> The <em>StatPearls</em> review puts patient education at the center of treatment: <a href="https://www.ncbi.nlm.nih.gov/books/NBK430973/" target="_blank" rel="noopener noreferrer">"The patient needs a thorough education on the disorder and understands that the symptoms are not life-threatening."</a> A racing heart during an attack is not a heart attack. Feeling unable to get a full breath is not the same as not getting enough air. The sensations are real and they are horrible, and they are not evidence of the emergency your body is insisting is happening.</p>
                     <p><strong>Before you take any of that as reassurance, read this.</strong> If you have never had a panic attack before, or you are having chest pain, or this feels different from your usual attacks, get it looked at today. Panic symptoms overlap with symptoms that need urgent medical attention, and no breathing exercise and no website can tell the difference between them. Only someone who can examine you can. Being checked and told it was panic is a good outcome rather than a wasted trip, and it is exactly the kind of thing urgent care is for.</p>
-                    <p>A panic attack is also not the same thing as panic disorder. Panic disorder is a diagnosis, and that review sets out the threshold: it can be made when <a href="https://www.ncbi.nlm.nih.gov/books/NBK430973/" target="_blank" rel="noopener noreferrer">"recurrent unexpected panic attacks are happening, followed by one month or more of persistent concern over having more attacks, along with a change in the behavior of the individual"</a> to avoid whatever they blame for the attack. A single attack, or attacks that only happen in an obviously frightening situation, is not that. Only a clinician can tell you which you have. A website cannot, and this one is not trying to.</p>
+                    <p>A panic attack is also not the same thing as panic disorder. Panic disorder is a diagnosis, and the <em>StatPearls</em> review sets out the threshold: it can be made when <a href="https://www.ncbi.nlm.nih.gov/books/NBK430973/" target="_blank" rel="noopener noreferrer">"recurrent unexpected panic attacks are happening, followed by one month or more of persistent concern over having more attacks, along with a change in the behavior of the individual"</a> to avoid whatever they blame for the attack. A single attack, or attacks that only happen in an obviously frightening situation, is not that. Only a clinician can tell you which you have. A website cannot, and this one is not trying to.</p>
                 </section>
 
                 <section>
@@ -565,13 +496,15 @@
 
                 <section>
                     <h2>Who should be careful</h2>
-                    <p>Cyclic sighing has no breath-holds and no fast breathing, which makes it one of the gentler patterns on this site. The switcher above, though, gives you access to patterns that do contain holds and one that is deliberately fast. Those carry real cautions, so they are set out here rather than buried.</p>
-                    <ul>
-                        <li><strong>Any pattern with a breath-hold</strong> — 4-7-8, box breathing, triangle breathing — deserves a conversation with your doctor first if you are pregnant, have a cardiovascular condition or uncontrolled high blood pressure, have epilepsy, have a respiratory condition such as asthma or COPD, have glaucoma, are recovering from surgery, or have panic disorder. Shorten or drop the hold if it makes you tense.</li>
-                        <li><strong>The energizing pattern</strong> is fast, rhythmic breathing. It is not a calming technique and it is the wrong choice during a panic attack. Never do it in water, in a bath, while driving, or standing up. It carries the same cautions as the breath-hold patterns above, and the timer will ask you to acknowledge them before it starts.</li>
-                        <li><strong>Any pattern at all</strong> should be stopped if you feel faint, get pins and needles in your hands or face, get a headache, or feel more panicked rather than less. Go back to breathing normally and let it settle. None of these techniques should be pushed through.</li>
-                        <li><strong>If you have a heart or lung condition</strong>, or you are on medication that affects your breathing or blood pressure, ask the clinician who knows your history before making any of this a routine.</li>
-                    </ul>
+                    <div class="callout callout--caution">
+                        <p>Cyclic sighing has no breath-holds and no fast breathing, which makes it one of the gentler patterns on this site. The switcher above, though, gives you access to patterns that do contain holds and one that is deliberately fast. Those carry real cautions, so they are set out here rather than buried.</p>
+                        <ul>
+                            <li><strong>Any pattern with a breath-hold</strong> — 4-7-8, box breathing, triangle breathing — deserves a conversation with your doctor first if you are pregnant, have a cardiovascular condition or uncontrolled high blood pressure, have epilepsy, have a respiratory condition such as asthma or COPD, have glaucoma, are recovering from surgery, or have panic disorder. Shorten or drop the hold if it makes you tense.</li>
+                            <li><strong>The energizing pattern</strong> is fast, rhythmic breathing. It is not a calming technique and it is the wrong choice during a panic attack. Never do it in water, in a bath, while driving, or standing up. It carries the same cautions as the breath-hold patterns above, and the timer will ask you to acknowledge them before it starts.</li>
+                            <li><strong>Any pattern at all</strong> should be stopped if you feel faint, get pins and needles in your hands or face, get a headache, or feel more panicked rather than less. Go back to breathing normally and let it settle. None of these techniques should be pushed through.</li>
+                            <li><strong>If you have a heart or lung condition</strong>, or you are on medication that affects your breathing or blood pressure, ask the clinician who knows your history before making any of this a routine.</li>
+                        </ul>
+                    </div>
                 </section>
 
                 <section>
@@ -644,41 +577,49 @@
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">Extended exhale</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About">
-                <a href="/science">What the research says</a>
-                <a href="/about">About</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About the site">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>

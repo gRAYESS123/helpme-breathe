@@ -17,22 +17,25 @@
     <meta property="og:description" content="A $99/year practitioner licence: commercial use, a white-label embed with your logo, co-branded client links, class mode, printable handouts and a compliance pack.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpmebreath.com/for-practitioners">
-    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/for-practitioners.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Help Me Breathe for Therapists, Teachers and Coaches">
     <meta name="twitter:description" content="A $99/year practitioner licence: commercial use, a white-label embed with your logo, co-branded client links, class mode, printable handouts and a compliance pack.">
-    <meta name="twitter:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/for-practitioners.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. No emoji anywhere. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE: font origins + render-critical CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,9 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!--
       Google Consent Mode v2. The DENIED defaults must be pushed before
@@ -77,40 +81,13 @@
     }
     </script>
 
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      "name": "Help Me Breathe Practitioner Licence",
-      "description": "An annual licence for individual therapists, counsellors, yoga and breathwork teachers, school staff and small workplace facilitators. Adds commercial-use rights, a white-label embed, co-branded client session links, class mode, a printable client handout pack, a homework-link builder and a written compliance pack.",
-      "url": "https://helpmebreath.com/for-practitioners",
-      "image": "https://helpmebreath.com/images/og-breathing-timer.jpg",
-      "category": "Software licence",
-      "brand": { "@type": "Brand", "name": "Help Me Breathe" },
-      "offers": [
-        {
-          "@type": "Offer",
-          "name": "Practitioner licence",
-          "description": "One practising individual, 25 activations, unlimited clients, white-label embed on your own domain.",
-          "price": "99.00",
-          "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock",
-          "url": "https://helpmebreath.com/for-practitioners",
-          "eligibleDuration": { "@type": "QuantitativeValue", "value": 1, "unitCode": "ANN" }
-        },
-        {
-          "@type": "Offer",
-          "name": "Studio licence",
-          "description": "Everything in the Practitioner licence across up to ten domains, plus a monthly aggregate usage report.",
-          "price": "199.00",
-          "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock",
-          "url": "https://helpmebreath.com/for-practitioners",
-          "eligibleDuration": { "@type": "QuantitativeValue", "value": 1, "unitCode": "ANN" }
-        }
-      ]
-    }
-    </script>
+    <!--
+      No Product/Offer block on this page. docs/AGENT_BRIEF.md restricts
+      Product and Offer structured data to /pro, so there is one Product
+      entity for the brand rather than two competing for the same query.
+      The Practitioner and Studio offers, with priceValidUntil and the
+      return policy, are declared on /pro.
+    -->
 
     <script type="application/ld+json">
     {
@@ -178,81 +155,12 @@
     </script>
 
     <style>
-        /* Page-local layout. Uses the existing tokens; adds no new colours. */
-        .tier-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1.25rem;
-            margin: 1.75rem 0 0.5rem;
-        }
+        /* Page-local layout for /for-practitioners.
+           Paper and Ink rules: every colour is a token; nothing is defined only
+           inside a media query or a .night block; --rule is decoration and
+           --edge is a boundary a person can operate. */
 
-        .tier-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 1.5rem 1.4rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .tier-card h3 {
-            margin-top: 0;
-        }
-
-        .tier-price {
-            font-size: 2rem;
-            font-weight: 600;
-            line-height: 1.1;
-            color: var(--text-primary);
-        }
-
-        .tier-price span {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 400;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
-        }
-
-        .tier-card ul {
-            margin: 1rem 0 1.25rem;
-            padding-left: 1.1rem;
-        }
-
-        .tier-card li {
-            margin-bottom: 0.4rem;
-        }
-
-        .tier-card .buy-btn {
-            margin-top: auto;
-        }
-
-        .buy-btn {
-            display: inline-block;
-            width: 100%;
-            padding: 0.85rem 1.25rem;
-            border: 1px solid var(--theme-primary);
-            border-radius: 999px;
-            background: var(--theme-primary);
-            color: #ffffff;
-            font-family: inherit;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-        }
-
-        .buy-btn:hover,
-        .buy-btn:focus-visible {
-            transform: translateY(-1px);
-            opacity: 0.92;
-        }
-
-        .buy-btn.buy-btn-secondary {
-            background: transparent;
-            color: var(--text-primary);
-        }
-
+        /* The licence contents, set as a ruled list rather than a card grid. */
         .feature-list {
             list-style: none;
             padding-left: 0;
@@ -260,19 +168,25 @@
         }
 
         .feature-list > li {
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--rule);
             padding: 1rem 0;
+            font-size: 1.0625rem;
+            line-height: 1.7;
         }
 
         .feature-list > li:last-child {
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--rule);
         }
 
         .feature-list strong {
             display: block;
             margin-bottom: 0.3rem;
+            font-family: var(--ui);
+            font-weight: 600;
         }
 
+        /* The worked example: numbered, in tabular figures, on a printed-form
+           square rather than a bubble. */
         .flow-steps {
             counter-reset: flow;
             list-style: none;
@@ -283,7 +197,7 @@
         .flow-steps > li {
             counter-increment: flow;
             position: relative;
-            padding-left: 2.6rem;
+            padding-left: 2.75rem;
             margin-bottom: 1rem;
         }
 
@@ -291,64 +205,79 @@
             content: counter(flow);
             position: absolute;
             left: 0;
-            top: 0;
-            width: 1.9rem;
-            height: 1.9rem;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            color: var(--text-primary);
+            top: 0.2rem;
+            width: 1.75rem;
+            height: 1.75rem;
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            background: var(--leaf);
+            color: var(--ink);
+            font-family: var(--ui);
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: var(--fs-small);
+            font-variant-numeric: tabular-nums;
         }
 
-        .checkout-fallback {
-            margin-top: 1.25rem;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 1rem 1.2rem;
-            background: var(--surface);
+        /* The Free and Pro cells of the matrix are ordinary links, not checkout
+           buttons, so they are marked up as <a>. `.article-page article a` in
+           css/styles.css is more specific than `.checkout-btn--secondary`, so
+           without this they would take the link green and stop matching the
+           Studio button beside them. */
+        .prose a.checkout-btn,
+        .prose a.checkout-btn:hover {
+            color: var(--ink);
+            text-decoration: none;
         }
 
-        .checkout-fallback:focus {
-            outline: 2px solid var(--theme-primary);
-            outline-offset: 3px;
-        }
-
-        .not-for {
-            border-left: 3px solid var(--theme-primary);
-            padding: 0.25rem 0 0.25rem 1.1rem;
-            margin: 1rem 0;
+        /* The closing checkout button is centred in its block, so it does not
+           need the full-width behaviour the matrix column gives it. */
+        .cta-block-final .checkout-btn {
+            width: auto;
+            min-width: 16rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
         }
     </style>
 </head>
 <body class="theme-box article-page" data-no-ads="true" data-no-asks="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element leaf leaf-3"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element ripple ripple-3"></div>
-    <div class="natural-element cloud cloud-1"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners" aria-current="page">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
                     <li>For practitioners</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Help Me Breathe for Therapists, Teachers and Coaches</h1>
-                <p class="subtitle">A commercial-use licence, a white-label embed with your name on it, and the paperwork a careful practitioner needs. Ninety-nine dollars a year.</p>
+            <h1>Help Me Breathe for Therapists, Teachers and Coaches</h1>
+            <p class="lead">A commercial-use licence, a white-label embed with your name on it, and the paperwork a careful practitioner needs. Ninety-nine dollars a year.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Published 2026-09-09 &middot; Updated 2026-09-10</p>
             </div>
         </header>
 
@@ -373,8 +302,9 @@
                         <li>Independent facilitators running small workplace sessions, where the client expects your branding and not a stranger's.</li>
                     </ul>
 
-                    <div class="not-for">
-                        <p><strong>Who this is not for.</strong> This is not an enterprise product and it is not sold through procurement. Help Me Breathe is one person: Georges Rayess, working as an individual, not a company. If your purchase needs a vendor security questionnaire, a SOC 2 report, a HIPAA Business Associate Agreement, single sign-on, a master services agreement drafted by your legal team or an entry on an approved-supplier register, this licence will not clear that bar and you should not buy it. The three compliance documents below are the whole of what exists. They are honest, they are signable, and they are deliberately modest.</p>
+                    <div class="callout">
+                        <h3>Who this is not for</h3>
+                        <p>This is not an enterprise product and it is not sold through procurement. Help Me Breathe is one person: Georges Rayess, working as an individual, not a company. If your purchase needs a vendor security questionnaire, a SOC 2 report, a HIPAA Business Associate Agreement, single sign-on, a master services agreement drafted by your legal team or an entry on an approved-supplier register, this licence will not clear that bar and you should not buy it. The three compliance documents below are the whole of what exists. They are honest, they are signable, and they are deliberately modest.</p>
                     </div>
                 </section>
 
@@ -420,44 +350,114 @@
                 <section>
                     <h2>Two licences</h2>
 
-                    <div class="tier-grid">
-                        <div class="tier-card">
-                            <h3>Practitioner</h3>
-                            <p class="tier-price">$99 <span>per year, one practising individual</span></p>
-                            <ul>
-                                <li>Commercial-use rights</li>
-                                <li>White-label embed on one domain</li>
-                                <li>Co-branded client session links</li>
-                                <li>Class and projector mode</li>
-                                <li>Handout pack with your name on it</li>
-                                <li>Homework-link builder</li>
-                                <li>25 activations</li>
-                                <li>Compliance pack</li>
-                                <li>Everything in Pro, included</li>
-                            </ul>
-                            <button class="buy-btn" type="button" data-action="checkout" data-sku="practitioner">Buy the Practitioner licence — $99/year</button>
-                        </div>
+                    <p>The two you can buy on this page are Practitioner and Studio. Free and Pro are in the table as well, so you can see what is already yours without paying anything, and what the personal upgrade adds before the commercial one.</p>
 
-                        <div class="tier-card">
-                            <h3>Studio</h3>
-                            <p class="tier-price">$199 <span>per year, up to ten domains</span></p>
-                            <ul>
-                                <li>Everything in the Practitioner licence</li>
-                                <li>White-label embed across up to 10 domains</li>
-                                <li>For a studio with several sites, or a small practice sharing one licence</li>
-                                <li>A monthly aggregate usage report: sessions started and completed per domain, and nothing else</li>
-                                <li>The usage report counts sessions, never people — there is no visitor identifier to count</li>
-                                <li>25 activations</li>
-                                <li>Compliance pack</li>
-                            </ul>
-                            <button class="buy-btn buy-btn-secondary" type="button" data-action="checkout" data-sku="studio">Buy the Studio licence — $199/year</button>
-                        </div>
+                    <p class="table-hint">Scroll the table sideways for Pro, Studio and Free.</p>
+                    <div class="table-scroll" tabindex="0" role="region" aria-label="Plan comparison table, scrollable">
+                        <table class="pricing-matrix">
+                            <caption class="sr-only">What each Help Me Breathe tier includes. Prices in US dollars.</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col"><span class="sr-only">Feature</span></th>
+                                    <th scope="col">
+                                        <span class="tier-name">Free</span>
+                                        <span class="price-figure">$0</span>
+                                        <span class="price-period">forever</span>
+                                        <a class="checkout-btn checkout-btn--secondary" href="/timer">Use it free</a>
+                                    </th>
+                                    <th scope="col">
+                                        <span class="tier-name">Pro</span>
+                                        <span class="price-figure">$19</span>
+                                        <span class="price-period">once, lifetime</span>
+                                        <a class="checkout-btn checkout-btn--secondary" href="/pro">See Pro</a>
+                                    </th>
+                                    <th scope="col" class="col-featured">
+                                        <span class="tier-flag">Most practitioners</span>
+                                        <span class="tier-name">Practitioner</span>
+                                        <span class="price-figure">$99</span>
+                                        <span class="price-period">per year</span>
+                                        <button class="checkout-btn" type="button" data-action="checkout" data-sku="practitioner">Buy Practitioner</button>
+                                    </th>
+                                    <th scope="col">
+                                        <span class="tier-name">Studio</span>
+                                        <span class="price-figure">$199</span>
+                                        <span class="price-period">per year</span>
+                                        <button class="checkout-btn checkout-btn--secondary" type="button" data-action="checkout" data-sku="studio">Buy Studio</button>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">All seven techniques</th>
+                                    <td>Yes</td><td>Yes</td><td class="col-featured">Yes</td><td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Custom patterns and saved presets</th>
+                                    <td>—</td><td>Yes</td><td class="col-featured">Yes</td><td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Streaks, heatmap and CSV export</th>
+                                    <td>—</td><td>Yes</td><td class="col-featured">Yes</td><td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Ambient soundscapes</th>
+                                    <td>—</td><td>Yes</td><td class="col-featured">Yes</td><td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Night mode</th>
+                                    <td>Follows your device</td><td>Manual toggle</td><td class="col-featured">Manual toggle</td><td>Manual toggle</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Ad-free</th>
+                                    <td>—</td><td>Yes</td><td class="col-featured">Yes</td><td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Commercial-use licence</th>
+                                    <td>—</td><td>—</td><td class="col-featured">Yes</td><td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">White-label embed</th>
+                                    <td>—</td><td>—</td><td class="col-featured">1 domain</td><td>10 domains</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Co-branded client links</th>
+                                    <td>—</td><td>—</td><td class="col-featured">Yes</td><td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Printable client handouts</th>
+                                    <td>Print, unbranded</td><td>Print, unbranded</td><td class="col-featured">Your name and logo</td><td>Your name and logo</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Class and projector mode</th>
+                                    <td>—</td><td>—</td><td class="col-featured">Yes</td><td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Compliance pack</th>
+                                    <td>—</td><td>—</td><td class="col-featured">Yes</td><td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Named invoice with a VAT field</th>
+                                    <td>—</td><td>Yes</td><td class="col-featured">Yes</td><td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Activations</th>
+                                    <td class="num">Not needed</td><td class="num">6 browsers</td><td class="col-featured num">25 browsers</td><td class="num">25 browsers</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Monthly aggregate usage report</th>
+                                    <td>—</td><td>—</td><td class="col-featured">—</td><td>Sessions per domain</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
-                    <p class="cta-subtext">Fourteen-day unconditional refund. Payment is handled by our merchant of record, who is the seller on record for the transaction and issues your receipt.</p>
+                    <p class="tax-note">Prices are in US dollars and are invoiced. Sales are made by our merchant of record, who is the seller on record for the transaction, collects any VAT or sales tax that applies where you are, and issues your receipt. Every purchase carries a 14-day unconditional refund.</p>
 
-                    <div class="checkout-fallback" data-role="checkout-fallback" tabindex="-1" hidden>
-                        <p><strong>Checkout is not open yet.</strong> The licence is real and the price is real — $99 a year for Practitioner, $199 for Studio — but the payment provider is still being set up. Email <a href="mailto:contact@helpmebreath.com?subject=Practitioner%20licence">contact@helpmebreath.com</a> with the word <em>practitioner</em> and you will be told the day it opens, at the price on this page. There is no sign-up form on this page: the email is the whole mechanism.</p>
+                    <p>Studio is for a studio with several sites, or a small practice sharing one licence: everything in the Practitioner licence, across up to ten domains, plus a monthly aggregate usage report of sessions started and completed per domain, and nothing else. The usage report counts sessions, never people — there is no visitor identifier to count.</p>
+
+                    <div class="callout" data-role="checkout-fallback" tabindex="-1" hidden>
+                        <h3>Checkout is not open yet</h3>
+                        <p>The licence is real and the price is real — $99 a year for Practitioner, $199 for Studio — but the payment provider is still being set up. Email <a href="mailto:contact@helpmebreath.com?subject=Practitioner%20licence">contact@helpmebreath.com</a> with the word <em>practitioner</em> and you will be told the day it opens, at the price on this page. There is no sign-up form on this page: the email is the whole mechanism.</p>
                     </div>
                 </section>
 
@@ -562,7 +562,7 @@
                 <section class="cta-block-final">
                     <h2>Ready when you are</h2>
                     <p>One payment a year, your name on the tool, and three documents that answer the questions before they are asked.</p>
-                    <button class="buy-btn" type="button" data-action="checkout" data-sku="practitioner">Buy the Practitioner licence — $99/year</button>
+                    <button class="checkout-btn" type="button" data-action="checkout" data-sku="practitioner">Buy the Practitioner licence — $99/year</button>
                     <p class="cta-subtext">Fourteen-day unconditional refund. Questions first? <a href="mailto:contact@helpmebreath.com?subject=Practitioner%20licence">Email contact@helpmebreath.com</a> and a person will answer within two business days.</p>
                 </section>
 
@@ -574,54 +574,63 @@
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/science">What the research says</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About and products">
-                <a href="/about">About</a>
-                <a href="/pro">Pro</a>
-                <a href="/handouts">Client handouts</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>
     </div>
 
     <script type="module" src="/js/consent.js"></script>
+    <script type="module" src="/js/app.js"></script>
 
     <script type="module">
         /* Checkout wiring for this page.
          *
-         * PAGE_CONTRACT section 7 forbids an email capture form on
+         * PAGE_CONTRACT section 11 forbids an email capture form on
          * /for-practitioners, and <body> here carries data-no-asks="true". So
          * this page must NEVER reach js/checkout.js's shared waitlist card: it
          * renders a capture form, and its copy is written for the $19 Pro tier
@@ -638,7 +647,9 @@
          *
          * This page does not load /js/pro/index.js, so there is no second
          * listener to double-fire; the shared window.__hmbCheckoutBound flag
-         * covers a future module that adds one.
+         * covers a future module that adds one. Only the Practitioner and
+         * Studio buttons carry data-action="checkout" — the Free and Pro cells
+         * of the matrix are ordinary links to /timer and /pro.
          */
         if (!window.__hmbCheckoutBound) {
             window.__hmbCheckoutBound = true;

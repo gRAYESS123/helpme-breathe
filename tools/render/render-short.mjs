@@ -360,15 +360,15 @@ function jobUrl(job, port) {
 
 /**
  * render.html reports what typeface actually painted in data-render-font.
- * Quicksand comes from Google Fonts, so a render machine with no network
- * produces a whole batch in a system sans-serif that looks almost, but not
- * quite, right. Say so rather than letting it pass.
+ * Newsreader (with IBM Plex Sans) comes from Google Fonts, so a render machine
+ * with no network produces a whole batch in a system serif that looks almost,
+ * but not quite, right. Say so rather than letting it pass.
  */
 async function fontWarning(page) {
   const state = await page.getAttribute('body', 'data-render-font').catch(() => null);
-  if (!state || state === 'quicksand') return null;
+  if (!state || state === 'newsreader') return null;
   if (state === 'fallback') {
-    return 'Quicksand did not load (Google Fonts unreachable?) — this capture is in a '
+    return 'Newsreader did not load (Google Fonts unreachable?) — this capture is in a '
       + 'fallback system font. Check the network and render it again.';
   }
   return `could not confirm the font loaded (data-render-font="${state}") — check the capture before posting`;

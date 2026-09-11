@@ -12,28 +12,41 @@
     <meta name="author" content="Georges Rayess">
     <meta name="robots" content="noindex, nofollow">
 
+    <!-- Open Graph -->
     <meta property="og:title" content="Data Processing Addendum — Help Me Breathe">
     <meta property="og:description" content="A signable Data Processing Addendum in plain English for the Help Me Breathe Practitioner and Studio licences. No client data is transmitted to or stored by us.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpmebreath.com/compliance/dpa">
-    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/dpa.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
-    <meta name="twitter:card" content="summary_large_image">
 
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Data Processing Addendum — Help Me Breathe">
+    <meta name="twitter:description" content="A signable Data Processing Addendum in plain English for the Help Me Breathe Practitioner and Studio licences. No client data is transmitted to or stored by us.">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/dpa.jpg">
+
+    <!-- Favicon: the ring with a gap. No emoji anywhere. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
+    <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
+    <!-- PERFORMANCE: font origins + render-critical CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/print.css" media="print">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -67,27 +80,40 @@
     </script>
 
     <style>
-        /* The two screen-side rules /css/print.css used to carry. They live
-           here so print.css can load with media="print" and stop blocking the
-           first paint of this page. */
+        /* Page-local layout for the compliance documents.
+           Paper and Ink rules: every colour is a token; nothing is defined only
+           inside a media query or a .night block; --rule is a decorative
+           hairline and --edge is the boundary of anything a person operates.
+           css/print.css owns the paper side of every .doc-* class; these are
+           the screen rules only. */
+
+        /* The two screen-side rules /css/print.css cannot carry, because a
+           media="print" sheet is not applied on screen at all. */
         .hmb-print-only { display: none !important; }
         .hmb-page-break { display: none; }
 
-        .doc-sheet { max-width: 820px; }
+        .doc-sheet {
+            max-width: 820px;
+            /* css/print.css resets this margin to 0 on paper. */
+            margin: 1.5rem auto 0;
+        }
 
         .doc-kicker {
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
             margin: 0 0 0.35rem;
+            font-family: var(--ui);
+            font-size: var(--fs-micro);
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--graphite);
         }
 
         .doc-meta {
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 1.1rem 1.3rem;
             margin-bottom: 2rem;
+            padding: 1.1rem 1.3rem;
+            background: var(--leaf);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
         }
 
         .doc-meta dl {
@@ -95,33 +121,57 @@
             grid-template-columns: minmax(140px, 200px) 1fr;
             gap: 0.45rem 1rem;
             margin: 0;
-            font-size: 0.9rem;
+            font-size: var(--fs-small);
         }
 
-        .doc-meta dt { font-weight: 600; }
-        .doc-meta dd { margin: 0; }
+        .doc-meta dt { font-weight: 600; color: var(--ink); }
+        .doc-meta dd { margin: 0; color: var(--ink); }
 
         .doc-callout {
-            border-left: 3px solid var(--theme-primary);
-            padding: 0.5rem 0 0.5rem 1.1rem;
             margin: 1.25rem 0;
+            padding: 1rem 1.25rem;
+            background: var(--leaf);
+            border: 1px solid var(--rule);
+            border-left: 3px solid var(--edge);
+            border-radius: var(--radius);
         }
+
+        .doc-callout p:last-child { margin-bottom: 0; }
 
         .doc-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
             margin-top: 1rem;
-            display: block;
-            overflow-x: auto;
+            font-family: var(--ui);
+            font-size: var(--fs-small);
         }
 
         .doc-table th,
         .doc-table td {
-            border: 1px solid var(--border);
-            padding: 0.55rem 0.7rem;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--rule);
             text-align: left;
             vertical-align: top;
+            color: var(--ink);
+        }
+
+        /* .article-page th in css/styles.css sets uppercase micro graphite for
+           every table heading. That is right for a data table and wrong for a
+           row header in a contract, so the row headers are reset here and only
+           the column headers keep the label treatment. */
+        .doc-table th {
+            font-size: var(--fs-small);
+            font-weight: 600;
+            letter-spacing: 0;
+            text-transform: none;
+            color: var(--ink);
+        }
+
+        .doc-table thead th {
+            font-size: var(--fs-micro);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--graphite);
         }
 
         .doc-signatures {
@@ -132,31 +182,23 @@
         }
 
         .doc-signature {
-            border-top: 1px solid var(--border);
             padding-top: 0.8rem;
+            border-top: 1px solid var(--ink);
         }
 
         .doc-signature h3 { margin-top: 0.4rem; font-size: 1rem; }
 
         .sig-rule {
             display: block;
-            border-bottom: 1px solid var(--text-secondary);
             height: 2.2rem;
             margin: 1rem 0 0.35rem;
+            border-bottom: 1px solid var(--graphite);
         }
 
         .sig-label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
             display: block;
-        }
-
-        .doc-foot {
-            border-top: 1px solid var(--border);
-            margin-top: 2rem;
-            padding-top: 0.8rem;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
+            font-size: var(--fs-small);
+            color: var(--graphite);
         }
 
         .doc-actions {
@@ -167,23 +209,57 @@
         }
 
         .doc-btn {
-            font-family: inherit;
-            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: var(--hit);
+            padding: 0.6rem 1.25rem;
+            font-family: var(--ui);
+            font-size: 0.9375rem;
             font-weight: 600;
-            padding: 0.7rem 1.3rem;
-            border-radius: 999px;
-            border: 1px solid var(--theme-primary);
-            background: var(--theme-primary);
-            color: #ffffff;
+            color: var(--chalk);
+            background: var(--green);
+            border: 1px solid var(--green);
+            border-radius: var(--radius);
             cursor: pointer;
+        }
+
+        .doc-btn:hover { background: var(--ink); border-color: var(--ink); }
+
+        .doc-foot {
+            margin-top: 2rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid var(--rule);
+            font-size: var(--fs-small);
+            color: var(--graphite);
         }
     </style>
 </head>
 <body class="article-page compliance-page" data-no-ads="true" data-no-asks="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners" aria-current="page">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
+
     <div class="container">
-        <header class="hmb-no-print">
+        <header class="article-header hmb-no-print">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
@@ -191,10 +267,8 @@
                     <li>Data Processing Addendum</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Data Processing Addendum</h1>
-                <p class="subtitle">For the Help Me Breathe Practitioner and Studio licences. Written to be read, printed and signed.</p>
-            </div>
+            <h1>Data Processing Addendum</h1>
+            <p class="lead">For the Help Me Breathe Practitioner and Studio licences. Written to be read, printed and signed.</p>
         </header>
 
         <main id="main">
@@ -255,42 +329,44 @@
 
                 <section class="doc-section">
                     <h2>4. Subject matter, duration, nature and purpose of the processing</h2>
-                    <table class="doc-table">
-                        <caption class="sr-only">Details of the processing carried out by the Provider</caption>
-                        <thead>
-                            <tr><th scope="col">Item</th><th scope="col">Detail</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th scope="row">Subject matter</th>
-                                <td>Administering a software licence: issuing it, verifying it, renewing it, refunding it, and answering your support email.</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Duration</th>
-                                <td>For the term of your licence, plus the period the Provider and the merchant of record must keep transaction records for tax and accounting purposes.</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Nature</th>
-                                <td>Collection, storage and transmission of a licence email address and a licence key. Reading and replying to email you send.</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Purpose</th>
-                                <td>To let you buy, activate and keep using the licence, and to support you while you do.</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Types of personal data</th>
-                                <td>Your name (if you give one), your email address, your country as determined by the merchant of record for tax, your business name and tax identifier if you enter one on the invoice, and anything you choose to write in an email to the Provider.</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Categories of data subject</th>
-                                <td>You, the practitioner. Nobody else.</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Special category data</th>
-                                <td>None is requested, required or knowingly processed. Please do not send client details by email.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-scroll">
+                        <table class="doc-table">
+                            <caption class="sr-only">Details of the processing carried out by the Provider</caption>
+                            <thead>
+                                <tr><th scope="col">Item</th><th scope="col">Detail</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">Subject matter</th>
+                                    <td>Administering a software licence: issuing it, verifying it, renewing it, refunding it, and answering your support email.</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Duration</th>
+                                    <td>For the term of your licence, plus the period the Provider and the merchant of record must keep transaction records for tax and accounting purposes.</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Nature</th>
+                                    <td>Collection, storage and transmission of a licence email address and a licence key. Reading and replying to email you send.</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Purpose</th>
+                                    <td>To let you buy, activate and keep using the licence, and to support you while you do.</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Types of personal data</th>
+                                    <td>Your name (if you give one), your email address, your country as determined by the merchant of record for tax, your business name and tax identifier if you enter one on the invoice, and anything you choose to write in an email to the Provider.</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Categories of data subject</th>
+                                    <td>You, the practitioner. Nobody else.</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Special category data</th>
+                                    <td>None is requested, required or knowingly processed. Please do not send client details by email.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
 
                 <section class="doc-section">
@@ -309,7 +385,7 @@
                     <ul>
                         <li>There is no client account, no client profile and no client identifier. Nothing on the site asks for a client's name, email address, date of birth or health information.</li>
                         <li>The timer runs entirely in the browser. Session settings, session history and streaks are written to that browser's own local storage under the <code>hmb.</code> prefix and are never transmitted anywhere.</li>
-                        <li>A co-branded client session link carries its whole configuration inside the link itself — the technique, the length, your name, your message. Opening it writes nothing to any server, and no record exists of which link was created, sent, or opened. It does load the Quicksand typeface from Google Fonts, so Google's font servers see the reader's IP address and user agent in the ordinary way, and a practitioner logo, where the link carries one, is fetched by the reader's browser from the practitioner's own server. Neither request carries anything about the session. The embedded widget under <code>/embed/v1/</code> makes no third-party request at all, so use it instead where that matters.</li>
+                        <li>A co-branded client session link carries its whole configuration inside the link itself — the technique, the length, your name, your message. Opening it writes nothing to any server, and no record exists of which link was created, sent, or opened. It does load the site's typefaces from Google Fonts, so Google's font servers see the reader's IP address and user agent in the ordinary way, and a practitioner logo, where the link carries one, is fetched by the reader's browser from the practitioner's own server. Neither request carries anything about the session. The embedded widget under <code>/embed/v1/</code> makes no third-party request at all, so use it instead where that matters.</li>
                         <li>The embedded widget makes no third-party requests of any kind: no fonts, no analytics, no advertising and no tracking pixels load inside the frame.</li>
                         <li>Class and projector mode, and the printable handouts, are entirely local. Practitioner details typed into the <a href="/handouts">handout page</a> are stored in that browser under <code>hmb.practitioner</code> and are never sent to the Provider.</li>
                     </ul>
@@ -319,34 +395,36 @@
                 <section class="doc-section">
                     <h2>7. Subprocessors</h2>
                     <p>The Provider uses the following subprocessors. You consent to them by signing this addendum.</p>
-                    <table class="doc-table">
-                        <caption class="sr-only">Subprocessors used by the Provider</caption>
-                        <thead>
-                            <tr><th scope="col">Subprocessor</th><th scope="col">What it does</th><th scope="col">What it sees</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Vercel Inc. (United States)</td>
-                                <td>Hosting and content delivery for helpmebreath.com and its serverless functions</td>
-                                <td>Ordinary web server logs: IP address, user agent, URL and timestamp. No form content, because there are no forms that carry client data.</td>
-                            </tr>
-                            <tr>
-                                <td>The merchant of record</td>
-                                <td>Sells the licence as the seller on record, takes the payment, charges and remits sales tax or VAT, issues your receipt and processes refunds</td>
-                                <td>Your name, email address, billing country, payment method and any business details you enter on the invoice.</td>
-                            </tr>
-                            <tr>
-                                <td>Google LLC (Analytics 4 and Google Fonts)</td>
-                                <td>Aggregate visit statistics for the public pages of helpmebreath.com; hosting of the Quicksand typeface used on the public pages and on client session links</td>
-                                <td>Standard analytics data, and only after a visitor accepts analytics in the cookie banner. Consent Mode defaults are set to denied. Analytics never runs inside the embedded widget or a client session link. Google's font servers separately see the IP address and user agent of anyone loading a page that uses the hosted typeface; the embedded widget requests no font.</td>
-                            </tr>
-                            <tr>
-                                <td>The email delivery provider</td>
-                                <td>Sends licence keys and receipts, and hosts the contact mailbox</td>
-                                <td>Your email address and the contents of messages between you and the Provider.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-scroll">
+                        <table class="doc-table">
+                            <caption class="sr-only">Subprocessors used by the Provider</caption>
+                            <thead>
+                                <tr><th scope="col">Subprocessor</th><th scope="col">What it does</th><th scope="col">What it sees</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Vercel Inc. (United States)</td>
+                                    <td>Hosting and content delivery for helpmebreath.com and its serverless functions</td>
+                                    <td>Ordinary web server logs: IP address, user agent, URL and timestamp. No form content, because there are no forms that carry client data.</td>
+                                </tr>
+                                <tr>
+                                    <td>The merchant of record</td>
+                                    <td>Sells the licence as the seller on record, takes the payment, charges and remits sales tax or VAT, issues your receipt and processes refunds</td>
+                                    <td>Your name, email address, billing country, payment method and any business details you enter on the invoice.</td>
+                                </tr>
+                                <tr>
+                                    <td>Google LLC (Analytics 4 and Google Fonts)</td>
+                                    <td>Aggregate visit statistics for the public pages of helpmebreath.com; hosting of the typefaces used on the public pages and on client session links</td>
+                                    <td>Standard analytics data, and only after a visitor accepts analytics in the cookie banner. Consent Mode defaults are set to denied. Analytics never runs inside the embedded widget or a client session link. Google's font servers separately see the IP address and user agent of anyone loading a page that uses a hosted typeface; the embedded widget requests no font.</td>
+                                </tr>
+                                <tr>
+                                    <td>The email delivery provider</td>
+                                    <td>Sends licence keys and receipts, and hosts the contact mailbox</td>
+                                    <td>Your email address and the contents of messages between you and the Provider.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <p>The Provider will give you at least ten days' notice by email, to the address on your licence, before adding or replacing a subprocessor that would handle your personal data. If you object on reasonable data protection grounds and the change cannot be avoided, you may terminate the licence and receive a pro-rata refund of the unused part of the term. The current list is always the one on this page. The merchant of record and the email provider are described here by role rather than by name because those arrangements are still being set up; the merchant of record is the company named as seller on your receipt, and both will be named on this page and on the <a href="/compliance/security-overview">security overview</a> once they are in place. Ask before you sign if you need the names first.</p>
                 </section>
 
@@ -451,26 +529,59 @@
         </main>
 
         <footer class="footer hmb-no-print">
-            <nav class="footer-nav" aria-label="Practitioner documents">
-                <a href="/for-practitioners">For practitioners</a>
-                <a href="/handouts">Client handouts</a>
-                <a href="/compliance/privacy-attestation">Privacy attestation</a>
-                <a href="/compliance/security-overview">Security overview</a>
-            </nav>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>
     </div>
 
     <script type="module" src="/js/consent.js"></script>
+    <script type="module" src="/js/app.js"></script>
 
     <script type="module">
         const printButton = document.querySelector('[data-role="print"]');

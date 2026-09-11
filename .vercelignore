@@ -1,0 +1,8 @@
+# Not part of the served site
+docs/
+tools/
+templates/
+.claude/
+README.md
+.gitignore
+.env.example

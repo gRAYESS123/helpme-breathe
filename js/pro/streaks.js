@@ -6,8 +6,9 @@
  * uploaded, there is no account, and the CSV is built with a Blob so no server
  * is involved.
  *
- * Free tier sees the last seven days plus a blurred heatmap teaser and a Pro
- * badge. Pro sees the whole picture.
+ * Free tier sees the last seven days plus a dimmed heatmap teaser and a Pro
+ * badge — dimmed, never blurred: the identity carries no blur. Pro sees the
+ * whole picture.
  *
  * Dates are handled in the visitor's own timezone, using local Y/M/D parts, so
  * a streak does not break at a month boundary or across a DST change.

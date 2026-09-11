@@ -17,22 +17,25 @@
     <meta property="og:description" content="Put the Help Me Breathe guided timer on your site with one line of HTML. Free, no account, no tracking inside the widget. Configure and copy the snippet here.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://helpmebreath.com/embed">
-    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/embed.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Embed a Free Breathing Exercise Widget on Your Site">
     <meta name="twitter:description" content="Put the Help Me Breathe guided timer on your site with one line of HTML. Free, no account, no tracking inside the widget. Configure and copy the snippet here.">
-    <meta name="twitter:image" content="https://helpmebreath.com/images/twitter-breathing-timer.jpg">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/embed.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,9 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <!-- Newsreader for display, IBM Plex Sans for anything you operate. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -131,13 +135,17 @@
     </script>
 
     <style>
-        /* Page-specific: the configurator. Uses the existing custom properties. */
+        /* Page-local: the configurator.
+           docs/PAGE_CONTRACT.md section 13a — every colour is a token, nothing
+           is defined only inside a media or .night block, and anything a person
+           can operate takes --edge for its boundary. */
+
         .embed-config {
             display: grid;
             grid-template-columns: minmax(260px, 1fr) minmax(280px, 1fr);
-            gap: 1.5rem;
+            gap: 1.25rem;
             align-items: start;
-            margin: 2rem 0;
+            margin: 1.75rem 0;
         }
 
         @media (max-width: 760px) {
@@ -145,16 +153,14 @@
         }
 
         .embed-panel {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 1.5rem;
+            background: var(--leaf);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sheet);
+            padding: 1.25rem;
         }
 
-        .embed-panel h3 {
-            font-size: 1.0625rem;
-            margin-bottom: 1rem;
-        }
+        .embed-panel h3 { margin: 0 0 1rem; font-size: 1rem; }
 
         .embed-field {
             display: flex;
@@ -165,64 +171,96 @@
 
         .embed-field label,
         .embed-field .embed-label {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
+            font-family: var(--ui);
+            font-size: var(--fs-small);
+            font-weight: 500;
+            color: var(--ink);
         }
 
         .embed-field select,
-        .embed-field input[type="color"] {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 0.6rem;
-            font-family: inherit;
-            font-size: 0.9375rem;
-            width: 100%;
+        .embed-accent-warn {
+            margin: 0.5rem 0 0;
+            padding-left: 0.7rem;
+            border-left: 3px solid var(--warn);
+            font-size: var(--fs-micro);
+            line-height: 1.55;
+            color: var(--ink);
         }
 
-        .embed-field select option { background: #1e1b4b; color: #ffffff; }
+        .embed-field input[type="color"] {
+            width: 100%;
+            min-height: var(--hit);
+            padding: 0.55rem 0.6rem;
+            font-family: var(--ui);
+            font-size: 0.9375rem;
+            color: var(--ink);
+            background: var(--leaf);
+            border: 1px solid var(--edge);
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
 
-        .embed-field input[type="color"] { height: 44px; padding: 0.25rem; cursor: pointer; }
+        .embed-field select option { background: var(--leaf); color: var(--ink); }
+
+        .embed-field input[type="color"] { padding: 0.25rem; }
 
         .embed-check {
             display: flex;
             align-items: center;
             gap: 0.6rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
+            min-height: var(--hit);
+            font-family: var(--ui);
+            font-size: var(--fs-small);
+            font-weight: 400;
+            color: var(--ink);
             cursor: pointer;
         }
 
-        .embed-check input { width: 18px; height: 18px; accent-color: var(--theme-primary); cursor: pointer; }
-
-        .embed-hint {
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-            margin-top: -0.5rem;
-            margin-bottom: 1.1rem;
+        .embed-check input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--green);
+            cursor: pointer;
         }
 
+        .embed-hint {
+            font-size: var(--fs-small);
+            line-height: 1.6;
+            color: var(--graphite);
+            margin: -0.25rem 0 1.1rem;
+        }
+
+        /* The preview is a real widget in a real iframe, so it gets the well
+           treatment rather than a card: a trough the frame sits in. */
         .embed-preview-frame {
+            display: block;
             width: 100%;
             min-height: 420px;
-            border: 0;
-            border-radius: 16px;
-            background: rgba(0, 0, 0, 0.15);
-            display: block;
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            background: var(--track);
         }
 
         .embed-snippet {
-            background: rgba(0, 0, 0, 0.32);
-            border: 1px solid var(--border);
-            border-radius: 14px;
+            margin: 0;
             padding: 1rem;
             overflow-x: auto;
-            font-size: 0.8125rem;
-            line-height: 1.7;
-            color: var(--text-primary);
-            white-space: pre;
             font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: var(--fs-small);
+            line-height: 1.7;
+            color: var(--ink);
+            background: var(--track);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            white-space: pre;
+        }
+
+        /* .embed-snippet already paints the well; the <code> inside it must not
+           paint a second one on top. */
+        .embed-snippet code {
+            background: none;
+            padding: 0;
+            font-size: inherit;
         }
 
         .embed-actions {
@@ -233,75 +271,106 @@
             margin-top: 1rem;
         }
 
+        /* The shared .cta-button rules were written for links; this makes a real
+           <button> match them without touching the border the identity needs. */
+        .embed-actions button.cta-button {
+            cursor: pointer;
+            font-family: var(--ui);
+        }
+
         .embed-copied {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
+            font-family: var(--ui);
+            font-size: var(--fs-small);
+            color: var(--graphite);
             min-height: 1.4em;
         }
 
         .tier-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1.25rem;
-            margin: 1.5rem 0;
+            gap: 0.85rem;
+            margin: 1.25rem 0;
         }
 
         .tier-card {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 1.5rem;
+            background: var(--leaf);
+            border: 1px solid var(--rule);
+            border-top: 3px solid var(--rim);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sheet);
+            padding: 1.25rem;
         }
 
-        .tier-card h3 { font-size: 1rem; margin-bottom: 0.75rem; }
+        .tier-card h3 { margin: 0 0 0.75rem; font-size: 1rem; }
 
-        .tier-card ul { margin: 0 0 0 1.1rem; }
+        .tier-card ul { margin: 0; padding-left: 1.15rem; }
 
-        .tier-card li { margin-bottom: 0.5rem; }
+        .tier-card li { font-size: 0.9375rem; line-height: 1.6; margin-bottom: 0.5rem; }
 
         .platform-list dt {
+            font-family: var(--ui);
             font-weight: 600;
             margin-top: 1.1rem;
-            color: var(--text-primary);
+            color: var(--ink);
         }
 
-        .platform-list dd { margin: 0.35rem 0 0; color: var(--text-secondary); }
-
-        /* The shared .cta-button rules were written for links; these two lines
-           make a real <button> match them. */
-        .article-page button.cta-button {
-            border: 0;
-            cursor: pointer;
-            font-family: inherit;
+        .platform-list dd {
+            margin: 0.35rem 0 0;
             font-size: 1rem;
+            line-height: 1.7;
+            color: var(--graphite);
         }
 
-        .article-page button.cta-button-large { font-size: 1.0625rem; }
+        /* --clay is the commerce voice, so the practitioner CTA uses the shared
+           checkout button. It is full width by default (it lives in a pricing
+           column); in a centred CTA block it sizes to its label. */
+        .cta-block-final .checkout-btn {
+            width: auto;
+            padding: 0.7rem 1.5rem;
+            font-size: 0.9375rem;
+        }
     </style>
 </head>
 
 <body class="theme-478 article-page" data-no-ads="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <!-- No aria-current here: /embed is not one of the five nav
+                     destinations, and marking a different URL as "current page"
+                     would be a lie to a screen reader. /about does the same. -->
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <!-- No .article-meta here: docs/PAGE_CONTRACT.md section 3 lists /embed
+             as a page with no author strip. The site has no medical reviewer
+             and none is invented anywhere. -->
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
                     <li>Embed the timer</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Put a guided breathing timer on your site</h1>
-                <p class="subtitle">One line of HTML. No account, no API key, no tracking inside the widget.</p>
-            </div>
+            <h1>Put a guided breathing timer on your site</h1>
+            <p class="lead">One line of HTML. No account, no API key, no tracking inside the widget.</p>
         </header>
 
         <main id="main">
@@ -369,8 +438,14 @@
                                     <input type="checkbox" id="cfg-accent-default" checked>
                                     Use the pattern's own colour
                                 </label>
-                                <input type="color" id="cfg-accent" value="#8b5cf6"
+                                <!-- The starting value is the 4-7-8 rim from
+                                     docs/BRAND.md; a colour input needs a
+                                     literal, and this control is disabled
+                                     until someone deliberately overrides the
+                                     pattern's own colour. -->
+                                <input type="color" id="cfg-accent" value="#33407F"
                                        aria-labelledby="cfg-accent-label" disabled>
+                                <p class="embed-accent-warn" id="cfg-accent-warn" role="status" aria-live="polite" hidden></p>
                             </div>
 
                             <div class="embed-field">
@@ -463,9 +538,11 @@ data-logo="https://your-site.example/logo.png"</code></pre>
                     covers the domain the widget is sitting on. Only then does the attribution line come off and
                     your logo go on. If the answer does not come back — the network is down, the licence has
                     lapsed, the domain is not on it — the free widget renders with attribution rather than
-                    something half-branded. The key travels inside your page's HTML, so treat it as public: it
-                    names a licence and holds nothing else, and copying it lets someone drop our name from their
-                    own site, which their licence does not permit.</p>
+                    something half-branded. The key travels inside your page's HTML, so treat it as public, and that is
+                    exactly why the domain list matters: a licence with no domains on it cannot white-label
+                    anything at all, so a key lifted from your page's source is useless on a site you did not list.
+                    List your domains when you activate the key on the <a href="/pro">Pro page</a> &mdash; there is a
+                    field under the licence box for them.</p>
 
                     <p><code>data-brand="Your practice name"</code> is free and needs no key. It prints a line of
                     text above the timer; it does not remove the attribution.</p>
@@ -535,7 +612,8 @@ data-logo="https://your-site.example/logo.png"</code></pre>
                     <p><strong>It is keyboard and screen-reader operable.</strong> Space starts and pauses, S
                     stops, and every phase change is announced through an ARIA live region rather than spoken
                     audio, so it does not talk over a class or a screen reader. If a visitor has asked their
-                    system for reduced motion, the circle stops scaling and changes brightness instead.</p>
+                    system for reduced motion, the circle holds one size and a ring drawn around its edge
+                    carries the pace instead.</p>
 
                     <p><strong>It fails quietly.</strong> Everything in the loader sits inside one try/catch.
                     An old browser, a blocked request or a content blocker leaves your page as it was.</p>
@@ -600,7 +678,7 @@ data-logo="https://your-site.example/logo.png"</code></pre>
                     your books. Whether that is deductible where you practise is a question for your accountant
                     rather than for us.</p>
                     <p>
-                        <button class="cta-button cta-button-large" type="button" data-action="checkout" data-sku="practitioner">Get the Practitioner licence — $99/year</button>
+                        <button class="checkout-btn" type="button" data-action="checkout" data-sku="practitioner">Get the Practitioner licence — $99/year</button>
                     </p>
                     <p class="cta-subtext">Refunds are unconditional for 14 days. Read the full list of what is
                     included on <a href="/for-practitioners">the practitioner page</a>.</p>
@@ -624,49 +702,61 @@ data-logo="https://your-site.example/logo.png"</code></pre>
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">Extended exhale</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About and products">
-                <a href="/science">What the research says</a>
-                <a href="/about">About</a>
-                <a href="/pro">Pro</a>
-                <a href="/for-practitioners">For practitioners</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician &mdash; <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>
     </div>
 
     <script type="module" src="/js/consent.js"></script>
+
+    <!-- js/app.js wires the site header's Menu button (and nothing else on a
+         page with no [data-breathing-app] root). -->
+    <script type="module" src="/js/app.js"></script>
 
     <script type="module">
     /*
@@ -753,9 +843,59 @@ data-logo="https://your-site.example/logo.png"</code></pre>
 
     let refreshTimer = 0;
 
+    /* --- the rim has to be visible ---------------------------------------
+       The widget deepens (or lightens) a low-contrast accent so the ring is
+       still a ring. Say so here, at pick time, rather than letting someone ship
+       a widget whose breathing circle they cannot see. Same 3:1 floor and the
+       same arithmetic as embed/v1/frame.html. */
+    const GROUND = { light: '#F5F1E8', dark: '#15191A' };
+
+    const toRgb = (hex) => {
+        const n = parseInt(String(hex).replace('#', ''), 16);
+        return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    };
+
+    const luminance = (rgb) => {
+        const [r, g, b] = rgb.map((v) => {
+            const c = v / 255;
+            return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+
+    const contrast = (a, b) => {
+        const la = luminance(a);
+        const lb = luminance(b);
+        return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+    };
+
+    function accentWarning(config) {
+        if (!config.accent) return '';
+        let surround = config.theme;
+        if (surround !== 'light' && surround !== 'dark') {
+            surround = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+        }
+        const value = contrast(toRgb(config.accent), toRgb(GROUND[surround]));
+        if (value >= 3) return '';
+        return surround === 'light'
+            ? 'That colour is too light to read as a ring on the light background '
+              + `(${value.toFixed(2)}:1, and a control outline needs 3:1). The widget will deepen it along the same hue so people can see the circle.`
+            : 'That colour is too dark to read as a ring on the dark background '
+              + `(${value.toFixed(2)}:1, and a control outline needs 3:1). The widget will lighten it along the same hue so people can see the circle.`;
+    }
+
+    const accentWarn = document.getElementById('cfg-accent-warn');
+
     function render() {
         const config = readConfig();
         controls.accent.disabled = controls.accentDefault.checked;
+        if (accentWarn) {
+            const warning = accentWarning(config);
+            accentWarn.textContent = warning;
+            accentWarn.hidden = warning === '';
+        }
         if (modeHint) modeHint.textContent = MODE_HINTS[config.mode] || '';
         if (snippetEl) snippetEl.textContent = snippetFor(config);
 
@@ -831,7 +971,7 @@ data-logo="https://your-site.example/logo.png"</code></pre>
             import('/js/checkout.js')
                 .then((module) => {
                     const checkout = module.checkout || module.default;
-                    if (typeof checkout === 'function') checkout(sku);
+                    if (typeof checkout === 'function') checkout(sku, { trigger: button, placement: 'embed' });
                     else window.location.href = '/for-practitioners';
                 })
                 .catch(() => { window.location.href = '/for-practitioners'; });

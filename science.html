@@ -17,22 +17,25 @@
     <meta property="og:description" content="What slow breathing research actually shows — heart rate variability, blood pressure, anxiety — with every source linked and the limits stated plainly.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://helpmebreath.com/science">
-    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/science.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="The Science of Slow Breathing — What the Evidence Shows">
     <meta name="twitter:description" content="What slow breathing research actually shows — heart rate variability, blood pressure, anxiety — with every source linked and the limits stated plainly.">
-    <meta name="twitter:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/science.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,10 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate.
+         Loaded without blocking render; display=swap prevents invisible text. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -95,7 +100,7 @@
       "@type": "Article",
       "headline": "The Science of Slow Breathing — What the Evidence Shows",
       "description": "A plain-language review of the research behind slow breathing — autonomic effects, resonance frequency and heart rate variability, cyclic sighing, blood pressure and anxiety — with the limitations of each study stated openly.",
-      "image": "https://helpmebreath.com/images/og-breathing-timer.jpg",
+      "image": "https://helpmebreath.com/images/og/science.jpg",
       "datePublished": "2026-09-09",
       "dateModified": "2026-09-09",
       "author": {
@@ -185,82 +190,69 @@
     </script>
 
     <style>
-        .prose ol {
-            margin: 0 0 1rem 1.35rem;
-            color: var(--text-secondary);
-            padding: 0;
-        }
+        /* Page-scoped rules for the reference desk. Tokens only, and no colour
+           defined inside a media or .night block: the token sets already flip.
+           See docs/PAGE_CONTRACT.md 13a. */
 
-        .prose ol li {
+        .evidence-summary {
+            font-size: var(--fs-small);
             line-height: 1.7;
-            margin-bottom: 0.65rem;
-            padding-left: 0.25rem;
+            color: var(--graphite);
         }
 
-        .prose .caution-block {
-            border: 1px solid var(--border);
-            border-left: 3px solid var(--theme-primary);
-            border-radius: 14px;
-            padding: 1.25rem 1.5rem;
-            margin: 1.5rem 0;
-            background: rgba(255, 255, 255, 0.04);
-        }
-
-        .prose .caution-block h3 {
-            margin-top: 0;
-        }
-
-        .prose .caution-block ul {
-            margin-bottom: 0;
-        }
-
-        .prose .reference-list {
+        .reference-list {
             list-style: none;
-            margin-left: 0;
+            margin: 0;
             padding-left: 0;
         }
 
-        .prose .reference-list li {
-            margin-bottom: 1.1rem;
+        .reference-list li {
+            margin: 0 0 1.1rem;
             padding-left: 1.1rem;
-            border-left: 2px solid var(--border);
-            font-size: 0.9375rem;
+            border-left: 1px solid var(--rule);
+            font-size: var(--fs-small);
+            line-height: 1.65;
+            color: var(--graphite);
         }
 
-        .prose .reference-list .ref-note {
+        .reference-list li:last-child { margin-bottom: 0; }
+
+        .reference-list em { color: var(--ink); }
+
+        .ref-note {
             display: block;
             margin-top: 0.35rem;
-            font-size: 0.875rem;
-            opacity: 0.85;
-        }
-
-        .prose .evidence-summary {
-            font-size: 0.9375rem;
+            font-size: var(--fs-small);
+            line-height: 1.6;
+            color: var(--graphite);
         }
     </style>
 </head>
 <body class="theme-coherent article-page">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element leaf leaf-3"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element ripple ripple-3"></div>
-    <div class="natural-element cloud cloud-1"></div>
-    <div class="natural-element sun-ray sun-ray-1"></div>
-    <div class="natural-element sun-ray sun-ray-2"></div>
-    <div class="natural-element sun-ray sun-ray-3"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science" aria-current="page">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
@@ -268,21 +260,17 @@
                     <li>The science of slow breathing</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>The Science of Slow Breathing</h1>
-                <p class="subtitle">What the research actually shows, what it does not show, and where every claim on this site comes from.</p>
+            <h1>The Science of Slow Breathing</h1>
+            <p class="lead">What the research actually shows, what it does not show, and where every claim on this site comes from.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Published 2026-09-09 &middot; Updated 2026-09-09</p>
             </div>
         </header>
 
         <main id="main">
             <article class="prose">
                 <section>
-                    <p class="article-meta">
-                        By <a href="/about">Georges Rayess</a> ·
-                        Published <time datetime="2026-09-09">9 September 2026</time> ·
-                        Last reviewed <time datetime="2026-09-09">9 September 2026</time>
-                    </p>
-
                     <p class="lead">Slow breathing is one of the few self-help practices that has both a plausible physical mechanism and a real research literature behind it. It is also surrounded by claims that literature does not support. This page is the reference desk for the rest of the site: every study we lean on, summarised in plain language, with the limits stated as clearly as the findings.</p>
 
                     <p>Everything below comes from a paper we opened and read. Where a result is small, or the sample was 40 people, or the trial ran for four weeks and then stopped, you will see that written down next to the result. That is not hedging for its own sake. Breathing research is a young field with a lot of enthusiastic coverage and a fairly thin evidence base underneath it, and you deserve to know which is which before you decide how much weight to give it.</p>
@@ -316,7 +304,7 @@
                     <p>Two honest caveats. First, a rise in heart rate variability is a physiological marker, not a symptom you can feel, and the leap from marker to wellbeing is exactly the leap the 2018 review said the field has not fully made. Second, resonance frequency varies from person to person; six breaths a minute is a good average, not a personal prescription.</p>
                 </section>
 
-                <div class="ad-slot" data-ad-slot="in-content-1" aria-hidden="true"></div>
+                <aside class="ad-slot" data-ad-slot="in-content-1" role="complementary" aria-label="Advertisement"></aside>
 
                 <section id="cyclic-sighing">
                     <h2>Cyclic sighing: the clearest single trial we have</h2>
@@ -405,7 +393,7 @@
 
                     <p>Gentle slow breathing with no holds — the pattern above — is low risk for most people. Two other families of technique are not, and both appear elsewhere on this site: patterns with long breath holds (such as the seven-count hold in <a href="/4-7-8-breathing">4-7-8</a> or the two holds in <a href="/box-breathing">box breathing</a>), and patterns with deliberately fast breathing (our <a href="/energizing-breath">energizing breath</a>).</p>
 
-                    <div class="caution-block">
+                    <div class="callout callout--caution">
                         <h3>Breath holds and fast breathing: do not practise these without medical advice if any of the following apply</h3>
                         <ul>
                             <li>You are pregnant.</li>
@@ -440,7 +428,7 @@
                     <p>What is left after all that is still worth having: a free, portable, side-effect-light practice with a measurable physiological signature and a small-to-medium effect on how stressed people say they feel. We think that is a good thing. We just do not think it is a miracle, and we would rather you heard the caveats from us than found them out later.</p>
                 </section>
 
-                <div class="ad-slot" data-ad-slot="in-content-2" aria-hidden="true"></div>
+                <aside class="ad-slot" data-ad-slot="in-content-2" role="complementary" aria-label="Advertisement"></aside>
 
                 <section id="editorial-policy">
                     <h2>How we choose sources</h2>
@@ -494,7 +482,7 @@
                     </div>
                 </section>
 
-                <section id="references">
+                <section class="citations" id="references">
                     <h2>References</h2>
 
                     <p class="evidence-summary">Every item below was opened and read while writing this page. Links open on the publisher's or the National Library of Medicine's site.</p>
@@ -575,56 +563,64 @@
                 </section>
             </article>
 
-            <nav class="technique-switcher" aria-label="Breathing timers">
-                <a href="/4-7-8-breathing">🌙 4-7-8</a>
-                <a href="/box-breathing">🌿 Box</a>
-                <a href="/heart-coherence-breathing">💗 Coherence</a>
-                <a href="/cyclic-sighing">🌊 Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">🌅 Extended exhale</a>
-                <a href="/triangle-breathing">☁️ Triangle</a>
-                <a href="/energizing-breath">☀️ Energizing</a>
+            <nav class="technique-switcher" aria-label="Other breathing timers">
+                <a href="/4-7-8-breathing">4-7-8</a>
+                <a href="/box-breathing">Box</a>
+                <a href="/heart-coherence-breathing">Coherence</a>
+                <a href="/cyclic-sighing">Cyclic sighing</a>
+                <a href="/extended-exhale-breathing">Extended exhale</a>
+                <a href="/triangle-breathing">Triangle</a>
+                <a href="/energizing-breath">Energizing</a>
                 <a href="/timer">All timers</a>
             </nav>
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">Extended exhale</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About and products">
-                <a href="/about">About</a>
-                <a href="/pro">Pro</a>
-                <a href="/for-practitioners">For practitioners</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>

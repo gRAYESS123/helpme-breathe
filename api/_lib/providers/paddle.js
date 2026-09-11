@@ -307,39 +307,87 @@ export const paddleProvider = {
     }
 
     const nowIso = new Date().toISOString();
-    const existing = (record.ref && record.ref.customerCustomData) || {};
-    const previousLedger =
-      existing[LEDGER_KEY] && typeof existing[LEDGER_KEY] === 'object' ? existing[LEDGER_KEY] : {};
 
-    const customData = {
-      ...existing,
-      [LEDGER_KEY]: {
-        ...previousLedger,
-        [record.orderId]: {
-          n: activations,
-          max: record.maxActivations,
-          doms: domains,
-          first: (record.ref && record.ref.firstActivation) || nowIso,
-          last: nowIso,
-        },
-      },
+    /*
+     * Read-modify-write, as close together as this API allows.
+     *
+     * The customer record was read earlier in the request, so counting from it
+     * lets two concurrent activations both read n and both write n+1. Paddle
+     * offers no compare-and-swap on custom_data, so the best available is: read
+     * the record again immediately before the PATCH, count from THAT, merge only
+     * this order's own sub-object rather than rewriting the whole ledger map,
+     * and — once — re-read after the write and retry if somebody landed between
+     * the two. It narrows the window to a couple of hundred milliseconds; it does
+     * not close it. The cap is a soft counter and is documented as one.
+     */
+    const readLedger = async () => {
+      const fresh = await paddleFetch(ctx, `/customers/${encodeURIComponent(customerId)}`);
+      if (!fresh.ok) return null;
+      const data = (fresh.body && fresh.body.data && fresh.body.data.custom_data) || {};
+      const ledger = data[LEDGER_KEY] && typeof data[LEDGER_KEY] === 'object' ? data[LEDGER_KEY] : {};
+      return { data, ledger };
     };
 
-    const result = await paddleFetch(ctx, `/customers/${encodeURIComponent(customerId)}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ custom_data: customData }),
-    });
+    const writeOnce = async () => {
+      const current = (await readLedger()) || {
+        data: (record.ref && record.ref.customerCustomData) || {},
+        ledger:
+          ((record.ref && record.ref.customerCustomData) || {})[LEDGER_KEY] &&
+          typeof ((record.ref && record.ref.customerCustomData) || {})[LEDGER_KEY] === 'object'
+            ? ((record.ref && record.ref.customerCustomData) || {})[LEDGER_KEY]
+            : {},
+      };
 
-    if (!result.ok) {
+      const entry =
+        current.ledger[record.orderId] && typeof current.ledger[record.orderId] === 'object'
+          ? current.ledger[record.orderId]
+          : {};
+      const count = (Number(entry.n) || record.activations || 0) + 1;
+      const merged = mergeDomains(
+        Array.isArray(entry.doms) ? entry.doms : record.domains,
+        (input && input.domains) || [],
+      );
+
+      const customData = {
+        ...current.data,
+        [LEDGER_KEY]: {
+          ...current.ledger,
+          [record.orderId]: {
+            ...entry,
+            n: count,
+            max: record.maxActivations,
+            doms: merged,
+            first: entry.first || (record.ref && record.ref.firstActivation) || nowIso,
+            last: nowIso,
+          },
+        },
+      };
+
+      const written = await paddleFetch(ctx, `/customers/${encodeURIComponent(customerId)}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ custom_data: customData }),
+      });
+
+      return { written, count, merged };
+    };
+
+    let attempt = await writeOnce();
+    if (!attempt.written.ok) {
+      // One retry: a concurrent PATCH is the likely cause, and the second read
+      // picks up whatever it wrote.
+      attempt = await writeOnce();
+    }
+
+    if (!attempt.written.ok) {
       console.warn(
         '[paddle] could not write the activation ledger. Check that the API key has ' +
           'customer.write permission, otherwise activation caps will not be enforced.',
-        { sub: (ctx && ctx.sub) || null, status: result.status },
+        { sub: (ctx && ctx.sub) || null, status: attempt.written.status },
       );
       return { ok: false, activations, domains, reason: 'ledger_write_failed' };
     }
 
-    return { ok: true, activations, domains };
+    return { ok: true, activations: attempt.count, domains: attempt.merged };
   },
 };
 

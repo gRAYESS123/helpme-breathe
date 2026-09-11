@@ -8,13 +8,29 @@ Disallow: /s/
 Disallow: /api/
 
 # AI search engines are a real referral channel — let them read the content.
+# A crawler obeys the single most specific group that matches it and ignores
+# `User-agent: *` entirely, so each named group repeats the Disallow lines.
+# Without them these three would be the only crawlers allowed onto the utility
+# surfaces, including /s/ client links that carry a practitioner's name.
 User-agent: GPTBot
 Allow: /
+Disallow: /render
+Disallow: /embed/v1/
+Disallow: /s/
+Disallow: /api/
 
 User-agent: ClaudeBot
 Allow: /
+Disallow: /render
+Disallow: /embed/v1/
+Disallow: /s/
+Disallow: /api/
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /render
+Disallow: /embed/v1/
+Disallow: /s/
+Disallow: /api/
 
 Sitemap: https://helpmebreath.com/sitemap.xml

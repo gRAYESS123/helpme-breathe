@@ -35,6 +35,19 @@ const METHODS = 'POST, OPTIONS';
 /** Five a minute per client IP, as specified. */
 const limiter = createLimiter({ name: 'subscribe', limit: 5, windowMs: 60 * 1000 });
 
+/**
+ * A second limiter, keyed on a hash of the address rather than on the caller.
+ *
+ * The IP bucket alone is not enough: a double opt-in confirmation email goes to
+ * whatever address the body names, so one address could be mailed repeatedly
+ * from a rotating set of sources. Three confirmation emails an hour to the same
+ * address is more than anyone needs and far less than a mailbox would call
+ * abuse, and it keeps the sending reputation of the domain out of it. The key is
+ * the same 12-character hash prefix the logs use — the address itself is never a
+ * bucket key.
+ */
+const addressLimiter = createLimiter({ name: 'subscribe-address', limit: 3, windowMs: 60 * 60 * 1000 });
+
 /** The confirmation sentence. One string, used for every success. */
 export const SUCCESS_MESSAGE = 'Check your inbox to confirm';
 
@@ -164,6 +177,24 @@ export async function POST(request) {
       return respond(400, { ok: false, error: valid.error, field: valid.field });
     }
 
+    // Only ever a hash prefix of the address, the same discipline the licence
+    // endpoints apply to keys. Computed here so it can key the second limiter.
+    const who = (await sha256Hex(valid.value.email)).slice(0, 12);
+
+    const perAddress = addressLimiter.check(who);
+    if (!perAddress.ok) {
+      return respond(
+        429,
+        {
+          ok: false,
+          error:
+            'A confirmation email has already gone to that address. Check your inbox and spam folder, ' +
+            'and try again in an hour if it has not arrived.',
+        },
+        rateLimitHeaders(perAddress, { includeRetryAfter: true }),
+      );
+    }
+
     const providerId = emailProviderName();
     const provider = getEmailProvider(providerId);
     const env = requireEnv(provider.requiredEnv);
@@ -171,10 +202,6 @@ export async function POST(request) {
     if (apiBase) env.EMAIL_API_BASE = apiBase;
 
     const result = await provider.subscribe(valid.value, { env });
-
-    // Only ever log a hash prefix of the address, the same discipline the
-    // licence endpoints apply to keys.
-    const who = (await sha256Hex(valid.value.email)).slice(0, 12);
 
     if (!result.ok) {
       console.warn('[subscribe] failed', {

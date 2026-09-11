@@ -5,51 +5,239 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offline | Help Me Breathe</title>
     <meta name="robots" content="noindex">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+
+    <!-- Favicon: the ring with a gap. Never an emoji data URI.
+         All three files are precached by sw.js, so they resolve offline. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
+
+    <!--
+      This page renders with no network at all: no webfont, no stylesheet
+      request, no script. Type falls back to the system stacks the way the
+      embed widget does. The token block is the same Paper and Ink palette as
+      css/styles.css, declared locally; every colour is a token and nothing is
+      defined only inside the dark media query. See docs/BRAND.md.
+    -->
     <style>
+        :root {
+            --paper: #F5F1E8;
+            --leaf: #FFFDF7;
+            --ink: #1C2320;
+            --graphite: #575F58;
+            --rule: #E3DCCC;
+            --edge: #83887E;
+            --green: #0F5136;
+            --chalk: #FFFFFF;
+
+            /* No webfont offline: the fallback stacks are the type. */
+            --display: ui-serif, Georgia, 'Times New Roman', serif;
+            --ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                  'Helvetica Neue', Arial, sans-serif;
+
+            --fs-micro: 0.6875rem;
+            --fs-small: 0.8125rem;
+            --radius: 8px;
+            --hit: 44px;
+            --page: 62rem;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body:not(.day) {
+                --paper: #15191A;
+                --leaf: #1E2426;
+                --ink: #EDE7DA;
+                --graphite: #A7AEA4;
+                --rule: #2E3536;
+                --edge: #767D77;
+                --green: #5FBF92;
+                --chalk: #15191A;
+                color-scheme: dark;
+            }
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Quicksand', 'Segoe UI', system-ui, sans-serif;
+            font-family: var(--ui);
+            font-weight: 400;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--ink);
+            background: var(--paper);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a { color: var(--green); }
+
+        :focus-visible {
+            outline: 2px solid var(--green);
+            outline-offset: 2px;
+        }
+
+        .site-header {
+            background: var(--leaf);
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .site-header-inner {
+            width: 100%;
+            max-width: var(--page);
+            margin: 0 auto;
+            padding: 0 1.25rem;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        .lockup {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            color: var(--ink);
+            padding: 0.5rem 0;
+        }
+
+        .lockup-mark {
+            display: block;
+            width: 26px;
+            height: 26px;
+            color: var(--green);
+            flex: 0 0 auto;
+        }
+
+        .wordmark {
+            font-family: var(--display);
+            font-weight: 500;
+            font-size: 1.0625rem;
+            letter-spacing: -0.012em;
+            line-height: 1;
+            white-space: nowrap;
+            color: var(--ink);
+        }
+
+        main {
+            flex: 1 0 auto;
+            width: 100%;
+            max-width: var(--page);
+            margin: 0 auto;
+            padding: 3rem 1.25rem;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 2rem;
-            color: #fff;
-            background: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
         }
-        .offline-card { max-width: 420px; }
-        .orb {
-            width: 120px; height: 120px; margin: 0 auto 2rem;
-            border-radius: 50%;
-            background: radial-gradient(circle at 35% 35%, #c7d2fe 0%, #8b5cf6 70%);
-            box-shadow: 0 0 60px #8b5cf6;
-            animation: breathe 8s ease-in-out infinite;
+
+        .card { max-width: 32rem; }
+
+        .mark {
+            display: block;
+            width: 112px;
+            height: 112px;
+            margin: 0 auto 2rem;
+            color: var(--green);
+            animation: mark-breathe 8s infinite;
+            transform-origin: 50% 50%;
         }
-        @keyframes breathe {
-            0%, 100% { transform: scale(0.85); }
-            50% { transform: scale(1.1); }
+
+        @keyframes mark-breathe {
+            0%   { transform: scale(0.86); animation-timing-function: cubic-bezier(.33, 0, .20, 1); }
+            50%  { transform: scale(1);    animation-timing-function: cubic-bezier(.42, 0, .30, 1); }
+            100% { transform: scale(0.86); }
         }
-        h1 { font-size: 1.75rem; font-weight: 300; margin-bottom: 1rem; letter-spacing: 0.05em; }
-        p { color: #c7d2fe; line-height: 1.6; margin-bottom: 2rem; }
-        a {
-            display: inline-block; padding: 0.875rem 1.75rem;
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px; color: #fff; text-decoration: none;
-            font-weight: 500; transition: background 0.3s ease;
+
+        .status {
+            font-size: var(--fs-micro);
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--graphite);
+            margin-bottom: 0.6rem;
         }
-        a:hover { background: rgba(255, 255, 255, 0.2); }
-        @media (prefers-reduced-motion: reduce) { .orb { animation: none; } }
+
+        h1 {
+            font-family: var(--display);
+            font-weight: 500;
+            font-size: 2rem;
+            line-height: 1.2;
+            letter-spacing: -0.012em;
+            margin-bottom: 0.85rem;
+            color: var(--ink);
+        }
+
+        .card p.body-copy {
+            color: var(--graphite);
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: var(--hit);
+            padding: 0.75rem 1.35rem;
+            font-family: var(--ui);
+            font-size: 0.9375rem;
+            font-weight: 500;
+            border-radius: var(--radius);
+            border: 1px solid var(--green);
+            background: var(--green);
+            color: var(--chalk);
+            text-decoration: none;
+        }
+
+        .footer {
+            width: 100%;
+            max-width: var(--page);
+            margin: 0 auto;
+            padding: 1.5rem 1.25rem 2rem;
+            border-top: 1px solid var(--ink);
+            font-size: var(--fs-small);
+            color: var(--graphite);
+        }
+
+        @media (max-width: 420px) {
+            .wordmark { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mark { animation: none; transform: scale(0.93); }
+        }
     </style>
 </head>
 <body>
-    <div class="offline-card">
-        <div class="orb"></div>
-        <h1>You're offline</h1>
-        <p>No internet connection right now — but you can still take a moment to breathe. Reconnect to load the guided timer.</p>
-        <a href="/">Try again</a>
-    </div>
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+        </div>
+    </header>
+
+    <main id="main">
+        <div class="card">
+            <svg class="mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+            </svg>
+            <p class="status">Offline</p>
+            <h1>You're offline</h1>
+            <p class="body-copy">No internet connection right now — but you can still take a moment to breathe. Reconnect to load the guided timer.</p>
+            <a class="btn" href="/">Try again</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>Written and maintained by Georges Rayess. Not a clinician.</p>
+    </footer>
 </body>
 </html>

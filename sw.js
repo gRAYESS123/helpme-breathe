@@ -8,10 +8,23 @@
  *   - /api/* and cross-origin : never intercepted, never cached
  *
  * Bump CACHE_NAME on every deploy that changes CSS, JS or the app shell.
+ * Webfonts are cross-origin: never precached, never intercepted.
  * Changing this file is what triggers the service-worker update.
  */
-const CACHE_NAME = 'hmb-v2-2026-09-09b';
+const CACHE_NAME = 'hmb-v4-paper-and-ink-2026-09-10';
 const OFFLINE_URL = '/offline.html';
+
+/**
+ * Caches this worker must NOT purge on activate. The Pro soundscape pack lives
+ * in its own cache (js/pro/soundscapes.js), roughly 4MB a paying customer chose
+ * to download for offline use. Purging every non-shell cache on every deploy
+ * wiped it, which broke "audio plays with the device offline after activation"
+ * for anyone whose first post-deploy load happened offline.
+ *
+ * Keep this name in step with AUDIO_CACHE in js/pro/soundscapes.js.
+ */
+const AUDIO_CACHE = 'hmb-audio';
+const KEEP_CACHES = new Set([CACHE_NAME, AUDIO_CACHE]);
 
 // App shell. Install does NOT fail when one entry 404s (a page can ship later);
 // each URL is fetched independently and failures are skipped.
@@ -26,8 +39,22 @@ const PRECACHE_URLS = [
   '/js/analytics.js',
   '/js/entitlements.js',
   '/js/consent.js',
+  '/js/config.js',
+  '/js/checkout.js',
   '/js/pro/index.js',
+  '/js/pro/patterns.js',
+  '/js/pro/streaks.js',
+  '/js/pro/paywall.js',
+  '/js/pro/capture.js',
+  '/js/pro/night.js',
+  '/js/pro/soundscapes.js',
+  '/css/pro.css',
+  '/css/print.css',
   '/manifest.json',
+  '/favicon.svg',
+  '/favicon-32.png',
+  '/favicon-16.png',
+  '/images/logo.svg',
   '/images/icon-192.png',
   '/images/icon-512.png',
   '/images/apple-touch-icon.png'
@@ -55,7 +82,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys.filter((key) => !KEEP_CACHES.has(key)).map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
@@ -63,6 +90,19 @@ self.addEventListener('activate', (event) => {
 function isCacheable(url) {
   if (url.origin !== self.location.origin) return false;
   if (url.pathname.startsWith('/api/')) return false;
+  return true;
+}
+
+/**
+ * A navigation worth keeping on disk. Anything carrying a query string is not:
+ * /pro/thanks arrives with a licence key in it, and /s/?c=… carries a
+ * practitioner's name and message. Caching those would write them to
+ * CacheStorage keyed on the full URL. They still work — they simply come from
+ * the network every time, which is what a one-off activation link wants anyway.
+ */
+function isCacheableNavigation(url) {
+  if (url.search) return false;
+  if (url.pathname === '/pro/thanks' || url.pathname === '/pro/thanks.html') return false;
   return true;
 }
 
@@ -84,7 +124,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          if (response && response.ok) {
+          if (response && response.ok && isCacheableNavigation(url)) {
             const copy = response.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
           }

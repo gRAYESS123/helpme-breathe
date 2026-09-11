@@ -26,13 +26,16 @@
     <meta name="twitter:description" content="Who writes Help Me Breathe, why it exists, how techniques and sources are chosen, and exactly how the site pays for itself.">
     <meta name="twitter:image" content="https://helpmebreath.com/images/og/about.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,8 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -129,103 +132,63 @@
     </script>
 
     <style>
-        /* Page-scoped: the definition list used by the editorial policy, a
-           bordered note block and a quiet review-date line. Everything else
-           reuses the shared .article-page prose system. */
-        .prose .policy-list {
-            margin: 1.25rem 0 0;
-        }
+        /* Page-scoped, tokens only. The shared article system carries everything
+           else; these three shapes have no component in css/styles.css yet. */
 
-        .prose .policy-list dt {
-            color: var(--text-primary);
-            font-weight: 600;
-            margin-top: 1.25rem;
-        }
+        /* The editorial policy is a definition list; css/styles.css section 7
+           now carries the dl/dt/dd shape. */
+        .prose .policy-list { margin: 1.25rem 0 0; }
 
-        .prose .policy-list dd {
-            margin: 0.35rem 0 0;
-            color: var(--text-secondary);
-            line-height: 1.75;
-        }
-
-        .prose .note-block {
-            border: 1px solid var(--border);
-            border-left: 3px solid var(--theme-primary);
-            border-radius: 14px;
-            padding: 1.25rem 1.5rem;
-            margin: 1.5rem 0;
-            background: rgba(255, 255, 255, 0.04);
-        }
-
-        .prose .note-block h3 {
-            margin-top: 0;
-        }
-
-        .prose .note-block p:last-child,
-        .prose .note-block ul:last-child {
-            margin-bottom: 0;
-        }
-
-        .prose .note-block ul li {
-            margin-bottom: 0.65rem;
-        }
-
+        /* The review-date line: quiet, and its dates set in tabular figures. */
         .prose .review-note {
-            font-size: 0.9375rem;
-            opacity: 0.9;
-        }
-
-        .prose .support-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin-top: 1.25rem;
+            font-size: var(--fs-small);
+            color: var(--graphite);
+            font-variant-numeric: tabular-nums;
         }
     </style>
 </head>
 <body class="theme-478 article-page" data-no-ads="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element leaf leaf-3"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element ripple ripple-3"></div>
-    <div class="natural-element cloud cloud-1"></div>
-    <div class="natural-element sun-ray sun-ray-1"></div>
-    <div class="natural-element sun-ray sun-ray-2"></div>
-    <div class="natural-element sun-ray sun-ray-3"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
                     <li>About</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>About Help Me Breathe</h1>
-                <p class="subtitle">Who writes this, how the pages get made, and where the money comes from.</p>
+            <h1>About Help Me Breathe</h1>
+            <p class="lead">Who writes this, how the pages get made, and where the money comes from.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Published <time datetime="2026-09-09">9 September 2026</time> &middot; Reviewed <time datetime="2026-09-09">9 September 2026</time></p>
             </div>
         </header>
 
         <main id="main">
             <article class="prose">
                 <section>
-                    <p class="article-meta">
-                        By <strong>Georges Rayess</strong> ·
-                        Published <time datetime="2026-09-09">9 September 2026</time> ·
-                        Last reviewed <time datetime="2026-09-09">9 September 2026</time>
-                    </p>
-
                     <p class="lead">Help Me Breathe is a free guided breathing timer. This page tells you who makes it, how the writing is done, what is checked and by whom, and exactly how the site earns money. If you are going to spend five quiet minutes with a health-adjacent website, you should be able to see all of that in one place, without hunting for it.</p>
                 </section>
 
@@ -340,7 +303,7 @@
                         </div>
                     </div>
 
-                    <div class="note-block">
+                    <div class="callout">
                         <h3>Things this site does not do</h3>
                         <ul>
                             <li>It does not sell or rent your personal data. There are no accounts and no passwords, so no profile of your practice is held anywhere under your name: your settings and your session history stay in your own browser.</li>
@@ -377,8 +340,8 @@
 
                     <p class="review-note">This page was last reviewed on <time datetime="2026-09-09">9 September 2026</time> and is scheduled for its next review by <time datetime="2027-03-09">9 March 2027</time>. Health and safety pages are reviewed at least every six months, and immediately whenever a source they rely on is updated or retracted.</p>
 
-                    <div class="support-row" data-ask="support">
-                        <a class="patreon-btn" href="https://www.patreon.com/GeorgesRayess" target="_blank" rel="noopener noreferrer" data-action="support" data-support-label="patreon">Support on Patreon</a>
+                    <div class="support-options" data-ask="support">
+                        <a href="https://www.patreon.com/GeorgesRayess" target="_blank" rel="noopener noreferrer" data-action="support" data-support-label="patreon">Support on Patreon</a>
                         <a class="pro-link" href="/pro" data-action="support" data-support-label="pro">Unlock Pro — one payment, forever</a>
                     </div>
                 </section>
@@ -391,55 +354,63 @@
             </article>
 
             <nav class="technique-switcher" aria-label="Breathing timers">
-                <a href="/4-7-8-breathing">🌙 4-7-8</a>
-                <a href="/box-breathing">🌿 Box</a>
-                <a href="/heart-coherence-breathing">💗 Coherence</a>
-                <a href="/cyclic-sighing">🌊 Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">🌅 Extended exhale</a>
-                <a href="/triangle-breathing">☁️ Triangle</a>
-                <a href="/energizing-breath">☀️ Energizing</a>
+                <a href="/4-7-8-breathing">4-7-8</a>
+                <a href="/box-breathing">Box</a>
+                <a href="/heart-coherence-breathing">Coherence</a>
+                <a href="/cyclic-sighing">Cyclic sighing</a>
+                <a href="/extended-exhale-breathing">Extended exhale</a>
+                <a href="/triangle-breathing">Triangle</a>
+                <a href="/energizing-breath">Energizing</a>
                 <a href="/timer">All timers</a>
             </nav>
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">Extended exhale</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About and products">
-                <a href="/science">What the research says</a>
-                <a href="/pro">Pro</a>
-                <a href="/for-practitioners">For practitioners</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/legal/medical-disclaimer">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>
@@ -447,5 +418,6 @@
 
     <script type="module" src="/js/consent.js"></script>
     <script type="module" src="/js/app.js"></script>
+    <script type="module" src="/js/pro/index.js"></script>
 </body>
 </html>

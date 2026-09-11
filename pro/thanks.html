@@ -8,15 +8,57 @@
     <meta name="description" content="Your Help Me Breathe Pro purchase is complete. Activate your licence key in this browser and start breathing.">
 
     <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
     <meta name="author" content="Georges Rayess">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!--
+      FIRST script on the page, before the gtag block below and before anything
+      else can read location.search.
+
+      The merchant of record returns the buyer here with the licence key (or, on
+      Paddle, the transaction reference that IS the key) in the query string. A
+      full key must never reach a log, an analytics event or an error report
+      (AGENT_BRIEF hard rule 9), and GA4's default `page_location` is exactly
+      such an event — it is sent even with analytics_storage denied. The address
+      bar, browser history, the bfcache and the service worker's navigation
+      cache would all keep a copy too.
+
+      So: read the parameters into a module-scoped global, then rewrite the URL
+      to the bare path. Everything downstream reads window.__hmbActivation, never
+      location.search. The gtag config below also pins page_location to the path,
+      so even a bypassed strip cannot leak it.
+    -->
+    <script>
+        (function () {
+            try {
+                var params = new URLSearchParams(window.location.search);
+                var names = ['key', 'k', 'license', '_ptxn', 'ptxn', 'transaction_id', 'transactionId', 'orderId'];
+                var found = {};
+                var dirty = false;
+                for (var i = 0; i < names.length; i += 1) {
+                    var value = params.get(names[i]);
+                    if (value) { found[names[i]] = value; dirty = true; }
+                }
+                window.__hmbActivation = found;
+                if (dirty && window.history && typeof window.history.replaceState === 'function') {
+                    window.history.replaceState(null, '', window.location.pathname);
+                }
+            } catch (error) {
+                window.__hmbActivation = window.__hmbActivation || {};
+            }
+        }());
+    </script>
+
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,8 +67,9 @@
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/pro.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!--
       Google Consent Mode v2 — copy verbatim, do not reorder. The DENIED
@@ -46,7 +89,10 @@
         gtag('js', new Date());
         gtag('config', 'G-09WY9JD4YM', {
             'anonymize_ip': true,
-            'cookie_expires': 63072000
+            'cookie_expires': 63072000,
+            // Belt and braces beside the strip above: a licence key can never
+            // reach Google in `dl`, whatever the address bar happens to hold.
+            'page_location': window.location.origin + window.location.pathname
         });
     </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
@@ -81,17 +127,27 @@
 <body class="theme-478 article-page pro-page" data-no-ads="true" data-no-asks="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element cloud cloud-1"></div>
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro" aria-current="page">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
@@ -99,10 +155,8 @@
                     <li>Thank you</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Thank you</h1>
-                <p class="subtitle">One thing left: unlock this browser with your licence key.</p>
-            </div>
+            <h1>Thank you</h1>
+            <p class="lead">One thing left: unlock this browser with your licence key.</p>
         </header>
 
         <main id="main">
@@ -161,19 +215,59 @@
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
+                <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>
     </div>
 
     <script type="module" src="/js/consent.js"></script>
+    <script type="module" src="/js/app.js"></script>
     <script type="module">
         import { activate, getLicenseInfo, tier } from '/js/entitlements.js';
         import { track, EVENTS } from '/js/analytics.js';
@@ -209,15 +303,23 @@
             );
         }
 
-        const params = new URLSearchParams(window.location.search);
+        // Captured and erased by the first script in <head>, so the key is not
+        // in location.search, in history, in the bfcache or in any GA4 event.
+        const captured = window.__hmbActivation || {};
+        const pick = (...names) => {
+            for (const name of names) {
+                const value = captured[name];
+                if (value) return String(value);
+            }
+            return '';
+        };
 
         // Our own link format first, then the provider's transaction reference.
         // Paddle Billing passes a transaction as `_ptxn`; other merchants of
         // record use `transaction_id` or `orderId`. /api/license accepts either
         // a licence key or a transaction reference.
-        const key = params.get('key') || params.get('k') || params.get('license') || '';
-        const txn = params.get('_ptxn') || params.get('ptxn') || params.get('transaction_id')
-            || params.get('transactionId') || params.get('orderId') || '';
+        const key = pick('key', 'k', 'license');
+        const txn = pick('_ptxn', 'ptxn', 'transaction_id', 'transactionId', 'orderId');
 
         // The Protocol Pack is a PDF, not an app tier, so /api/license answers
         // 422 pack_only for a pack key. That is not a failure worth alarming

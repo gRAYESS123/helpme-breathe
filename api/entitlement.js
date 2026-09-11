@@ -1,7 +1,7 @@
 /**
  * POST /api/entitlement — silent token refresh.
  *
- * Request  { token: string, key?: string }
+ * Request  { token: string, key?: string, host?: string }
  * Response { ok: true, token, tier, exp, act, dom?, refreshed, stale? }
  *          { ok: false, reason, tier?, exp? }
  *
@@ -40,6 +40,24 @@
  * `ok: false, reason: 'refresh_required'`, at which point the client leans on its
  * own 14-day offline grace. A refresh never increments the activation counter —
  * it is not an activation.
+ *
+ * `host` IS CHECKED, AND WHAT THAT IS AND IS NOT WORTH
+ *
+ * The embed frame sends the hostname of the page it is embedded in. When the
+ * token carries a `dom` claim and the caller names a host that the claim does
+ * not cover, the answer is `ok: false, reason: 'domain_mismatch'` — so a lifted
+ * token pasted into someone else's site gets a no from the server as well as
+ * from the widget.
+ *
+ * Be honest about the limit. The frame is served from our own origin, so the
+ * request's `Origin` and `Referer` headers say helpmebreath.com and cannot tell
+ * us anything about the embedding page; `host` is supplied by the frame, and
+ * someone hosting their own copy of the frame could supply whatever they like.
+ * The binding that actually matters is therefore the one done at mint time: a
+ * token gets a `dom` claim at activation, and embed/v1/frame.html refuses to
+ * white-label a token with no claim at all. This check is defence in depth on
+ * top of that, not the boundary itself. A request that names no host is not
+ * refused, because js/entitlements.js refreshes from helpmebreath.com itself.
  *
  * CORS: this endpoint answers `Access-Control-Allow-Origin: *` because the embed
  * frame and the client session link are rendered inside third-party sites. See
@@ -147,6 +165,21 @@ export async function OPTIONS(request) {
  * @param {Request} request
  * @returns {Promise<Response>}
  */
+/**
+ * Does `host` fall under one of the hostnames on the licence? An entry covers
+ * itself and its subdomains; a leading `*.` is tolerated and ignored.
+ * @param {string} host
+ * @param {string[]} claimed
+ * @returns {boolean}
+ */
+function hostAllowed(host, claimed) {
+  return claimed.some((entry) => {
+    const claim = String(entry).trim().toLowerCase().replace(/^\*\./, '');
+    if (!claim) return false;
+    return host === claim || host.endsWith(`.${claim}`);
+  });
+}
+
 export async function GET(request) {
   return methodNotAllowed(request, METHODS, { anyOrigin: true });
 }
@@ -176,6 +209,10 @@ export async function POST(request) {
 
     const token = typeof parsed.data.token === 'string' ? parsed.data.token.trim() : '';
     const key = typeof parsed.data.key === 'string' ? parsed.data.key.trim() : '';
+    const host =
+      typeof parsed.data.host === 'string'
+        ? parsed.data.host.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/[/:].*$/, '')
+        : '';
     if (!token) return respond(400, { ok: false, reason: 'missing_token' });
 
     const env = requireEnv(['LICENSE_SECRET']);
@@ -189,6 +226,14 @@ export async function POST(request) {
     }
 
     const payload = verified.payload;
+
+    // Domain binding, checked server-side as well as in the widget. Only when the
+    // caller names a host: a refresh from helpmebreath.com names none.
+    const claimed = Array.isArray(payload.dom) ? payload.dom.filter(Boolean) : [];
+    if (host && claimed.length && !hostAllowed(host, claimed)) {
+      return respond(200, { ok: false, reason: 'domain_mismatch' });
+    }
+
     const window = refreshWindow(payload);
 
     /** Hand the caller's own token back. `stale` says a recheck was wanted but could not run. */

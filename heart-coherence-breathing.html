@@ -17,22 +17,25 @@
     <meta property="og:description" content="A free 5-5 heart coherence breathing timer: five seconds in, five seconds out, six breaths a minute. Guided pacer, audio cues, and what the research shows.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://helpmebreath.com/heart-coherence-breathing">
-    <meta property="og:image" content="https://helpmebreath.com/images/og/coherent-breathing.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/heart-coherence-breathing.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Heart Coherence Breathing Timer — 5-5 Resonance Pacer">
     <meta name="twitter:description" content="A free 5-5 heart coherence breathing timer: five seconds in, five seconds out, six breaths a minute. Guided pacer, audio cues, and what the research shows.">
-    <meta name="twitter:image" content="https://helpmebreath.com/images/og/coherent-breathing.jpg">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/heart-coherence-breathing.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
-    <!-- PWA -->
+    <!-- PWA. The dark entry must come first: the first matching one wins. -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,8 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!--
       Google Consent Mode v2 — copy verbatim, do not reorder. The DENIED
@@ -100,7 +103,7 @@
       "@type": "HowTo",
       "name": "How to practise heart coherence breathing (5-5)",
       "description": "A paced 5-5 rhythm: five seconds in, five seconds out, with no pause at either end — about six breaths a minute.",
-      "image": "https://helpmebreath.com/images/og/coherent-breathing.jpg",
+      "image": "https://helpmebreath.com/images/og/heart-coherence-breathing.jpg",
       "totalTime": "PT5M",
       "estimatedCost": { "@type": "MonetaryAmount", "currency": "USD", "value": "0" },
       "supply": [
@@ -211,25 +214,28 @@
 <body class="theme-coherent article-page technique-page">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element leaf leaf-3"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element ripple ripple-3"></div>
-    <div class="natural-element cloud cloud-1"></div>
-    <div class="natural-element sun-ray sun-ray-1"></div>
-    <div class="natural-element sun-ray sun-ray-2"></div>
-    <div class="natural-element sun-ray sun-ray-3"></div>
+    <!-- ============ PERSISTENT SITE HEADER — identical on every page ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer" aria-current="page">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
@@ -237,9 +243,11 @@
                     <li>Heart coherence breathing</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Heart Coherence Breathing Timer</h1>
-                <p class="subtitle">Five seconds in, five seconds out, no holds — a paced 5-5 rhythm at about six breaths a minute.</p>
+            <h1>Heart Coherence Breathing Timer</h1>
+            <p class="lead">Five seconds in, five seconds out, no holds — a paced 5-5 rhythm at about six breaths a minute.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Published 2026-09-10 &middot; Updated 2026-09-10</p>
             </div>
         </header>
 
@@ -252,7 +260,15 @@
                      data-lock-technique
                      aria-labelledby="timer-heading">
 
-                <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">⚙️</button>
+                <div class="app-bar">
+                    <h2 id="timer-heading" data-role="technique-title">Heart coherence breathing</h2>
+                    <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+                            <circle cx="12" cy="12" r="3.2"/>
+                            <path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
+                        </svg>
+                    </button>
+                </div>
 
                 <div class="settings-panel" data-role="settings-panel">
                     <div class="setting-item">
@@ -276,22 +292,21 @@
                     </div>
                 </div>
 
-                <h2 id="timer-heading" data-role="technique-title">Heart coherence breathing</h2>
-
+                <!-- The mark, alive. Two dotted calipers mark full inhale and full
+                     exhale; the third ring is the reduced-motion pacer. The notch
+                     at twelve o'clock is the logo's gap and closes on a hold. -->
                 <div class="breathing-container">
-                    <div class="breathing-aura"></div>
+                    <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
+                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
+                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                    </svg>
                     <div class="breathing-circle technique-coherent" data-role="circle">
-                        <div class="circle-text-container">
-                            <span data-role="circle-text">Ready</span>
-                        </div>
+                        <span class="circle-notch" aria-hidden="true"></span>
                     </div>
-                    <div class="breathing-particles" aria-hidden="true">
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
+                    <div class="circle-text-container">
+                        <span class="phase-word" data-role="circle-text">Ready</span>
+                        <span class="phase-count" data-role="phase-count"></span>
                     </div>
                 </div>
 
@@ -326,6 +341,7 @@
                     </div>
                 </div>
 
+                <!-- SLOT: Pro tools -->
                 <div class="tools-row" data-slot="tools"></div>
 
                 <div class="controls">
@@ -343,6 +359,7 @@
                     </div>
                 </div>
 
+                <!-- SLOT: post-session cards -->
                 <div data-slot="post-session"></div>
 
                 <div class="technique-info" data-role="technique-info"></div>
@@ -352,13 +369,13 @@
 
             <!-- ============ TECHNIQUE SWITCHER ============ -->
             <nav class="technique-switcher" aria-label="Other breathing timers">
-                <a href="/4-7-8-breathing">🌙 4-7-8</a>
-                <a href="/box-breathing">🌿 Box</a>
-                <a href="/heart-coherence-breathing" aria-current="page">💗 Coherence</a>
-                <a href="/cyclic-sighing">🌊 Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">🌅 Extended exhale</a>
-                <a href="/triangle-breathing">☁️ Triangle</a>
-                <a href="/energizing-breath">☀️ Energizing</a>
+                <a href="/4-7-8-breathing">4-7-8</a>
+                <a href="/box-breathing">Box</a>
+                <a href="/heart-coherence-breathing" aria-current="page">Coherence</a>
+                <a href="/cyclic-sighing">Cyclic sighing</a>
+                <a href="/extended-exhale-breathing">Extended exhale</a>
+                <a href="/triangle-breathing">Triangle</a>
+                <a href="/energizing-breath">Energizing</a>
                 <a href="/timer">All timers</a>
             </nav>
 
@@ -419,15 +436,17 @@
 
                 <section>
                     <h2>Who should take this one gently</h2>
-                    <p>There are no breath-holds and no fast breathing here, so this is one of the mildest patterns on the site. It is still worth reading the list.</p>
-                    <ul>
-                        <li><strong>If you have asthma, COPD or another respiratory condition</strong> — a five-second exhale may be longer than is comfortable. Shorten both halves rather than forcing the count, and keep your reliever inhaler where you can reach it.</li>
-                        <li><strong>If you are pregnant</strong> — gentle paced breathing is widely used in pregnancy, but keep every breath easy and unforced, and check with your midwife or doctor before adding any new practice.</li>
-                        <li><strong>If you have a cardiovascular condition, or you take medication for blood pressure or heart rhythm</strong> — talk to the person who prescribes it before you start a regular practice, and never adjust a dose because of anything on this page.</li>
-                        <li><strong>If you get dizzy easily or have low blood pressure</strong> — practise sitting or lying down, and get up slowly afterwards.</li>
-                        <li><strong>If you live with panic disorder or find that watching your breath makes you anxious</strong> — paying close attention to breathing can itself set off symptoms in some people. Keep your eyes open, keep the sessions short, and stop if the feeling is building rather than easing.</li>
-                        <li><strong>If your hands tingle, your head goes light or your vision sparkles</strong> — you are taking in more air than you need. Make each breath smaller, not longer, or stop and breathe normally for a minute.</li>
-                    </ul>
+                    <div class="callout callout--caution">
+                        <p>There are no breath-holds and no fast breathing here, so this is one of the mildest patterns on the site. It is still worth reading the list.</p>
+                        <ul>
+                            <li><strong>If you have asthma, COPD or another respiratory condition</strong> — a five-second exhale may be longer than is comfortable. Shorten both halves rather than forcing the count, and keep your reliever inhaler where you can reach it.</li>
+                            <li><strong>If you are pregnant</strong> — gentle paced breathing is widely used in pregnancy, but keep every breath easy and unforced, and check with your midwife or doctor before adding any new practice.</li>
+                            <li><strong>If you have a cardiovascular condition, or you take medication for blood pressure or heart rhythm</strong> — talk to the person who prescribes it before you start a regular practice, and never adjust a dose because of anything on this page.</li>
+                            <li><strong>If you get dizzy easily or have low blood pressure</strong> — practise sitting or lying down, and get up slowly afterwards.</li>
+                            <li><strong>If you live with panic disorder or find that watching your breath makes you anxious</strong> — paying close attention to breathing can itself set off symptoms in some people. Keep your eyes open, keep the sessions short, and stop if the feeling is building rather than easing.</li>
+                            <li><strong>If your hands tingle, your head goes light or your vision sparkles</strong> — you are taking in more air than you need. Make each breath smaller, not longer, or stop and breathe normally for a minute.</li>
+                        </ul>
+                    </div>
                 </section>
 
                 <section>
@@ -435,7 +454,6 @@
                     <p>The clearest finding is a physiological one. Breathing slowly and evenly at around six breaths a minute produces the largest swings in heart rate; as one review of slow breathing in healthy adults puts it, "maximisation of RSA/HRV at around 6 breaths per min has since been confirmed by numerous studies", where slow breathing is defined as "any rate from 4 to 10 breaths per min (0.07–0.16 Hz)". A broader systematic review of slow breathing reports that these techniques "promote autonomic changes increasing Heart Rate Variability and Respiratory Sinus Arrhythmia paralleled by Central Nervous System (CNS) activity modifications", alongside reported increases in comfort and relaxation and reductions in anxiety and arousal.</p>
                     <p>What is much less settled is how far any of that carries. Larger heart rate variability during a session is a measurement of what your heart is doing while you breathe slowly; it is not by itself proof of a lasting health benefit. The same systematic review is blunt about the state of the field, noting "the lack in scientific literature of a standardized methodology, both when considering the experimental design and the description of breathing techniques", and the healthy-adults review ends by saying that "there appears to be a dire need for further research into the area". Studies are often small, short and hard to blind, and a person who knows they are doing a calming exercise tends to report feeling calmer.</p>
                     <p>So the fair summary is this: 5-5 breathing reliably changes the rhythm of your heart rate while you do it, many people find it pleasant and settling, and the long-term clinical case is still being built. That is a good enough reason to spend five minutes on it. It is not a reason to treat it as medicine. There is a fuller account of the literature, with the same caveats, on our <a href="/science">what the research says</a> page.</p>
-                    <p><em>Sources: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4104929/" target="_blank" rel="noopener noreferrer">Lehrer &amp; Gevirtz, Frontiers in Psychology (2014)</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5709795/" target="_blank" rel="noopener noreferrer">Russo, Santarelli &amp; O'Rourke, Breathe (2017)</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6137615/" target="_blank" rel="noopener noreferrer">Zaccaro et al., Frontiers in Human Neuroscience (2018)</a></em></p>
                 </section>
 
                 <section>
@@ -487,49 +505,67 @@
                     <h2>A note on what this is</h2>
                     <p>Help Me Breathe is a free timer, not medical care, and nothing on this page diagnoses, treats or replaces treatment for any condition. If you are unwell, breathless, or worried about your heart, speak to a doctor. Please read the full <a href="/legal/medical-disclaimer">medical disclaimer</a>.</p>
                 </section>
+
+                <section class="citations">
+                    <h2>Sources</h2>
+                    <ol>
+                        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4104929/" target="_blank" rel="noopener noreferrer">Lehrer &amp; Gevirtz, Frontiers in Psychology (2014)</a></li>
+                        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5709795/" target="_blank" rel="noopener noreferrer">Russo, Santarelli &amp; O'Rourke, Breathe (2017)</a></li>
+                        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6137615/" target="_blank" rel="noopener noreferrer">Zaccaro et al., Frontiers in Human Neuroscience (2018)</a></li>
+                    </ol>
+                </section>
             </article>
 
-            <div class="ad-slot" data-ad-slot="in-content-1" aria-hidden="true"></div>
+            <!-- In-content ad unit: below the prose, below the fold, hidden during a session. -->
+            <aside class="ad-slot" data-ad-slot="in-content-1" role="complementary" aria-label="Advertisement"></aside>
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">Extended exhale</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About and products">
-                <a href="/science">What the research says</a>
-                <a href="/about">About</a>
-                <a href="/pro">Pro</a>
-                <a href="/for-practitioners">For practitioners</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>

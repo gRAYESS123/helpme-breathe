@@ -118,13 +118,16 @@ function buildBanner() {
   el.setAttribute('role', 'dialog');
   el.setAttribute('aria-live', 'polite');
   el.setAttribute('aria-label', 'Cookie choices');
+  // Declining is listed first and carries exactly the same visual weight as
+  // accepting. See docs/BRAND.md — the cookie banner is not a persuasion
+  // surface.
   el.innerHTML = [
-    '<p>We use analytics cookies to see which pages help people, and advertising cookies on our article pages. ',
-    'Choose "Essential only" and neither is set — the timer works exactly the same. ',
+    '<p>We can set analytics cookies to see which pages help people, and advertising cookies on article pages. ',
+    'Choose &ldquo;Essential only&rdquo; and neither is set — the timer works exactly the same. ',
     'Read the <a href="/legal/privacy-policy">Privacy Policy</a>.</p>',
     '<div class="cookie-buttons">',
-    '<button type="button" class="cookie-btn" data-action="consent-all">Accept all</button>',
     '<button type="button" class="cookie-btn secondary" data-action="consent-essential">Essential only</button>',
+    '<button type="button" class="cookie-btn" data-action="consent-all">Accept all</button>',
     '</div>',
   ].join('');
   document.body.appendChild(el);

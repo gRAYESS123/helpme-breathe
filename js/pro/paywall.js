@@ -37,8 +37,8 @@ const FEATURE_COPY = {
     line: 'The last seven days are free. Streaks, the 12-week heatmap, the per-technique breakdown and the CSV export are part of Pro.',
   },
   night: {
-    name: 'Night mode',
-    line: 'A near-black screen with warm, dimmed text for practising in the dark — and the screen stays awake while you breathe.',
+    name: 'The night switch',
+    line: 'The page already follows your device, free. Pro adds the switch, so you can hold it dark on a bright phone or light on a dark one — and it keeps the screen awake while you breathe.',
   },
   soundscapes: {
     name: 'Ambient soundscapes',
@@ -145,7 +145,11 @@ function onSessionComplete(event) {
   // alone so the offer is still there if they ever drop back to free.
   if (isPro()) return;
   if (getFlag(FLAG_SHOWN) === true) return;
-  if (completedSessionCount() !== OFFER_SESSION) return;
+  // `<` not `!==`. A user whose exact third session lands on a data-no-asks page
+  // returns above before the flag is set; with strict equality the count then
+  // passes three and the offer could never appear again, on any page, ever. The
+  // FLAG_SHOWN guard above already keeps it to one showing.
+  if (completedSessionCount() < OFFER_SESSION) return;
 
   const root = detail.root;
   const container = root && root.querySelector ? root.querySelector('[data-slot="post-session"]') : null;

@@ -15,3 +15,8 @@ docs/private/
 tools/render/node_modules/
 tools/render/out/
 audio/*.wav
+
+# Third-party agent skills installed with the skills CLI (not part of the site)
+.agents/
+.claude/skills/
+skills-lock.json
