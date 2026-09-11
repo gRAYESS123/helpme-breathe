@@ -28,6 +28,7 @@ import {
   techniqueForPath,
   patternToPhases,
   cycleSeconds,
+  needsCautionBlock,
   THEME_CLASSES,
   CIRCLE_CLASSES,
 } from './techniques.js';
@@ -428,6 +429,25 @@ export function createBreathingApp(rootEl, options = {}) {
       const p = document.createElement('p');
       p.textContent = t.description || '';
       el.techniqueInfo.append(h3, p);
+      // Hard rule 4: every breath-hold or fast-breathing pattern carries a
+      // visible contraindication block wherever it can be chosen. Rendering it
+      // here means the wording follows whatever the visitor actually selected,
+      // on every page that hosts the engine, without per-page markup.
+      if (needsCautionBlock(t)) {
+        const box = document.createElement('div');
+        box.className = 'callout callout--caution technique-cautions';
+        box.setAttribute('data-role', 'technique-cautions');
+        const h4 = document.createElement('h4');
+        h4.textContent = 'Before you start this pattern';
+        const ul = document.createElement('ul');
+        for (const line of t.contraindications) {
+          const li = document.createElement('li');
+          li.textContent = line;
+          ul.appendChild(li);
+        }
+        box.append(h4, ul);
+        el.techniqueInfo.appendChild(box);
+      }
     }
     if (el.safetyAckBody && Array.isArray(t.contraindications) && t.contraindications.length) {
       el.safetyAckBody.replaceChildren();
@@ -622,6 +642,14 @@ export function createBreathingApp(rootEl, options = {}) {
      never rendered during a session, and never on a `data-no-asks` page. */
   let nightHintArmed = false;
 
+  function prefersDark() {
+    return (
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    );
+  }
+
   function armNightHint() {
     const hour = new Date().getHours();
     const body = document.body;
@@ -631,6 +659,9 @@ export function createBreathingApp(rootEl, options = {}) {
       body.dataset.noAsks !== 'true' &&
       !body.classList.contains('night') &&
       !body.classList.contains('day') &&
+      // The page already follows the device. Offering to "dim the page" to
+      // someone looking at a dark page sells them what they can see they have.
+      !prefersDark() &&
       storage.getFlag('night-hint-dismissed') !== true;
   }
 
@@ -641,7 +672,11 @@ export function createBreathingApp(rootEl, options = {}) {
     if (!slot || slot.querySelector('.night-hint')) return;
     const line = document.createElement('p');
     line.className = 'night-hint';
-    line.append(document.createTextNode('Practising this late? Night mode dims the whole page.'));
+    line.append(
+      document.createTextNode(
+        'Practising this late? Pro adds a night switch, so the page stays dark even in daylight.',
+      ),
+    );
     const dismiss = document.createElement('button');
     dismiss.type = 'button';
     dismiss.className = 'night-hint-dismiss';

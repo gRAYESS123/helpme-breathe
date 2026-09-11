@@ -155,6 +155,11 @@
 
 .pro-panel input[type='range'] {
     width: 100%;
+    /* The native control's box is 16px tall, which is the whole pointer target.
+       Giving it the full hit height keeps a finger on the thumb; the track and
+       thumb stay centred inside the taller transparent box. */
+    height: var(--hit);
+    margin: 0;
     accent-color: var(--green);
     background: transparent;
     cursor: pointer;
@@ -256,8 +261,8 @@
 }
 
 .preset-action {
-    min-height: 36px;
-    padding: 0.3rem 0.7rem;
+    min-height: var(--hit);
+    padding: 0.3rem 0.8rem;
     border-radius: var(--radius);
     border: 1px solid var(--edge);
     background: var(--leaf);
@@ -372,13 +377,17 @@
 /* --------------------------------------------------------------------------
    Offer and capture cards (extend .post-session-card from styles.css)
    -------------------------------------------------------------------------- */
+/* This card renders inside [data-slot="post-session"], which lives in
+   .breathing-section. BRAND.md sections 1 and 8 keep --clay off the timer
+   screen, so the on-timer offer speaks in the neutral voice: ink price, green
+   button. --clay stays on /pro, /for-practitioners and the pricing matrix. */
 .paywall-card .paywall-price {
     font-family: var(--display);
     font-size: 1.375rem;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.012em;
-    color: var(--clay);
+    color: var(--ink);
     margin-bottom: 0.85rem;
 }
 
@@ -396,8 +405,8 @@
     min-height: var(--hit);
     padding: 0.7rem 1.35rem;
     border-radius: var(--radius);
-    border: 1px solid var(--clay);
-    background: var(--clay);
+    border: 1px solid var(--green);
+    background: var(--green);
     color: var(--chalk);
     font-family: var(--ui);
     font-weight: 600;
@@ -481,6 +490,13 @@ body.night .ad-slot {
     color: var(--ink);
     font-family: var(--ui);
     font-size: 0.9375rem;
+}
+
+.pro-page .restore-domains-note {
+    max-width: var(--measure);
+    margin: 1.5rem 0 0.6rem;
+    font-size: var(--fs-small);
+    color: var(--graphite);
 }
 
 .pro-page .restore-status {

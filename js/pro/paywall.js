@@ -145,7 +145,11 @@ function onSessionComplete(event) {
   // alone so the offer is still there if they ever drop back to free.
   if (isPro()) return;
   if (getFlag(FLAG_SHOWN) === true) return;
-  if (completedSessionCount() !== OFFER_SESSION) return;
+  // `<` not `!==`. A user whose exact third session lands on a data-no-asks page
+  // returns above before the flag is set; with strict equality the count then
+  // passes three and the offer could never appear again, on any page, ever. The
+  // FLAG_SHOWN guard above already keeps it to one showing.
+  if (completedSessionCount() < OFFER_SESSION) return;
 
   const root = detail.root;
   const container = root && root.querySelector ? root.querySelector('[data-slot="post-session"]') : null;

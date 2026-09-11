@@ -286,6 +286,20 @@ export function getTechnique(key) {
   return Object.prototype.hasOwnProperty.call(TECHNIQUES, String(key)) ? TECHNIQUES[String(key)] : null;
 }
 
+/**
+ * True when a technique holds the breath or speeds it up, and therefore needs a
+ * visible contraindication block wherever it can be selected (hard rule 4).
+ * The three gentle patterns share GENTLE_NOTE, which is a comfort note rather
+ * than a contraindication list, so they answer false.
+ * @param {string|object} technique a key or a technique object
+ * @returns {boolean}
+ */
+export function needsCautionBlock(technique) {
+  const t = typeof technique === 'string' ? getTechnique(technique) : technique;
+  if (!t || !Array.isArray(t.contraindications) || !t.contraindications.length) return false;
+  return t.contraindications[0] !== GENTLE_NOTE[0];
+}
+
 /** Extra URL paths that should resolve to a technique but are not its own slug. */
 const PATH_ALIASES = {
   '4-7-8-breathing-technique': '478',

@@ -707,14 +707,23 @@ Write "Yes", "—" or the actual limit as words. Never a tick emoji.
 ## 11. Ad slot
 
 ```html
-<div class="ad-slot" data-ad-slot="in-content-1" aria-hidden="true"></div>
-<div class="ad-slot ad-slot--leaderboard" data-ad-slot="leaderboard-1" aria-hidden="true"></div>
+<aside class="ad-slot" data-ad-slot="in-content-1" role="complementary" aria-label="Advertisement"></aside>
+<aside class="ad-slot ad-slot--leaderboard" data-ad-slot="leaderboard-1" role="complementary" aria-label="Advertisement"></aside>
 ```
+
+**Not `aria-hidden="true"`.** AdSense injects links and an iframe into this
+container; hiding the container from assistive technology while leaving its
+contents in the tab order is the axe `aria-hidden-focus` failure, and WCAG 4.1.2
+and 2.4.3 with it. Label the region instead — the visible "Advertisement" label
+the CSS prints then has a real accessible counterpart.
 
 1px dashed `--edge` on paper with an "Advertisement" label in `--graphite`.
 Height is reserved in CSS (280px, or 90px for the leaderboard variant) so
 toggling measures CLS 0. `body.session-active .ad-slot { display: none }` hides
-them while someone is breathing.
+them while someone is breathing, and
+`body[data-tier="pro"|"practitioner"|"studio"] .ad-slot { display: none }` keeps
+a paying customer from ever seeing reserved ad space (`js/ads.js` also removes
+the nodes outright).
 
 **Allowed:** content pages, use-case pages and comparison pages — below the fold,
 never between the Begin button and the circle. At most two in-content units per

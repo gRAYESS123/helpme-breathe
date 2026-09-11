@@ -158,7 +158,13 @@ CIELAB LCh number, and check OKLCH as a second opinion.
 > `#DABFD6`, night rim `#D59CCB`), and `node tools/brand/build-assets.mjs
 > --palette` re-verifies it. This document and `css/styles.css` remain the
 > source of truth; the generator follows them. Any social card rendered before
-> 2026-09-10 carries the older `#613878` box violet and needs re-rendering.
+> 2026-09-10 carried the older `#613878` box violet; every card in `images/og/`
+> and `images/pins/` was re-rendered from the corrected table on 2026-09-11, so
+> the deprecated violet is no longer in any shipped asset.
+>
+> The `hue` column in `tools/brand/tokens.mjs` is an **HSL** angle (box 306.0°);
+> the angles quoted in this document are **CIELAB LCh** (box 329.8°). They
+> describe the same colour in two spaces and are not in conflict.
 
 ### Night
 
@@ -521,6 +527,10 @@ turns out badly.
    `[data-phase]` — the mechanism is already used for the phase word and the
    reduced-motion pacing ring.
 
-8. **`--clay` on paid surfaces only** is a discipline, not a mechanism. Nothing
-   in the CSS stops someone putting a clay price on the timer screen. If it
-   starts leaking, add a lint rule rather than a new token.
+8. **`--clay` on paid surfaces only** now has a mechanism behind it. It did
+   leak — into the post-session paywall card in `css/pro.css` — and
+   `tools/site-check.mjs` gained a `clay-on-timer` rule on 2026-09-11 that fails
+   the build on `var(--clay)` under any selector scoped to `.breathing-section`,
+   `[data-slot="post-session"]`, `.post-session-card` or `.paywall-card`. The
+   on-timer offer speaks in the neutral voice: `--ink` price, `--green` button.
+   `--clay` stays on `/pro`, `/for-practitioners` and the pricing matrix.

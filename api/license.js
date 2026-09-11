@@ -250,9 +250,14 @@ export async function POST(request) {
       providerCtx,
     );
     if (!activation.ok) {
-      // A ledger write failure must not strand a paying customer. The token is
-      // still issued; the adapter has already logged the cause.
-      console.warn('[license] ledger not updated', {
+      // A ledger write failure must not strand a paying customer, so the token
+      // is still issued — but it is issued for ONE DAY instead of the usual
+      // 30 or 7. An unwritable ledger means the activation cap is not being
+      // counted at all, and a full-length token would quietly turn that into an
+      // uncapped licence for a month. A one-day token keeps the buyer working
+      // and re-checks tomorrow, so the condition self-corrects the moment the
+      // ledger is writable again. The adapter has already logged the cause.
+      console.warn('[license] ledger not updated; issuing a short token', {
         sub,
         provider: provider.id,
         reason: activation.reason,
@@ -265,7 +270,7 @@ export async function POST(request) {
       sub,
       kid,
       act: activation.activations,
-      days: SKU_TOKEN_DAYS[record.sku],
+      days: activation.ok ? SKU_TOKEN_DAYS[record.sku] : 1,
       domains: activation.domains,
     });
     const token = await signToken(payload, LICENSE_SECRET);

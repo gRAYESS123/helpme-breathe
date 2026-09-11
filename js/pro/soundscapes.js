@@ -489,10 +489,10 @@ async function cacheForOffline(url, response) {
  * decode. It is skipped entirely for a free visitor, which is what keeps the
  * free-tier cache exactly as small as it is today.
  *
- * It re-checks on every load rather than trusting a "done" flag, because the
- * service worker's `activate` handler deletes every cache whose name is not the
- * current shell cache — `hmb-audio` included — so the pack can disappear under
- * us on any deploy. Files already present are skipped, so the re-check is free.
+ * It re-checks on every load rather than trusting a "done" flag. sw.js now
+ * exempts `hmb-audio` from its activate-time purge (KEEP_CACHES), so a deploy no
+ * longer wipes the pack — but a browser may still evict it under storage
+ * pressure, and files already present are skipped, so the re-check is free.
  */
 let warming = null;
 

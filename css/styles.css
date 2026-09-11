@@ -1688,12 +1688,62 @@ body.session-active .night-hint { display: none; }
 
 /* --------------------------------------------------------------- FAQ ----- */
 
+/* The homepage's visible FAQ and contraindication block. It sits outside
+   .main-content so it is not pulled into the timer grid. */
+/* One tap from the top of a crisis-safe page to the timer. It sits under the
+   article header so the crisis block is still the first thing in the main
+   content, and it is a control, so it is sans and it clears 44px. */
+.jump-to-timer { margin: 0 0 1.25rem; }
+
+.jump-to-timer a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit);
+    padding: 0.5rem 1.1rem;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    text-decoration: none;
+}
+
+.jump-to-timer a:hover { border-color: var(--ink); text-decoration: none; }
+
+.breathing-section[id] { scroll-margin-top: 4.5rem; }
+
+.home-faq {
+    margin: 2.5rem auto 0;
+    max-width: var(--measure);
+}
+
 .faq-item {
     padding: 1.1rem 0;
     border-bottom: 1px solid var(--rule);
 }
 
 .faq-item:last-child { border-bottom: 0; }
+
+/* The per-technique contraindication block the engine renders into
+   [data-role="technique-info"]. It follows the selected pattern. */
+.technique-cautions { margin-top: 1.25rem; }
+.technique-cautions h4 {
+    margin: 0 0 0.5rem;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--ink);
+}
+.technique-cautions ul { margin: 0; padding-left: 1.15rem; }
+.technique-cautions li {
+    font-size: var(--fs-small);
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: 0.35rem;
+}
+.technique-cautions li:last-child { margin-bottom: 0; }
 
 .faq-item h3 { margin: 0 0 0.4rem; font-size: 1rem; }
 
@@ -1853,6 +1903,28 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
     margin: 1.5rem 0;
 }
 
+/* The wrapper carries tabindex="0" so a keyboard or switch user can scroll it.
+   A focusable element needs a visible focus state. */
+.table-scroll:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 3px;
+}
+
+/* A one-line hint above a scroller, so nobody misses a column that starts
+   off-screen. Hidden once the viewport is wide enough to show the whole table. */
+.table-hint {
+    margin: 1.25rem 0 -0.75rem;
+    font-family: var(--ui);
+    font-size: var(--fs-micro);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--graphite);
+}
+
+@media (min-width: 60rem) {
+    .table-hint { display: none; }
+}
+
 .data-table,
 .article-page table {
     width: 100%;
@@ -1989,8 +2061,8 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
 .technique-switcher a {
     display: inline-flex;
     align-items: center;
-    min-height: 36px;
-    padding: 0.4rem 0.85rem;
+    min-height: var(--hit);
+    padding: 0.4rem 0.95rem;
     font-size: var(--fs-small);
     font-weight: 500;
     color: var(--graphite);
@@ -2037,6 +2109,10 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
 
 .cta-block-final h2 { margin-top: 0; }
 
+.article-page article a.cta-button,
+.article-page article a.cta-button-large,
+.prose a.cta-button,
+.prose a.cta-button-large,
 .cta-button,
 .cta-button-large {
     display: inline-flex;
@@ -2054,8 +2130,12 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
     text-decoration: none;
 }
 
+.article-page article a.cta-button:hover,
+.article-page article a.cta-button-large:hover,
+.prose a.cta-button:hover,
+.prose a.cta-button-large:hover,
 .cta-button:hover,
-.cta-button-large:hover { background: var(--ink); border-color: var(--ink); text-decoration: none; }
+.cta-button-large:hover { color: var(--chalk); background: var(--ink); border-color: var(--ink); text-decoration: none; }
 
 .cta-subtext {
     margin: 0.75rem 0 0;
@@ -2188,6 +2268,51 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
 
 .checkout-btn--secondary:hover { color: var(--ink); background: var(--leaf); border-color: var(--ink); }
 
+/* Below 44rem the five-column matrix cannot fit a phone, so it scrolls. A
+   scroller that starts on "Free" hides the column the page is actually about,
+   so the row becomes a flex row and the columns are re-ordered: feature label,
+   Practitioner, Pro, Studio, Free. The featured column is then the first thing
+   in view, and the rest is one short swipe away. Widths are fixed here because
+   the table layout algorithm no longer aligns the columns for us. */
+@media (max-width: 44rem) {
+    .pricing-matrix {
+        display: block;
+        min-width: 0;
+        width: max-content;
+    }
+
+    .pricing-matrix thead,
+    .pricing-matrix tbody { display: block; }
+
+    .pricing-matrix tr {
+        display: flex;
+        align-items: stretch;
+    }
+
+    .pricing-matrix thead tr { align-items: flex-end; }
+
+    .pricing-matrix th,
+    .pricing-matrix td {
+        flex: 0 0 10.5rem;
+        display: block;
+    }
+
+    .pricing-matrix thead th:not(.col-featured) { padding-top: 0.65rem; }
+    .pricing-matrix thead .checkout-btn { min-height: var(--hit); }
+
+    .pricing-matrix thead th:first-child,
+    .pricing-matrix tbody th[scope="row"] {
+        flex: 0 0 9rem;
+        width: auto;
+        order: 0;
+    }
+
+    .pricing-matrix tr > *:nth-child(4) { order: 1; }
+    .pricing-matrix tr > *:nth-child(3) { order: 2; }
+    .pricing-matrix tr > *:nth-child(5) { order: 3; }
+    .pricing-matrix tr > *:nth-child(2) { order: 4; }
+}
+
 .tax-note {
     max-width: var(--measure);
     margin: 0.75rem 0 2rem;
@@ -2228,6 +2353,12 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
 
 body.session-active .ad-slot,
 body.session-active [data-ask] { display: none; }
+
+/* A paid tier gets no reserved ad space at all. js/entitlements.js stamps
+   document.body.dataset.tier; js/ads.js also removes the nodes outright. */
+body[data-tier="pro"] .ad-slot,
+body[data-tier="practitioner"] .ad-slot,
+body[data-tier="studio"] .ad-slot { display: none; }
 
 /* ==========================================================================
    8 — UTILITIES AND LEGACY SHIMS
@@ -2322,7 +2453,20 @@ body.session-active [data-ask] { display: none; }
 
     .breathing-section { padding: 0 1rem 1.5rem; }
 
-    .app-bar { margin: 0 -1rem 1.25rem; padding: 0.5rem 1rem; }
+    .app-bar { margin: 0 -1rem 0.85rem; padding: 0.5rem 1rem; }
+
+    /* Vertical rhythm on a phone: every rem between the top of the app bar and
+       the Begin button is a rem a distressed visitor has to scroll past. The
+       stage, the instruction line and the stats each give some back without
+       changing the design — the calipers still frame the circle and the
+       instruction line still reserves its two lines so nothing reflows. */
+    .breathing-container { margin: 0.9rem auto 0.75rem; width: min(var(--stage), 72vw); }
+
+    .breathing-text { margin-bottom: 0.75rem; min-height: 2.4em; }
+
+    .session-stats { margin: 0.65rem 0 0.35rem; }
+
+    .controls { margin-top: 1rem; }
 
     .settings-panel { right: 1rem; top: 3.4rem; }
 

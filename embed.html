@@ -178,6 +178,15 @@
         }
 
         .embed-field select,
+        .embed-accent-warn {
+            margin: 0.5rem 0 0;
+            padding-left: 0.7rem;
+            border-left: 3px solid var(--warn);
+            font-size: var(--fs-micro);
+            line-height: 1.55;
+            color: var(--ink);
+        }
+
         .embed-field input[type="color"] {
             width: 100%;
             min-height: var(--hit);
@@ -436,6 +445,7 @@
                                      pattern's own colour. -->
                                 <input type="color" id="cfg-accent" value="#33407F"
                                        aria-labelledby="cfg-accent-label" disabled>
+                                <p class="embed-accent-warn" id="cfg-accent-warn" role="status" aria-live="polite" hidden></p>
                             </div>
 
                             <div class="embed-field">
@@ -528,9 +538,11 @@ data-logo="https://your-site.example/logo.png"</code></pre>
                     covers the domain the widget is sitting on. Only then does the attribution line come off and
                     your logo go on. If the answer does not come back — the network is down, the licence has
                     lapsed, the domain is not on it — the free widget renders with attribution rather than
-                    something half-branded. The key travels inside your page's HTML, so treat it as public: it
-                    names a licence and holds nothing else, and copying it lets someone drop our name from their
-                    own site, which their licence does not permit.</p>
+                    something half-branded. The key travels inside your page's HTML, so treat it as public, and that is
+                    exactly why the domain list matters: a licence with no domains on it cannot white-label
+                    anything at all, so a key lifted from your page's source is useless on a site you did not list.
+                    List your domains when you activate the key on the <a href="/pro">Pro page</a> &mdash; there is a
+                    field under the licence box for them.</p>
 
                     <p><code>data-brand="Your practice name"</code> is free and needs no key. It prints a line of
                     text above the timer; it does not remove the attribution.</p>
@@ -831,9 +843,59 @@ data-logo="https://your-site.example/logo.png"</code></pre>
 
     let refreshTimer = 0;
 
+    /* --- the rim has to be visible ---------------------------------------
+       The widget deepens (or lightens) a low-contrast accent so the ring is
+       still a ring. Say so here, at pick time, rather than letting someone ship
+       a widget whose breathing circle they cannot see. Same 3:1 floor and the
+       same arithmetic as embed/v1/frame.html. */
+    const GROUND = { light: '#F5F1E8', dark: '#15191A' };
+
+    const toRgb = (hex) => {
+        const n = parseInt(String(hex).replace('#', ''), 16);
+        return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    };
+
+    const luminance = (rgb) => {
+        const [r, g, b] = rgb.map((v) => {
+            const c = v / 255;
+            return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+
+    const contrast = (a, b) => {
+        const la = luminance(a);
+        const lb = luminance(b);
+        return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+    };
+
+    function accentWarning(config) {
+        if (!config.accent) return '';
+        let surround = config.theme;
+        if (surround !== 'light' && surround !== 'dark') {
+            surround = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+        }
+        const value = contrast(toRgb(config.accent), toRgb(GROUND[surround]));
+        if (value >= 3) return '';
+        return surround === 'light'
+            ? 'That colour is too light to read as a ring on the light background '
+              + `(${value.toFixed(2)}:1, and a control outline needs 3:1). The widget will deepen it along the same hue so people can see the circle.`
+            : 'That colour is too dark to read as a ring on the dark background '
+              + `(${value.toFixed(2)}:1, and a control outline needs 3:1). The widget will lighten it along the same hue so people can see the circle.`;
+    }
+
+    const accentWarn = document.getElementById('cfg-accent-warn');
+
     function render() {
         const config = readConfig();
         controls.accent.disabled = controls.accentDefault.checked;
+        if (accentWarn) {
+            const warning = accentWarning(config);
+            accentWarn.textContent = warning;
+            accentWarn.hidden = warning === '';
+        }
         if (modeHint) modeHint.textContent = MODE_HINTS[config.mode] || '';
         if (snippetEl) snippetEl.textContent = snippetFor(config);
 
@@ -909,7 +971,7 @@ data-logo="https://your-site.example/logo.png"</code></pre>
             import('/js/checkout.js')
                 .then((module) => {
                     const checkout = module.checkout || module.default;
-                    if (typeof checkout === 'function') checkout(sku);
+                    if (typeof checkout === 'function') checkout(sku, { trigger: button, placement: 'embed' });
                     else window.location.href = '/for-practitioners';
                 })
                 .catch(() => { window.location.href = '/for-practitioners'; });

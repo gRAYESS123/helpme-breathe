@@ -8,7 +8,46 @@
     <meta name="description" content="Your Help Me Breathe Pro purchase is complete. Activate your licence key in this browser and start breathing.">
 
     <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
     <meta name="author" content="Georges Rayess">
+
+    <!--
+      FIRST script on the page, before the gtag block below and before anything
+      else can read location.search.
+
+      The merchant of record returns the buyer here with the licence key (or, on
+      Paddle, the transaction reference that IS the key) in the query string. A
+      full key must never reach a log, an analytics event or an error report
+      (AGENT_BRIEF hard rule 9), and GA4's default `page_location` is exactly
+      such an event — it is sent even with analytics_storage denied. The address
+      bar, browser history, the bfcache and the service worker's navigation
+      cache would all keep a copy too.
+
+      So: read the parameters into a module-scoped global, then rewrite the URL
+      to the bare path. Everything downstream reads window.__hmbActivation, never
+      location.search. The gtag config below also pins page_location to the path,
+      so even a bypassed strip cannot leak it.
+    -->
+    <script>
+        (function () {
+            try {
+                var params = new URLSearchParams(window.location.search);
+                var names = ['key', 'k', 'license', '_ptxn', 'ptxn', 'transaction_id', 'transactionId', 'orderId'];
+                var found = {};
+                var dirty = false;
+                for (var i = 0; i < names.length; i += 1) {
+                    var value = params.get(names[i]);
+                    if (value) { found[names[i]] = value; dirty = true; }
+                }
+                window.__hmbActivation = found;
+                if (dirty && window.history && typeof window.history.replaceState === 'function') {
+                    window.history.replaceState(null, '', window.location.pathname);
+                }
+            } catch (error) {
+                window.__hmbActivation = window.__hmbActivation || {};
+            }
+        }());
+    </script>
 
     <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -50,7 +89,10 @@
         gtag('js', new Date());
         gtag('config', 'G-09WY9JD4YM', {
             'anonymize_ip': true,
-            'cookie_expires': 63072000
+            'cookie_expires': 63072000,
+            // Belt and braces beside the strip above: a licence key can never
+            // reach Google in `dl`, whatever the address bar happens to hold.
+            'page_location': window.location.origin + window.location.pathname
         });
     </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
@@ -261,15 +303,23 @@
             );
         }
 
-        const params = new URLSearchParams(window.location.search);
+        // Captured and erased by the first script in <head>, so the key is not
+        // in location.search, in history, in the bfcache or in any GA4 event.
+        const captured = window.__hmbActivation || {};
+        const pick = (...names) => {
+            for (const name of names) {
+                const value = captured[name];
+                if (value) return String(value);
+            }
+            return '';
+        };
 
         // Our own link format first, then the provider's transaction reference.
         // Paddle Billing passes a transaction as `_ptxn`; other merchants of
         // record use `transaction_id` or `orderId`. /api/license accepts either
         // a licence key or a transaction reference.
-        const key = params.get('key') || params.get('k') || params.get('license') || '';
-        const txn = params.get('_ptxn') || params.get('ptxn') || params.get('transaction_id')
-            || params.get('transactionId') || params.get('orderId') || '';
+        const key = pick('key', 'k', 'license');
+        const txn = pick('_ptxn', 'ptxn', 'transaction_id', 'transactionId', 'orderId');
 
         // The Protocol Pack is a PDF, not an app tier, so /api/license answers
         // 422 pack_only for a pack key. That is not a failure worth alarming

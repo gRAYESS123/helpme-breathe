@@ -1579,6 +1579,44 @@ function checkAdsTxt() {
   }
 }
 
+/* ------------------------------------------------- --clay on the timer ---- */
+/**
+ * docs/BRAND.md section 1: "--clay ... Never on the timer screen." Section 8
+ * repeats it, and section 10.8 predicted that a discipline with no mechanism
+ * behind it would eventually leak — it did, into the post-session paywall card
+ * in css/pro.css. This is the mechanism it asked for.
+ *
+ * A stylesheet rule whose selector is scoped to the breathing section or to the
+ * post-session slot may not use var(--clay). The commerce accent belongs on
+ * /pro, /for-practitioners and the pricing matrix; the timer is not for sale.
+ */
+function checkClayOnTimer() {
+  const TIMER_SCOPES = ['.breathing-section', '[data-slot="post-session"]', '.post-session-card', '.paywall-card'];
+  for (const file of [...allFiles].filter((f) => f.endsWith('.css')).sort()) {
+    const raw = readText(file);
+    if (raw == null) continue;
+    const lineOf = makeLineLookup(raw);
+    // Strip comments so a mention in prose is not a finding.
+    const css = raw.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '));
+    const ruleRe = /([^{}]+)\{([^{}]*)\}/g;
+    let m;
+    while ((m = ruleRe.exec(css)) !== null) {
+      const selector = m[1];
+      const body = m[2];
+      if (!body.includes('var(--clay)')) continue;
+      const scope = TIMER_SCOPES.find((s2) => selector.includes(s2));
+      if (!scope) continue;
+      ERR(
+        file,
+        lineOf(m.index + m[1].length),
+        'clay-on-timer',
+        `var(--clay) under a timer-scoped selector (${scope}). BRAND.md sections 1 and 8: ` +
+          'the commerce accent never appears on the timer screen.',
+      );
+    }
+  }
+}
+
 /* -------------------------------------------------------------- vercel.json */
 function checkVercelJson() {
   if (!allFiles.has('vercel.json')) return;
@@ -1691,6 +1729,11 @@ try {
   checkVercelJson();
 } catch (e) {
   ERR('vercel.json', null, 'internal-error', `vercel.json check failed: ${e.message}`);
+}
+try {
+  checkClayOnTimer();
+} catch (e) {
+  ERR(null, null, 'internal-error', `--clay check failed: ${e.message}`);
 }
 try {
   checkOrphans();

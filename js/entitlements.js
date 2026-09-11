@@ -176,7 +176,23 @@ function evaluate(token) {
   };
 }
 
+/**
+ * Stamp the current tier on <body> so CSS can respond to it — specifically so a
+ * paid tier reserves no ad space at all (css/styles.css hides .ad-slot for
+ * pro/practitioner/studio). This is a presentation hint, never a gate: the gate
+ * is requirePro(), and the real check is the server's HMAC verification.
+ */
+function stampTier() {
+  if (!hasDocument) return;
+  const apply = () => {
+    if (document.body) document.body.dataset.tier = state.tier;
+  };
+  if (document.body) apply();
+  else document.addEventListener('DOMContentLoaded', apply, { once: true });
+}
+
 function notify() {
+  stampTier();
   for (const cb of listeners) {
     try {
       cb(state.tier, { exp: state.exp, payload: state.payload });
@@ -253,7 +269,33 @@ function maybeSilentRefresh() {
   else window.setTimeout(run, 1200);
 }
 
-if (hasWindow) refreshFromStorage();
+if (hasWindow) {
+  refreshFromStorage();
+  stampTier();
+}
+
+/**
+ * Turn whatever a form gave us into a list of bare hostnames. Accepts a comma,
+ * space or newline separated string, or an array. A pasted URL is reduced to its
+ * host, and a leading `www.` is kept as typed — the server normalises further and
+ * is the authority on what is acceptable.
+ * @param {string[]|string|undefined} input
+ * @returns {string[]}
+ */
+function normaliseDomainInput(input) {
+  if (input == null) return [];
+  const raw = Array.isArray(input) ? input : String(input).split(/[\s,]+/);
+  const out = [];
+  for (const item of raw) {
+    let value = String(item || '').trim().toLowerCase();
+    if (!value) continue;
+    value = value.replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/:\d+$/, '');
+    if (!value || out.includes(value)) continue;
+    out.push(value);
+    if (out.length >= 10) break;
+  }
+  return out;
+}
 
 /* --------------------------------------------------------------- public API */
 
@@ -297,12 +339,21 @@ export function requirePro(featureName) {
  * `activation_limit`, `unrecognised_key`, …) so a page can add a friendlier
  * branch; it is absent when the failure never reached the server.
  *
+ * `domains` binds a Practitioner or Studio licence to the hostnames the
+ * white-label embed may drop its attribution on. The server writes them into the
+ * token's `dom` claim, and embed/v1/frame.html refuses to white-label a token
+ * that carries no `dom` at all — so a token without domains is an ordinary
+ * attributed embed, never an unbound bearer credential. Ignored for Free and Pro,
+ * which have no white-label right to bind.
+ *
  * @param {string} key the licence key, or a provider transaction reference
+ * @param {string[]|string} [domains] hostnames for the white-label embed
  * @returns {Promise<{ok:boolean, tier?:string, error?:string, code?:string}>}
  */
-export async function activate(key) {
+export async function activate(key, domains) {
   const trimmed = String(key || '').trim();
   if (!trimmed) return { ok: false, error: 'Enter your licence key.', code: 'missing_key' };
+  const hosts = normaliseDomainInput(domains);
   if (typeof fetch !== 'function') {
     return { ok: false, error: 'This browser cannot reach the licence server.', code: 'no_fetch' };
   }
@@ -310,7 +361,7 @@ export async function activate(key) {
     const response = await fetch(LICENSE_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: trimmed }),
+      body: JSON.stringify(hosts.length ? { key: trimmed, domains: hosts } : { key: trimmed }),
     });
     let data = null;
     try {

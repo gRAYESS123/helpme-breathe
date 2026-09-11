@@ -16,7 +16,7 @@
  * Markup: <div class="ad-slot" data-ad-slot="in-content-1" aria-hidden="true"></div>
  */
 
-import { isPro } from './entitlements.js';
+import { isPro, onChange } from './entitlements.js';
 import { consentState, hasAdConsent } from './consent.js';
 
 const CLIENT = 'ca-pub-7348129075274196';
@@ -105,6 +105,13 @@ function startWhenIdle() {
 }
 
 function boot() {
+  // A paying customer bought "ad-free". Returning early is not enough: the
+  // reserved 280px container and its "Advertisement" label would still occupy
+  // the layout. Strip them.
+  if (isPro()) {
+    removeAds();
+    return;
+  }
   if (!adsAllowedOnThisPage()) return;
   if (!slots().length) return;
   // Wait for a consent decision before requesting anything from Google.
@@ -124,4 +131,8 @@ if (typeof document !== 'undefined') {
   // A session starting after ads loaded: CSS hides the slots, nothing to do here.
   document.addEventListener('hmb:session-complete', () => initAds());
   document.addEventListener('hmb:session-stop', () => initAds());
+  // A licence activated mid-session strips the slots immediately, without a reload.
+  onChange(() => {
+    if (isPro()) removeAds();
+  });
 }

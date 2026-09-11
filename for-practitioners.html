@@ -81,40 +81,13 @@
     }
     </script>
 
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      "name": "Help Me Breathe Practitioner Licence",
-      "description": "An annual licence for individual therapists, counsellors, yoga and breathwork teachers, school staff and small workplace facilitators. Adds commercial-use rights, a white-label embed, co-branded client session links, class mode, a printable client handout pack, a homework-link builder and a written compliance pack.",
-      "url": "https://helpmebreath.com/for-practitioners",
-      "image": "https://helpmebreath.com/images/og/for-practitioners.jpg",
-      "category": "Software licence",
-      "brand": { "@type": "Brand", "name": "Help Me Breathe" },
-      "offers": [
-        {
-          "@type": "Offer",
-          "name": "Practitioner licence",
-          "description": "One practising individual, 25 activations, unlimited clients, white-label embed on your own domain.",
-          "price": "99.00",
-          "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock",
-          "url": "https://helpmebreath.com/for-practitioners",
-          "eligibleDuration": { "@type": "QuantitativeValue", "value": 1, "unitCode": "ANN" }
-        },
-        {
-          "@type": "Offer",
-          "name": "Studio licence",
-          "description": "Everything in the Practitioner licence across up to ten domains, plus a monthly aggregate usage report.",
-          "price": "199.00",
-          "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock",
-          "url": "https://helpmebreath.com/for-practitioners",
-          "eligibleDuration": { "@type": "QuantitativeValue", "value": 1, "unitCode": "ANN" }
-        }
-      ]
-    }
-    </script>
+    <!--
+      No Product/Offer block on this page. docs/AGENT_BRIEF.md restricts
+      Product and Offer structured data to /pro, so there is one Product
+      entity for the brand rather than two competing for the same query.
+      The Practitioner and Studio offers, with priceValidUntil and the
+      return policy, are declared on /pro.
+    -->
 
     <script type="application/ld+json">
     {
@@ -379,7 +352,8 @@
 
                     <p>The two you can buy on this page are Practitioner and Studio. Free and Pro are in the table as well, so you can see what is already yours without paying anything, and what the personal upgrade adds before the commercial one.</p>
 
-                    <div class="table-scroll">
+                    <p class="table-hint">Scroll the table sideways for Pro, Studio and Free.</p>
+                    <div class="table-scroll" tabindex="0" role="region" aria-label="Plan comparison table, scrollable">
                         <table class="pricing-matrix">
                             <caption class="sr-only">What each Help Me Breathe tier includes. Prices in US dollars.</caption>
                             <thead>

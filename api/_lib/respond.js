@@ -129,22 +129,43 @@ export function methodNotAllowed(request, methods, options = {}) {
 }
 
 /**
- * The caller's IP, best effort. Vercel sets x-forwarded-for; the first entry is
- * the client. Used only as a rate-limit bucket key — never stored, never logged.
+ * The caller's IP, best effort. Used only as a rate-limit bucket key — never
+ * stored, never logged.
+ *
+ * ORDER MATTERS, AND IT IS NOT THE OBVIOUS ONE.
+ *
+ * `x-forwarded-for` is a chain, and the caller controls its head: anyone can
+ * send `X-Forwarded-For: 1.2.3.4` and the platform appends its own hop to the
+ * end of whatever arrived. Reading the FIRST entry therefore handed an abuser a
+ * fresh rate-limit bucket on every request, which defeated every limiter on the
+ * site — including the one in front of /api/subscribe, i.e. an email-bombing
+ * vector from our own sending domain.
+ *
+ * So: the platform-set header first (`x-vercel-forwarded-for`, which the client
+ * cannot inject), then `x-real-ip`, and only then the LAST entry of the
+ * forwarded chain, which is the hop the platform appended rather than the one
+ * the caller wrote.
+ *
  * @param {Request} request
  * @returns {string}
  */
 export function clientIp(request) {
+  const platform = request.headers.get('x-vercel-forwarded-for');
+  if (platform) {
+    const value = platform.split(',').pop().trim();
+    if (value) return value;
+  }
+
+  const real = request.headers.get('x-real-ip');
+  if (real && real.trim()) return real.trim();
+
   const forwarded = request.headers.get('x-forwarded-for');
   if (forwarded) {
-    const first = forwarded.split(',')[0].trim();
-    if (first) return first;
+    const last = forwarded.split(',').pop().trim();
+    if (last) return last;
   }
-  return (
-    request.headers.get('x-real-ip') ||
-    request.headers.get('x-vercel-forwarded-for') ||
-    'unknown'
-  );
+
+  return 'unknown';
 }
 
 /**

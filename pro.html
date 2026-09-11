@@ -297,7 +297,8 @@
                 <section>
                     <h2>The four plans</h2>
 
-                    <div class="table-scroll">
+                    <p class="table-hint">Scroll the table sideways for Pro, Studio and Free.</p>
+                    <div class="table-scroll" tabindex="0" role="region" aria-label="Plan comparison table, scrollable">
                         <table class="pricing-matrix">
                             <caption class="sr-only">What each Help Me Breathe plan includes, feature by feature.</caption>
                             <thead>
@@ -517,7 +518,7 @@
                     on 9 September 2026. Prices change and vary by country, so treat them as a snapshot rather than a
                     promise, and check before you buy anything.</p>
 
-                    <div class="table-scroll">
+                    <div class="table-scroll" tabindex="0" role="region" aria-label="App price comparison table, scrollable">
                         <table class="data-table">
                             <caption>Verified from each app's US App Store listing on 9 September 2026.</caption>
                             <thead>
@@ -585,6 +586,16 @@
                         <input type="text" id="restore-key" name="key" autocomplete="off" spellcheck="false" placeholder="Paste your licence key">
                         <button class="pro-btn pro-btn-primary" type="submit">Activate</button>
                         <p class="restore-status" data-role="restore-status" role="status" aria-live="polite"></p>
+                    </form>
+
+                    <p class="restore-domains-note">Practitioner and Studio only: if you are going to use the
+                    white-label embed, list the sites you will put it on. The licence is written to those hostnames,
+                    and the widget will only drop its attribution there. Leave it empty if you are not embedding
+                    anything &mdash; everything else works either way.</p>
+
+                    <form class="restore-form" data-role="restore-domains-form" novalidate>
+                        <label class="sr-only" for="restore-domains">Domains for the white-label embed</label>
+                        <input type="text" id="restore-domains" name="domains" autocomplete="off" spellcheck="false" placeholder="clinic.example, studio.example">
                     </form>
                 </section>
 
@@ -740,9 +751,12 @@
                     say('Paste the licence key from your receipt email.', true);
                     return;
                 }
+                // Only the hostnames. The key itself is never logged or tracked.
+                const domainsField = document.getElementById('restore-domains');
+                const domains = domainsField ? String(domainsField.value || '') : '';
                 say('Checking…');
                 track(EVENTS.ACTIVATE_ATTEMPT, { source: 'pro-page' });
-                const result = await activate(key);
+                const result = await activate(key, domains);
                 if (result.ok) {
                     track(EVENTS.ACTIVATE_SUCCESS, { tier: result.tier || tier() });
                     track(EVENTS.RESTORE_SUCCESS, { tier: result.tier || tier() });
