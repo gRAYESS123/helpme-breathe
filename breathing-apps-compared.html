@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
     <title>Breathing Apps Compared: Free vs Paid (2026)</title>
     <meta name="description" content="What breathing apps really cost in 2026, what each free tier does, and when a plain pacer is enough. Prices checked 10 September 2026, with sources.">
@@ -141,7 +142,7 @@
           "name": "What is the best breathing app without a subscription?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "If you want no subscription at all, a web pacer is the simplest answer, because there is nothing to install and nothing to cancel. On iOS, Breathing Exercises: Breathe+ is the closest app equivalent: it is free to download, ad-supported, and its App Store listing shows a one-time Unlock Everything purchase at 69.99 US dollars alongside its subscriptions, so you can pay once instead of monthly. Help Me Breathe is free with an optional one-time Pro unlock, and every breathing pattern stays free forever."
+            "text": "If you want no subscription at all, a web pacer is the simplest answer, because there is nothing to install and nothing to cancel. On iOS, Breathing Exercises: Breathe+ is the closest app equivalent: it is free to download, ad-supported, and its App Store listing shows a one-time Unlock Everything purchase at 69.99 US dollars alongside its subscriptions, so you can pay once instead of monthly. Help Me Breathe's timer is free to use with no account, and its one paid plan is $10 a month or $100 a year with three days free."
           }
         },
         {
@@ -326,7 +327,11 @@
                      aria-labelledby="timer-heading">
 
                 <div class="app-bar">
-                    <h2 id="timer-heading" data-role="technique-title">Heart Coherence</h2>
+                    <div class="technique-head">
+                        <p class="technique-eyebrow" data-role="technique-eyebrow"></p>
+                        <h2 id="timer-heading" data-role="technique-title">Heart Coherence</h2>
+                        <p class="pattern-line" data-role="pattern-line"></p>
+                    </div>
                     <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
                             <circle cx="12" cy="12" r="3.2"/>
@@ -359,9 +364,9 @@
 
                 <div class="breathing-container">
                     <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
-                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
-                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
-                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                        <circle class="ring-track" cx="160" cy="160" r="150"/>
+                        <circle class="ring-live" cx="160" cy="160" r="150"/>
+                        <circle class="ring-bridge" cx="160" cy="160" r="150"/>
                     </svg>
                     <div class="breathing-circle technique-coherent" data-role="circle">
                         <span class="circle-notch" aria-hidden="true"></span>
@@ -403,7 +408,6 @@
                     </div>
                 </div>
 
-                <div class="tools-row" data-slot="tools"></div>
 
                 <div class="controls">
                     <button class="control-btn" type="button" data-role="start" data-action="start">Begin Practice</button>
@@ -421,6 +425,9 @@
                 </div>
 
                 <div data-slot="post-session"></div>
+
+                <!-- SLOT: Pro tools (custom pattern, your practice, soundscapes, night mode) -->
+                <div class="tools-row" data-slot="tools"></div>
 
                 <div class="technique-info" data-role="technique-info"></div>
 
@@ -481,7 +488,7 @@
                             <tbody>
                                 <tr class="is-ours">
                                     <th scope="row">Help Me Breathe</th>
-                                    <td>Free. Optional <a href="/pro">Pro unlock</a>, one payment.</td>
+                                    <td>The timer is free. One plan, $10 a month or $100 a year, three days free.</td>
                                     <td>Everything that paces: all seven patterns, every session length, audio and vibration cues.</td>
                                     <td>Yes — installs as a web app and keeps running with no connection.</td>
                                     <td>Yes</td>
@@ -639,7 +646,7 @@
 
                     <div class="faq-item">
                         <h3>What is the best breathing app without a subscription?</h3>
-                        <p>If you want no subscription at all, a web pacer is the simplest answer, because there is nothing to install and nothing to cancel. On iOS, Breathing Exercises: Breathe+ is the closest app equivalent: it is free to download, ad-supported, and its App Store listing shows a one-time Unlock Everything purchase at 69.99 US dollars alongside its subscriptions, so you can pay once instead of monthly. Help Me Breathe is free with an optional one-time Pro unlock, and every breathing pattern stays free forever.</p>
+                        <p>If you want no subscription at all, a web pacer is the simplest answer, because there is nothing to install and nothing to cancel. On iOS, Breathing Exercises: Breathe+ is the closest app equivalent: it is free to download, ad-supported, and its App Store listing shows a one-time Unlock Everything purchase at 69.99 US dollars alongside its subscriptions, so you can pay once instead of monthly. Help Me Breathe's timer is free to use with no account, and its one paid plan is $10 a month or $100 a year with three days free.</p>
                     </div>
 
                     <div class="faq-item">
@@ -673,7 +680,7 @@
                         <li><strong>Othership</strong> — US App Store listing, seller Breathwork Plus Inc, app free to download. Subscriptions shown at $17.99 monthly and $129.99 yearly. The listing states: "We also maintain 5 free sessions on our app that rotate regularly, these are available to anyone who downloads our app." <a href="https://apps.apple.com/us/app/othership-guided-breathwork/id1590348936" rel="nofollow noopener" target="_blank">App Store listing</a>, opened 10 September 2026.</li>
                         <li><strong>Breathing Exercises: Breathe+</strong> — US App Store listing, developer Dynamic App Design LLC, app free to download. Purchases shown: Unlock Everything $69.99, Yearly Subscription $29.99, Monthly Subscription $9.99, Remove Ads $3.99, Unlock Themes $3.99, Unlock Usage History $3.99. The listing describes "Guided session lengths from 1-60 minutes", "Free-form session lengths", "Adjust inhale, exhale lengths from 1-32 seconds" and "Add breath holds from 1-32 seconds if desired", which is where the free-tier cell in the table comes from. It does not say whether an account is required, so that cell is "not verified". <a href="https://apps.apple.com/us/app/breathing-exercises-breathe/id1106998959" rel="nofollow noopener" target="_blank">App Store listing</a>, opened 10 September 2026.</li>
                         <li><strong>moonbird</strong> — the device is listed at €179 on moonbird's own store, which advertises "Free returns &amp; shipping" — with free shipping stated as applying above €/$/£100 — and a "30-day money-back guarantee". The page states that "The basic version of the app is included with your device. No subscription needed", and that Premium "starts with a 7-day free trial, then auto-renews to a monthly or yearly plan" — without publishing what those plans cost, so the Premium price is not verified. Read on moonbird.life, 10 September 2026. We have not repeated the link here because the two moonbird links higher up the page are affiliate links, and a source citation should not also be a thing that pays us.</li>
-                        <li><strong>Help Me Breathe</strong> — this site. Free, no account, all seven patterns and all session lengths included, with an optional one-time <a href="/pro">Pro unlock</a>. We are obviously not a neutral party about our own product, which is exactly why the recommendation above is "use the free thing", including when the free thing is somebody else's.</li>
+                        <li><strong>Help Me Breathe</strong> — this site. The timer is free, no account, all seven patterns and all session lengths included, and the one paid plan is $10 a month or $100 a year. We are obviously not a neutral party about our own product, which is exactly why the recommendation above is "use the free thing", including when the free thing is somebody else's.</li>
                     </ul>
                     <p>If you find a price here that is out of date, tell us at <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and we will correct it and date the correction. A comparison table nobody maintains is worse than no table at all.</p>
                 </section>
@@ -683,7 +690,7 @@
                     <ul>
                         <li><a href="/timer">All seven breathing timers</a> — the free pacer, every pattern, no account.</li>
                         <li><a href="/science">What the research says</a> — the studies behind slow breathing, with their limitations stated.</li>
-                        <li><a href="/pro">Help Me Breathe Pro</a> — one payment, no subscription, if you want custom patterns and streaks.</li>
+                        <li><a href="/pro">The Help Me Breathe plan</a> — $10 a month or $100 a year, three days free, if you want custom patterns and streaks.</li>
                         <li><a href="/box-breathing-vs-4-7-8">Box breathing vs 4-7-8</a> — which pattern to use before you worry about which app.</li>
                         <li><a href="/breathing-exercises-for-sleep">Breathing for sleep</a> — the wind-down patterns, free.</li>
                     </ul>

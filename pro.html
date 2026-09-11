@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
-    <title>Help Me Breathe Pro — Buy Once, Breathe Forever</title>
-    <meta name="description" content="Pro adds custom patterns, saved presets, streaks and soundscapes for one payment of $19. Every breathing technique on the site stays free forever.">
+    <title>Help Me Breathe — one plan, everything included</title>
+    <meta name="description" content="Everything in Help Me Breathe for $10 a month or $100 a year: custom patterns, streaks, soundscapes, night mode, no ads and the practitioner tools. Three days free.">
 
     <link rel="canonical" href="https://helpmebreath.com/pro">
 
@@ -13,8 +14,8 @@
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Help Me Breathe Pro — Buy Once, Breathe Forever">
-    <meta property="og:description" content="Pro adds custom patterns, saved presets, streaks and soundscapes for one payment of $19. Every breathing technique on the site stays free forever.">
+    <meta property="og:title" content="Help Me Breathe — one plan, everything included">
+    <meta property="og:description" content="Everything in Help Me Breathe for $10 a month or $100 a year: custom patterns, streaks, soundscapes, night mode, no ads and the practitioner tools. Three days free.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpmebreath.com/pro">
     <meta property="og:image" content="https://helpmebreath.com/images/og/pro.jpg">
@@ -22,8 +23,8 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Help Me Breathe Pro — Buy Once, Breathe Forever">
-    <meta name="twitter:description" content="Pro adds custom patterns, saved presets, streaks and soundscapes for one payment of $19. Every breathing technique on the site stays free forever.">
+    <meta name="twitter:title" content="Help Me Breathe — one plan, everything included">
+    <meta name="twitter:description" content="Everything in Help Me Breathe for $10 a month or $100 a year: custom patterns, streaks, soundscapes, night mode, no ads and the practitioner tools. Three days free.">
     <meta name="twitter:image" content="https://helpmebreath.com/images/og/pro.jpg">
 
     <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
@@ -85,19 +86,24 @@
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "Pro",
+          "name": "The plan",
           "item": "https://helpmebreath.com/pro"
         }
       ]
     }
     </script>
 
+    <!--
+      One product, two intervals. Availability is PreOrder until checkout is
+      genuinely open (js/config.js CHECKOUT.mode is still 'waitlist'); flip both
+      offers to https://schema.org/InStock in the same commit that turns it on.
+    -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Product",
-      "name": "Help Me Breathe Pro",
-      "description": "A one-time unlock for the Help Me Breathe guided breathing timer: a custom pattern builder with saved presets and share links, streaks with a 12-week heatmap and CSV export, ambient soundscapes, night mode, no ads, and the printable Protocol Pack.",
+      "name": "Help Me Breathe",
+      "description": "One plan for the Help Me Breathe guided breathing timer: a custom pattern builder with saved presets and share links, streaks with a 12-week heatmap and CSV export, ambient soundscapes, night mode, no ads, and the practitioner tools — commercial use, white-label embed, client links, printable handouts and a compliance pack.",
       "url": "https://helpmebreath.com/pro",
       "image": "https://helpmebreath.com/images/og/pro.jpg",
       "brand": {
@@ -108,67 +114,35 @@
       "offers": [
         {
           "@type": "Offer",
-          "name": "Pro — lifetime",
-          "price": "19.00",
+          "name": "Monthly",
+          "price": "10.00",
           "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock",
+          "availability": "https://schema.org/PreOrder",
           "url": "https://helpmebreath.com/pro",
-          "priceValidUntil": "2027-09-09",
-          "hasMerchantReturnPolicy": {
-            "@type": "MerchantReturnPolicy",
-            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-            "merchantReturnDays": 14,
-            "returnFees": "https://schema.org/FreeReturn"
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "10.00",
+            "priceCurrency": "USD",
+            "billingDuration": 1,
+            "billingIncrement": 1,
+            "unitCode": "MON"
           }
         },
         {
           "@type": "Offer",
-          "name": "Pro — founding member",
-          "price": "14.00",
+          "name": "Yearly",
+          "price": "100.00",
           "priceCurrency": "USD",
-          "availability": "https://schema.org/LimitedAvailability",
+          "availability": "https://schema.org/PreOrder",
           "url": "https://helpmebreath.com/pro",
-          "priceValidUntil": "2027-09-09",
-          "eligibleQuantity": {
-            "@type": "QuantitativeValue",
-            "value": 100
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "100.00",
+            "priceCurrency": "USD",
+            "billingDuration": 1,
+            "billingIncrement": 1,
+            "unitCode": "ANN"
           }
-        },
-        {
-          "@type": "Offer",
-          "name": "Pro — monthly",
-          "price": "3.99",
-          "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock",
-          "url": "https://helpmebreath.com/pro",
-          "priceValidUntil": "2027-09-09"
-        },
-        {
-          "@type": "Offer",
-          "name": "Practitioner licence",
-          "price": "99.00",
-          "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock",
-          "url": "https://helpmebreath.com/pro",
-          "priceValidUntil": "2027-09-09"
-        },
-        {
-          "@type": "Offer",
-          "name": "Studio licence",
-          "price": "199.00",
-          "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock",
-          "url": "https://helpmebreath.com/pro",
-          "priceValidUntil": "2027-09-09"
-        },
-        {
-          "@type": "Offer",
-          "name": "Protocol Pack",
-          "price": "19.00",
-          "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock",
-          "url": "https://helpmebreath.com/pro",
-          "priceValidUntil": "2027-09-09"
         }
       ]
     }
@@ -181,34 +155,34 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "Do I lose any of the free techniques if I do not buy Pro?",
+          "name": "What is free?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. All seven techniques, every session length including unlimited, the audio and vibration cues, the offline install and your saved settings and history stay free and unlimited. Pro adds tools around the practice. It never takes the practice away."
+            "text": "Every technique, every session length, the audio and vibration cues and the offline install are free to use today, without an account. The plan adds the tools around the practice listed on this page. It never takes the timer away."
           }
         },
         {
           "@type": "Question",
-          "name": "What if your payment provider disappears?",
+          "name": "How does the free trial work?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Payments are handled by a merchant of record, and providers do sometimes close accounts or exit markets. Two things protect you. Your licence lives in your browser as a signed token, so a lifetime unlock keeps working through the offline grace path even when nothing can be reached. And if the provider goes away, keys are reissued through the replacement provider at no cost to you — email contact@helpmebreath.com with the address you paid from."
+            "text": "The trial lasts three days from the moment you start it. A payment card is required to begin and is not charged during the trial. When the three days end, the card is charged the price shown at checkout, $10 for the monthly plan or $100 for the yearly plan in US dollars plus any tax due in your country, and the subscription begins, unless you cancel first. Cancelling during the trial takes two clicks from your account page. One free trial per person."
           }
         },
         {
           "@type": "Question",
-          "name": "Do I need an account or a password?",
+          "name": "Do I need an account?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. There is no sign-up, no password and no database of users. Buying Pro emails you a licence key; pasting that key into this page unlocks the browser you pasted it into. Your practice history stays in your browser and is never uploaded."
+            "text": "For the plan, yes. You sign in with a link sent to your email or with a Google account; there is no password to remember. The account holds your plan so it follows you between your phone, tablet and laptop. Your practice history stays in your browser unless you export it."
           }
         },
         {
           "@type": "Question",
-          "name": "How many devices does one Pro licence cover?",
+          "name": "Can I cancel?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Six activations for Pro, which covers a phone, a tablet and a laptop with room to replace one. Practitioner covers twenty-five. If you run out because you changed devices, email contact@helpmebreath.com and the count is reset."
+            "text": "Any time, from your account page, in two clicks. Cancelling stops the next charge and you keep access until the end of the period you have already paid for. There is no cancellation fee and no one will email you to talk you out of it."
           }
         },
         {
@@ -216,15 +190,31 @@
           "name": "Is there a refund?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Fourteen days, unconditional. Email contact@helpmebreath.com within fourteen days of paying and you get the money back. No reason required, and no follow-up questions."
+            "text": "Fourteen days, unconditional. Email contact@helpmebreath.com within fourteen days of a charge and the money goes back to the card you paid with. No reason required, and no follow-up questions."
           }
         },
         {
           "@type": "Question",
-          "name": "Should I buy the monthly plan or the lifetime unlock?",
+          "name": "Monthly or yearly?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The lifetime unlock, in almost every case. At $3.99 a month the subscription costs more than the one-time price within five months. The monthly plan exists for people who want to try Pro without committing, and it can be cancelled at any time."
+            "text": "They include exactly the same things. Yearly costs $100 against $120 for twelve monthly payments, so it is two months free for anyone who already knows they will keep the habit. If you start monthly you can switch to yearly from your account at any time, and the months you have already paid are credited."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "I teach breathing to clients. Is that included?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The commercial-use licence, the white-label embed for your own site, co-branded client session links, the printable handout pack with your name on it, class and projector mode, and the signable data-processing agreement are all part of the one plan. There is no separate practitioner tier."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What if your payment provider disappears?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Payments are handled by a merchant of record, and providers do sometimes close accounts or exit markets. Your plan is honoured for the period you have paid for whatever happens to the provider, and if one has to be replaced you are moved to the replacement at no cost. Email contact@helpmebreath.com with the address you signed in with."
           }
         }
       ]
@@ -258,258 +248,104 @@
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
-                    <li>Pro</li>
+                    <li>The plan</li>
                 </ol>
             </nav>
-            <h1>Buy it once. Breathe forever.</h1>
-            <p class="lead">Pro adds the tools around your practice for one payment. The practice itself stays free.</p>
-            <div class="article-meta">
-                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
-                <p class="article-dates">Published 2026-09-09 &middot; Updated 2026-09-10</p>
-            </div>
+            <h1>Everything, one plan.</h1>
+            <p class="lead">The timer is free to use. One plan unlocks the tools around your practice, for you and for the people you work with. Three days free, then $10 a month or $100 a year.</p>
         </header>
 
         <main id="main">
-            <article class="prose">
-                <section>
-                    <p class="lead">Help Me Breathe is a free breathing timer, and it stays one. Pro is a single
-                    payment that unlocks the things you only want once breathing has become a habit: your own
-                    patterns, saved and shareable; your practice history; sound to breathe to; a screen that will
-                    not blind you at two in the morning. There is no subscription, no account and no password.</p>
-
-                    <p><span class="founding-counter" data-role="founding-counter">Founding price: $14 for the first 100 people, then $19.</span></p>
-                </section>
-
-                <section>
-                    <h2>What stays free, in plain words</h2>
-                    <p>All seven techniques — 4-7-8, box breathing, heart coherence, cyclic sighing, extended
-                    exhale, triangle breathing and the energizing breath — stay free and unlimited forever. So do
-                    every session length, the audio and vibration cues, the offline install, your saved settings and
-                    your session history. Nothing that works today will ever move behind a payment. If we add a new
-                    technique, it lands on the free tier too. That is not a promotion; it is the shape of the thing.</p>
-
-                    <p>The reason is simple. Someone arriving at this site at three in the morning because they
-                    cannot sleep, or in the middle of a panic attack, should get a working timer and nothing else.
-                    Putting a price in front of that would be indefensible, and it would also be bad business: the
-                    free timer is what brings people here. Pro is for the people who come back.</p>
-                </section>
-
-                <section>
-                    <h2>The four plans</h2>
-
-                    <p class="table-hint">Scroll the table sideways for Pro, Studio and Free.</p>
-                    <div class="table-scroll" tabindex="0" role="region" aria-label="Plan comparison table, scrollable">
-                        <table class="pricing-matrix">
-                            <caption class="sr-only">What each Help Me Breathe plan includes, feature by feature.</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col"><span class="sr-only">Feature</span></th>
-                                    <th scope="col">
-                                        <span class="tier-name">Free</span>
-                                        <span class="price-figure">$0</span>
-                                        <span class="price-period">forever, with no account</span>
-                                        <a class="checkout-btn checkout-btn--secondary" href="/timer">Start breathing</a>
-                                    </th>
-                                    <th scope="col">
-                                        <span class="tier-name">Pro</span>
-                                        <span class="price-figure">$19</span>
-                                        <span class="price-period">one payment, yours for good</span>
-                                        <button class="checkout-btn checkout-btn--secondary" type="button" data-action="checkout" data-sku="lifetime" data-placement="pricing-matrix">Unlock Pro — $19</button>
-                                    </th>
-                                    <th scope="col" class="col-featured">
-                                        <span class="tier-flag">Most practitioners</span>
-                                        <span class="tier-name">Practitioner</span>
-                                        <span class="price-figure">$99</span>
-                                        <span class="price-period">per year, per practitioner</span>
-                                        <button class="checkout-btn" type="button" data-action="checkout" data-sku="practitioner" data-placement="pricing-matrix">Get a Practitioner licence</button>
-                                    </th>
-                                    <th scope="col">
-                                        <span class="tier-name">Studio</span>
-                                        <span class="price-figure">$199</span>
-                                        <span class="price-period">per year, per studio or clinic</span>
-                                        <button class="checkout-btn checkout-btn--secondary" type="button" data-action="checkout" data-sku="studio" data-placement="pricing-matrix">Get a Studio licence</button>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th scope="row">All seven techniques</th>
-                                    <td>Yes</td>
-                                    <td>Yes</td>
-                                    <td class="col-featured">Yes</td>
-                                    <td>Yes</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Custom patterns</th>
-                                    <td>Build and run any pattern</td>
-                                    <td>Save, name and share</td>
-                                    <td class="col-featured">Save, name and share</td>
-                                    <td>Save, name and share</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Streaks and CSV export</th>
-                                    <td>Last seven days</td>
-                                    <td>Yes</td>
-                                    <td class="col-featured">Yes</td>
-                                    <td>Yes</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Ambient soundscapes</th>
-                                    <td>Preview only</td>
-                                    <td>Six beds, offline</td>
-                                    <td class="col-featured">Six beds, offline</td>
-                                    <td>Six beds, offline</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Night mode</th>
-                                    <td>Follows your device</td>
-                                    <td>Toggle, screen kept awake</td>
-                                    <td class="col-featured">Toggle, screen kept awake</td>
-                                    <td>Toggle, screen kept awake</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Ad-free</th>
-                                    <td>Ads on the guide pages</td>
-                                    <td>Yes</td>
-                                    <td class="col-featured">Yes</td>
-                                    <td>Yes</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Commercial-use licence</th>
-                                    <td>&mdash;</td>
-                                    <td>&mdash;</td>
-                                    <td class="col-featured">Yes</td>
-                                    <td>Yes</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">White-label embed</th>
-                                    <td>&mdash;</td>
-                                    <td>&mdash;</td>
-                                    <td class="col-featured">1 domain</td>
-                                    <td>10 domains</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Co-branded client links</th>
-                                    <td>&mdash;</td>
-                                    <td>&mdash;</td>
-                                    <td class="col-featured">Yes</td>
-                                    <td>Yes</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Printable handouts</th>
-                                    <td>&mdash;</td>
-                                    <td>Protocol Pack</td>
-                                    <td class="col-featured">Protocol Pack and client pack</td>
-                                    <td>Protocol Pack and client pack</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Class and projector mode</th>
-                                    <td>&mdash;</td>
-                                    <td>&mdash;</td>
-                                    <td class="col-featured">Yes</td>
-                                    <td>Yes</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Compliance pack</th>
-                                    <td>&mdash;</td>
-                                    <td>&mdash;</td>
-                                    <td class="col-featured">DPA and privacy attestation</td>
-                                    <td>DPA, attestation and usage report</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">Named invoice with a VAT field</th>
-                                    <td>&mdash;</td>
-                                    <td>Yes</td>
-                                    <td class="col-featured">Yes</td>
-                                    <td>Yes</td>
-                                </tr>
-                            </tbody>
-                        </table>
+            <section class="plan" aria-labelledby="plan-heading">
+                <div class="plan-card">
+                    <div class="plan-toggle" role="group" aria-label="Billing interval">
+                        <button class="plan-interval is-active" type="button" data-interval="monthly" aria-pressed="true">Monthly</button>
+                        <button class="plan-interval" type="button" data-interval="yearly" aria-pressed="false">Yearly <span class="plan-save">two months free</span></button>
                     </div>
 
-                    <p class="tax-note">Prices are in US dollars and are invoiced. Sales are made by our merchant of record, who collects any VAT or sales tax that applies where you are. Every purchase carries a 14-day unconditional refund.</p>
-
-                    <p>A few things the table leaves out. Free keeps every session length including unlimited, the
-                    audio and vibration cues, the offline install, your saved settings and session history, and the
-                    embeddable timer with our attribution. Pro covers six device activations, which is a phone, a
-                    tablet and a laptop with room to replace one. Practitioner covers twenty-five, adds the
-                    homework-link builder, and comes with a signed data-processing agreement. Studio covers up to ten
-                    domains or locations and adds a monthly aggregate usage report — no cookies, no client
-                    identifiers — plus priority email support.</p>
-
-                    <p>Two smaller options sit alongside those. <strong>Pro monthly</strong> is $3.99 a month for the
-                    same features, for anyone who would rather try it than commit; it costs more than the lifetime
-                    unlock after five months, and we would rather say so than let it run quietly. The
-                    <strong>Protocol Pack</strong> is $19 on its own: print-ready protocol cards for sleep, panic
-                    interruption, focus and pre-performance, plus a fill-in practice log, in A4 and Letter. It is
-                    included free with Pro and with Practitioner, so buy it separately only if the printables are
-                    the only part you want.</p>
-
-                    <p class="pro-panel-actions">
-                        <button class="pro-btn" type="button" data-action="checkout" data-sku="monthly" data-placement="secondary">Try Pro monthly — $3.99</button>
-                        <button class="pro-btn" type="button" data-action="checkout" data-sku="pack" data-placement="secondary">Protocol Pack — $19</button>
+                    <p class="plan-price">
+                        <span class="price-figure" data-role="plan-price">$10</span>
+                        <span class="price-period" data-role="plan-period">a month, billed monthly, US dollars</span>
                     </p>
 
+                    <p class="plan-trial" data-role="plan-trial"><strong>3 days free, then $10 a month.</strong> We ask for a card now. You are not charged during the trial. On day 3 the card is charged automatically unless you cancel, and cancelling takes two clicks from your account page at any time during the trial. One free trial per person.</p>
+
+                    <button class="checkout-btn" type="button" data-action="checkout" data-plan="monthly" data-role="plan-cta" data-placement="plan-card">Start the free trial</button>
+
+                    <p class="plan-fine">Cancel any time. Cancel later and you keep access until the end of the period you have paid for. Fourteen-day refund, no reason needed. Payments are handled by a merchant of record, who acts as the seller for this purchase; the price at checkout includes any VAT or sales tax due in your country.</p>
+
                     <div data-checkout-slot></div>
+                </div>
+
+                <div class="plan-included">
+                    <h2 id="plan-heading">What is included</h2>
+                    <p>One list, no tiers, no ticks and crosses. Everything below is in the plan whether you pay monthly or yearly.</p>
+                    <ul class="included-list">
+                        <li><strong>All seven techniques, without limits</strong><span>4-7-8, box, heart coherence, cyclic sighing, extended exhale, triangle and the energizing breath, at any session length including unlimited.</span></li>
+                        <li><strong>Your own patterns, saved and shareable</strong><span>Four sliders, a name, and a link that opens anyone's timer already set to your pattern.</span></li>
+                        <li><strong>Streaks and a twelve-week history</strong><span>Current and longest streak, total minutes, a heatmap and a breakdown by technique, with CSV export.</span></li>
+                        <li><strong>Six ambient soundscapes</strong><span>No voices, no beat, mixed to sit under the pacing tones. Cached for offline use after the first play.</span></li>
+                        <li><strong>Night mode that stays put</strong><span>Hold the page dark on a bright device or light on a dark one, and keep the screen awake while a session runs.</span></li>
+                        <li><strong>No ads, anywhere</strong><span>The guide pages carry a small number of ads to pay hosting. The plan removes them site-wide.</span></li>
+                        <li><strong>Commercial-use licence</strong><span>Use the timer in paid one-to-one sessions, classes, workshops and corporate sessions you are paid to run.</span></li>
+                        <li><strong>White-label embed</strong><span>Put the timer on your own site with your logo and accent colour and no Help Me Breathe branding.</span></li>
+                        <li><strong>Client session links and class mode</strong><span>Send a client a link with the technique and length already chosen, or put the timer on a projector for a room.</span></li>
+                        <li><strong>Printable handouts and the compliance pack</strong><span>Seven handout sheets with your name and logo, a signable data-processing agreement, a privacy attestation and a security overview.</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <article class="prose">
+                <section>
+                    <h2>Why one plan</h2>
+                    <p>Most people want the same three things from a breathing timer once it has become a habit: to
+                    keep the habit, to make the timer feel like their own, and to be left alone while they breathe.
+                    Practitioners want those and a licence they can show to whoever asks. Splitting that across tiers
+                    means explaining the split instead of the product, so there is one plan and everything is in
+                    it.</p>
+
+                    <p>Someone arriving here at three in the morning because they cannot sleep, or in the middle of a
+                    panic attack, still gets a working timer and nothing else. The plan is for the people who come
+                    back.</p>
                 </section>
 
                 <section>
-                    <h2>What Pro actually adds</h2>
-
+                    <h2>How the trial works</h2>
                     <div class="steps-container">
                         <div class="step">
-                            <h3>Your own patterns, saved</h3>
-                            <p>Four sliders: inhale, hold, exhale, hold. Anyone can build a pattern and run it — that
-                            part is free, and it is the fastest way to find the rhythm that suits you rather than the
-                            one a book recommended. Pro saves patterns under names you choose, so "wind-down" is one
-                            tap away, and turns any pattern into a link. Send that link to someone and their timer
-                            opens already set to it, whether or not they have paid for anything.</p>
+                            <h3>Start it</h3>
+                            <p>Sign in with an email link or a Google account, pick monthly or yearly, and enter a card
+                            at checkout. Nothing is charged today.</p>
                         </div>
                         <div class="step">
-                            <h3>A record of what you have actually done</h3>
-                            <p>Every completed session is already stored in your browser. Pro turns that into a
-                            current streak, a longest streak, total minutes, a twelve-week heatmap and a breakdown by
-                            technique, plus a CSV export if you want the numbers somewhere else. None of it leaves
-                            your device — there is no server holding your history, which is also why we cannot
-                            restore it if you clear your browser.</p>
+                            <h3>Use everything for three days</h3>
+                            <p>The whole plan is open from the first minute: your patterns, your history, the
+                            soundscapes, night mode, the practitioner tools. Nothing is held back for later.</p>
                         </div>
                         <div class="step">
-                            <h3>Something to breathe to</h3>
-                            <p>Six ambient soundscapes, no voices and no music with a beat, mixed to sit under the
-                            pacing tones rather than compete with them. They cache for offline use after the first
-                            play, so a flight or a basement does not silence them.</p>
-                        </div>
-                        <div class="step">
-                            <h3>Night mode</h3>
-                            <p>The site already follows your device: set the phone to dark and the page comes up dark,
-                            paid or not. Pro adds the switch, so you can hold the page dark on a bright device or
-                            light on a dark one, and it asks the browser to keep the screen awake while a session
-                            runs, so the phone does not lock halfway through.</p>
-                        </div>
-                        <div class="step">
-                            <h3>No ads, anywhere</h3>
-                            <p>The guides and comparison articles carry a small number of ads to pay hosting costs.
-                            Pro removes them site-wide. There has never been an ad on the timer screen itself, on the
-                            anxiety page or on the panic-attack page, for anyone, and there never will be.</p>
-                        </div>
-                        <div class="step">
-                            <h3>The Protocol Pack</h3>
-                            <p>Print-ready cards for four situations — falling asleep, interrupting a panic spiral,
-                            a focus sprint and the few minutes before something you are dreading — with a practice
-                            log you can fill in by hand. Included with Pro at no extra cost.</p>
+                            <h3>Decide</h3>
+                            <p>On day three the card is charged for the plan you chose, unless you have cancelled.
+                            Cancelling is two clicks on your account page, at any point during the trial, and you are
+                            told the exact date and amount before you start.</p>
                         </div>
                     </div>
+                    <p>One free trial per person. If you have had one before, checkout opens without a trial and says
+                    so plainly rather than pretending otherwise.</p>
                 </section>
 
                 <section>
                     <h2>Working with clients?</h2>
-                    <p>If you teach breathing to other people — as a therapist, a yoga or fitness teacher, a coach or
-                    a school counsellor — the <a href="/for-practitioners">Practitioner licence</a> is the one to read
-                    about. It covers commercial use,
+                    <p>If you teach breathing to other people, as a therapist, a yoga or fitness teacher, a coach or a
+                    school counsellor, the plan covers your practice as well as your own. It grants commercial use,
                     removes our attribution from an embed you put on your own site, lets you set your logo and
                     colours, and gives you a link you can send a client with the technique and length already chosen.
-                    It also comes with a signed data-processing agreement and a plain attestation that no client data
-                    leaves the browser, which is usually the part your insurer or your employer asks about.</p>
+                    It also comes with a signable data-processing agreement and a plain attestation that no client
+                    data leaves the browser, which is usually the part your insurer or your employer asks about.
+                    <a href="/for-practitioners">The practitioner page</a> walks through each of those.</p>
+
+                    <p>This is not an enterprise product. Help Me Breathe is one person, working as an individual. If
+                    your purchase needs a vendor security questionnaire, a SOC 2 report, a HIPAA Business Associate
+                    Agreement or single sign-on, the plan will not clear that bar and you should not buy it.</p>
                 </section>
 
                 <section>
@@ -530,9 +366,9 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <th scope="row">Help Me Breathe Pro</th>
-                                    <td>$19 once, or $14 as a founding member</td>
-                                    <td>One payment. No account. The timer itself is free with no limits.</td>
+                                    <th scope="row">Help Me Breathe</th>
+                                    <td>$10 monthly, $100 yearly</td>
+                                    <td>One plan, everything included, three days free. The timer itself is free to use without an account.</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Headspace</th>
@@ -560,91 +396,83 @@
 
                     <p>The point of that table is not that the others are overpriced. Headspace and Calm sell a
                     library of produced sessions and a curriculum, which a pacing circle cannot be, and for some
-                    people that is worth $70 a year. The point is that if what you want is a good timer, you should
-                    not have to rent one.</p>
+                    people that is worth the money. The point is that you can see the whole price here, and that the
+                    timer you actually breathe with is free either way.</p>
                 </section>
 
                 <section>
                     <h2>The refund promise</h2>
                     <p>Fourteen days, unconditional. Email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>
-                    within fourteen days of paying and the money goes back, with no reason required and no attempt to
-                    talk you out of it. There is no form to fill in and no reason you have to give, and it works
-                    the same way whether you bought Pro, the Protocol Pack or a Practitioner licence. The rest of
-                    the small print is in the <a href="/legal/terms-of-service">terms of service</a>.</p>
-                </section>
-
-                <section>
-                    <h2>Restore a purchase</h2>
-                    <p>Already bought Pro? Paste the licence key from your receipt email to unlock this browser.
-                    Keys work on any device you use, up to the activation count for your plan. Nothing is sent
-                    anywhere except the key itself, for verification — and the key is then kept in this browser
-                    alongside the licence, so the licence can renew itself quietly instead of asking you to paste
-                    it again every few weeks. Clearing your browser data removes both.</p>
-
-                    <form class="restore-form" data-role="restore-form" novalidate>
-                        <label class="sr-only" for="restore-key">Licence key</label>
-                        <input type="text" id="restore-key" name="key" autocomplete="off" spellcheck="false" placeholder="Paste your licence key">
-                        <button class="pro-btn pro-btn-primary" type="submit">Activate</button>
-                        <p class="restore-status" data-role="restore-status" role="status" aria-live="polite"></p>
-                    </form>
-
-                    <p class="restore-domains-note">Practitioner and Studio only: if you are going to use the
-                    white-label embed, list the sites you will put it on. The licence is written to those hostnames,
-                    and the widget will only drop its attribution there. Leave it empty if you are not embedding
-                    anything &mdash; everything else works either way.</p>
-
-                    <form class="restore-form" data-role="restore-domains-form" novalidate>
-                        <label class="sr-only" for="restore-domains">Domains for the white-label embed</label>
-                        <input type="text" id="restore-domains" name="domains" autocomplete="off" spellcheck="false" placeholder="clinic.example, studio.example">
-                    </form>
+                    within fourteen days of a charge and the money goes back to the card you paid with, with no
+                    reason required and no attempt to talk you out of it. A cancelled trial is not a refund: nothing
+                    was charged, so there is nothing to give back. The rest of the small print is in the
+                    <a href="/legal/terms-of-service">terms of service</a>.</p>
                 </section>
 
                 <section>
                     <h2>Common questions</h2>
 
                     <div class="faq-item">
-                        <h3>Do I lose any of the free techniques if I do not buy Pro?</h3>
-                        <p>No. All seven techniques, every session length including unlimited, the audio and
-                        vibration cues, the offline install and your saved settings and history stay free and
-                        unlimited. Pro adds tools around the practice. It never takes the practice away.</p>
+                        <h3>What is free?</h3>
+                        <p>Every technique, every session length, the audio and vibration cues and the offline install
+                        are free to use today, without an account. The plan adds the tools around the practice listed
+                        on this page. It never takes the timer away.</p>
                     </div>
 
                     <div class="faq-item">
-                        <h3>What if your payment provider disappears?</h3>
-                        <p>Payments are handled by a merchant of record, and providers do sometimes close accounts or
-                        exit markets. Two things protect you. Your licence lives in your browser as a signed token,
-                        so a lifetime unlock keeps working through the offline grace path even when nothing can be
-                        reached. And if the provider goes away, keys are reissued through the replacement provider at
-                        no cost to you — email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>
-                        with the address you paid from.</p>
+                        <h3>How does the free trial work?</h3>
+                        <p>The trial lasts three days from the moment you start it. A payment card is required to begin
+                        and is not charged during the trial. When the three days end, the card is charged the price
+                        shown at checkout, $10 for the monthly plan or $100 for the yearly plan in US dollars plus any
+                        tax due in your country, and the subscription begins, unless you cancel first. Cancelling
+                        during the trial takes two clicks from your account page. One free trial per person.</p>
                     </div>
 
                     <div class="faq-item">
-                        <h3>Do I need an account or a password?</h3>
-                        <p>No. There is no sign-up, no password and no database of users. Buying Pro emails you a
-                        licence key; pasting that key into this page unlocks the browser you pasted it into. Your
-                        practice history stays in your browser and is never uploaded.</p>
+                        <h3>Do I need an account?</h3>
+                        <p>For the plan, yes. You sign in with a link sent to your email or with a Google account;
+                        there is no password to remember. The account holds your plan so it follows you between your
+                        phone, tablet and laptop. Your practice history stays in your browser unless you export it.</p>
                     </div>
 
                     <div class="faq-item">
-                        <h3>How many devices does one Pro licence cover?</h3>
-                        <p>Six activations for Pro, which covers a phone, a tablet and a laptop with room to replace
-                        one. Practitioner covers twenty-five. If you run out because you changed devices, email
-                        <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and the count is reset.</p>
+                        <h3>Can I cancel?</h3>
+                        <p>Any time, from your account page, in two clicks. Cancelling stops the next charge and you
+                        keep access until the end of the period you have already paid for. There is no cancellation
+                        fee and no one will email you to talk you out of it.</p>
                     </div>
 
                     <div class="faq-item">
                         <h3>Is there a refund?</h3>
                         <p>Fourteen days, unconditional. Email
                         <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> within fourteen days of
-                        paying and you get the money back. No reason required, and no follow-up questions.</p>
+                        a charge and the money goes back to the card you paid with. No reason required, and no
+                        follow-up questions.</p>
                     </div>
 
                     <div class="faq-item">
-                        <h3>Should I buy the monthly plan or the lifetime unlock?</h3>
-                        <p>The lifetime unlock, in almost every case. At $3.99 a month the subscription costs more
-                        than the one-time price within five months. The monthly plan exists for people who want to
-                        try Pro without committing, and it can be cancelled at any time.</p>
+                        <h3>Monthly or yearly?</h3>
+                        <p>They include exactly the same things. Yearly costs $100 against $120 for twelve monthly
+                        payments, so it is two months free for anyone who already knows they will keep the habit. If
+                        you start monthly you can switch to yearly from your account at any time, and the months you
+                        have already paid are credited.</p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3>I teach breathing to clients. Is that included?</h3>
+                        <p>Yes. The commercial-use licence, the white-label embed for your own site, co-branded client
+                        session links, the printable handout pack with your name on it, class and projector mode, and
+                        the signable data-processing agreement are all part of the one plan. There is no separate
+                        practitioner tier.</p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3>What if your payment provider disappears?</h3>
+                        <p>Payments are handled by a merchant of record, and providers do sometimes close accounts or
+                        exit markets. Your plan is honoured for the period you have paid for whatever happens to the
+                        provider, and if one has to be replaced you are moved to the replacement at no cost. Email
+                        <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> with the address you
+                        signed in with.</p>
                     </div>
                 </section>
 
@@ -652,11 +480,10 @@
                     <h2>A note on what this is</h2>
                     <p>This is a timer and a set of tools for a breathing practice. Nothing here is medical care and
                     none of it replaces treatment, a clinician or a crisis line. Some breathing patterns are not
-                    suitable for everyone — breath holds and fast breathing in particular carry real
+                    suitable for everyone; breath holds and fast breathing in particular carry real
                     contraindications, which are written on each technique's own page. Read the
                     <a href="/legal/medical-disclaimer">medical disclaimer</a> before you start, and the
-                    <a href="/legal/privacy-policy">privacy policy</a> if you want to know exactly what is stored
-                    (almost nothing, all of it in your own browser).</p>
+                    <a href="/legal/privacy-policy">privacy policy</a> if you want to know exactly what is stored.</p>
                 </section>
             </article>
         </main>
@@ -701,7 +528,7 @@
                 </nav>
             </div>
 
-            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician: <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
@@ -716,80 +543,64 @@
     <script type="module" src="/js/app.js"></script>
     <script type="module" src="/js/checkout.js"></script>
     <script type="module">
-        import { activate, tier, getLicenseInfo } from '/js/entitlements.js';
-        import { track, EVENTS } from '/js/analytics.js';
-        import { CHECKOUT, PRICES } from '/js/config.js';
+        import { PRICES, CHECKOUT } from '/js/config.js';
 
-        const form = document.querySelector('[data-role="restore-form"]');
-        const status = document.querySelector('[data-role="restore-status"]');
-        const input = document.getElementById('restore-key');
+        // The interval toggle. Everything it changes is text and one attribute
+        // on the button; the checkout module reads data-plan when the button is
+        // clicked. `?plan=yearly` preselects an interval so a link from
+        // elsewhere lands on the right one.
+        const priceEl = document.querySelector('[data-role="plan-price"]');
+        const periodEl = document.querySelector('[data-role="plan-period"]');
+        const trialEl = document.querySelector('[data-role="plan-trial"]');
+        const cta = document.querySelector('[data-role="plan-cta"]');
+        const buttons = Array.from(document.querySelectorAll('.plan-interval'));
+        const trialDays = Number(CHECKOUT.trialDays) || 0;
 
-        function say(text, isError) {
-            if (!status) return;
-            status.textContent = text;
-            status.classList.toggle('is-error', isError === true);
-        }
-
-        const TIER_NAMES = {
-            pro: 'Pro',
-            practitioner: 'Practitioner',
-            studio: 'Studio'
+        const COPY = {
+            monthly: {
+                price: '$' + PRICES.monthly,
+                period: 'a month, billed monthly, US dollars',
+                then: '$' + PRICES.monthly + ' a month',
+            },
+            yearly: {
+                price: '$' + PRICES.yearly,
+                period: 'a year, billed yearly, US dollars. About $' + (PRICES.yearly / 12).toFixed(2) + ' a month.',
+                then: '$' + PRICES.yearly + ' a year',
+            },
         };
 
-        function showCurrentTier() {
-            const info = getLicenseInfo();
-            if (!info.isPro) return;
-            say(TIER_NAMES[info.tier] + ' is active in this browser. Nothing else to do.');
-            if (input) input.value = '';
+        function trialCopy(plan) {
+            const then = COPY[plan].then;
+            if (trialDays > 0) {
+                return '<strong>' + trialDays + ' days free, then ' + then + '.</strong> We ask for a card now. ' +
+                    'You are not charged during the trial. On day ' + trialDays + ' the card is charged automatically unless you cancel, ' +
+                    'and cancelling takes two clicks from your account page at any time during the trial. One free trial per person.';
+            }
+            return '<strong>' + then + '. Cancel any time.</strong> Fourteen days, unconditional: if it is not for you, email us and we refund it in full.';
         }
 
-        if (form) {
-            form.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                const key = input ? String(input.value || '').trim() : '';
-                if (!key) {
-                    say('Paste the licence key from your receipt email.', true);
-                    return;
-                }
-                // Only the hostnames. The key itself is never logged or tracked.
-                const domainsField = document.getElementById('restore-domains');
-                const domains = domainsField ? String(domainsField.value || '') : '';
-                say('Checking…');
-                track(EVENTS.ACTIVATE_ATTEMPT, { source: 'pro-page' });
-                const result = await activate(key, domains);
-                if (result.ok) {
-                    track(EVENTS.ACTIVATE_SUCCESS, { tier: result.tier || tier() });
-                    track(EVENTS.RESTORE_SUCCESS, { tier: result.tier || tier() });
-                    say((TIER_NAMES[result.tier] || 'Pro') + ' unlocked in this browser. Open any timer and the extra tools are there.');
-                    if (input) input.value = '';
-                } else {
-                    track(EVENTS.ACTIVATE_FAIL, { reason: result.code || 'rejected' });
-                    // The Protocol Pack is printables, not an app tier, so a pack
-                    // key has nothing to unlock here. Say that plainly.
-                    say(result.code === 'pack_only'
-                        ? 'That is a Protocol Pack key. The pack is a set of printable PDFs rather than an app unlock, so there is nothing to activate — the download link is in your receipt email.'
-                        : (result.error || 'That key could not be verified.'), true);
-                }
-            });
-            showCurrentTier();
+        function select(plan) {
+            if (!COPY[plan]) plan = 'monthly';
+            for (const b of buttons) {
+                const on = b.getAttribute('data-interval') === plan;
+                b.classList.toggle('is-active', on);
+                b.setAttribute('aria-pressed', on ? 'true' : 'false');
+            }
+            if (priceEl) priceEl.textContent = COPY[plan].price;
+            if (periodEl) periodEl.textContent = COPY[plan].period;
+            if (trialEl) trialEl.innerHTML = trialCopy(plan);
+            if (cta) {
+                cta.setAttribute('data-plan', plan);
+                cta.textContent = trialDays > 0 ? 'Start the free trial' : 'Subscribe';
+            }
         }
 
-        // Founding-member counter. The endpoint is optional: if it is not there
-        // yet, the static line stays exactly as written in the markup.
-        const counter = document.querySelector('[data-role="founding-counter"]');
-        if (counter && CHECKOUT.founding && CHECKOUT.founding.cap > 0) {
-            fetch('/api/founding')
-                .then((response) => (response.ok ? response.json() : null))
-                .then((data) => {
-                    if (!data || typeof data.sold !== 'number') return;
-                    const cap = Number(data.cap) || CHECKOUT.founding.cap;
-                    const left = Math.max(0, cap - data.sold);
-                    counter.textContent = left > 0
-                        ? 'Founding price: $' + PRICES.founding + ' — ' + left + ' of ' + cap + ' places left, then $' + PRICES.lifetime + '.'
-                        : 'The founding places have all gone. Pro is $' + PRICES.lifetime + '.';
-                })
-                .catch(() => {});
+        for (const b of buttons) {
+            b.addEventListener('click', () => select(b.getAttribute('data-interval')));
         }
+
+        const wanted = new URLSearchParams(window.location.search).get('plan');
+        select(wanted === 'yearly' ? 'yearly' : 'monthly');
     </script>
 </body>
 </html>

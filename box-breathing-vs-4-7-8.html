@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
     <title>Box Breathing vs 4-7-8: Which Should You Use?</title>
     <meta name="description" content="Box breathing or 4-7-8? Run both timers here for three minutes each, then compare pattern, pace, holds and best time of day in one honest table.">
@@ -300,7 +301,11 @@
                          aria-labelledby="timer-heading-box">
 
                     <div class="app-bar">
-                        <h2 id="timer-heading-box" data-role="technique-title">Box breathing</h2>
+                        <div class="technique-head">
+                            <p class="technique-eyebrow" data-role="technique-eyebrow"></p>
+                            <h2 id="timer-heading-box" data-role="technique-title">Box breathing</h2>
+                            <p class="pattern-line" data-role="pattern-line"></p>
+                        </div>
                         <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open box breathing settings" aria-expanded="false">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
                                 <circle cx="12" cy="12" r="3.2"/>
@@ -331,13 +336,12 @@
                         </div>
                     </div>
 
-                    <p class="pair-label">Box breathing · in 4, hold 4, out 4, hold 4</p>
 
                     <div class="breathing-container">
                         <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
-                            <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
-                            <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
-                            <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                            <circle class="ring-track" cx="160" cy="160" r="150"/>
+                            <circle class="ring-live" cx="160" cy="160" r="150"/>
+                            <circle class="ring-bridge" cx="160" cy="160" r="150"/>
                         </svg>
                         <div class="breathing-circle technique-box" data-role="circle">
                             <span class="circle-notch" aria-hidden="true"></span>
@@ -379,7 +383,6 @@
                         </div>
                     </div>
 
-                    <div class="tools-row" data-slot="tools"></div>
 
                     <div class="controls">
                         <button class="control-btn" type="button" data-role="start" data-action="start">Begin Practice</button>
@@ -398,6 +401,9 @@
 
                     <div data-slot="post-session"></div>
 
+                    <!-- SLOT: Pro tools (custom pattern, your practice, soundscapes, night mode) -->
+                    <div class="tools-row" data-slot="tools"></div>
+
                     <div class="technique-info" data-role="technique-info"></div>
 
                     <p class="live-region" data-role="live-region" aria-live="polite" aria-atomic="true"></p>
@@ -413,7 +419,11 @@
                          aria-labelledby="timer-heading-478">
 
                     <div class="app-bar">
-                        <h2 id="timer-heading-478" data-role="technique-title">4-7-8 breathing</h2>
+                        <div class="technique-head">
+                            <p class="technique-eyebrow" data-role="technique-eyebrow"></p>
+                            <h2 id="timer-heading-478" data-role="technique-title">4-7-8 breathing</h2>
+                            <p class="pattern-line" data-role="pattern-line"></p>
+                        </div>
                         <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open 4-7-8 breathing settings" aria-expanded="false">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
                                 <circle cx="12" cy="12" r="3.2"/>
@@ -444,13 +454,12 @@
                         </div>
                     </div>
 
-                    <p class="pair-label">4-7-8 breathing · in 4, hold 7, out 8</p>
 
                     <div class="breathing-container">
                         <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
-                            <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
-                            <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
-                            <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                            <circle class="ring-track" cx="160" cy="160" r="150"/>
+                            <circle class="ring-live" cx="160" cy="160" r="150"/>
+                            <circle class="ring-bridge" cx="160" cy="160" r="150"/>
                         </svg>
                         <div class="breathing-circle technique-478" data-role="circle">
                             <span class="circle-notch" aria-hidden="true"></span>
@@ -492,7 +501,6 @@
                         </div>
                     </div>
 
-                    <div class="tools-row" data-slot="tools"></div>
 
                     <div class="controls">
                         <button class="control-btn" type="button" data-role="start" data-action="start">Begin Practice</button>
@@ -510,6 +518,9 @@
                     </div>
 
                     <div data-slot="post-session"></div>
+
+                    <!-- SLOT: Pro tools (custom pattern, your practice, soundscapes, night mode) -->
+                    <div class="tools-row" data-slot="tools"></div>
 
                     <div class="technique-info" data-role="technique-info"></div>
 

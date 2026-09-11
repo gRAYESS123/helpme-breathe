@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
     <title>Free Guided Breathing Timer — 4-7-8, Box &amp; Coherence</title>
     <meta name="description" content="A free guided breathing timer with seven patterns: 4-7-8, box breathing, coherence, cyclic sighing and more. Audio cues, no account, works offline.">
@@ -82,7 +83,7 @@
           "@id": "https://helpmebreath.com/#website",
           "url": "https://helpmebreath.com/",
           "name": "Help Me Breathe",
-          "description": "Guided breathing timer with seven patterns, free and without an account",
+          "description": "Guided breathing timer with seven patterns, free to use without an account",
           "publisher": { "@id": "https://helpmebreath.com/#organization" },
           "inLanguage": "en-US"
         },
@@ -99,14 +100,13 @@
             "@type": "ContactPoint",
             "email": "contact@helpmebreath.com",
             "contactType": "customer service"
-          },
-          "sameAs": ["https://www.patreon.com/GeorgesRayess"]
+          }
         },
         {
           "@type": "WebApplication",
           "@id": "https://helpmebreath.com/#webapp",
           "name": "Help Me Breathe",
-          "description": "A guided breathing timer with seven patterns, audio and vibration cues, saved settings and offline use. Every technique is free.",
+          "description": "A guided breathing timer with seven patterns, audio and vibration cues, saved settings and offline use. Every technique is free to use; one plan adds the tools around the practice.",
           "url": "https://helpmebreath.com/",
           "applicationCategory": "HealthApplication",
           "operatingSystem": "Web Browser",
@@ -121,29 +121,20 @@
           },
           "hasOfferCatalog": {
             "@type": "OfferCatalog",
-            "name": "Optional paid upgrades",
+            "name": "Help Me Breathe plan",
             "url": "https://helpmebreath.com/pro",
             "itemListElement": [
               {
                 "@type": "Offer",
-                "name": "Pro — Lifetime",
-                "description": "Custom pattern builder and saved presets, streaks and history export, ambient soundscapes, night mode, ad-free.",
-                "price": "19.00",
+                "name": "Help Me Breathe — monthly",
+                "description": "Everything included: custom patterns and saved presets, streaks and history export, ambient soundscapes, night mode, no ads, and the practitioner tools. Three-day free trial.",
+                "price": "10.00",
                 "priceCurrency": "USD",
-                "availability": "https://schema.org/InStock",
-                "url": "https://helpmebreath.com/pro"
-              },
-              {
-                "@type": "Offer",
-                "name": "Pro — Monthly",
-                "description": "The same Pro feature set, billed monthly.",
-                "price": "3.99",
-                "priceCurrency": "USD",
-                "availability": "https://schema.org/InStock",
+                "availability": "https://schema.org/PreOrder",
                 "url": "https://helpmebreath.com/pro",
                 "priceSpecification": {
                   "@type": "UnitPriceSpecification",
-                  "price": "3.99",
+                  "price": "10.00",
                   "priceCurrency": "USD",
                   "billingDuration": 1,
                   "billingIncrement": 1,
@@ -152,32 +143,15 @@
               },
               {
                 "@type": "Offer",
-                "name": "Practitioner",
-                "description": "Commercial-use licence, white-label embed, client session links and class mode. Billed yearly.",
-                "price": "99.00",
+                "name": "Help Me Breathe — yearly",
+                "description": "The same plan, billed once a year. Two months free against the monthly price.",
+                "price": "100.00",
                 "priceCurrency": "USD",
-                "availability": "https://schema.org/InStock",
+                "availability": "https://schema.org/PreOrder",
                 "url": "https://helpmebreath.com/pro",
                 "priceSpecification": {
                   "@type": "UnitPriceSpecification",
-                  "price": "99.00",
-                  "priceCurrency": "USD",
-                  "billingDuration": 1,
-                  "billingIncrement": 1,
-                  "unitCode": "ANN"
-                }
-              },
-              {
-                "@type": "Offer",
-                "name": "Studio",
-                "description": "Practitioner across ten domains plus a monthly aggregate usage report. Billed yearly.",
-                "price": "199.00",
-                "priceCurrency": "USD",
-                "availability": "https://schema.org/InStock",
-                "url": "https://helpmebreath.com/pro",
-                "priceSpecification": {
-                  "@type": "UnitPriceSpecification",
-                  "price": "199.00",
+                  "price": "100.00",
                   "priceCurrency": "USD",
                   "billingDuration": 1,
                   "billingIncrement": 1,
@@ -230,7 +204,7 @@
           "name": "Do I need an account, and does it cost anything?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No account, and all seven patterns are free with no time limit. Your settings and session history stay in your own browser and are never uploaded."
+            "text": "Not to breathe. Every technique works today without an account, and your settings and session history stay in your own browser. One plan, $10 a month or $100 a year with a three-day free trial, adds the tools around the practice: your own patterns, saved presets, streaks, soundscapes, night mode and no ads."
           }
         },
         {
@@ -270,22 +244,23 @@
     </header>
 
     <div class="container">
-        <header>
-            <div class="header-content">
-                <h1>Guided Breathing Exercises for Sleep, Stress &amp; Focus</h1>
-                <p class="subtitle">Seven guided patterns with audio and vibration cues — 4-7-8, box breathing, cyclic sighing and more. Free, no account, works offline.</p>
-            </div>
+        <header class="hero">
+            <h1>Guided breathing exercises for sleep, stress and focus</h1>
+            <p class="subtitle">Seven paced patterns with audio and vibration cues: 4-7-8, box breathing, cyclic sighing and more. Pick one, press Begin, follow the circle.</p>
         </header>
 
         <!--
-          The whole timer UI (breathing section + technique selector) sits inside
-          one app root, so the engine can find every [data-role] with a single
-          scoped query. See docs/PAGE_CONTRACT.md.
+          The whole timer UI sits inside one app root, so the engine can find
+          every [data-role] with a single scoped query. See docs/PAGE_CONTRACT.md.
         -->
         <main class="main-content" id="main" data-breathing-app>
             <section class="breathing-section" aria-labelledby="breathing-tool-heading">
                 <div class="app-bar">
-                    <h2 id="breathing-tool-heading" data-role="technique-title">Deep Sleep</h2>
+                    <div class="technique-head">
+                        <p class="technique-eyebrow" data-role="technique-eyebrow">4-7-8</p>
+                        <h2 id="breathing-tool-heading" data-role="technique-title">Deep Sleep</h2>
+                        <p class="pattern-line" data-role="pattern-line">In 4 · Hold 7 · Out 8</p>
+                    </div>
                     <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
                             <circle cx="12" cy="12" r="3.2"/>
@@ -306,6 +281,7 @@
                     <div class="setting-item">
                         <label class="setting-label" for="session-duration">Session length</label>
                         <select id="session-duration" class="duration-select" data-role="duration-select">
+                            <option value="180">3 minutes</option>
                             <option value="300">5 minutes</option>
                             <option value="600" selected>10 minutes</option>
                             <option value="900">15 minutes</option>
@@ -317,9 +293,9 @@
 
                 <div class="breathing-container">
                     <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
-                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
-                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
-                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                        <circle class="ring-track" cx="160" cy="160" r="150"/>
+                        <circle class="ring-live" cx="160" cy="160" r="150"/>
+                        <circle class="ring-bridge" cx="160" cy="160" r="150"/>
                     </svg>
                     <div class="breathing-circle technique-478" data-role="circle">
                         <span class="circle-notch" aria-hidden="true"></span>
@@ -361,9 +337,6 @@
                     </div>
                 </div>
 
-                <!-- Pro modules inject their buttons here. Empty = zero height. -->
-                <div class="tools-row" data-slot="tools"></div>
-
                 <div class="controls">
                     <button class="control-btn" type="button" data-role="start" data-action="start">Begin Practice</button>
                     <button class="control-btn" type="button" data-role="pause" data-action="pause" disabled>Pause</button>
@@ -379,46 +352,67 @@
                     </div>
                 </div>
 
-                <!-- Post-session cards (paywall, printable) render here. -->
+                <!-- Post-session cards (offer, printable) render here. -->
                 <div data-slot="post-session"></div>
+
+                <h3 class="sr-only" id="technique-picker-heading">Choose a technique</h3>
+                <div class="technique-buttons" data-role="technique-buttons" role="group" aria-labelledby="technique-picker-heading">
+                    <button class="technique-btn active" type="button" data-action="select-technique" data-technique="478" aria-pressed="true" aria-describedby="desc-478">Deep Sleep</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false" aria-describedby="desc-box">Focus &amp; Grounding</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="false" aria-describedby="desc-coherent">Heart Coherence</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="false" aria-describedby="desc-sigh">Cyclic Sighing</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false" aria-describedby="desc-extended">Extended Exhale</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false" aria-describedby="desc-triangle">Quick Calm</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="wim" aria-pressed="false" aria-describedby="desc-wim">Energizing Breath</button>
+                </div>
+
+                <div id="desc-478" class="sr-only">4-7-8: in for four, hold seven, out for eight</div>
+                <div id="desc-box" class="sr-only">Box breathing: four equal counts in, hold, out, hold</div>
+                <div id="desc-coherent" class="sr-only">Coherence: five seconds in, five seconds out</div>
+                <div id="desc-sigh" class="sr-only">Cyclic sighing: a double inhale then a long exhale</div>
+                <div id="desc-extended" class="sr-only">Extended exhale: four seconds in, six seconds out</div>
+                <div id="desc-triangle" class="sr-only">Triangle: three counts in, hold, out</div>
+                <div id="desc-wim" class="sr-only">Energizing breath: fast rhythmic breathing, read the safety note first</div>
+
+                <!-- Pro modules inject their buttons here. Empty = zero height. -->
+                <div class="tools-row" data-slot="tools"></div>
 
                 <div class="technique-info" data-role="technique-info"></div>
 
                 <p class="live-region" data-role="live-region" aria-live="polite" aria-atomic="true"></p>
             </section>
-
-            <aside class="sidebar">
-                <section class="card technique-selector" aria-labelledby="technique-selector-heading">
-                    <h3 id="technique-selector-heading">Breathing techniques</h3>
-                    <div class="technique-buttons" data-role="technique-buttons">
-                        <button class="technique-btn active" type="button" data-action="select-technique" data-technique="478" aria-pressed="true" aria-describedby="desc-478">Deep Sleep</button>
-                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false" aria-describedby="desc-box">Focus &amp; Grounding</button>
-                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="false" aria-describedby="desc-coherent">Heart Coherence</button>
-                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="false" aria-describedby="desc-sigh">Cyclic Sighing</button>
-                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false" aria-describedby="desc-extended">Extended Exhale</button>
-                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false" aria-describedby="desc-triangle">Quick Calm</button>
-                        <button class="technique-btn" type="button" data-action="select-technique" data-technique="wim" aria-pressed="false" aria-describedby="desc-wim">Energizing Breath</button>
-                    </div>
-
-                    <div id="desc-478" class="sr-only">4-7-8: in for four, hold seven, out for eight</div>
-                    <div id="desc-box" class="sr-only">Box breathing: four equal counts in, hold, out, hold</div>
-                    <div id="desc-coherent" class="sr-only">Coherence: five seconds in, five seconds out</div>
-                    <div id="desc-sigh" class="sr-only">Cyclic sighing: a double inhale then a long exhale</div>
-                    <div id="desc-extended" class="sr-only">Extended exhale: four seconds in, six seconds out</div>
-                    <div id="desc-triangle" class="sr-only">Triangle: three counts in, hold, out</div>
-                    <div id="desc-wim" class="sr-only">Energizing breath: fast rhythmic breathing, read the safety note first</div>
-                </section>
-
-                <section class="card support-card" data-ask="support" aria-labelledby="support-heading">
-                    <h3 id="support-heading">Support this project</h3>
-                    <p>Help Me Breathe is free, needs no account, and keeps your practice on your own device. If it has been useful, there are two ways to keep it going.</p>
-                    <div class="support-options">
-                        <a href="https://www.patreon.com/GeorgesRayess" target="_blank" rel="noopener noreferrer" data-action="support" data-support-label="patreon">Support on Patreon</a>
-                        <a class="pro-link" href="/pro" data-action="support" data-support-label="pro">Unlock Pro — one payment, forever</a>
-                    </div>
-                </section>
-            </aside>
         </main>
+
+        <nav class="pathways" aria-label="Guides by situation">
+            <a class="pathway" href="/breathing-exercises-for-sleep">
+                <span class="pathway-label">Before sleep</span>
+                <strong>Slow the evening down</strong>
+                <span>Which patterns help you fall asleep, in what order to try them, and the one to leave alone late at night.</span>
+            </a>
+            <a class="pathway" href="/breathing-exercises-anxiety">
+                <span class="pathway-label">Anxious moments</span>
+                <strong>Something steady to hold on to</strong>
+                <span>Two patterns without breath-holds, a plain account of what they can and cannot do, and where to turn if it is more than anxiety.</span>
+            </a>
+            <a class="pathway" href="/breathing-exercises-for-focus">
+                <span class="pathway-label">Focus and work</span>
+                <strong>Three minutes before the hard thing</strong>
+                <span>Short, steady patterns for the start of a task, between meetings, or before something you have been dreading.</span>
+            </a>
+        </nav>
+
+        <section class="plan-band" aria-labelledby="plan-heading">
+            <div>
+                <h2 id="plan-heading">Everything, one plan.</h2>
+                <p>The timer is free to use. One plan adds the tools around the practice: your own patterns and saved presets, streaks and a twelve-week history, ambient soundscapes, night mode, no ads anywhere, and the practitioner tools for anyone who teaches breathing to others.</p>
+            </div>
+            <div class="plan-band-price">
+                <span class="price-figure">$10</span>
+                <span class="price-period">a month, or $100 a year with two months free</span>
+                <a class="checkout-btn" href="/pro">See what is included</a>
+                <p class="plan-note">Three days free with a card on file. One free trial per person. Cancel any time.</p>
+            </div>
+        </section>
 
         <!--
           Visible counterparts for the FAQPage structured data in <head>. Google's
@@ -438,7 +432,7 @@
                 you are pregnant, or if you live with a heart condition, uncontrolled high blood pressure, epilepsy or
                 another seizure disorder, asthma, COPD or another respiratory condition, glaucoma, or if you have had
                 surgery recently. If you live with panic attacks, breath-holds can reproduce sensations you would
-                rather not invite; the patterns without holds — extended exhale, cyclic sighing and heart coherence —
+                rather not invite; the patterns without holds, extended exhale, cyclic sighing and heart coherence,
                 are the safer starting point. Practise sitting or lying down, never while driving, cycling or in
                 water. Stop if you feel dizzy, tingly, short of breath or simply unwell. This site is not medical care
                 and does not replace it; the full wording is in the
@@ -460,8 +454,10 @@
 
             <div class="faq-item">
                 <h3>Do I need an account, and does it cost anything?</h3>
-                <p>No account, and all seven patterns are free with no time limit. Your settings and session history
-                stay in your own browser and are never uploaded.</p>
+                <p>Not to breathe. Every technique works today without an account, and your settings and session
+                history stay in your own browser. One plan, $10 a month or $100 a year with a three-day free trial,
+                adds the tools around the practice: your own patterns, saved presets, streaks, soundscapes, night mode
+                and no ads.</p>
             </div>
 
             <div class="faq-item">
@@ -505,14 +501,14 @@
                 <nav class="footer-nav" aria-label="About and products">
                     <p class="footer-heading">The site</p>
                     <a href="/about">About</a>
-                    <a href="/pro">Pro</a>
+                    <a href="/pro">The plan</a>
                     <a href="/for-practitioners">For practitioners</a>
                     <a href="/embed">Embed the timer</a>
                     <a href="/handouts">Printable handouts</a>
                 </nav>
             </div>
 
-            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician: <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>

@@ -65,14 +65,13 @@ function sessionRunning() {
   return !!(document.body && document.body.classList.contains('session-active'));
 }
 
-function foundingActive() {
-  return CHECKOUT.founding && Number(CHECKOUT.founding.cap) > 0;
+function trialActive() {
+  return Number(CHECKOUT.trialDays) > 0;
 }
 
 function priceLine() {
-  return foundingActive()
-    ? `$${PRICES.founding} once for the first ${CHECKOUT.founding.cap} people, then $${PRICES.lifetime}. No subscription, ever.`
-    : `$${PRICES.lifetime} once. No subscription, ever.`;
+  const prices = `$${PRICES.monthly} a month or $${PRICES.yearly} a year. Cancel any time.`;
+  return trialActive() ? `${CHECKOUT.trialDays} days free, then ${prices}` : prices;
 }
 
 /* ------------------------------------------------------------------ pieces */
@@ -110,14 +109,14 @@ function buildCard({ heading, body, feature, dismissLabel, onDismiss }) {
   buy.type = 'button';
   buy.className = 'paywall-buy';
   buy.setAttribute('data-action', 'checkout');
-  buy.setAttribute('data-sku', 'lifetime');
+  buy.setAttribute('data-plan', 'monthly');
   buy.setAttribute('data-placement', feature ? `feature:${feature}` : 'third-session');
-  buy.textContent = foundingActive() ? `Unlock Pro — $${PRICES.founding}` : `Unlock Pro — $${PRICES.lifetime}`;
+  buy.textContent = trialActive() ? 'Start the free trial' : `Subscribe — $${PRICES.monthly} a month`;
 
   const more = document.createElement('a');
   more.className = 'paywall-more';
   more.href = '/pro';
-  more.textContent = 'See everything in Pro';
+  more.textContent = 'See everything included';
   more.addEventListener('click', () => {
     track(EVENTS.PAYWALL_CLICK, { feature: feature || 'offer', target: 'pro-page' });
   });
@@ -158,8 +157,8 @@ function onSessionComplete(event) {
   const card = buildCard({
     heading: 'Three sessions in',
     body:
-      'You have practised three times. If this is becoming a habit, Pro adds your own patterns and saved presets, ' +
-      'your streak and 12-week heatmap, ambient soundscapes, night mode and no ads anywhere on the site.',
+      'You have practised three times. If this is becoming a habit, one plan unlocks everything: your own patterns and saved presets, ' +
+      'your streak and 12-week heatmap, ambient soundscapes, night mode, and no ads anywhere on the site.',
     feature: null,
     dismissLabel: 'No thanks, hide this',
   });

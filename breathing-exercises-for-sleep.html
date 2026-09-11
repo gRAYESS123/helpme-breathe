@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
     <title>Breathing Exercises for Sleep — Free Guided Wind-Down Timer</title>
     <meta name="description" content="A ten-minute guided 4-7-8 wind-down you can run in bed. Free timer, no sign-up, plus what to do when your mind will not stop racing.">
@@ -232,7 +233,11 @@
                      aria-labelledby="timer-heading">
 
                 <div class="app-bar">
-                    <h2 id="timer-heading" data-role="technique-title">4-7-8 breathing</h2>
+                    <div class="technique-head">
+                        <p class="technique-eyebrow" data-role="technique-eyebrow"></p>
+                        <h2 id="timer-heading" data-role="technique-title">4-7-8 breathing</h2>
+                        <p class="pattern-line" data-role="pattern-line"></p>
+                    </div>
                     <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
                             <circle cx="12" cy="12" r="3.2"/>
@@ -265,9 +270,9 @@
 
                 <div class="breathing-container">
                     <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
-                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
-                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
-                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                        <circle class="ring-track" cx="160" cy="160" r="150"/>
+                        <circle class="ring-live" cx="160" cy="160" r="150"/>
+                        <circle class="ring-bridge" cx="160" cy="160" r="150"/>
                     </svg>
                     <div class="breathing-circle technique-478" data-role="circle">
                         <span class="circle-notch" aria-hidden="true"></span>
@@ -309,8 +314,6 @@
                     </div>
                 </div>
 
-                <!-- SLOT: Pro tools -->
-                <div class="tools-row" data-slot="tools"></div>
 
                 <div class="controls">
                     <button class="control-btn" type="button" data-role="start" data-action="start">Begin Practice</button>
@@ -329,6 +332,9 @@
 
                 <!-- SLOT: post-session cards -->
                 <div data-slot="post-session"></div>
+
+                <!-- SLOT: Pro tools (custom pattern, your practice, soundscapes, night mode) -->
+                <div class="tools-row" data-slot="tools"></div>
 
                 <div class="technique-info" data-role="technique-info"></div>
 
@@ -362,7 +368,7 @@
                     <div class="steps-container">
                         <div class="step" id="step1">
                             <h3>1. Set the room before you start</h3>
-                            <p>Lights off or very low. Phone on charge, face down, brightness at its lowest. If the screen is still too bright for a dark room, the night mode in <a href="/pro">Pro</a> drops the page to near-black with warm, dimmed text; the free timer works exactly the same, it is just brighter.</p>
+                            <p>Lights off or very low. Phone on charge, face down, brightness at its lowest. If the screen is still too bright for a dark room, the night mode in <a href="/pro">the plan</a> drops the page to near-black with warm, dimmed text; the free timer works exactly the same, it is just brighter.</p>
                         </div>
                         <div class="step" id="step2">
                             <h3>2. Lie down and take two ordinary breaths</h3>
@@ -466,7 +472,7 @@
                         <li><a href="/cyclic-sighing">Cyclic sighing</a> — the double inhale and long exhale to reach for when your mind is racing.</li>
                         <li><a href="/timer">All breathing timers</a> — seven patterns, every duration, free.</li>
                         <li><a href="/4-7-8-breathing-technique">The full 4-7-8 guide</a> — the longer read on where the pattern comes from and how to build it into a week.</li>
-                        <li><a href="/pro">Pro</a> — custom patterns, saved presets and a practice history, for one payment.</li>
+                        <li><a href="/pro">The plan</a> — custom patterns, saved presets and a practice history, for $10 a month or $100 a year.</li>
                     </ul>
                 </section>
 

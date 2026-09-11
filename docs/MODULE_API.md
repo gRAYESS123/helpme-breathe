@@ -360,10 +360,15 @@ Every one is optional — a missing role is simply not driven.
 `circle`, `circle-text`, `breathing-text`, `timer`, `progress-fill`,
 `progress-time`, `session-info`, `session-progress-fill`,
 `session-time-remaining`, `start`, `pause`, `stop`, `stats`, `breath-count`,
-`avg-breath`, `session-progress`, `technique-title`, `technique-info`,
-`settings-btn`, `settings-panel`, `sound-toggle`, `vibration-toggle`,
-`duration-select`, `technique-buttons`, `safety-ack`, `safety-ack-body`,
-`live-region`.
+`avg-breath`, `session-progress`, `technique-title`, `technique-eyebrow`,
+`pattern-line`, `technique-info`, `settings-btn`, `settings-panel`,
+`sound-toggle`, `vibration-toggle`, `duration-select`, `technique-buttons`,
+`safety-ack`, `safety-ack-body`, `live-region`.
+
+`technique-eyebrow` receives the technique's `shortName` ("4-7-8", "Box") and
+`pattern-line` the pattern in words ("In 4 · Hold 7 · Out 8"; cyclic sighing's
+short second inhale reads "Sip 1"). Both are rewritten on every technique
+change, including custom patterns.
 
 Plus one page-level role, looked up on `document`: `keyboard-hint`.
 
@@ -503,8 +508,14 @@ New behaviour, all inside the existing lifecycle:
   `hmb:phase`'s `phaseKind` detail is unchanged and still reports `inhale` for
   the top-up.
 - **`--phase-duration` on the app root.** Set to the current phase's length in
-  seconds (`'4s'`) at every boundary, removed on reset. The reduced-motion
-  pacing ring animates over it.
+  seconds (`'4s'`) at every boundary, removed on reset. The ring gauge
+  animates over it.
+- **`--ring-from` and `--ring-to` on the app root.** The two ends of the ring
+  gauge's sweep for the current phase, as `stroke-dashoffset` values in the
+  ring's own units: `816.81` is an empty rail, `0` a full one (the rail is
+  312° of a circle with r=150, matching `--ring-arc` in `css/styles.css`).
+  An in-breath or top-up sweeps to full, an out-breath to empty, a hold keeps
+  the previous level. Both are removed on reset.
 - **`[data-role="phase-count"]`.** Optional span inside the circle text block.
   When present the engine writes the whole seconds remaining in the current
   phase into it, at the phase boundary and on every tick. Absent, nothing

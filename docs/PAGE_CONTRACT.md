@@ -287,7 +287,11 @@ circle's `technique-*` class.
          aria-labelledby="timer-heading">
 
     <div class="app-bar">
-        <h2 id="timer-heading" data-role="technique-title">Box breathing</h2>
+        <div class="technique-head">
+            <p class="technique-eyebrow" data-role="technique-eyebrow"></p>
+            <h2 id="timer-heading" data-role="technique-title">Box breathing</h2>
+            <p class="pattern-line" data-role="pattern-line"></p>
+        </div>
         <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
                 <circle cx="12" cy="12" r="3.2"/>
@@ -320,9 +324,9 @@ circle's `technique-*` class.
 
     <div class="breathing-container">
         <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
-            <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
-            <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
-            <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+            <circle class="ring-track" cx="160" cy="160" r="150"/>
+            <circle class="ring-live" cx="160" cy="160" r="150"/>
+            <circle class="ring-bridge" cx="160" cy="160" r="150"/>
         </svg>
         <div class="breathing-circle technique-box" data-role="circle">
             <span class="circle-notch" aria-hidden="true"></span>
@@ -364,9 +368,6 @@ circle's `technique-*` class.
         </div>
     </div>
 
-    <!-- SLOT: Pro tools ("Your practice", "Soundscapes", "Custom pattern") -->
-    <div class="tools-row" data-slot="tools"></div>
-
     <div class="controls">
         <button class="control-btn" type="button" data-role="start" data-action="start">Begin Practice</button>
         <button class="control-btn" type="button" data-role="pause" data-action="pause" disabled>Pause</button>
@@ -385,6 +386,11 @@ circle's `technique-*` class.
     <!-- SLOT: post-session cards (paywall, printable capture) -->
     <div data-slot="post-session"></div>
 
+    <!-- Technique pills go here on a hub page (see "Technique pills" below). -->
+
+    <!-- SLOT: Pro tools (custom pattern, your practice, soundscapes, night mode) -->
+    <div class="tools-row" data-slot="tools"></div>
+
     <div class="technique-info" data-role="technique-info"></div>
 
     <p class="live-region" data-role="live-region" aria-live="polite" aria-atomic="true"></p>
@@ -395,10 +401,11 @@ circle's `technique-*` class.
 
 | Change | Reason |
 |---|---|
-| `<h2 data-role="technique-title">` and the settings button are wrapped in `<div class="app-bar">` | The gear sits at the right of the app bar, which reads as the second row of the site header. It stays **inside the app root** because the engine scopes every `[data-role]` lookup to that root, and a comparison page carries two timers. |
+| `<h2 data-role="technique-title">` sits inside `<div class="technique-head">` with an eyebrow (`data-role="technique-eyebrow"`, the technique's short name) and a pattern line (`data-role="pattern-line"`, "In 4 · Hold 7 · Out 8"); the head and the settings button are wrapped in `<div class="app-bar">` | The engine fills all three from the technique. The gear stays **inside the app root** because the engine scopes every `[data-role]` lookup to that root, and a comparison page carries two timers. |
 | The settings button contains an inline SVG gear, not the gear emoji | No emoji. |
-| `<svg class="breathing-guides">` added | Two dotted calipers (full inhale / full exhale) plus the reduced-motion pacing ring. |
-| `<span class="circle-notch">` added inside the circle | The mark's gap. CSS closes it on a hold. |
+| `<svg class="breathing-guides">` carries three circles at r=150: `ring-track`, `ring-live`, `ring-bridge` | The mark around the disc: the rail with its 48° gap, the gauge that fills with the breath, and the bridge that closes the gap on a hold. See `docs/BRAND.md` §5. The old `caliper` / `pacer-ring` circles are legacy and draw nothing. |
+| `<span class="circle-notch">` inside the circle | Legacy. Keep it in the markup; it draws nothing — the gap lives on the ring now. |
+| The tools slot sits **below** the controls and pills, directly above `technique-info` | The Pro tools are a quieter row under the technique choice, not a bar above the controls. |
 | `.circle-text-container` moved **out of** `.breathing-circle` | So the phase word does not scale with the circle. Pages that still nest it inside keep working, but move it when you convert. |
 | `[data-role="phase-count"]` added | The engine writes the per-second count into it. Without the span there is no count; nothing else breaks. |
 | `.breathing-aura`, `.breathing-particles`, `#fluid-effect` deleted | Gone from the design system. |
@@ -625,82 +632,47 @@ The old "Made for a calmer, more mindful world." line and the bullet separators
 between the legal links are gone: the byline names a person, and the legal row
 spaces itself.
 
-## 9. Support and upgrade links
+## 9. Plan links and checkout buttons
 
 Never `alert()`, never Ko-fi, Buy Me a Coffee, PayPal, Stripe, Gumroad, Lemon
-Squeezy, Polar, Creem or Freemius. **Patreon stays, as a plain secondary link —
-no `patreon-btn` class, no brand red.**
+Squeezy, Polar, Creem, Freemius or Patreon. There is no "support us" ask
+anywhere on the site (revised 2026-09-11: Patreon cannot pay out to the owner).
+
+There is **one plan**: everything included, $10 a month or $100 a year, 3-day
+free trial with a card on file, "One free trial per person." A page that needs
+to point at it uses a plain link to `/pro` ("See the plan") or a checkout
+button:
 
 ```html
-<div class="support-options">
-    <a href="https://www.patreon.com/GeorgesRayess" target="_blank" rel="noopener noreferrer"
-       data-action="support" data-support-label="patreon">Support on Patreon</a>
-    <a class="pro-link" href="/pro"
-       data-action="support" data-support-label="pro">Unlock Pro — one payment, forever</a>
-</div>
+<button class="checkout-btn" type="button" data-action="checkout" data-plan="monthly">Start the free trial</button>
 ```
 
-Checkout buttons belong to the Pro agent:
-`<button class="checkout-btn" data-action="checkout" data-sku="practitioner">`.
+`data-plan` is `monthly` or `yearly`. `js/checkout.js` handles the click; while
+`js/config.js` is in `waitlist` mode the button renders an email capture card
+instead of a checkout, so it is never dead. A page that carries a checkout
+button must load `/js/checkout.js` (or `/js/pro/index.js`, which imports it).
+Put a `<div data-checkout-slot></div>` under the button so the card lands
+there. Prices and the trial length come from `js/config.js` (`PRICES`,
+`CHECKOUT.trialDays`); do not hard-code them in a script.
 
-## 10. Pricing matrix (`/pro`, `/for-practitioners`)
+## 10. The plan card (`/pro`)
 
-A full feature matrix, not a row of cards. The **Practitioner** column is the
-featured one: flagged, tinted with `--track`, and the only filled primary
-button. `--clay` appears here and nowhere near the timer.
+`/pro` is the only page that carries Product and Offer structured data, and
+the only page with the full plan card (`.plan`, `.plan-card`, `.plan-toggle`,
+`.included-list` in `css/pro.css`): an interval toggle, the price, the honest
+trial statement, one button, the fine print, and one list of what is included.
+No matrix, no tiers, no ticks and crosses. `--clay` appears on the price and
+the button here and on the home page's `.plan-band`, and nowhere near the
+timer.
 
-Rows, in this order: all seven techniques · custom patterns · streaks + export ·
-soundscapes · night mode · ad-free · commercial-use licence · white-label embed
-(1 vs 10 domains) · client links · printable handouts · class mode ·
-compliance pack · named invoice with a VAT field.
+`/for-practitioners` points at the same plan with a ruled list of what it
+means for a practitioner and one `data-plan="yearly"` button. The
+`.pricing-matrix` classes still exist in `css/styles.css` for any old page
+that has not been converted; do not build new ones.
 
-```html
-<div class="table-scroll">
-    <table class="pricing-matrix">
-        <thead>
-            <tr>
-                <th scope="col"><span class="sr-only">Feature</span></th>
-                <th scope="col">
-                    <span class="tier-name">Free</span>
-                    <span class="price-figure">$0</span>
-                    <span class="price-period">forever</span>
-                </th>
-                <th scope="col">
-                    <span class="tier-name">Pro</span>
-                    <span class="price-figure">$19</span>
-                    <span class="price-period">once, lifetime</span>
-                    <button class="checkout-btn checkout-btn--secondary" type="button" data-action="checkout" data-sku="lifetime">Get Pro</button>
-                </th>
-                <th scope="col" class="col-featured">
-                    <span class="tier-flag">Most practitioners</span>
-                    <span class="tier-name">Practitioner</span>
-                    <span class="price-figure">$99</span>
-                    <span class="price-period">per year</span>
-                    <button class="checkout-btn" type="button" data-action="checkout" data-sku="practitioner">Get Practitioner</button>
-                </th>
-                <th scope="col">
-                    <span class="tier-name">Studio</span>
-                    <span class="price-figure">$199</span>
-                    <span class="price-period">per year</span>
-                    <button class="checkout-btn checkout-btn--secondary" type="button" data-action="checkout" data-sku="studio">Get Studio</button>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="row">All seven techniques</th>
-                <td>Yes</td><td>Yes</td><td class="col-featured">Yes</td><td>Yes</td>
-            </tr>
-            <tr>
-                <th scope="row">White-label embed</th>
-                <td>—</td><td>—</td><td class="col-featured">1 domain</td><td>10 domains</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-<p class="tax-note">Prices are in US dollars and are invoiced. Sales are made by our merchant of record, who collects any VAT or sales tax that applies where you are. Every purchase carries a 14-day unconditional refund.</p>
-```
+Structured data on `/pro`: two `Offer`s (10.00 USD, `unitCode` `MON`; 100.00
+USD, `unitCode` `ANN`), `availability` `https://schema.org/PreOrder` until
+checkout is genuinely open, then `InStock` in the same commit that turns it on.
 
 Write "Yes", "—" or the actual limit as words. Never a tick emoji.
 

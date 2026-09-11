@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
-    <title>Thank you — Help Me Breathe Pro</title>
-    <meta name="description" content="Your Help Me Breathe Pro purchase is complete. Activate your licence key in this browser and start breathing.">
+    <title>Thank you — Help Me Breathe</title>
+    <meta name="description" content="Your Help Me Breathe plan is starting. Three days free, then $10 a month or $100 a year. Cancel any time.">
 
     <meta name="robots" content="noindex, nofollow">
     <meta name="referrer" content="no-referrer">
@@ -15,8 +16,8 @@
       FIRST script on the page, before the gtag block below and before anything
       else can read location.search.
 
-      The merchant of record returns the buyer here with the licence key (or, on
-      Paddle, the transaction reference that IS the key) in the query string. A
+      The merchant of record can return the buyer here with a key (or with the
+      transaction reference that stands in for one) in the query string. A
       full key must never reach a log, an analytics event or an error report
       (AGENT_BRIEF hard rule 9), and GA4's default `page_location` is exactly
       such an event — it is sent even with analytics_storage denied. The address
@@ -90,8 +91,8 @@
         gtag('config', 'G-09WY9JD4YM', {
             'anonymize_ip': true,
             'cookie_expires': 63072000,
-            // Belt and braces beside the strip above: a licence key can never
-            // reach Google in `dl`, whatever the address bar happens to hold.
+            // Belt and braces beside the strip above: a key can never reach
+            // Google in `dl`, whatever the address bar happens to hold.
             'page_location': window.location.origin + window.location.pathname
         });
     </script>
@@ -156,7 +157,7 @@
                 </ol>
             </nav>
             <h1>Thank you</h1>
-            <p class="lead">One thing left: unlock this browser with your licence key.</p>
+            <p class="lead">Your plan is starting. Three days free, then $10 a month or $100 a year.</p>
         </header>
 
         <main id="main">
@@ -169,14 +170,14 @@
                 </section>
 
                 <section>
-                    <h2>Activate a key by hand</h2>
-                    <p>If your key did not come through in the link, paste it here. It is in the receipt email, and
-                    it looks like a long line of letters and numbers. Nothing is uploaded except the key itself, for
-                    verification.</p>
+                    <h2>Have a key from an earlier purchase?</h2>
+                    <p>Early buyers were sent a key rather than an account. Paste it here and this browser is
+                    unlocked. It is in the receipt email, and it looks like a long line of letters and numbers.
+                    Nothing is uploaded except the key itself, for verification.</p>
 
                     <form class="restore-form" data-role="restore-form" novalidate>
-                        <label class="sr-only" for="thanks-key">Licence key</label>
-                        <input type="text" id="thanks-key" name="key" autocomplete="off" spellcheck="false" placeholder="Paste your licence key">
+                        <label class="sr-only" for="thanks-key">Key from an earlier purchase</label>
+                        <input type="text" id="thanks-key" name="key" autocomplete="off" spellcheck="false" placeholder="Paste your key">
                         <button class="pro-btn pro-btn-primary" type="submit">Activate</button>
                         <p class="restore-status" data-role="restore-status" role="status" aria-live="polite"></p>
                     </form>
@@ -187,14 +188,14 @@
                     <div class="steps-container">
                         <div class="step">
                             <h3>1. Your receipt</h3>
-                            <p>The receipt and the licence key arrive by email from our merchant of record. If it is
-                            not in your inbox within a few minutes, check the spam folder before writing to us.</p>
+                            <p>The receipt arrives by email from our merchant of record. If it is not in your inbox
+                            within a few minutes, check the spam folder before writing to us.</p>
                         </div>
                         <div class="step">
                             <h3>2. Your other devices</h3>
-                            <p>Open <a href="/pro">the Pro page</a> on any other phone, tablet or laptop and paste the
-                            same key there. Keep that email — it is the copy you can rely on, and there is no
-                            account to recover it from.</p>
+                            <p>Sign in on any other phone, tablet or laptop with an email link or a Google account,
+                            and the plan is there. If you were sent a key instead, paste it into the box above on
+                            each device and keep that email.</p>
                         </div>
                         <div class="step">
                             <h3>3. The new tools</h3>
@@ -204,8 +205,11 @@
                         </div>
                     </div>
 
-                    <p>Fourteen-day unconditional refund, as promised on the
-                    <a href="/pro">Pro page</a>. Email
+                    <p>The first three days are free. Your card is not charged during the trial, and on day
+                    three it is charged automatically unless you cancel first. One free trial per person. Cancel
+                    any time from your account page, in two clicks, and access continues to the end of the period
+                    you have paid for. A fourteen-day unconditional refund applies to any charge, as set out on
+                    <a href="/pro">the plan</a>. Email
                     <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> if anything at all is
                     wrong, including if you simply changed your mind.</p>
 
@@ -272,12 +276,6 @@
         import { activate, getLicenseInfo, tier } from '/js/entitlements.js';
         import { track, EVENTS } from '/js/analytics.js';
 
-        const TIER_NAMES = {
-            pro: 'Pro',
-            practitioner: 'Practitioner',
-            studio: 'Studio'
-        };
-
         const title = document.querySelector('[data-role="activation-title"]');
         const body = document.querySelector('[data-role="activation-body"]');
         const form = document.querySelector('[data-role="restore-form"]');
@@ -295,11 +293,10 @@
             status.classList.toggle('is-error', isError === true);
         }
 
-        function unlocked(activeTier) {
-            const name = TIER_NAMES[activeTier] || 'Pro';
+        function unlocked() {
             show(
-                name + ' is active in this browser',
-                'That is everything. Open a timer and the extra tools are under the circle. Keep the receipt email — the key is how you unlock your other devices.'
+                'Your plan is active in this browser',
+                'That is everything. Open a timer and the extra tools are under the circle.'
             );
         }
 
@@ -317,24 +314,23 @@
         // Our own link format first, then the provider's transaction reference.
         // Paddle Billing passes a transaction as `_ptxn`; other merchants of
         // record use `transaction_id` or `orderId`. /api/license accepts either
-        // a licence key or a transaction reference.
+        // a key or a transaction reference.
         const key = pick('key', 'k', 'license');
         const txn = pick('_ptxn', 'ptxn', 'transaction_id', 'transactionId', 'orderId');
 
-        // The Protocol Pack is a PDF, not an app tier, so /api/license answers
-        // 422 pack_only for a pack key. That is not a failure worth alarming
-        // someone about — say what they bought and where it is.
-        const PACK_LINE = 'That is a Protocol Pack key. The pack is a set of printable PDFs, not an app '
-            + 'unlock, so there is nothing to activate here — the download link is in your receipt email. '
-            + 'Pro includes the pack, so if you meant to buy Pro, email contact@helpmebreath.com and the '
-            + 'difference will be sorted out.';
+        // /api/license answers 422 pack_only for a key that unlocks a download
+        // rather than the app. That is not a failure worth alarming someone
+        // about — say where the download is instead.
+        const DOWNLOAD_LINE = 'That key unlocks a set of printable PDFs rather than the app, so there is '
+            + 'nothing to activate here — the download link is in your receipt email. If that is not what '
+            + 'you meant to buy, email contact@helpmebreath.com and it will be sorted out.';
 
         async function tryActivate(value, source) {
             track(EVENTS.ACTIVATE_ATTEMPT, { source: source });
             const result = await activate(value);
             if (result.ok) {
                 track(EVENTS.ACTIVATE_SUCCESS, { tier: result.tier || tier(), source: source });
-                unlocked(result.tier || tier());
+                unlocked();
                 return { ok: true };
             }
             track(EVENTS.ACTIVATE_FAIL, { source: source, reason: result.code || 'rejected' });
@@ -342,13 +338,13 @@
                 ok: false,
                 code: result.code || 'rejected',
                 // /api/license writes `error` as a finished sentence for the buyer.
-                error: result.code === 'pack_only' ? PACK_LINE : result.error
+                error: result.code === 'pack_only' ? DOWNLOAD_LINE : result.error
             };
         }
 
         (async () => {
             if (getLicenseInfo().isPro) {
-                unlocked(tier());
+                unlocked();
                 return;
             }
 
@@ -356,7 +352,7 @@
                 const result = await tryActivate(key, 'thanks-link');
                 if (result.ok) return;
                 if (result.code === 'pack_only') {
-                    show('Your Protocol Pack is in your receipt email', result.error);
+                    show('Your download link is in your receipt email', result.error);
                     return;
                 }
                 show(
@@ -372,19 +368,19 @@
                 const result = await tryActivate(txn, 'thanks-transaction');
                 if (result.ok) return;
                 if (result.code === 'pack_only') {
-                    show('Your Protocol Pack is in your receipt email', result.error);
+                    show('Your download link is in your receipt email', result.error);
                     return;
                 }
                 show(
-                    'Payment received — your key is on its way',
-                    'The licence key is emailed within a couple of minutes of the payment clearing. When it arrives, paste it in the box below. If nothing has arrived in ten minutes, email contact@helpmebreath.com and it will be issued by hand.'
+                    'Payment received — your plan is starting',
+                    'The receipt is emailed within a couple of minutes of the payment clearing. If you were sent a key as well, paste it in the box below. If nothing has arrived in ten minutes, email contact@helpmebreath.com and it will be sorted out by hand.'
                 );
                 return;
             }
 
             show(
-                'Your key is in your receipt email',
-                'Paste it into the box below to unlock this browser. If the email has not arrived yet, give it a couple of minutes — and check the spam folder before writing in.'
+                'Your receipt is on its way',
+                'Nothing else is needed here. If you hold a key from an earlier purchase, paste it into the box below to unlock this browser. If the receipt email has not arrived yet, give it a couple of minutes — and check the spam folder before writing in.'
             );
         })();
 
@@ -393,7 +389,7 @@
                 event.preventDefault();
                 const value = input ? String(input.value || '').trim() : '';
                 if (!value) {
-                    say('Paste the licence key from your receipt email.', true);
+                    say('Paste the key from your receipt email.', true);
                     return;
                 }
                 say('Checking…');

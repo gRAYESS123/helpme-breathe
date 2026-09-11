@@ -14,7 +14,7 @@
  *     the capture waits for the next completed session
  *
  * `renderCaptureCard()` is exported so js/checkout.js can reuse the same card
- * for the founding-member waitlist.
+ * for the checkout waitlist shown while checkout is closed.
  */
 
 import { getFlag, setFlag } from '../storage.js';
@@ -53,7 +53,7 @@ function techniqueLabel(key) {
  *   submitLabel?:string, consentLabel?:string, note?:string,
  *   successMessage?:string, markShown?:boolean
  * }} [options] The copy options exist because the same card is reused for the
- *   founding-member waitlist, and a consent line has to describe the email the
+ *   checkout waitlist, and a consent line has to describe the email the
  *   person is actually agreeing to receive. `markShown` defaults to true only
  *   for the post-session card.
  * @returns {Element|null} the card element

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
     <title>Embed a Free Breathing Exercise Widget on Your Site</title>
     <meta name="description" content="Put the Help Me Breathe guided timer on your site with one line of HTML. Free, no account, no tracking inside the widget. Configure and copy the snippet here.">
@@ -87,7 +88,7 @@
           "name": "Is the embedded breathing timer really free?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. All seven patterns, every session length, audio and vibration cues, kiosk mode and unlimited page views are free, with no account and no API key. The free widget carries a small \"Powered by Help Me Breathe\" line under the timer. A Practitioner licence removes that line and adds your own logo, but nothing about the timer itself is held back."
+            "text": "Yes. All seven patterns, every session length, audio and vibration cues, kiosk mode and unlimited page views are free, with no account and no API key. The free widget carries a small \"Powered by Help Me Breathe\" line under the timer. The paid plan removes that line and adds your own logo, but nothing about the timer itself is held back."
           }
         },
         {
@@ -111,7 +112,7 @@
           "name": "Can I put the widget on more than one page or more than one site?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The free widget can go on as many pages and as many sites as you like, including several embeds on the same page. A white-label Practitioner licence is tied to the domains listed on it, so a studio with two domains should list both."
+            "text": "The free widget can go on as many pages and as many sites as you like, including several embeds on the same page. A white-label key is bound to the sites you list when you set it up, so list every site you want your own logo to appear on."
           }
         },
         {
@@ -489,7 +490,7 @@
                 </section>
 
                 <section>
-                    <h2>What is free and what needs a Practitioner licence</h2>
+                    <h2>What is free and what the plan adds</h2>
 
                     <p>Being straight about this saves everyone time. Paced-breathing timers are widely
                     available for nothing, so charging for the timer would be charging for the wrong thing. What
@@ -509,7 +510,7 @@
                             </ul>
                         </div>
                         <div class="tier-card">
-                            <h3>Practitioner licence, $99 a year</h3>
+                            <h3>The plan, $10 a month or $100 a year</h3>
                             <ul>
                                 <li>White label: the attribution line is removed</li>
                                 <li>Your own logo and practice name above the timer</li>
@@ -517,19 +518,20 @@
                                 <li>Co-branded client session links you can send as homework</li>
                                 <li>A commercial-use licence you can put on an expense claim</li>
                                 <li>A privacy attestation and data-processing terms for clinic paperwork</li>
+                                <li>Three days free first, with a card on file. One free trial per person.</li>
                             </ul>
                         </div>
                     </div>
 
                     <p>The attribution link is <code>rel="nofollow noopener"</code> in every case. There is no
-                    setting, no tier and no price that makes it a followed link — that is a deliberate limit, not
-                    an oversight.</p>
+                    setting and no price that makes it a followed link — that is a deliberate limit, not an
+                    oversight.</p>
 
                     <h3>Adding a licence to the snippet</h3>
 
-                    <p>The configurator above never asks for your licence key, because a key does not belong in a
-                    shared preview. If you hold a Practitioner or Studio licence, paste the snippet as usual and
-                    then add two attributes to it by hand:</p>
+                    <p>The configurator above never asks for your white-label key, because a key does not belong
+                    in a shared preview. If you are on the plan, paste the snippet as usual and then add two
+                    attributes to it by hand:</p>
 
                     <pre class="embed-snippet"><code>data-wl="your-licence-key"
 data-logo="https://your-site.example/logo.png"</code></pre>
@@ -541,7 +543,7 @@ data-logo="https://your-site.example/logo.png"</code></pre>
                     something half-branded. The key travels inside your page's HTML, so treat it as public, and that is
                     exactly why the domain list matters: a licence with no domains on it cannot white-label
                     anything at all, so a key lifted from your page's source is useless on a site you did not list.
-                    List your domains when you activate the key on the <a href="/pro">Pro page</a> &mdash; there is a
+                    List your domains when you activate the key on <a href="/pro">the plan page</a> &mdash; there is a
                     field under the licence box for them.</p>
 
                     <p><code>data-brand="Your practice name"</code> is free and needs no key. It prints a line of
@@ -599,9 +601,9 @@ data-logo="https://your-site.example/logo.png"</code></pre>
                     preference in browser storage that modern browsers partition to your site, and that value
                     never leaves the device. If your privacy notice lists embedded third parties, the honest entry
                     is that a breathing timer is loaded from helpmebreath.com and sets no cookies. There is
-                    exactly one exception, and it is one you would have to switch on yourself: a Practitioner
-                    licence with a <code>data-logo</code> attribute fetches that image from the address you gave,
-                    once the licence has been verified.</p>
+                    exactly one exception, and it is one you would have to switch on yourself: a white-label
+                    key with a <code>data-logo</code> attribute fetches that image from the address you gave,
+                    once the key has been verified.</p>
 
                     <p><strong>It sizes itself.</strong> The frame measures its own content and posts the height
                     to your page; the loader listens for that message and adjusts the iframe. The message is only
@@ -626,7 +628,7 @@ data-logo="https://your-site.example/logo.png"</code></pre>
                         <h3>Is the embedded breathing timer really free?</h3>
                         <p>Yes. All seven patterns, every session length, audio and vibration cues, kiosk mode and
                         unlimited page views are free, with no account and no API key. The free widget carries a
-                        small "Powered by Help Me Breathe" line under the timer. A Practitioner licence removes
+                        small "Powered by Help Me Breathe" line under the timer. The paid plan removes
                         that line and adds your own logo, but nothing about the timer itself is held back.</p>
                     </div>
 
@@ -648,8 +650,8 @@ data-logo="https://your-site.example/logo.png"</code></pre>
                     <div class="faq-item">
                         <h3>Can I put the widget on more than one page or more than one site?</h3>
                         <p>The free widget can go on as many pages and as many sites as you like, including
-                        several embeds on the same page. A white-label Practitioner licence is tied to the domains
-                        listed on it, so a studio with two domains should list both.</p>
+                        several embeds on the same page. A white-label key is bound to the sites you list when you
+                        set it up, so list every site you want your own logo to appear on.</p>
                     </div>
 
                     <div class="faq-item">
@@ -670,18 +672,19 @@ data-logo="https://your-site.example/logo.png"</code></pre>
 
                 <section class="cta-block-final" data-ask="practitioner">
                     <h2>Running sessions with clients or a class?</h2>
-                    <p>The Practitioner licence is for therapists, counsellors, yoga and breathwork teachers,
-                    school staff and small-group facilitators. It removes the attribution line, puts your logo and
-                    colours on the widget, unlocks class mode for a projector, and gives you co-branded session
-                    links to send as homework — plus the commercial-use licence and privacy paperwork a practice
-                    needs on file. It is $99 a year, and the merchant of record who sells it issues a proper receipt for
-                    your books. Whether that is deductible where you practise is a question for your accountant
-                    rather than for us.</p>
+                    <p>The plan is for therapists, counsellors, yoga and breathwork teachers, school staff and
+                    small-group facilitators. It removes the attribution line, puts your logo and colours on the
+                    widget, unlocks class mode for a projector, and gives you co-branded session links to send as
+                    homework — plus the commercial-use licence and privacy paperwork a practice needs on file. It
+                    is $10 a month or $100 a year, the first three days are free, and the merchant of record who
+                    sells it issues a proper receipt for your books. Whether that is deductible where you practise
+                    is a question for your accountant rather than for us.</p>
                     <p>
-                        <button class="checkout-btn" type="button" data-action="checkout" data-sku="practitioner">Get the Practitioner licence — $99/year</button>
+                        <button class="checkout-btn" type="button" data-action="checkout" data-plan="yearly">Start the free trial</button>
                     </p>
-                    <p class="cta-subtext">Refunds are unconditional for 14 days. Read the full list of what is
-                    included on <a href="/for-practitioners">the practitioner page</a>.</p>
+                    <p class="cta-subtext">A card is required and is not charged during the trial. One free trial
+                    per person. Cancel any time, and refunds are unconditional for 14 days. Read the full list of
+                    what is included on <a href="/for-practitioners">the practitioner page</a>.</p>
                 </section>
 
                 <section>
@@ -689,8 +692,8 @@ data-logo="https://your-site.example/logo.png"</code></pre>
                     <p>A breathing timer is a paced-breathing tool, not medical care, and putting one on your site
                     does not make it one. Nothing here treats, cures or replaces treatment for any condition. The
                     widget carries its own safety block — a "Before you start" panel listing the
-                    contraindications for whichever pattern you configured, plus a link to our disclaimer — and a
-                    Practitioner licence does not remove it: white-labelling takes our name off the widget, not
+                    contraindications for whichever pattern you configured, plus a link to our disclaimer — and the
+                    plan does not remove it: white-labelling takes our name off the widget, not
                     the health warning. The energizing pattern additionally asks for a one-tap acknowledgement
                     before its first session. Please read the
                     <a href="/legal/medical-disclaimer">medical disclaimer</a> before you embed this on a page
@@ -755,8 +758,10 @@ data-logo="https://your-site.example/logo.png"</code></pre>
     <script type="module" src="/js/consent.js"></script>
 
     <!-- js/app.js wires the site header's Menu button (and nothing else on a
-         page with no [data-breathing-app] root). -->
+         page with no [data-breathing-app] root). js/checkout.js installs the
+         delegated handler for the plan button; without it the button is inert. -->
     <script type="module" src="/js/app.js"></script>
+    <script type="module" src="/js/checkout.js"></script>
 
     <script type="module">
     /*
@@ -800,7 +805,7 @@ data-logo="https://your-site.example/logo.png"</code></pre>
     const MODE_HINTS = {
         normal: 'A timer sized to your page. Everyone can use this.',
         kiosk: 'Fills the space you give it, starts on load and loops. Set the iframe height yourself for this one, and post the safety notes near the screen — kiosk mode hides everything except the circle.',
-        class: 'Oversized phase text for a projector. Needs a Practitioner licence — the preview below falls back to normal until a licence token is added.',
+        class: 'Oversized phase text for a projector. Needs the paid plan — the preview below falls back to normal until a white-label key is added.',
     };
 
     function readConfig() {

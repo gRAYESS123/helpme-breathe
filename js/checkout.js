@@ -3,14 +3,15 @@
  *
  * Everything provider-specific is read from js/config.js. Pages just write:
  *
- *   <button type="button" data-action="checkout" data-sku="practitioner">Buy</button>
+ *   <button type="button" data-action="checkout" data-plan="monthly">Start free trial</button>
  *
- * and this module handles the click. Three modes (see js/config.js):
+ * and this module handles the click. `data-plan` is 'monthly' or 'yearly' —
+ * the two intervals of the one plan. Three modes (see js/config.js):
  *
- *   link      → open the hosted payment link for that SKU in a new tab
+ *   link      → open the hosted payment link for that interval in a new tab
  *   paddle    → Paddle Billing v2 overlay checkout on our own page
- *   waitlist  → no payment configured yet: render the founding-member email
- *               capture card instead of a dead link (the default)
+ *   waitlist  → no payment configured yet: render the email capture card
+ *               instead of a dead link (the default)
  *
  * Paddle Billing v2, verified against developer.paddle.com on 2026-09-09:
  *   - script: https://cdn.paddle.com/paddle/v2/paddle.js
@@ -96,55 +97,23 @@ function openLink(sku) {
 /**
  * The waitlist card, per SKU.
  *
- * It used to be one hardcoded string about the $14 founding Pro offer, served
- * for every SKU — so the Practitioner and Studio buttons on /pro and /embed
- * promised the wrong product at the wrong price, a few lines under a matrix
- * printing $99 and $199. The founding line is now shown only where it is true:
- * the lifetime SKU, and only while there are founding places left.
+ * One plan, two intervals: the copy names the interval's own price and the
+ * trial length from js/config.js so a button and the card under it can never
+ * disagree.
  *
  * @param {string} sku
  * @returns {{title:string, message:string, consentLabel:string, note:string, successMessage:string}}
  */
 function waitlistCopy(sku) {
-  const label = SKU_LABELS[sku] || 'Help Me Breathe Pro';
-  const price = PRICES[sku];
-
-  if (sku === 'practitioner' || sku === 'studio') {
-    return {
-      title: `Tell me when the ${label} opens`,
-      message: `Checkout opens soon — the ${label} is $${price} a year`,
-      consentLabel:
-        ` Email me once when the ${label} opens. You can unsubscribe from any email, and the address is used for nothing else.`,
-      note: 'One email to confirm, then one when checkout opens. Nothing else.',
-      successMessage:
-        'You are on the list. Confirm the address from the email that just went out and you will hear from us the day checkout opens.',
-    };
-  }
-
-  if (sku === 'pack') {
-    return {
-      title: 'Tell me when the Protocol Pack opens',
-      message: `Checkout opens soon — the Protocol Pack is $${price}, and it is included free with Pro`,
-      consentLabel:
-        ' Email me once when the Protocol Pack opens. You can unsubscribe from any email, and the address is used for nothing else.',
-      note: 'One email to confirm, then one when checkout opens. Nothing else.',
-      successMessage:
-        'You are on the list. Confirm the address from the email that just went out and you will hear from us the day checkout opens.',
-    };
-  }
-
-  const founding = sku === 'lifetime' && CHECKOUT.founding && CHECKOUT.founding.cap > 0;
-  const message = founding
-    ? `Checkout opens soon — founding members get Pro for $${PRICES.founding}`
-    : sku === 'monthly'
-      ? `Checkout opens soon — Pro monthly is $${price} a month`
-      : `Checkout opens soon — Pro is $${price}, one payment`;
+  const price = PRICES[sku] || PRICES.monthly;
+  const period = sku === 'yearly' ? 'a year' : 'a month';
+  const trial = CHECKOUT.trialDays > 0 ? `${CHECKOUT.trialDays} days free, then ` : '';
 
   return {
-    title: 'Tell me when Pro opens',
-    message,
+    title: 'Tell me when subscriptions open',
+    message: `Subscriptions open soon — ${trial}$${price} ${period}, everything included`,
     consentLabel:
-      ' Email me once when Pro opens. You can unsubscribe from any email, and the address is used for nothing else.',
+      ' Email me once when subscriptions open. You can unsubscribe from any email, and the address is used for nothing else.',
     note: 'One email to confirm, then one when checkout opens. Nothing else.',
     successMessage:
       'You are on the list. Confirm the address from the email that just went out and you will hear from us the day checkout opens.',
@@ -228,7 +197,7 @@ async function openWaitlist(sku, trigger, target) {
 /**
  * Open checkout for one SKU.
  *
- * @param {'lifetime'|'monthly'|'practitioner'|'studio'|'pack'} sku
+ * @param {'monthly'|'yearly'} sku
  * @param {{trigger?:Element, container?:Element, placement?:string}} [options]
  * @returns {Promise<{ok:boolean, mode:string, sku:string, error?:string}>}
  */
@@ -260,8 +229,10 @@ async function runCheckout(key, options) {
 
   track(EVENTS.CHECKOUT_OPEN, {
     sku: key,
+    plan: key,
+    trial: CHECKOUT.trialDays > 0,
     mode,
-    price: PRICES[key === 'lifetime' && CHECKOUT.founding.cap > 0 ? 'founding' : key] || null,
+    price: PRICES[key] || null,
     placement: options.placement || 'page',
   });
 
@@ -275,7 +246,7 @@ async function runCheckout(key, options) {
   }
 }
 
-/** The label a button should show for a SKU, e.g. "Practitioner licence". */
+/** The label a button should show for an interval, e.g. "Yearly plan". */
 export function skuLabel(sku) {
   return SKU_LABELS[String(sku || '')] || 'Help Me Breathe Pro';
 }
@@ -289,7 +260,9 @@ function onDocumentClick(event) {
   if (!trigger) return;
   event.preventDefault();
 
-  const sku = trigger.getAttribute('data-sku') || 'lifetime';
+  // `data-plan` is the name the billing design uses; `data-sku` is the older
+  // spelling and still works. Both name an interval of the one plan.
+  const sku = trigger.getAttribute('data-plan') || trigger.getAttribute('data-sku') || 'monthly';
   const placement = trigger.getAttribute('data-placement') || undefined;
 
   // A checkout button inside an offer card is also a paywall click.
