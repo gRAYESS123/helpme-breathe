@@ -1,54 +1,53 @@
 /* ==========================================================================
-   css/pro.css — the Pro layer.
+   css/pro.css — the Pro layer, in Paper and Ink.
 
    Loaded two ways:
      - js/pro/index.js injects it on any page with a timer
      - /pro and /pro/thanks link it directly
 
-   It extends the existing glass language in css/styles.css and adds nothing
-   that changes how the free timer looks or behaves. Every colour comes from a
-   custom property already defined by the theme, so panels follow the technique
-   theme automatically.
+   Every colour is a token from css/styles.css. Nothing here defines a colour
+   that only exists in a media query or a .night block, because the token set
+   already swaps for night. Control boundaries are --edge; --rule is decorative.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
    Panels (custom pattern, your practice, soundscapes)
    -------------------------------------------------------------------------- */
 .pro-panel {
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    box-shadow: var(--shadow);
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sheet);
     padding: 1.25rem 1.25rem 1rem;
     margin: 0 0 1.25rem;
     text-align: left;
 }
 
 .pro-panel-title {
+    font-family: var(--ui);
     font-size: 1rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--ink);
     margin: 0 0 0.35rem;
 }
 
 .pro-panel-help {
-    font-size: 0.8125rem;
+    font-size: var(--fs-small);
     line-height: 1.6;
-    color: var(--text-secondary);
+    color: var(--graphite);
     margin: 0 0 0.75rem;
 }
 
 .pro-panel-status {
-    font-size: 0.8125rem;
+    font-size: var(--fs-small);
     line-height: 1.5;
-    color: var(--text-secondary);
+    color: var(--graphite);
     margin: 0.5rem 0 0;
     min-height: 1.2em;
 }
 
 .pro-panel-status.is-error {
-    color: #fecaca;
+    color: var(--bad);
 }
 
 .pro-panel-actions {
@@ -64,50 +63,55 @@
 .pro-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.4rem;
-    padding: 0.55rem 1rem;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text-primary);
-    font-family: inherit;
-    font-size: 0.8125rem;
+    min-height: var(--hit);
+    padding: 0.6rem 1.1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--edge);
+    background: var(--leaf);
+    color: var(--ink);
+    font-family: var(--ui);
+    font-size: var(--fs-small);
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.25s ease, transform 0.2s ease;
+    text-decoration: none;
+    transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
 }
 
 .pro-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.18);
+    border-color: var(--ink);
 }
 
 .pro-btn:disabled {
-    opacity: 0.5;
+    color: var(--graphite);
+    border-color: var(--rule);
     cursor: not-allowed;
 }
 
 .pro-btn-primary {
-    background: var(--theme-primary);
-    border-color: transparent;
-    color: #fff;
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--chalk);
     font-weight: 600;
 }
 
 .pro-btn-primary:hover:not(:disabled) {
-    transform: translateY(-1px);
-    background: var(--theme-primary);
-    filter: brightness(1.08);
+    background: var(--ink);
+    border-color: var(--ink);
 }
 
 .pro-pill {
     display: inline-block;
     padding: 0.1rem 0.45rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.22);
-    border: 1px solid var(--border);
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
+    border-radius: var(--radius-pill);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    color: var(--graphite);
+    font-family: var(--ui);
+    font-size: var(--fs-micro);
+    font-weight: 600;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     line-height: 1.5;
 }
@@ -116,8 +120,9 @@
     margin-left: 0.4rem;
 }
 
-.tool-btn.is-on {
-    background: rgba(255, 255, 255, 0.24);
+.tools-row .tool-btn.is-on {
+    color: var(--ink);
+    font-weight: 600;
 }
 
 /* --------------------------------------------------------------------------
@@ -133,41 +138,44 @@
     grid-template-columns: minmax(7rem, 9rem) 1fr 3rem;
     align-items: center;
     gap: 0.6rem;
+    min-height: var(--hit);
 }
 
 .slider-label {
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
+    font-size: var(--fs-small);
+    color: var(--graphite);
 }
 
 .slider-value {
-    font-size: 0.8125rem;
+    font-size: var(--fs-small);
     font-variant-numeric: tabular-nums;
-    color: var(--text-primary);
+    color: var(--ink);
     text-align: right;
 }
 
 .pro-panel input[type='range'] {
     width: 100%;
-    accent-color: var(--theme-primary);
+    accent-color: var(--green);
     background: transparent;
     cursor: pointer;
 }
 
 .pro-panel input[type='range']:focus-visible {
-    outline: 2px solid var(--theme-primary);
+    outline: 2px solid var(--green);
     outline-offset: 4px;
 }
 
 .pattern-preview {
+    font-family: var(--ui);
     font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
     line-height: 1.6;
-    color: var(--text-primary);
+    color: var(--ink);
     margin: 0.9rem 0 0;
     padding: 0.65rem 0.85rem;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--paper);
+    border: 1px solid var(--rule);
 }
 
 .pattern-name-row {
@@ -180,18 +188,18 @@
 
 .pro-panel input[type='text'] {
     width: 100%;
+    min-height: var(--hit);
     padding: 0.55rem 0.75rem;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-    font-family: inherit;
+    border-radius: var(--radius);
+    border: 1px solid var(--edge);
+    background: var(--leaf);
+    color: var(--ink);
+    font-family: var(--ui);
     font-size: 0.875rem;
 }
 
 .pro-panel input::placeholder {
-    color: var(--text-secondary);
-    opacity: 0.75;
+    color: var(--graphite);
 }
 
 .share-url {
@@ -200,15 +208,17 @@
 
 /* Presets */
 .preset-heading {
-    font-size: 0.8125rem;
+    font-family: var(--ui);
+    font-size: var(--fs-micro);
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--text-secondary);
+    color: var(--graphite);
     margin: 1.1rem 0 0.5rem;
 }
 
-.preset-items {
+.preset-items,
+.preset-list {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -221,43 +231,45 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.45rem 0.5rem;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid var(--border);
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--radius);
+    background: var(--paper);
+    border: 1px solid var(--rule);
 }
 
 .preset-load {
     flex: 1 1 12rem;
     text-align: left;
-    padding: 0.25rem 0.35rem;
-    border: none;
+    min-height: var(--hit);
+    padding: 0.35rem 0.4rem;
+    border: 0;
     background: transparent;
-    color: var(--text-primary);
-    font-family: inherit;
+    color: var(--ink);
+    font-family: var(--ui);
     font-size: 0.875rem;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: var(--radius);
 }
 
 .preset-load:hover {
-    background: rgba(255, 255, 255, 0.1);
+    text-decoration: underline;
 }
 
 .preset-action {
-    padding: 0.3rem 0.6rem;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text-secondary);
-    font-family: inherit;
-    font-size: 0.75rem;
+    min-height: 36px;
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--edge);
+    background: var(--leaf);
+    color: var(--graphite);
+    font-family: var(--ui);
+    font-size: var(--fs-micro);
     cursor: pointer;
 }
 
 .preset-action:hover {
-    background: rgba(255, 255, 255, 0.18);
-    color: var(--text-primary);
+    color: var(--ink);
+    border-color: var(--ink);
 }
 
 /* --------------------------------------------------------------------------
@@ -276,22 +288,23 @@
     align-items: center;
     gap: 0.15rem;
     padding: 0.7rem 0.4rem;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--paper);
+    border: 1px solid var(--rule);
 }
 
 .practice-stat-value {
+    font-family: var(--ui);
     font-size: 1.375rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--ink);
     font-variant-numeric: tabular-nums;
 }
 
 .practice-stat-label {
-    font-size: 0.6875rem;
-    letter-spacing: 0.03em;
-    color: var(--text-secondary);
+    font-size: var(--fs-micro);
+    letter-spacing: 0.06em;
+    color: var(--graphite);
     text-align: center;
 }
 
@@ -306,30 +319,30 @@
 
 .heatmap-cell {
     aspect-ratio: 1 / 1;
-    border-radius: 3px;
-    background: rgba(255, 255, 255, 0.07);
+    border-radius: 2px;
+    background: var(--track);
 }
 
-.heatmap-cell.level-1 { background: color-mix(in srgb, var(--theme-primary) 30%, transparent); }
-.heatmap-cell.level-2 { background: color-mix(in srgb, var(--theme-primary) 50%, transparent); }
-.heatmap-cell.level-3 { background: color-mix(in srgb, var(--theme-primary) 72%, transparent); }
-.heatmap-cell.level-4 { background: var(--theme-primary); }
+.heatmap-cell.level-1 { background: color-mix(in srgb, var(--rim) 28%, var(--track)); }
+.heatmap-cell.level-2 { background: color-mix(in srgb, var(--rim) 52%, var(--track)); }
+.heatmap-cell.level-3 { background: color-mix(in srgb, var(--rim) 76%, var(--track)); }
+.heatmap-cell.level-4 { background: var(--rim); }
 
 /* Browsers without color-mix() still show a usable ramp. */
 @supports not (background: color-mix(in srgb, red 50%, transparent)) {
-    .heatmap-cell.level-1 { background: rgba(255, 255, 255, 0.22); }
-    .heatmap-cell.level-2 { background: rgba(255, 255, 255, 0.38); }
-    .heatmap-cell.level-3 { background: rgba(255, 255, 255, 0.58); }
-    .heatmap-cell.level-4 { background: var(--theme-primary); }
+    .heatmap-cell.level-1 { background: var(--track); }
+    .heatmap-cell.level-2 { background: var(--rule); }
+    .heatmap-cell.level-3 { background: var(--edge); }
+    .heatmap-cell.level-4 { background: var(--rim); }
 }
 
 .heatmap-teaser {
     position: relative;
 }
 
+/* A locked heatmap is dimmed, not blurred: the brand carries no blur. */
 .heatmap.is-teaser {
-    filter: blur(4px);
-    opacity: 0.55;
+    opacity: 0.35;
     pointer-events: none;
     user-select: none;
 }
@@ -340,8 +353,9 @@
     left: 50%;
     transform: translate(-50%, -50%);
     white-space: nowrap;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-    background: rgba(0, 0, 0, 0.55);
+    background: var(--leaf);
+    border-color: var(--edge);
+    box-shadow: var(--shadow-lift);
 }
 
 .technique-breakdown {
@@ -350,17 +364,21 @@
     padding: 0;
     display: grid;
     gap: 0.35rem;
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
+    font-size: var(--fs-small);
+    font-variant-numeric: tabular-nums;
+    color: var(--graphite);
 }
 
 /* --------------------------------------------------------------------------
    Offer and capture cards (extend .post-session-card from styles.css)
    -------------------------------------------------------------------------- */
 .paywall-card .paywall-price {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-family: var(--display);
+    font-size: 1.375rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.012em;
+    color: var(--clay);
     margin-bottom: 0.85rem;
 }
 
@@ -372,31 +390,32 @@
 }
 
 .paywall-buy {
-    padding: 0.75rem 1.4rem;
-    border-radius: 14px;
-    border: none;
-    background: var(--theme-primary);
-    color: #fff;
-    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--hit);
+    padding: 0.7rem 1.35rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--clay);
+    background: var(--clay);
+    color: var(--chalk);
+    font-family: var(--ui);
     font-weight: 600;
     font-size: 0.9375rem;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    transition: background-color 180ms ease, border-color 180ms ease;
 }
 
 .paywall-buy:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+    background: var(--ink);
+    border-color: var(--ink);
 }
 
 .paywall-more {
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: var(--green);
     text-decoration: underline;
-}
-
-.paywall-more:hover {
-    color: var(--text-primary);
 }
 
 .capture-card .capture-consent {
@@ -408,23 +427,14 @@
 
 .capture-card .capture-consent input[type='checkbox'] {
     margin-top: 0.15rem;
-    accent-color: var(--theme-primary);
+    accent-color: var(--green);
     flex: 0 0 auto;
-}
-
-/* The activation card on /pro/thanks leads with an <h2> so the heading order
-   after the page <h1> does not skip a level. Give it the same weight the card's
-   own <h3> gets in css/styles.css rather than the page's article-scale h2. */
-.post-session-card h2 {
-    font-size: 1.0625rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0 0 0.5rem;
-    padding-right: 2rem;
+    width: 18px;
+    height: 18px;
 }
 
 .post-session-card .form-error.form-success {
-    color: var(--text-primary);
+    color: var(--ok);
 }
 
 .checkout-waitlist-host {
@@ -432,121 +442,25 @@
 }
 
 /* --------------------------------------------------------------------------
-   Night mode. Near-black backgrounds, warm dimmed text, a much softer glow.
+   Night mode. Every token is already swapped by css/styles.css when
+   body.night is set; the only thing left to say here is that ads go.
    -------------------------------------------------------------------------- */
-body.night {
-    background: #05060a !important;
-    --text-primary: #f5e6d3;
-    --text-secondary: #c2ad96;
-    --surface: rgba(255, 255, 255, 0.04);
-    --border: rgba(245, 230, 211, 0.12);
-    --theme-glow: #4a3d2f;
-}
-
-body.night .nature-bg,
-body.night .natural-element {
-    opacity: 0.15;
-}
-
-body.night .breathing-circle {
-    box-shadow: 0 0 40px rgba(74, 61, 47, 0.45);
-    filter: saturate(0.55) brightness(0.75);
-}
-
-body.night .breathing-aura {
-    opacity: 0.25;
-}
-
 body.night .ad-slot {
     display: none;
-}
-
-body.night .pro-panel,
-body.night .post-session-card {
-    background: rgba(255, 255, 255, 0.04);
 }
 
 /* --------------------------------------------------------------------------
    /pro and /pro/thanks page furniture
    -------------------------------------------------------------------------- */
-.pro-page .pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1rem;
-    margin: 2rem 0;
-}
-
-.pro-page .pricing-card {
-    display: flex;
-    flex-direction: column;
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    padding: 1.5rem 1.25rem;
-    text-align: left;
-}
-
-.pro-page .pricing-card.is-featured {
-    border-color: var(--theme-primary);
-    box-shadow: 0 16px 44px -10px rgba(0, 0, 0, 0.45);
-}
-
-.pro-page .pricing-card h3 {
-    font-size: 1.0625rem;
-    font-weight: 600;
-    margin: 0 0 0.25rem;
-    color: var(--text-primary);
-}
-
-.pro-page .pricing-price {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0.25rem 0 0.1rem;
-}
-
-.pro-page .pricing-note {
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    margin: 0 0 0.9rem;
-}
-
-.pro-page .pricing-card ul {
-    list-style: none;
-    margin: 0 0 1.1rem;
-    padding: 0;
-    display: grid;
-    gap: 0.4rem;
-    font-size: 0.8125rem;
-    line-height: 1.5;
-    color: var(--text-secondary);
-}
-
-.pro-page .pricing-card li::before {
-    content: '·';
-    margin-right: 0.45rem;
-    color: var(--theme-primary);
-    font-weight: 700;
-}
-
-.pro-page .pricing-card .pro-btn,
-.pro-page .pricing-card .paywall-buy {
-    margin-top: auto;
-    width: 100%;
-    justify-content: center;
-    text-align: center;
-}
-
 .pro-page .founding-counter {
     display: inline-block;
     padding: 0.35rem 0.8rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid var(--border);
-    font-size: 0.8125rem;
-    color: var(--text-primary);
+    border-radius: var(--radius-pill);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    font-size: var(--fs-small);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
 }
 
 .pro-page .restore-form {
@@ -559,58 +473,26 @@ body.night .post-session-card {
 
 .pro-page .restore-form input[type='text'] {
     flex: 1 1 16rem;
+    min-height: var(--hit);
     padding: 0.7rem 0.9rem;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-    font-family: inherit;
+    border-radius: var(--radius);
+    border: 1px solid var(--edge);
+    background: var(--leaf);
+    color: var(--ink);
+    font-family: var(--ui);
     font-size: 0.9375rem;
 }
 
 .pro-page .restore-status {
     flex: 1 1 100%;
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: var(--graphite);
     margin: 0.25rem 0 0;
     min-height: 1.2em;
 }
 
 .pro-page .restore-status.is-error {
-    color: #fecaca;
-}
-
-.pro-page .compare-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1.25rem 0;
-    font-size: 0.875rem;
-}
-
-.pro-page .compare-table th,
-.pro-page .compare-table td {
-    padding: 0.65rem 0.75rem;
-    border-bottom: 1px solid var(--border);
-    text-align: left;
-    color: var(--text-secondary);
-    vertical-align: top;
-}
-
-.pro-page .compare-table th[scope='row'],
-.pro-page .compare-table thead th {
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-.pro-page .table-scroll {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-@media (max-width: 820px) {
-    .pro-page .pricing-grid {
-        grid-template-columns: 1fr;
-    }
+    color: var(--bad);
 }
 
 /* --------------------------------------------------------------------------
@@ -619,19 +501,14 @@ body.night .post-session-card {
 @media (prefers-reduced-motion: reduce) {
     .pro-btn,
     .paywall-buy,
-    .tool-btn {
+    .tools-row .tool-btn {
         transition: none;
-    }
-
-    .pro-btn-primary:hover:not(:disabled),
-    .paywall-buy:hover {
-        transform: none;
     }
 }
 
 .pro-panel button:focus-visible,
 .post-session-card button:focus-visible,
 .pro-page .restore-form button:focus-visible {
-    outline: 2px solid var(--theme-primary);
+    outline: 2px solid var(--green);
     outline-offset: 3px;
 }

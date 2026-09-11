@@ -115,7 +115,10 @@ function waitlistContainer(trigger, container) {
   if (trigger && trigger.parentNode) {
     const host = doc.createElement('div');
     host.className = 'checkout-waitlist-host';
-    const anchor = trigger.closest('.pricing-card, .cta-block, section, p') || trigger;
+    // `.table-scroll` first: a checkout button now lives in a pricing-matrix
+    // header cell, and a card dropped inside the table would be invalid markup.
+    const anchor =
+      trigger.closest('.table-scroll, .pricing-card, .cta-block, section, p') || trigger;
     anchor.parentNode.insertBefore(host, anchor.nextSibling);
     return host;
   }

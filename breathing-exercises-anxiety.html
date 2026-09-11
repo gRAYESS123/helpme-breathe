@@ -17,22 +17,25 @@
     <meta property="og:description" content="A free guided breathing timer for anxious moments, with slow long-exhale patterns, an honest how-to, and crisis helplines if you need one now.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://helpmebreath.com/breathing-exercises-anxiety">
-    <meta property="og:image" content="https://helpmebreath.com/images/og/breathing-exercises-for-anxiety.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/breathing-exercises-anxiety.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Breathing Exercises for Anxiety — Free Guided Timer">
     <meta name="twitter:description" content="A free guided breathing timer for anxious moments, with slow long-exhale patterns, an honest how-to, and crisis helplines if you need one now.">
-    <meta name="twitter:image" content="https://helpmebreath.com/images/og/breathing-exercises-for-anxiety.jpg">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/breathing-exercises-anxiety.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,8 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -95,7 +98,7 @@
       "@type": "Article",
       "headline": "Breathing exercises for anxiety",
       "description": "A free guided breathing timer for anxious moments, with slow long-exhale patterns, an honest how-to, and crisis helplines if you need one now.",
-      "image": "https://helpmebreath.com/images/og/breathing-exercises-for-anxiety.jpg",
+      "image": "https://helpmebreath.com/images/og/breathing-exercises-anxiety.jpg",
       "datePublished": "2026-09-09",
       "dateModified": "2026-09-09",
       "inLanguage": "en",
@@ -177,116 +180,40 @@
     </script>
 
     <style>
-        /* Crisis block — page-scoped. Uses the existing theme custom properties. */
-        .article-page .crisis-card {
-            max-width: 760px;
-            margin: 0 auto 1.5rem;
-            padding: 1.75rem 2rem;
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--theme-primary);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            text-align: left;
-        }
-
-        .article-page .crisis-card h2 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            line-height: 1.4;
-            margin: 0 0 0.75rem;
-            color: var(--text-primary);
-        }
-
-        .article-page .crisis-card p {
-            font-size: 0.95rem;
-            line-height: 1.7;
-            color: var(--text-primary);
-            margin: 0 0 1rem;
-        }
-
-        .article-page .crisis-card ul {
-            list-style: none;
-            margin: 0 0 1rem;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 0.7rem;
-        }
-
-        .article-page .crisis-card li {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: var(--text-primary);
-        }
-
-        .article-page .crisis-card a {
-            color: var(--text-primary);
-            text-decoration: underline;
-            text-decoration-thickness: 1px;
-            text-underline-offset: 3px;
-        }
-
-        .article-page .crisis-card a:hover,
-        .article-page .crisis-card a:focus-visible {
-            color: var(--theme-secondary);
-            text-decoration-thickness: 2px;
-        }
-
-        .article-page .crisis-card .crisis-note {
-            font-size: 0.875rem;
-            color: var(--text-primary);
-            margin: 0;
-        }
-
-        .article-page .prose p.sources {
-            font-size: 0.85rem;
-            line-height: 1.8;
-            color: var(--text-secondary);
-        }
-
-        .article-page .contraindications {
-            border-left: 4px solid var(--theme-primary);
-            border-radius: 12px;
-            padding: 1.25rem 1.5rem;
-            background: rgba(0, 0, 0, 0.18);
-        }
-
-        .article-page .contraindications ul {
-            margin-bottom: 0;
-        }
-
-        @media (max-width: 768px) {
-            .article-page .crisis-card {
-                padding: 1.5rem 1.25rem;
-                border-radius: 16px;
-            }
+        /* Page-local: the one line the shared crisis component does not cover.
+           Tokens only; nothing here is defined inside a media or .night block. */
+        .crisis-block .crisis-note {
+            margin: 0.9rem 0 0;
+            font-size: var(--fs-small);
+            color: var(--graphite);
         }
     </style>
 </head>
 <body class="theme-478 article-page technique-page" data-no-ads="true" data-no-asks="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element leaf leaf-3"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element ripple ripple-3"></div>
-    <div class="natural-element cloud cloud-1"></div>
-    <div class="natural-element sun-ray sun-ray-1"></div>
-    <div class="natural-element sun-ray sun-ray-2"></div>
-    <div class="natural-element sun-ray sun-ray-3"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides" aria-current="page">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
@@ -294,15 +221,17 @@
                     <li>Breathing exercises for anxiety</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Breathing Exercises for Anxious Moments</h1>
-                <p class="subtitle">A free guided timer set to a slow, long-exhale pattern. No account, no ads on this page, nothing to buy.</p>
+            <h1>Breathing Exercises for Anxious Moments</h1>
+            <p class="lead">A free guided timer set to a slow, long-exhale pattern. No account, no ads on this page, nothing to buy.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Published 2026-09-09 &middot; Updated 2026-09-09</p>
             </div>
         </header>
 
         <main id="main">
             <!-- ============ CRISIS BLOCK — stays first, above everything ============ -->
-            <aside class="crisis-card" aria-labelledby="crisis-heading">
+            <section class="crisis-block" aria-labelledby="crisis-heading">
                 <h2 id="crisis-heading">If you are in immediate danger or thinking about harming yourself</h2>
                 <p>Please stop reading and talk to a person. A breathing timer is not the right help for this moment, and calling is not an overreaction. The services below are confidential and answered by people trained for exactly this call.</p>
                 <ul>
@@ -313,7 +242,7 @@
                     <li><strong>Lebanon</strong> — call <a href="https://embracelebanon.org/" target="_blank" rel="noopener noreferrer">Embrace Lifeline</a> on <a href="tel:1564">1564</a>. Free, confidential and available 24/7.</li>
                 </ul>
                 <p class="crisis-note">If someone's life is in immediate danger, call your local emergency number instead.</p>
-            </aside>
+            </section>
 
             <!-- ============ TIMER ============ -->
             <section class="breathing-section"
@@ -322,7 +251,15 @@
                      data-duration="300"
                      aria-labelledby="timer-heading">
 
-                <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">⚙️</button>
+                <div class="app-bar">
+                    <h2 id="timer-heading" data-role="technique-title">Deep Sleep</h2>
+                    <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+                            <circle cx="12" cy="12" r="3.2"/>
+                            <path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
+                        </svg>
+                    </button>
+                </div>
 
                 <div class="settings-panel" data-role="settings-panel">
                     <div class="setting-item">
@@ -346,22 +283,18 @@
                     </div>
                 </div>
 
-                <h2 id="timer-heading" data-role="technique-title">🌙 Deep Sleep</h2>
-
                 <div class="breathing-container">
-                    <div class="breathing-aura"></div>
+                    <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
+                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
+                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                    </svg>
                     <div class="breathing-circle technique-478" data-role="circle">
-                        <div class="circle-text-container">
-                            <span data-role="circle-text">Ready</span>
-                        </div>
+                        <span class="circle-notch" aria-hidden="true"></span>
                     </div>
-                    <div class="breathing-particles" aria-hidden="true">
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
+                    <div class="circle-text-container">
+                        <span class="phase-word" data-role="circle-text">Ready</span>
+                        <span class="phase-count" data-role="phase-count"></span>
                     </div>
                 </div>
 
@@ -396,6 +329,7 @@
                     </div>
                 </div>
 
+                <!-- Pro modules inject their buttons here. Empty = zero height. -->
                 <div class="tools-row" data-slot="tools"></div>
 
                 <div class="controls">
@@ -413,16 +347,17 @@
                     </div>
                 </div>
 
+                <!-- Crisis-safe page: this slot stays empty. data-no-asks keeps it that way. -->
                 <div data-slot="post-session"></div>
 
                 <h3 class="sr-only" id="technique-picker-heading">Choose a different breathing pattern</h3>
                 <div class="technique-buttons" data-role="technique-buttons" role="group" aria-labelledby="technique-picker-heading">
-                    <button class="technique-btn active" type="button" data-action="select-technique" data-technique="478" aria-pressed="true">🌙 4-7-8</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false">🌅 Extended Exhale</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="false">🌊 Cyclic Sighing</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="false">💗 Heart Coherence</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false">🌿 Box Breathing</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false">☁️ Triangle</button>
+                    <button class="technique-btn active" type="button" data-action="select-technique" data-technique="478" aria-pressed="true">4-7-8</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false">Extended Exhale</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="false">Cyclic Sighing</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="false">Heart Coherence</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false">Box Breathing</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false">Triangle</button>
                 </div>
 
                 <div class="technique-info" data-role="technique-info"></div>
@@ -432,13 +367,13 @@
 
             <!-- ============ TECHNIQUE SWITCHER ============ -->
             <nav class="technique-switcher" aria-label="Other breathing timers">
-                <a href="/4-7-8-breathing">🌙 4-7-8</a>
-                <a href="/box-breathing">🌿 Box</a>
-                <a href="/heart-coherence-breathing">💗 Coherence</a>
-                <a href="/cyclic-sighing">🌊 Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">🌅 Extended exhale</a>
-                <a href="/triangle-breathing">☁️ Triangle</a>
-                <a href="/energizing-breath">☀️ Energizing</a>
+                <a href="/4-7-8-breathing">4-7-8</a>
+                <a href="/box-breathing">Box</a>
+                <a href="/heart-coherence-breathing">Coherence</a>
+                <a href="/cyclic-sighing">Cyclic sighing</a>
+                <a href="/extended-exhale-breathing">Extended exhale</a>
+                <a href="/triangle-breathing">Triangle</a>
+                <a href="/energizing-breath">Energizing</a>
                 <a href="/timer">All timers</a>
             </nav>
 
@@ -494,23 +429,33 @@
                     <p>There are times to reach for something else. In the middle of a full panic attack, a seven-second hold is usually the wrong instruction, and a page written for that specific situation will serve you better — read <a href="/breathing-exercises-for-panic-attacks">breathing exercises for panic attacks</a> instead. If you notice you are using breathing exercises to avoid a situation entirely, rather than to get through it, that is worth mentioning to a therapist, because avoidance is the mechanism that keeps anxiety in place. And if breathing has quietly turned into a ritual you must complete a set number of times or something bad will happen, that is a different problem and a timer will not fix it.</p>
                 </section>
 
-                <section class="contraindications">
+                <section>
                     <h2>Who should be careful with the hold</h2>
-                    <p>4-7-8 contains a seven-second breath-hold, and breath-holds are not for everyone. This is not a scary-warning formality — please read it.</p>
-                    <ul>
-                        <li>Speak to a clinician before practicing breath-holds if you are pregnant, or if you live with a cardiovascular condition, uncontrolled high blood pressure, epilepsy, a respiratory condition such as asthma or COPD, glaucoma, or you have had surgery recently.</li>
-                        <li>If you live with panic attacks, the air hunger from a hold can feel like the beginning of one. Use extended exhale or cyclic sighing instead, both of which are on the buttons above and hold nothing.</li>
-                        <li>Practice sitting or lying down. Never while driving, cycling, on a ladder or in water.</li>
-                        <li>Stop if you feel dizzy, light-headed, tingly or short of breath, and go back to breathing normally. Feeling worse is a reason to stop, not a reason to push through.</li>
-                        <li>If a pattern leaves you gasping at the end of the exhale, the pattern is too long for you today. Shorten it. There is nothing to be gained from finishing the count.</li>
-                    </ul>
+                    <div class="callout callout--caution">
+                        <p>4-7-8 contains a seven-second breath-hold, and breath-holds are not for everyone. This is not a scary-warning formality — please read it.</p>
+                        <ul>
+                            <li>Speak to a clinician before practicing breath-holds if you are pregnant, or if you live with a cardiovascular condition, uncontrolled high blood pressure, epilepsy, a respiratory condition such as asthma or COPD, glaucoma, or you have had surgery recently.</li>
+                            <li>If you live with panic attacks, the air hunger from a hold can feel like the beginning of one. Use extended exhale or cyclic sighing instead, both of which are on the buttons above and hold nothing.</li>
+                            <li>Practice sitting or lying down. Never while driving, cycling, on a ladder or in water.</li>
+                            <li>Stop if you feel dizzy, light-headed, tingly or short of breath, and go back to breathing normally. Feeling worse is a reason to stop, not a reason to push through.</li>
+                            <li>If a pattern leaves you gasping at the end of the exhale, the pattern is too long for you today. Shorten it. There is nothing to be gained from finishing the count.</li>
+                        </ul>
+                    </div>
                 </section>
 
                 <section>
                     <h2>What the evidence shows</h2>
                     <p>Honestly: modest, real, and not a cure. The 2018 review quoted further up reported that across the studies it covered, slow breathing was associated with "increased comfort, relaxation, pleasantness, vigor and alertness, and reduced symptoms of arousal, anxiety, depression, anger, and confusion" — a list of self-reported states, gathered from small studies using several different protocols. Balban and colleagues' 2023 randomized controlled trial in <em>Cell Reports Medicine</em> put 108 people through 28 days of five-minute daily practice — three different breathwork patterns against an equal amount of mindfulness meditation — and reported that "Cyclic sighing is most effective at improving mood and reducing respiratory rate". That was the pattern in the trial with the longest, most deliberate exhale. And Fincham and colleagues' 2023 meta-analysis of randomized controlled trials in <em>Scientific Reports</em> found, across twenty trials measuring anxiety, "a significant small-medium between-group ES in favour of breathwork, <em>g</em> = − 0.32", while noting that "Most studies were deemed as being at moderate risk of bias" and that its authors "urge caution and advocate for nuanced research approaches with low risk-of-bias study designs to avoid a miscalibration between hype and evidence". So: a real but small-to-medium effect on how anxious people say they feel, drawn from a literature that is not yet as clean as anyone would like. That is a good reason to give five minutes of it a try, and not a reason to change anything else you are doing about your anxiety.</p>
                     <p>Two things that paragraph deliberately does not say. It does not say breathing treats an anxiety disorder — none of those papers tested that, and this timer makes no such claim. And it does not say one pattern is right for you. The trial that favored cyclic sighing measured group averages over a month; you are one person on one afternoon, and the pattern you can actually stay with for five minutes is the one that will do you the most good.</p>
-                    <p class="sources">Sources: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6137615/" target="_blank" rel="noopener noreferrer">Zaccaro et al., <em>Frontiers in Human Neuroscience</em>, 2018</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9873947/" target="_blank" rel="noopener noreferrer">Balban et al., <em>Cell Reports Medicine</em>, 2023</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9828383/" target="_blank" rel="noopener noreferrer">Fincham et al., <em>Scientific Reports</em>, 2023</a></p>
+
+                    <section class="citations">
+                        <h3>Sources</h3>
+                        <ol>
+                            <li>Zaccaro et al., <em>Frontiers in Human Neuroscience</em>, 2018. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6137615/" target="_blank" rel="noopener noreferrer">https://pmc.ncbi.nlm.nih.gov/articles/PMC6137615/</a></li>
+                            <li>Balban et al., <em>Cell Reports Medicine</em>, 2023. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9873947/" target="_blank" rel="noopener noreferrer">https://pmc.ncbi.nlm.nih.gov/articles/PMC9873947/</a></li>
+                            <li>Fincham et al., <em>Scientific Reports</em>, 2023. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9828383/" target="_blank" rel="noopener noreferrer">https://pmc.ncbi.nlm.nih.gov/articles/PMC9828383/</a></li>
+                        </ol>
+                    </section>
                 </section>
 
                 <section>
@@ -568,41 +513,49 @@
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">Extended exhale</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About">
-                <a href="/science">What the research says</a>
-                <a href="/about">About</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About the site">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>

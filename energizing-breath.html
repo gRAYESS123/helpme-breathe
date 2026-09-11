@@ -26,13 +26,16 @@
     <meta name="twitter:description" content="A free guided timer for energizing breath — a fast two-second inhale, one-second exhale. Read the safety limits first, then breathe along.">
     <meta name="twitter:image" content="https://helpmebreath.com/images/og/energizing-breathing.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
-    <!-- PWA -->
+    <!-- PWA. The dark entry must come first: the first matching one wins. -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,8 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!--
       Google Consent Mode v2 — copy verbatim, do not reorder. The DENIED
@@ -221,28 +224,33 @@
     </script>
 
     <style>
-        /* Page-local: the pre-timer safety block reuses the .safety-ack panel
-           styling but sits in the page flow, matched to the 760px column that
-           .technique-page uses for the timer and the prose. */
+        /* Page-local: the pre-timer safety block is the shared contraindication
+           callout (.callout--caution, a 3px --warn left rule on leaf), sized to
+           the reading measure so it lines up with the article header above it
+           and the prose below. Layout and type scale only — every colour comes
+           from the shared tokens, so it flips with day and night on its own. */
         .safety-first {
-            max-width: 760px;
-            margin: 0 auto 1.5rem;
+            max-width: var(--measure);
+            margin: 0 auto 1.75rem;
         }
 
         .safety-first h2 {
             font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
+            margin: 0 0 0.75rem;
         }
 
         .safety-first h3 {
-            font-size: 0.9375rem;
-            font-weight: 600;
+            font-size: 1rem;
             margin: 1.25rem 0 0.5rem;
         }
 
         .safety-first ul {
-            margin: 0 0 0.5rem 1.1rem;
+            margin: 0 0 0.75rem 1.15rem;
+            padding: 0;
+        }
+
+        .safety-first li {
+            margin-bottom: 0.4rem;
         }
 
         .safety-first p:last-child {
@@ -264,25 +272,28 @@
 <body class="theme-wim article-page technique-page">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element leaf leaf-3"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element ripple ripple-3"></div>
-    <div class="natural-element cloud cloud-1"></div>
-    <div class="natural-element sun-ray sun-ray-1"></div>
-    <div class="natural-element sun-ray sun-ray-2"></div>
-    <div class="natural-element sun-ray sun-ray-3"></div>
+    <!-- ============ PERSISTENT SITE HEADER — identical on every page ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer" aria-current="page">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
@@ -290,15 +301,20 @@
                     <li>Energizing breath</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Energizing Breath Timer</h1>
-                <p class="subtitle">A fast two-second inhale and one-second exhale, paced for two minutes — with the safety rules that have to come with it.</p>
+            <h1>Energizing Breath Timer</h1>
+            <p class="lead">A fast two-second inhale and one-second exhale, paced for two minutes — with the safety rules that have to come with it.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Published 2026-09-09 &middot; Updated 2026-09-10</p>
             </div>
         </header>
 
         <main id="main">
-            <!-- ============ SAFETY FIRST — ABOVE THE TIMER ============ -->
-            <section class="safety-ack safety-first" aria-labelledby="safety-heading">
+            <!-- ============ SAFETY FIRST — ABOVE THE TIMER ============
+                 The contraindication callout: a 3px --warn left rule on leaf.
+                 This block stays above the timer. Do not move it, shorten it or
+                 fold it behind a disclosure. -->
+            <section class="callout callout--caution safety-first" aria-labelledby="safety-heading">
                 <h2 id="safety-heading">Read this before you start</h2>
 
                 <p>This is the only stimulating pattern on Help Me Breathe, and it is the one that carries real physical risk. Every pattern here has people it does not suit, but this is the one that can make an otherwise healthy person faint. Breathing faster than your body asks for lowers the carbon dioxide in your blood. That can make you light-headed, make your hands cramp, and make you lose consciousness without much warning.</p>
@@ -335,7 +351,15 @@
                      data-lock-technique
                      aria-labelledby="timer-heading">
 
-                <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">⚙️</button>
+                <div class="app-bar">
+                    <h2 id="timer-heading" data-role="technique-title">Energizing Breath</h2>
+                    <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+                            <circle cx="12" cy="12" r="3.2"/>
+                            <path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
+                        </svg>
+                    </button>
+                </div>
 
                 <div class="settings-panel" data-role="settings-panel">
                     <div class="setting-item">
@@ -360,22 +384,22 @@
                     </div>
                 </div>
 
-                <h2 id="timer-heading" data-role="technique-title">☀️ Energizing Breath</h2>
-
+                <!-- The mark, alive. Two dotted calipers mark full inhale and full
+                     exhale; the third ring is the reduced-motion pacer and stays
+                     invisible unless that preference is set. The notch at twelve
+                     o'clock is the logo's gap and closes on a hold. -->
                 <div class="breathing-container">
-                    <div class="breathing-aura"></div>
+                    <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
+                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
+                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                    </svg>
                     <div class="breathing-circle technique-wim" data-role="circle">
-                        <div class="circle-text-container">
-                            <span data-role="circle-text">Ready</span>
-                        </div>
+                        <span class="circle-notch" aria-hidden="true"></span>
                     </div>
-                    <div class="breathing-particles" aria-hidden="true">
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
+                    <div class="circle-text-container">
+                        <span class="phase-word" data-role="circle-text">Ready</span>
+                        <span class="phase-count" data-role="phase-count"></span>
                     </div>
                 </div>
 
@@ -436,13 +460,13 @@
 
             <!-- ============ TECHNIQUE SWITCHER ============ -->
             <nav class="technique-switcher" aria-label="Other breathing timers">
-                <a href="/4-7-8-breathing">🌙 4-7-8</a>
-                <a href="/box-breathing">🌿 Box</a>
-                <a href="/heart-coherence-breathing">💗 Coherence</a>
-                <a href="/cyclic-sighing">🌊 Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">🌅 Extended exhale</a>
-                <a href="/triangle-breathing">☁️ Triangle</a>
-                <a href="/energizing-breath" aria-current="page">☀️ Energizing</a>
+                <a href="/4-7-8-breathing">4-7-8</a>
+                <a href="/box-breathing">Box</a>
+                <a href="/heart-coherence-breathing">Coherence</a>
+                <a href="/cyclic-sighing">Cyclic sighing</a>
+                <a href="/extended-exhale-breathing">Extended exhale</a>
+                <a href="/triangle-breathing">Triangle</a>
+                <a href="/energizing-breath" aria-current="page">Energizing</a>
                 <a href="/timer">All timers</a>
             </nav>
 
@@ -503,17 +527,19 @@
 
                 <section>
                     <h2>Who should not use this pattern at all</h2>
-                    <p>This is worth repeating below the timer as well as above it, because it is the part people skim.</p>
-                    <ul>
-                        <li>Anyone who is pregnant.</li>
-                        <li>Anyone with a cardiovascular condition, uncontrolled high blood pressure, an arrhythmia, or a history of stroke or aneurysm.</li>
-                        <li>Anyone with epilepsy or a seizure disorder.</li>
-                        <li>Anyone with a respiratory condition such as asthma or COPD.</li>
-                        <li>Anyone who lives with panic attacks or a history of hyperventilation.</li>
-                        <li>Anyone with glaucoma or raised eye pressure, or who has had surgery recently.</li>
-                        <li>Anyone under 18 without a clinician's say-so.</li>
-                    </ul>
-                    <p>And for everyone: never in or near water, never while driving, never standing, and never followed by a long breath-hold. If a clinician who knows your history has told you a fast pattern is fine for you, follow what they said rather than what a web page says.</p>
+                    <div class="callout callout--caution">
+                        <p>This is worth repeating below the timer as well as above it, because it is the part people skim.</p>
+                        <ul>
+                            <li>Anyone who is pregnant.</li>
+                            <li>Anyone with a cardiovascular condition, uncontrolled high blood pressure, an arrhythmia, or a history of stroke or aneurysm.</li>
+                            <li>Anyone with epilepsy or a seizure disorder.</li>
+                            <li>Anyone with a respiratory condition such as asthma or COPD.</li>
+                            <li>Anyone who lives with panic attacks or a history of hyperventilation.</li>
+                            <li>Anyone with glaucoma or raised eye pressure, or who has had surgery recently.</li>
+                            <li>Anyone under 18 without a clinician's say-so.</li>
+                        </ul>
+                        <p>And for everyone: never in or near water, never while driving, never standing, and never followed by a long breath-hold. If a clinician who knows your history has told you a fast pattern is fine for you, follow what they said rather than what a web page says.</p>
+                    </div>
                 </section>
 
                 <section>
@@ -589,43 +615,51 @@
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">Extended exhale</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About and products">
-                <a href="/science">What the research says</a>
-                <a href="/about">About</a>
-                <a href="/pro">Pro</a>
-                <a href="/for-practitioners">For practitioners</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>

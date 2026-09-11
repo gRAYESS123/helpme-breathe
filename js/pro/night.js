@@ -1,31 +1,38 @@
 /**
- * js/pro/night.js — night mode.
+ * js/pro/night.js — the manual night/day override.
  *
- * Puts `night` on `<body>` (styled in css/pro.css): near-black backgrounds,
- * warm dimmed text, a much softer circle glow. While a session is running it
- * also asks for a Screen Wake Lock so the phone does not sleep mid-practice,
- * and releases it the moment the session ends.
+ * The night token set in css/styles.css is honoured for EVERY visitor through
+ * `@media (prefers-color-scheme: dark)`, paid or not. What this module sells is
+ * the switch: it puts `night` or `day` on `<body>` so a choice made here beats
+ * the device preference in both directions, and it holds that choice in this
+ * browser under the `hmb.night` flag. While a session is running it also asks
+ * for a Screen Wake Lock so the phone does not sleep mid-practice, and releases
+ * it the moment the session ends.
  *
- * Pro only, and persisted in this browser under the `hmb.night` flag.
- * (`storage.saveSettings()` deliberately keeps only the four engine settings,
- * so preferences that belong to a module live as flags.)
+ * Pro only. (`storage.saveSettings()` deliberately keeps only the four engine
+ * settings, so preferences that belong to a module live as flags.)
  */
 
 import { getFlag, setFlag } from '../storage.js';
 import { requirePro, isPro, onChange } from '../entitlements.js';
 
 const FLAG = 'night';
-const BODY_CLASS = 'night';
+const NIGHT_CLASS = 'night';
+const DAY_CLASS = 'day';
 
 const toggles = new Set();
 let enabled = false;
+/* Has this browser made a choice at all? Until it has, neither class goes on
+   the body and the visitor keeps whatever their device asked for. */
+let overridden = false;
 let wakeLock = null;
 let sessionRunning = false;
 let wired = false;
 
 function applyBodyClass() {
   if (!document.body) return;
-  document.body.classList.toggle(BODY_CLASS, enabled);
+  document.body.classList.toggle(NIGHT_CLASS, overridden && enabled);
+  document.body.classList.toggle(DAY_CLASS, overridden && !enabled);
 }
 
 function syncToggles() {
@@ -84,8 +91,12 @@ function wireOnce() {
   });
 
   onChange(() => {
-    if (!isPro() && enabled) {
+    if (!isPro() && overridden) {
+      // The override is a paid control, so it lapses with the licence. Dropping
+      // both classes hands the visitor back to their own device preference
+      // rather than pinning them to a bright page.
       enabled = false;
+      overridden = false;
       applyBodyClass();
       releaseWakeLock();
     }
@@ -96,6 +107,7 @@ function wireOnce() {
 /** Turn night mode on or off. Returns the new state. */
 export function setNight(next) {
   enabled = next === true;
+  overridden = true;
   setFlag(FLAG, enabled);
   applyBodyClass();
   syncToggles();
@@ -126,10 +138,16 @@ export function initNight(rootEl, options = {}) {
 
   wireOnce();
 
-  // Restore the stored preference once, for a paid visitor.
-  if (!toggles.size && isPro() && getFlag(FLAG) === true) {
-    enabled = true;
-    applyBodyClass();
+  // Restore the stored preference once, for a paid visitor. A stored `false`
+  // is a real choice — "keep this page light whatever my phone says" — so it
+  // is restored as an override too. Only an absent flag means "no choice yet".
+  if (!toggles.size && isPro()) {
+    const stored = getFlag(FLAG);
+    if (stored === true || stored === false) {
+      enabled = stored === true;
+      overridden = true;
+      applyBodyClass();
+    }
   }
 
   const button = document.createElement('button');

@@ -17,22 +17,25 @@
     <meta property="og:description" content="What Help Me Breathe stores in your browser, what leaves your device, who handles payments and email, and how to exercise your data rights.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://helpmebreath.com/legal/privacy-policy">
-    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/privacy-policy.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Privacy Policy">
     <meta name="twitter:description" content="What Help Me Breathe stores in your browser, what leaves your device, who handles payments and email, and how to exercise your data rights.">
-    <meta name="twitter:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/privacy-policy.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,8 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -111,415 +114,340 @@
     </script>
 
     <style>
-        .legal-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .legal-content {
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            padding: 3rem;
-            border-radius: 30px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            margin-top: 2rem;
-        }
-
-        .legal-content h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        .legal-content h2 {
-            font-size: 1.5rem;
-            margin-top: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        .legal-content h3 {
-            font-size: 1.25rem;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            color: var(--text-primary);
-        }
-
-        .legal-content p {
-            line-height: 1.8;
-            margin-bottom: 1rem;
-            color: var(--text-secondary);
-        }
-
-        .legal-content ul {
-            margin: 1rem 0;
-            padding-left: 2rem;
-        }
-
-        .legal-content li {
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .legal-content strong {
-            color: var(--text-primary);
-        }
-
-        .legal-content a {
-            color: var(--text-primary);
-            text-decoration: underline;
-            transition: opacity 0.3s ease;
-        }
-
-        .legal-content a:hover {
-            opacity: 0.7;
-        }
-
-        .last-updated {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            opacity: 0.8;
-            margin-bottom: 2rem;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-primary);
-            text-decoration: none;
-            margin-bottom: 2rem;
-            transition: opacity 0.3s ease;
-        }
-
-        .back-link:hover {
-            opacity: 0.7;
-        }
-
-        .summary-box {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--theme-primary);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .summary-box h2 {
-            margin-top: 0;
-            font-size: 1.25rem;
-        }
-
-        .summary-box ul {
-            margin-bottom: 0;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.5rem 0;
-            font-size: 0.9375rem;
-        }
-
-        .data-table th,
-        .data-table td {
-            text-align: left;
-            padding: 0.75rem 0.85rem;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-secondary);
-            line-height: 1.6;
-            vertical-align: top;
-        }
-
-        .data-table th {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .table-scroll {
-            overflow-x: auto;
-        }
-
-        .legal-nav {
-            margin-top: 3rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border);
-            font-size: 0.9375rem;
-        }
-
-        @media (max-width: 768px) {
-            .legal-content {
-                padding: 2rem 1.5rem;
-            }
-
-            .legal-content h1 {
-                font-size: 2rem;
-            }
-        }
+        /* `.callout > h2` and `.legal-nav` are now shared components in
+           css/styles.css section 7. Nothing page-scoped is left here. */
     </style>
 </head>
-<body class="theme-478" data-no-ads="true" data-no-asks="true">
+<body class="theme-478 article-page" data-no-ads="true" data-no-asks="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
-    <div class="legal-container">
-        <a href="/" class="back-link">← Back to Help Me Breathe</a>
-
-        <main id="main" class="legal-content">
+    <div class="container">
+        <header class="article-header">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    <li>Privacy policy</li>
+                </ol>
+            </nav>
             <h1>Privacy Policy</h1>
-            <p class="last-updated">Last updated <time datetime="2026-09-09">9 September 2026</time>. Published by Georges Rayess, an individual.</p>
-
-            <p>Help Me Breathe is a guided breathing timer at <a href="https://helpmebreath.com/">helpmebreath.com</a>. It is published by one person — Georges Rayess, an individual resident in Lebanon — and not by a company. There is no account system, no login, no password and no database of users anywhere in this project.</p>
-
-            <p>This policy explains what the site keeps on your device, what leaves your device and when, who else is involved, and what you can ask me to do. It is written to be read, not to be survived. If anything here is unclear, write to <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and I will answer in plain words.</p>
-
-            <div class="summary-box">
-                <h2>The short version</h2>
-                <ul>
-                    <li>The timer runs entirely in your browser. Your settings, your session history and your saved patterns stay on your device.</li>
-                    <li><strong>Nothing you do in the timer leaves your device unless you submit an email address or a licence key.</strong> Those are the only two moments you hand me anything.</li>
-                    <li>Analytics and advertising cookies are set to <strong>denied</strong> before anything loads, and stay denied unless you choose "Accept all" in the cookie banner.</li>
-                    <li>Payments are handled end to end by a merchant of record. I never see your card details, and I do not store them anywhere.</li>
-                    <li>I do not sell personal information and I do not share it for cross-context behavioural advertising.</li>
-                </ul>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Last updated <time datetime="2026-09-09">9 September 2026</time>. Published by Georges Rayess, an individual.</p>
             </div>
+        </header>
+
+        <main id="main">
+            <article class="prose">
+                <section>
+                    <p class="lead">Help Me Breathe is a guided breathing timer at <a href="https://helpmebreath.com/">helpmebreath.com</a>. It is published by one person — Georges Rayess, an individual resident in Lebanon — and not by a company. There is no account system, no login, no password and no database of users anywhere in this project.</p>
+
+                    <p>This policy explains what the site keeps on your device, what leaves your device and when, who else is involved, and what you can ask me to do. It is written to be read, not to be survived. If anything here is unclear, write to <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and I will answer in plain words.</p>
+
+                    <div class="callout">
+                        <h2>The short version</h2>
+                        <ul>
+                            <li>The timer runs entirely in your browser. Your settings, your session history and your saved patterns stay on your device.</li>
+                            <li><strong>Nothing you do in the timer leaves your device unless you submit an email address or a licence key.</strong> Those are the only two moments you hand me anything.</li>
+                            <li>Analytics and advertising cookies are set to <strong>denied</strong> before anything loads, and stay denied unless you choose "Accept all" in the cookie banner.</li>
+                            <li>Payments are handled end to end by a merchant of record. I never see your card details, and I do not store them anywhere.</li>
+                            <li>I do not sell personal information and I do not share it for cross-context behavioural advertising.</li>
+                        </ul>
+                    </div>
+                </section>
 
-            <h2>1. Who is responsible for your data</h2>
+                <section id="controller">
+                    <h2>1. Who is responsible for your data</h2>
 
-            <p>The controller for this site is Georges Rayess, an individual, contactable at <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. There is no data protection officer, because a one-person project does not need one and I would rather not pretend otherwise.</p>
+                    <p>The controller for this site is Georges Rayess, an individual, contactable at <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. There is no data protection officer, because a one-person project does not need one and I would rather not pretend otherwise.</p>
 
-            <p>Two other parties are controllers in their own right for the parts they handle: the merchant of record that sells the paid licences, and Google, for the analytics and advertising services described below. Each is named in the section that covers it.</p>
+                    <p>Two other parties are controllers in their own right for the parts they handle: the merchant of record that sells the paid licences, and Google, for the analytics and advertising services described below. Each is named in the section that covers it.</p>
+                </section>
 
-            <h2>2. What is stored in your browser</h2>
+                <section id="browser-storage">
+                    <h2>2. What is stored in your browser</h2>
 
-            <p>The timer keeps a small amount of information in your browser's <strong>local storage</strong>, under keys that all begin with <code>hmb.</code> This is storage on your own machine. It is not a cookie, it is not sent with your requests, and I cannot read it.</p>
+                    <p>The timer keeps a small amount of information in your browser's <strong>local storage</strong>, under keys that all begin with <code>hmb.</code> This is storage on your own machine. It is not a cookie, it is not sent with your requests, and I cannot read it.</p>
 
-            <div class="table-scroll">
-                <table class="data-table">
-                    <caption class="sr-only">What Help Me Breathe stores in your browser</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">What</th>
-                            <th scope="col">Why it exists</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row">Settings</th>
-                            <td>Your chosen technique, session length, sound and vibration toggles, so the timer opens the way you left it.</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Session history</th>
-                            <td>A short list of finished sessions — date, technique, seconds, breath count, whether you finished. Capped at the most recent 500. It powers the streak view and the CSV export.</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Licence token</th>
-                            <td>If you buy a licence, the signed token that unlocks the paid features. It carries a tier, an expiry, a short hash of your key, the number of devices the licence has been activated on and, for a white-label embed, the domains it is licensed for — never the key itself.</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Consent choice</th>
-                            <td>Whether you chose "Accept all" or "Essential only" in the cookie banner, so you are not asked on every page.</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Saved presets</th>
-                            <td>Custom breathing patterns you build and name yourself, in the Pro pattern builder.</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Small flags</th>
-                            <td>Whether you have acknowledged a safety note, whether night mode is on, and whether a prompt has already been shown once.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                    <div class="table-scroll">
+                        <table class="data-table">
+                            <caption class="sr-only">What Help Me Breathe stores in your browser</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">What</th>
+                                    <th scope="col">Why it exists</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">Settings</th>
+                                    <td>Your chosen technique, session length, sound and vibration toggles, so the timer opens the way you left it.</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Session history</th>
+                                    <td>A short list of finished sessions — date, technique, seconds, breath count, whether you finished. Capped at the most recent 500. It powers the streak view and the CSV export.</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Licence token</th>
+                                    <td>If you buy a licence, the signed token that unlocks the paid features. It carries a tier, an expiry, a short hash of your key, the number of devices the licence has been activated on and, for a white-label embed, the domains it is licensed for — never the key itself.</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Consent choice</th>
+                                    <td>Whether you chose "Accept all" or "Essential only" in the cookie banner, so you are not asked on every page.</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Saved presets</th>
+                                    <td>Custom breathing patterns you build and name yourself, in the Pro pattern builder.</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Small flags</th>
+                                    <td>Whether you have acknowledged a safety note, whether night mode is on, and whether a prompt has already been shown once.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-            <p>All of it is written and read by code running on your device, and all of it stays there. <strong>None of it is transmitted to me, to Google, or to anyone else.</strong> You can wipe every bit of it by clearing site data for this domain in your browser, and the site will work exactly the same afterwards — it will simply have forgotten your preferences.</p>
+                    <p>All of it is written and read by code running on your device, and all of it stays there. <strong>None of it is transmitted to me, to Google, or to anyone else.</strong> You can wipe every bit of it by clearing site data for this domain in your browser, and the site will work exactly the same afterwards — it will simply have forgotten your preferences.</p>
 
-            <p>If your browser blocks storage — a private window, a locked-down profile, a full quota — the timer keeps the same values in memory for that page's lifetime instead, and forgets them on reload. Nothing breaks.</p>
+                    <p>If your browser blocks storage — a private window, a locked-down profile, a full quota — the timer keeps the same values in memory for that page's lifetime instead, and forgets them on reload. Nothing breaks.</p>
+                </section>
 
-            <h2>3. What leaves your device, and when</h2>
+                <section id="what-leaves">
+                    <h2>3. What leaves your device, and when</h2>
 
-            <h3>3.1 Loading a page</h3>
+                    <h3>3.1 Loading a page</h3>
 
-            <p>Like every website, asking for a page means your browser sends a request. The host that serves this site receives your IP address, the page requested, your user-agent string and the referring page, and keeps short-lived operational logs for security and troubleshooting. This is ordinary web hosting, not a profile of you.</p>
+                    <p>Like every website, asking for a page means your browser sends a request. The host that serves this site receives your IP address, the page requested, your user-agent string and the referring page, and keeps short-lived operational logs for security and troubleshooting. This is ordinary web hosting, not a profile of you.</p>
 
-            <p>Pages on this site also load the Quicksand typeface from Google Fonts. That request reveals your IP address to Google. The embedded widget and the co-branded client session links deliberately do not, as explained in section 4.</p>
+                    <p>Pages on this site also load the Newsreader and IBM Plex Sans typefaces from Google Fonts. That request reveals your IP address to Google. The embedded widget and the co-branded client session links deliberately do not, as explained in section 4.</p>
 
-            <h3>3.2 Analytics — Google Analytics 4 with Consent Mode</h3>
+                    <h3>3.2 Analytics — Google Analytics 4 with Consent Mode</h3>
 
-            <p>I use Google Analytics 4 to see which pages help people and which do not. It runs with <strong>Google Consent Mode v2, and every consent signal starts at "denied"</strong> — analytics storage, advertising storage, advertising user data and advertising personalisation are all refused before any Google script has a chance to run.</p>
+                    <p>I use Google Analytics 4 to see which pages help people and which do not. It runs with <strong>Google Consent Mode v2, and every consent signal starts at "denied"</strong> — analytics storage, advertising storage, advertising user data and advertising personalisation are all refused before any Google script has a chance to run.</p>
 
-            <p>If you choose <strong>"Essential only"</strong> in the cookie banner, or ignore it, they stay denied. No analytics cookie is written. If you choose <strong>"Accept all"</strong>, analytics is enabled and Google Analytics records page views, the technique you selected, whether a session started or completed, and similar interaction events. IP anonymisation is on. Events never carry an email address, a licence key or anything you typed.</p>
+                    <p>If you choose <strong>"Essential only"</strong> in the cookie banner, or ignore it, they stay denied. No analytics cookie is written. If you choose <strong>"Accept all"</strong>, analytics is enabled and Google Analytics records page views, the technique you selected, whether a session started or completed, and similar interaction events. IP anonymisation is on. Events never carry an email address, a licence key or anything you typed.</p>
 
-            <p>Google puts it this way: <q>Your web browser automatically sends certain information to Google. This includes the URL of the page you're visiting and your IP address.</q> Those sentences are from <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">Google's page on how it uses information from sites that use its services</a>. You can change your decision at any time by clearing this site's storage, which brings the banner back.</p>
+                    <p>Google puts it this way: <q>Your web browser automatically sends certain information to Google. This includes the URL of the page you're visiting and your IP address.</q> Those sentences are from <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">Google's page on how it uses information from sites that use its services</a>. You can change your decision at any time by clearing this site's storage, which brings the banner back.</p>
 
-            <h3>3.3 Advertising — Google AdSense on content pages only</h3>
+                    <h3>3.3 Advertising — Google AdSense on content pages only</h3>
 
-            <p>Some of the free written guides carry advertising from Google AdSense. This pays for the hosting. The rules I hold myself to are narrow and worth stating:</p>
+                    <p>Some of the free written guides carry advertising from Google AdSense. This pays for the hosting. The rules I hold myself to are narrow and worth stating:</p>
 
-            <ul>
-                <li>Ads appear on <strong>content and comparison pages only</strong>, below the fold. Never inside the breathing viewport.</li>
-                <li>There are <strong>no ads at all</strong> on the anxiety and panic-attack pages, on the product pages, on the embedded widget, or on this page.</li>
-                <li>Ads are hidden while a breathing session is running.</li>
-                <li><strong>Anyone with a Pro, Practitioner or Studio licence sees no advertising anywhere on the site.</strong> The ad loader checks your licence before it loads, and stops if you have one.</li>
-                <li>If you did not accept advertising cookies, the loader requests <strong>non-personalised ads</strong> instead.</li>
-            </ul>
+                    <ul>
+                        <li>Ads appear on <strong>content and comparison pages only</strong>, below the fold. Never inside the breathing viewport.</li>
+                        <li>There are <strong>no ads at all</strong> on the anxiety and panic-attack pages, on the product pages, on the embedded widget, or on this page.</li>
+                        <li>Ads are hidden while a breathing session is running.</li>
+                        <li><strong>Anyone with a Pro, Practitioner or Studio licence sees no advertising anywhere on the site.</strong> The ad loader checks your licence before it loads, and stops if you have one.</li>
+                        <li>If you did not accept advertising cookies, the loader requests <strong>non-personalised ads</strong> instead.</li>
+                    </ul>
 
-            <p>Google's own explanation is that <q>Cookies help to make advertising more effective.</q> You do not have to accept that trade. <strong>To opt out of personalised advertising across Google's products</strong>, use <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">Google's advertising page</a>, which states that <q>You can use ad settings to manage the Google ads you see and turn off personalized ads.</q> The settings hub itself is at <a href="https://myadcenter.google.com/" target="_blank" rel="noopener noreferrer">myadcenter.google.com</a>, and the choice you make there follows you across sites, not just this one. Declining advertising cookies in our banner, or holding any paid licence, also works.</p>
+                    <p>Google's own explanation is that <q>Cookies help to make advertising more effective.</q> You do not have to accept that trade. <strong>To opt out of personalised advertising across Google's products</strong>, use <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">Google's advertising page</a>, which states that <q>You can use ad settings to manage the Google ads you see and turn off personalized ads.</q> The settings hub itself is at <a href="https://myadcenter.google.com/" target="_blank" rel="noopener noreferrer">myadcenter.google.com</a>, and the choice you make there follows you across sites, not just this one. Declining advertising cookies in our banner, or holding any paid licence, also works.</p>
 
-            <h3>3.4 Buying a licence — the merchant of record</h3>
+                    <h3>3.4 Buying a licence — the merchant of record</h3>
 
-            <p>I do not sell to you directly and I never touch your payment details. Paid licences are sold through a <strong>merchant of record</strong>, which is the legal seller of what you buy. It takes the payment, calculates and remits sales tax and VAT, issues the receipt, and is the <strong>controller of your payment data in its own right</strong>. It then pays me.</p>
+                    <p>I do not sell to you directly and I never touch your payment details. Paid licences are sold through a <strong>merchant of record</strong>, which is the legal seller of what you buy. It takes the payment, calculates and remits sales tax and VAT, issues the receipt, and is the <strong>controller of your payment data in its own right</strong>. It then pays me.</p>
 
-            <p>The provider is <strong>Paddle</strong>. Paddle's privacy notice describes it as <q>an authorised reseller of digital products</q> and lists the financial data it collects from buyers, beginning <q>invoice records, payment records, billing address, payment method</q> and continuing through the cardholder name and the card details themselves. Read it at <a href="https://www.paddle.com/legal/privacy" target="_blank" rel="noopener noreferrer">paddle.com/legal/privacy</a>.</p>
+                    <p>The provider is <strong>Paddle</strong>. Paddle's privacy notice describes it as <q>an authorised reseller of digital products</q> and lists the financial data it collects from buyers, beginning <q>invoice records, payment records, billing address, payment method</q> and continuing through the cardholder name and the card details themselves. Read it at <a href="https://www.paddle.com/legal/privacy" target="_blank" rel="noopener noreferrer">paddle.com/legal/privacy</a>.</p>
 
-            <p><strong>FastSpring</strong> is the alternative provider for the same role, and may be the one that appears at your checkout. FastSpring states that <q>FastSpring is a Joint Controller with the Seller/Reseller when acting as a Merchant of Record for processing financial transactions related to the sale of digital goods and services.</q> Its policy is at <a href="https://www.fastspring.com/privacy/" target="_blank" rel="noopener noreferrer">fastspring.com/privacy</a>.</p>
+                    <p><strong>FastSpring</strong> is the alternative provider for the same role, and may be the one that appears at your checkout. FastSpring states that <q>FastSpring is a Joint Controller with the Seller/Reseller when acting as a Merchant of Record for processing financial transactions related to the sale of digital goods and services.</q> Its policy is at <a href="https://www.fastspring.com/privacy/" target="_blank" rel="noopener noreferrer">fastspring.com/privacy</a>.</p>
 
-            <p>Whichever it is, <strong>the company named as seller on your receipt is the merchant of record for your purchase</strong>, and its privacy notice governs your payment data. What reaches me is limited: an order reference, the licence tier, the email address you used to buy, and the country used for tax. I never receive your card number, and there is nowhere in this project it could be stored.</p>
+                    <p>Whichever it is, <strong>the company named as seller on your receipt is the merchant of record for your purchase</strong>, and its privacy notice governs your payment data. What reaches me is limited: an order reference, the licence tier, the email address you used to buy, and the country used for tax. I never receive your card number, and there is nowhere in this project it could be stored.</p>
 
-            <h3>3.5 Activating a licence</h3>
+                    <h3>3.5 Activating a licence</h3>
 
-            <p>Activation is the one moment a licence key leaves your device. Your browser sends the key to this site's activation endpoint, which checks it against the merchant of record's own records and returns a short signed token for your browser to keep.</p>
+                    <p>Activation is the one moment a licence key leaves your device. Your browser sends the key to this site's activation endpoint, which checks it against the merchant of record's own records and returns a short signed token for your browser to keep.</p>
 
-            <p>Two things matter here. First, <strong>the key is hashed and is never stored in full on the server</strong> — there is no database to store it in. Only the first twelve characters of a one-way hash of the key are used, as an opaque reference inside the token and in error logs. A hash cannot be turned back into a key. Second, <strong>the count of how many devices a licence has been activated on is kept by the payment provider</strong>, on your customer record there, because that is the only ledger this project has. No activation history, no device fingerprint and no IP log of activations is kept by me.</p>
+                    <p>Two things matter here. First, <strong>the key is hashed and is never stored in full on the server</strong> — there is no database to store it in. Only the first twelve characters of a one-way hash of the key are used, as an opaque reference inside the token and in error logs. A hash cannot be turned back into a key. Second, <strong>the count of how many devices a licence has been activated on is kept by the payment provider</strong>, on your customer record there, because that is the only ledger this project has. No activation history, no device fingerprint and no IP log of activations is kept by me.</p>
 
-            <p>A full licence key is never written to a log, never sent to analytics and never included in an error report.</p>
+                    <p>A full licence key is never written to a log, never sent to analytics and never included in an error report.</p>
 
-            <h3>3.6 The email list</h3>
+                    <h3>3.6 The email list</h3>
 
-            <p>You can ask for occasional email — a note when a new technique or guide goes up. It is entirely optional and nothing on the site requires it.</p>
+                    <p>You can ask for occasional email — a note when a new technique or guide goes up. It is entirely optional and nothing on the site requires it.</p>
 
-            <p>It works on <strong>double opt-in</strong>. You enter your address, the provider sends you a confirmation email, and nothing is sent until you click the link in it. If you never click, the address is left unconfirmed and receives nothing. The list is run by <strong>our email service provider</strong>, a third-party mailing platform that stores the address and the confirmation record on my behalf as a processor. Only a twelve-character hash prefix of an address ever appears in this site's own logs.</p>
+                    <p>It works on <strong>double opt-in</strong>. You enter your address, the provider sends you a confirmation email, and nothing is sent until you click the link in it. If you never click, the address is left unconfirmed and receives nothing. The list is run by <strong>our email service provider</strong>, a third-party mailing platform that stores the address and the confirmation record on my behalf as a processor. Only a twelve-character hash prefix of an address ever appears in this site's own logs.</p>
 
-            <p><strong>Every email carries an unsubscribe link</strong>, one click, no questions and no retention email. You can also write to <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and ask to be removed. When you leave, the address is deleted from the list.</p>
+                    <p><strong>Every email carries an unsubscribe link</strong>, one click, no questions and no retention email. You can also write to <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and ask to be removed. When you leave, the address is deleted from the list.</p>
 
-            <h3>3.7 Writing to me</h3>
+                    <h3>3.7 Writing to me</h3>
 
-            <p>If you email me, I have your address and whatever you wrote, for as long as the conversation is useful and my records need to exist. I read that email in Lebanon. Support correspondence is not added to the mailing list.</p>
+                    <p>If you email me, I have your address and whatever you wrote, for as long as the conversation is useful and my records need to exist. I read that email in Lebanon. Support correspondence is not added to the mailing list.</p>
+                </section>
 
-            <h2>4. The embedded widget</h2>
+                <section id="widget">
+                    <h2>4. The embedded widget</h2>
 
-            <p>The breathing widget that other sites embed is deliberately sealed. Inside the frame there are <strong>no cookies, no analytics and no advertising</strong> — no web font, no tracking pixel, no consent script, no measurement of any kind. The frame loads its stylesheet and the timer code from this domain and nothing else, with two narrow exceptions that are worth naming rather than glossing over:</p>
+                    <p>The breathing widget that other sites embed is deliberately sealed. Inside the frame there are <strong>no cookies, no analytics and no advertising</strong> — no web font, no tracking pixel, no consent script, no measurement of any kind. The frame loads its stylesheet and the timer code from this domain and nothing else, with two narrow exceptions that are worth naming rather than glossing over:</p>
 
-            <ul>
-                <li><strong>White-label verification.</strong> If an embed carries a practitioner's licence token, the frame asks this site's own activation endpoint whether that token is valid, so it knows whether to drop the attribution. The request goes to helpmebreath.com, carries the token and nothing about the visitor, and is not recorded against anyone.</li>
-                <li><strong>A practitioner's own logo.</strong> A white-label embed can show the practitioner's logo. If they host that image somewhere other than their own site, the visitor's browser fetches it from that host, which sees the visitor's IP address the way any image on any page does. That is the only outbound request the frame can ever make, the practitioner chooses the address, and it cannot happen on the free embed at all.</li>
-            </ul>
+                    <ul>
+                        <li><strong>White-label verification.</strong> If an embed carries a practitioner's licence token, the frame asks this site's own activation endpoint whether that token is valid, so it knows whether to drop the attribution. The request goes to helpmebreath.com, carries the token and nothing about the visitor, and is not recorded against anyone.</li>
+                        <li><strong>A practitioner's own logo.</strong> A white-label embed can show the practitioner's logo. If they host that image somewhere other than their own site, the visitor's browser fetches it from that host, which sees the visitor's IP address the way any image on any page does. That is the only outbound request the frame can ever make, the practitioner chooses the address, and it cannot happen on the free embed at all.</li>
+                    </ul>
 
-            <p>Beyond those two, a visitor to a site that embeds the timer is not tracked by me in any way.</p>
+                    <p>Beyond those two, a visitor to a site that embeds the timer is not tracked by me in any way.</p>
 
-            <p>The widget may keep a plain <strong>aggregate, cookieless count of how many times it has loaded</strong>, so I know whether the feature is used at all. Such a count records no identifier, no IP address and nothing about any individual visitor, and it cannot be linked back to a person or a session. No per-visitor measurement will ever be added to the frame.</p>
+                    <p>The widget may keep a plain <strong>aggregate, cookieless count of how many times it has loaded</strong>, so I know whether the feature is used at all. Such a count records no identifier, no IP address and nothing about any individual visitor, and it cannot be linked back to a person or a session. No per-visitor measurement will ever be added to the frame.</p>
+                </section>
 
-            <h2>5. Practitioners and their clients</h2>
+                <section id="practitioners">
+                    <h2>5. Practitioners and their clients</h2>
 
-            <p>If you hold a Practitioner or Studio licence and use the timer with your own clients, classes or students, <strong>I process no data about those people</strong>. Their sessions run in their own browsers and stay there. There is no client record, no attendance log, no completion report and no database in which such a thing could exist.</p>
+                    <p>If you hold a Practitioner or Studio licence and use the timer with your own clients, classes or students, <strong>I process no data about those people</strong>. Their sessions run in their own browsers and stay there. There is no client record, no attendance log, no completion report and no database in which such a thing could exist.</p>
 
-            <p>That means <strong>you are the controller of your own client relationship</strong> and of anything you choose to record about it. I am not a processor of your client data, because I never receive it. What I do hold for you is narrow licence administration: your email address, your order reference, your activation count and your licensed domains. A signable <a href="/compliance/dpa">data processing addendum</a>, a dated <a href="/compliance/privacy-attestation">privacy attestation</a> and a <a href="/compliance/security-overview">security overview</a> covering all of this are published in the compliance pack.</p>
+                    <p>That means <strong>you are the controller of your own client relationship</strong> and of anything you choose to record about it. I am not a processor of your client data, because I never receive it. What I do hold for you is narrow licence administration: your email address, your order reference, your activation count and your licensed domains. A signable <a href="/compliance/dpa">data processing addendum</a>, a dated <a href="/compliance/privacy-attestation">privacy attestation</a> and a <a href="/compliance/security-overview">security overview</a> covering all of this are published in the compliance pack.</p>
+                </section>
 
-            <h2>6. Cookies and similar technologies</h2>
+                <section id="cookies">
+                    <h2>6. Cookies and similar technologies</h2>
 
-            <p>This site sets <strong>no cookies of its own</strong>. Your preferences live in local storage, described in section 2, which is not a cookie and is not transmitted.</p>
+                    <p>This site sets <strong>no cookies of its own</strong>. Your preferences live in local storage, described in section 2, which is not a cookie and is not transmitted.</p>
 
-            <p>Two third parties may set cookies, and only after you choose "Accept all":</p>
+                    <p>Two third parties may set cookies, and only after you choose "Accept all":</p>
 
-            <ul>
-                <li><strong>Google Analytics</strong> — measurement cookies, to count visits and see which pages are read.</li>
-                <li><strong>Google AdSense</strong> — advertising cookies, on content pages only, to serve and cap ads. If you declined, non-personalised ads are requested instead.</li>
-            </ul>
+                    <ul>
+                        <li><strong>Google Analytics</strong> — measurement cookies, to count visits and see which pages are read.</li>
+                        <li><strong>Google AdSense</strong> — advertising cookies, on content pages only, to serve and cap ads. If you declined, non-personalised ads are requested instead.</li>
+                    </ul>
 
-            <p>Choosing "Essential only" means neither is set, and the timer behaves identically. Nothing on this site is degraded, delayed or nagged because you declined.</p>
+                    <p>Choosing "Essential only" means neither is set, and the timer behaves identically. Nothing on this site is degraded, delayed or nagged because you declined.</p>
+                </section>
 
-            <h2>7. Affiliate links</h2>
+                <section id="affiliates">
+                    <h2>7. Affiliate links</h2>
 
-            <p>A small number of pages link to products I think are genuinely worth the money — currently <strong>Headspace</strong> and <strong>moonbird</strong>. Those are <strong>affiliate links</strong>, marked as sponsored, and if you buy after clicking one <strong>I may earn a commission at no extra cost to you</strong>. Clicking such a link takes you to that company's own site, where its own privacy policy and its own cookies apply, and it may set a cookie to attribute the sale. Nothing about you is sent to them by me. If you do not click, no data is shared. The recommendation on those pages is never for sale — the comparison page still concludes that the free option is enough for most people.</p>
+                    <p>A small number of pages link to products I think are genuinely worth the money — currently <strong>Headspace</strong> and <strong>moonbird</strong>. Those are <strong>affiliate links</strong>, marked as sponsored, and if you buy after clicking one <strong>I may earn a commission at no extra cost to you</strong>. Clicking such a link takes you to that company's own site, where its own privacy policy and its own cookies apply, and it may set a cookie to attribute the sale. Nothing about you is sent to them by me. If you do not click, no data is shared. The recommendation on those pages is never for sale — the comparison page still concludes that the free option is enough for most people.</p>
+                </section>
 
-            <h2>8. Legal bases for processing</h2>
+                <section id="legal-bases">
+                    <h2>8. Legal bases for processing</h2>
 
-            <p>For readers in the European Economic Area and the United Kingdom, the bases I rely on are:</p>
+                    <p>For readers in the European Economic Area and the United Kingdom, the bases I rely on are:</p>
 
-            <ul>
-                <li><strong>Consent</strong> — analytics cookies, advertising cookies and the email list. Withdrawable at any time, and withdrawing is as easy as giving it.</li>
-                <li><strong>Performance of a contract</strong> — selling you a licence, activating it and supporting it.</li>
-                <li><strong>Legitimate interests</strong> — keeping the site up, preventing abuse of the activation endpoint, and answering your email. These interests are weighed against your rights and are limited to what a small site actually needs.</li>
-                <li><strong>Legal obligation</strong> — tax and accounting records, which the merchant of record largely holds.</li>
-            </ul>
+                    <ul>
+                        <li><strong>Consent</strong> — analytics cookies, advertising cookies and the email list. Withdrawable at any time, and withdrawing is as easy as giving it.</li>
+                        <li><strong>Performance of a contract</strong> — selling you a licence, activating it and supporting it.</li>
+                        <li><strong>Legitimate interests</strong> — keeping the site up, preventing abuse of the activation endpoint, and answering your email. These interests are weighed against your rights and are limited to what a small site actually needs.</li>
+                        <li><strong>Legal obligation</strong> — tax and accounting records, which the merchant of record largely holds.</li>
+                    </ul>
+                </section>
 
-            <h2>9. How long things are kept</h2>
+                <section id="retention">
+                    <h2>9. How long things are kept</h2>
 
-            <p>Browser storage lives on your device until you clear it; nothing expires it on a schedule except the licence token, which is refreshed periodically. Server logs are short-lived and operational. Mailing list entries are kept until you unsubscribe. Purchase and tax records are kept by the merchant of record for as long as its own law requires. Email correspondence is kept while it is useful and then deleted.</p>
+                    <p>Browser storage lives on your device until you clear it; nothing expires it on a schedule except the licence token, which is refreshed periodically. Server logs are short-lived and operational. Mailing list entries are kept until you unsubscribe. Purchase and tax records are kept by the merchant of record for as long as its own law requires. Email correspondence is kept while it is useful and then deleted.</p>
+                </section>
 
-            <h2>10. Your rights, and how to use them</h2>
+                <section id="rights">
+                    <h2>10. Your rights, and how to use them</h2>
 
-            <p>Depending on where you live, you may have the right to access the personal data held about you, to correct it, to delete it, to restrict or object to its processing, to receive it in a portable form, and to withdraw consent. Under the <strong>GDPR</strong> and the <strong>UK GDPR</strong> those rights are yours as a matter of law.</p>
+                    <p>Depending on where you live, you may have the right to access the personal data held about you, to correct it, to delete it, to restrict or object to its processing, to receive it in a portable form, and to withdraw consent. Under the <strong>GDPR</strong> and the <strong>UK GDPR</strong> those rights are yours as a matter of law.</p>
 
-            <p>Under the <strong>California Consumer Privacy Act</strong>, as amended by the CPRA, California residents may also ask what personal information is collected, ask for it to be deleted or corrected, and opt out of sale or sharing. <strong>I do not sell personal information and I do not share it for cross-context behavioural advertising</strong>, so there is nothing to opt out of there. You will never be treated differently for exercising a right.</p>
+                    <p>Under the <strong>California Consumer Privacy Act</strong>, as amended by the CPRA, California residents may also ask what personal information is collected, ask for it to be deleted or corrected, and opt out of sale or sharing. <strong>I do not sell personal information and I do not share it for cross-context behavioural advertising</strong>, so there is nothing to opt out of there. You will never be treated differently for exercising a right.</p>
 
-            <p><strong>How to exercise any of them: email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a></strong> and say what you want. There is no form and no portal. I will answer within thirty days, and sooner if it is simple. Because there is no account, I may need you to write from the address you used, or quote the order reference on your receipt, so I can be sure I am answering the right person. For anything touching a payment, ask the merchant of record on your receipt as well — it holds the payment record, not me. If you are unhappy with my answer, you may complain to your national data protection authority.</p>
+                    <p><strong>How to exercise any of them: email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a></strong> and say what you want. There is no form and no portal. I will answer within thirty days, and sooner if it is simple. Because there is no account, I may need you to write from the address you used, or quote the order reference on your receipt, so I can be sure I am answering the right person. For anything touching a payment, ask the merchant of record on your receipt as well — it holds the payment record, not me. If you are unhappy with my answer, you may complain to your national data protection authority.</p>
 
-            <p>One honest limitation: most of what this site holds about you is not held by me at all. It is in your browser, where you can read it and delete it yourself in seconds.</p>
+                    <p>One honest limitation: most of what this site holds about you is not held by me at all. It is in your browser, where you can read it and delete it yourself in seconds.</p>
+                </section>
 
-            <h2>11. Children</h2>
+                <section id="children">
+                    <h2>11. Children</h2>
 
-            <p>This site is not directed at children under 13, and I do not knowingly collect personal information from them. The timer itself needs no personal information from anyone. If you believe a child has sent me an email address or bought a licence, write to <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and I will delete it.</p>
+                    <p>This site is not directed at children under 13, and I do not knowingly collect personal information from them. The timer itself needs no personal information from anyone. If you believe a child has sent me an email address or bought a licence, write to <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and I will delete it.</p>
+                </section>
 
-            <h2>12. International transfers</h2>
+                <section id="transfers">
+                    <h2>12. International transfers</h2>
 
-            <p>This is a small site with a global audience, so data crosses borders. Pages are served from a content delivery network with locations worldwide. The merchant of record, the mailing platform and Google each operate their own international infrastructure and their own transfer safeguards, described in their own policies. The narrow set of licence administration data reaches <strong>Lebanon</strong>, because that is where I read email; Lebanon has not been the subject of a European Commission adequacy decision. Where you are in the EEA, the UK or Switzerland and need a transfer mechanism for that, ask before you buy and I will sign the European Commission's Standard Contractual Clauses and the UK International Data Transfer Addendum. I will not claim to have safeguards in place that have not actually been signed.</p>
+                    <p>This is a small site with a global audience, so data crosses borders. Pages are served from a content delivery network with locations worldwide. The merchant of record, the mailing platform and Google each operate their own international infrastructure and their own transfer safeguards, described in their own policies. The narrow set of licence administration data reaches <strong>Lebanon</strong>, because that is where I read email; Lebanon has not been the subject of a European Commission adequacy decision. Where you are in the EEA, the UK or Switzerland and need a transfer mechanism for that, ask before you buy and I will sign the European Commission's Standard Contractual Clauses and the UK International Data Transfer Addendum. I will not claim to have safeguards in place that have not actually been signed.</p>
+                </section>
 
-            <h2>13. Security</h2>
+                <section id="security">
+                    <h2>13. Security</h2>
 
-            <p>The site is served over HTTPS. Secrets live in server environment variables, never in the code and never in a browser. Licence keys are hashed, email addresses are logged only as a short hash prefix, and no payment data reaches this project at all. The strongest protection here is structural rather than technical: there is no database, so there is no database to breach. No system is perfectly secure, and I will not promise that it is.</p>
+                    <p>The site is served over HTTPS. Secrets live in server environment variables, never in the code and never in a browser. Licence keys are hashed, email addresses are logged only as a short hash prefix, and no payment data reaches this project at all. The strongest protection here is structural rather than technical: there is no database, so there is no database to breach. No system is perfectly secure, and I will not promise that it is.</p>
+                </section>
 
-            <h2>14. Changes to this policy</h2>
+                <section id="changes">
+                    <h2>14. Changes to this policy</h2>
 
-            <p>I will update this page when the facts change — a new provider, a new feature, a different ad partner. The date at the top always says when it last changed. If a change is material, I will say so clearly on the page rather than quietly editing a sentence. Continuing to use the site after a change means the updated policy applies.</p>
+                    <p>I will update this page when the facts change — a new provider, a new feature, a different ad partner. The date at the top always says when it last changed. If a change is material, I will say so clearly on the page rather than quietly editing a sentence. Continuing to use the site after a change means the updated policy applies.</p>
+                </section>
 
-            <h2>15. Contact</h2>
+                <section id="contact">
+                    <h2>15. Contact</h2>
 
-            <p>Questions, requests and corrections: <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. This site is <a href="https://helpmebreath.com/">helpmebreath.com</a>, published by Georges Rayess, an individual.</p>
+                    <p>Questions, requests and corrections: <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. This site is <a href="https://helpmebreath.com/">helpmebreath.com</a>, published by Georges Rayess, an individual.</p>
 
-            <p class="legal-nav">See also: <a href="/legal/terms-of-service">Terms of Service</a> · <a href="/legal/medical-disclaimer">Medical Disclaimer</a> · <a href="/about">About this site</a></p>
+                    <p class="legal-nav">See also: <a href="/legal/terms-of-service">Terms of Service</a> &middot; <a href="/legal/medical-disclaimer">Medical Disclaimer</a> &middot; <a href="/about">About this site</a></p>
+                </section>
+            </article>
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About and products">
-                <a href="/science">What the research says</a>
-                <a href="/about">About</a>
-                <a href="/pro">Pro</a>
-                <a href="/for-practitioners">For practitioners</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">&bull;</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">&bull;</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>
@@ -527,5 +455,6 @@
 
     <script type="module" src="/js/consent.js"></script>
     <script type="module" src="/js/app.js"></script>
+    <script type="module" src="/js/pro/index.js"></script>
 </body>
 </html>

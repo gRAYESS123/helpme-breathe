@@ -1,13 +1,14 @@
 # Page Contract — Help Me Breathe
 
-Copy-paste blocks for building a page. Everything here is exact: paste it, then
-change only what the notes tell you to change.
+Copy-paste blocks for building or converting a page to the **Paper and Ink**
+identity (owner decision, 2026-09-10). Everything here is exact: paste it, then
+change only what the notes tell you to change. `docs/BRAND.md` says why.
 
-A faster start: copy `templates/technique-page.template.html`, delete its
-`<meta name="robots" content="noindex, nofollow">` line, and replace the
-`{{PLACEHOLDERS}}`. Placeholders in that file are `{{TITLE}}`, `{{DESCRIPTION}}`,
-`{{SLUG}}`, `{{H1}}`, `{{SUBTITLE}}`, `{{BREADCRUMB_NAME}}`, `{{THEME}}`,
-`{{CIRCLE_CLASS}}`, `{{TECHNIQUE}}`, `{{DURATION}}`, `{{OG_IMAGE}}`,
+A faster start for a new page: copy `templates/technique-page.template.html`,
+delete its `<meta name="robots" content="noindex, nofollow">` line, and replace
+the `{{PLACEHOLDERS}}`: `{{TITLE}}`, `{{DESCRIPTION}}`, `{{SLUG}}`, `{{H1}}`,
+`{{SUBTITLE}}`, `{{BREADCRUMB_NAME}}`, `{{THEME}}`, `{{CIRCLE_CLASS}}`,
+`{{TECHNIQUE}}`, `{{DURATION}}`, `{{OG_IMAGE}}`, `{{PUBLISHED}}`, `{{UPDATED}}`,
 `{{PROSE}}`, `{{JSONLD}}`.
 
 Rules that are not negotiable:
@@ -20,15 +21,73 @@ Rules that are not negotiable:
   `/breathing-exercises-anxiety`, `/breathing-exercises-for-panic-attacks`,
   `/pro`, `/pro/thanks`, `/for-practitioners` or `/embed`.
 - Never put "Wim Hof" in a title, H1, meta description or slug.
+- **No emoji. Anywhere. In any file.** Not in nav labels, not in card titles,
+  not in a favicon data URI, not in a footer.
+- No gradient, no `backdrop-filter`, no glow `box-shadow`, no `text-shadow`,
+  no Quicksand, no Patreon brand red.
+
+---
+
+## 0. Conversion recipe — turning an old page into a Paper and Ink page
+
+Work top to bottom. Everything in **DELETE** is gone from the design system, so
+leaving it in produces unstyled markup, not a fallback.
+
+### DELETE
+
+| Delete | Where it usually is |
+|---|---|
+| The Quicksand `<link rel="preload">` **and** its `<noscript>` twin | head |
+| The emoji favicon: the `<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,...">` whose data URI contains an SVG `<text>` glyph | head |
+| `<meta name="theme-color" content="#8b5cf6">` | head |
+| `<div class="nature-bg"></div>` | first child of `<body>` |
+| Every `<div class="natural-element …">` (stars, leaves, ripples, clouds, sun-rays) | after `nature-bg` |
+| `<div class="breathing-aura"></div>` | inside `.breathing-container` |
+| `<div class="breathing-particles">` and its six `<span class="particle-float">` | inside `.breathing-container` |
+| The `<svg class="breathing-svg-filter">` block containing `<filter id="fluid-effect">` | inside `.breathing-container` (index only) |
+| `class="patreon-btn"` | support links |
+| Every emoji in a technique name, nav label, card title, switcher link or footer | everywhere |
+
+### ADD / REPLACE
+
+1. **Head** — replace the favicon, theme-color and font blocks with §1 below.
+2. **Site header** — paste §2 immediately after the skip link, before
+   `<div class="container">`. It goes on **every** page, timer or not.
+3. **Article header** — if the page has a breadcrumb + `h1`, rewrap it as §3.
+4. **Timer section** — if the page has a timer, replace the whole
+   `.breathing-section` with §4. The changes inside it are: the `.app-bar`
+   wrapper around the `h2` + settings button, an SVG gear instead of the emoji,
+   the caliper/pacer `<svg>`, the `.circle-notch`, and `.circle-text-container`
+   moved **out of** `.breathing-circle` and given a `[data-role="phase-count"]`.
+5. **Technique switcher** — §5, plain text labels.
+6. **Prose** — unchanged markup; use the callout/crisis/citation blocks in §7
+   where the page has warnings or sources.
+7. **Footer** — replace the three `<nav class="footer-nav">` blocks with the
+   four-column block in §8, plus the byline and legal row.
+8. **Support links** — replace `class="patreon-btn"` with a plain link inside
+   `.support-options` (§9).
+
+### CHECK
+
+Run these from the repo root and drive both to zero for the file you changed:
+
+```
+grep -nE "Quicksand|linear-gradient|radial-gradient|conic-gradient|backdrop-filter|text-shadow|blur\(|nature-bg|natural-element|breathing-particles|particle-float|breathing-aura|breathing-svg-filter|fluid-effect|patreon-btn|#8b5cf6|#1e1b4b|#f96854" <file>
+
+python -c "import re,sys; pat=re.compile('[\U0001F300-\U0001FAFF\u2600-\u27BF\U0001F900-\U0001F9FF\uFE0F]'); [print(f, len(pat.findall(open(f,encoding='utf-8').read()))) for f in sys.argv[1:]]" <file>
+```
+
+Then `node tools/site-check.mjs` and fix every ERROR naming your file.
 
 ---
 
 ## 1. The `<head>` block
 
-Replace the five `{{…}}` values. Everything else is verbatim, **including the
-order of the consent script** — the denied defaults must be pushed before
+Replace the `{{…}}` values. Everything else is verbatim, **including the order
+of the consent script** — the denied defaults must be pushed before
 `gtag('config', …)`, and ES modules are deferred, so this cannot move into
-`js/consent.js`.
+`js/consent.js`. The dark `theme-color` must come **first**: the first matching
+one wins.
 
 ```html
 <!DOCTYPE html>
@@ -59,13 +118,16 @@ order of the consent script** — the denied defaults must be pushed before
     <meta name="twitter:description" content="{{DESCRIPTION}}">
     <meta name="twitter:image" content="https://helpmebreath.com/images/og/{{OG_IMAGE}}">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -73,8 +135,8 @@ order of the consent script** — the denied defaults must be pushed before
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -95,11 +157,9 @@ order of the consent script** — the denied defaults must be pushed before
     </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
 
-    <!-- JSON-LD blocks go here. See section 6. -->
+    <!-- JSON-LD blocks go here. See section 10. -->
 </head>
 ```
-
-Rules for the values:
 
 | Value | Rule |
 |---|---|
@@ -108,51 +168,42 @@ Rules for the values:
 | `{{SLUG}}` | No leading slash, no `.html`. Legal pages use `legal/<name>`. |
 | `{{OG_IMAGE}}` | `<slug>.jpg`. If `images/og/<slug>.jpg` does not exist, file an `og-image` integration request and point at `/images/og-breathing-timer.jpg` meanwhile. |
 
-Do **not** paste an AdSense loader tag. `js/ads.js` injects it, only when it is allowed.
+Do **not** paste an AdSense loader tag. `js/ads.js` injects it, only when it is
+allowed.
 
-## 2. `<body>` and the page frame
+## 2. `<body>`, the site header and the page frame
 
 ```html
 <body class="theme-box article-page technique-page">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element leaf leaf-3"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element ripple ripple-3"></div>
-    <div class="natural-element cloud cloud-1"></div>
-    <div class="natural-element sun-ray sun-ray-1"></div>
-    <div class="natural-element sun-ray sun-ray-2"></div>
-    <div class="natural-element sun-ray sun-ray-3"></div>
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
-            <nav aria-label="Breadcrumb">
-                <ol class="breadcrumb">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/timer">Breathing timers</a></li>
-                    <li>Box breathing</li>
-                </ol>
-            </nav>
-            <div class="header-content">
-                <h1>Box Breathing Timer</h1>
-                <p class="subtitle">One sentence saying what the page gives you.</p>
-            </div>
-        </header>
+        <header class="article-header"><!-- section 3 --></header>
 
         <main id="main">
             <!-- timer section, switcher, prose, ad slot -->
         </main>
 
-        <footer class="footer"><!-- section 7 --></footer>
+        <footer class="footer"><!-- section 8 --></footer>
     </div>
 
     <div class="keyboard-hint" data-role="keyboard-hint">
@@ -168,26 +219,64 @@ Do **not** paste an AdSense loader tag. `js/ads.js` injects it, only when it is 
 </html>
 ```
 
-Body classes:
+Notes:
 
-- `theme-*` — the technique's theme (`js/techniques.js` → `technique.theme`).
-  The engine re-applies it on load; setting it statically only avoids a flash.
-- `article-page` — turns on the prose typography system.
-- `technique-page` — timer on top, prose below, single column.
-- Crisis-safe pages must also carry `data-no-ads="true" data-no-asks="true"` on
-  `<body>`.
+- Add `aria-current="page"` to **one** `.site-nav` link, the one whose section
+  this page belongs to. Do not remove the link — the header is identical
+  everywhere.
+- **`/guides` does not exist yet.** `node tools/site-check.mjs` will report it
+  as a `broken-link` ERROR on your page. That is expected and it is not yours to
+  fix: the Integrate agent adds a `/guides` rewrite to `vercel.json`, and a
+  content agent later builds the real hub. Do not drop the link, do not point it
+  somewhere else, and do not create `guides.html` yourself. The same is true of
+  `/extended-exhale-breathing` in the footer and the switcher.
+- The `Menu` button needs no page script. `js/app.js` wires
+  `[data-action="toggle-nav"]` once per page, and every page already loads it.
+- The **Pro link is not accent-coloured.** It is a nav item like the others.
+- Body classes: `theme-*` (the technique's theme from `js/techniques.js`),
+  `article-page` (prose typography), `technique-page` (timer on top, prose
+  below). Crisis-safe pages also carry
+  `data-no-ads="true" data-no-asks="true"` on `<body>`.
+- The cookie banner is **not** page markup. `js/consent.js` injects it, with
+  "Essential only" listed first.
 
-The cookie banner is **not** page markup. `js/consent.js` injects it.
+## 3. The article header block
 
-## 3. The timer section — exact snippet
+Breadcrumb eyebrow, `h1`, lead, then a hairline-ruled strip: author name and
+role on the left, dates in tabular figures on the right.
+
+```html
+<header class="article-header">
+    <nav aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+            <li><a href="/">Home</a></li>
+            <li><a href="/timer">Breathing timers</a></li>
+            <li>Box breathing</li>
+        </ol>
+    </nav>
+    <h1>Box Breathing Timer</h1>
+    <p class="lead">One sentence saying what the page gives you.</p>
+    <div class="article-meta">
+        <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+        <p class="article-dates">Published 2026-09-10 &middot; Updated 2026-09-10</p>
+    </div>
+</header>
+```
+
+**The site has no medical reviewer. Never invent one.** If a page has not been
+reviewed by anyone, it says Published and Updated and nothing else. Writing
+"Reviewed by …" for a review that did not happen is a fabricated credential.
+
+On a page with no author strip (a legal page, `/embed`), drop `.article-meta`
+and keep the breadcrumb, `h1` and lead.
+
+## 4. The timer section — exact snippet
 
 Paste this inside `<main>`. It carries every `data-role` the engine knows and
-both slots. Change only the four marked spots.
-
-The four spots to change: `data-technique` (the technique key), `data-duration`
-(default seconds for a first-time visitor; `-1` = unlimited), `data-lock-technique`
-(delete it on a hub page that lets people switch), and the circle's technique
-class. HTML comments never go inside a tag, so they are not shown inline below.
+both slots. Change only the four marked spots: `data-technique`,
+`data-duration` (default seconds for a first-time visitor; `-1` = unlimited),
+`data-lock-technique` (delete it on a hub page that lets people switch), and the
+circle's `technique-*` class.
 
 ```html
 <section class="breathing-section"
@@ -197,7 +286,15 @@ class. HTML comments never go inside a tag, so they are not shown inline below.
          data-lock-technique
          aria-labelledby="timer-heading">
 
-    <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">⚙️</button>
+    <div class="app-bar">
+        <h2 id="timer-heading" data-role="technique-title">Box breathing</h2>
+        <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="3.2"/>
+                <path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
+            </svg>
+        </button>
+    </div>
 
     <div class="settings-panel" data-role="settings-panel">
         <div class="setting-item">
@@ -221,22 +318,18 @@ class. HTML comments never go inside a tag, so they are not shown inline below.
         </div>
     </div>
 
-    <h2 id="timer-heading" data-role="technique-title">Box breathing</h2>
-
     <div class="breathing-container">
-        <div class="breathing-aura"></div>
+        <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+            <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
+            <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
+            <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+        </svg>
         <div class="breathing-circle technique-box" data-role="circle">
-            <div class="circle-text-container">
-                <span data-role="circle-text">Ready</span>
-            </div>
+            <span class="circle-notch" aria-hidden="true"></span>
         </div>
-        <div class="breathing-particles" aria-hidden="true">
-            <span class="particle-float"></span>
-            <span class="particle-float"></span>
-            <span class="particle-float"></span>
-            <span class="particle-float"></span>
-            <span class="particle-float"></span>
-            <span class="particle-float"></span>
+        <div class="circle-text-container">
+            <span class="phase-word" data-role="circle-text">Ready</span>
+            <span class="phase-count" data-role="phase-count"></span>
         </div>
     </div>
 
@@ -298,46 +391,76 @@ class. HTML comments never go inside a tag, so they are not shown inline below.
 </section>
 ```
 
-Notes:
+### What changed from the old snippet, and why
+
+| Change | Reason |
+|---|---|
+| `<h2 data-role="technique-title">` and the settings button are wrapped in `<div class="app-bar">` | The gear sits at the right of the app bar, which reads as the second row of the site header. It stays **inside the app root** because the engine scopes every `[data-role]` lookup to that root, and a comparison page carries two timers. |
+| The settings button contains an inline SVG gear, not the gear emoji | No emoji. |
+| `<svg class="breathing-guides">` added | Two dotted calipers (full inhale / full exhale) plus the reduced-motion pacing ring. |
+| `<span class="circle-notch">` added inside the circle | The mark's gap. CSS closes it on a hold. |
+| `.circle-text-container` moved **out of** `.breathing-circle` | So the phase word does not scale with the circle. Pages that still nest it inside keep working, but move it when you convert. |
+| `[data-role="phase-count"]` added | The engine writes the per-second count into it. Without the span there is no count; nothing else breaks. |
+| `.breathing-aura`, `.breathing-particles`, `#fluid-effect` deleted | Gone from the design system. |
+
+### Still true
 
 - **Both slots are required** on every page with a timer, even if nothing fills
   them today. `[data-slot]:empty` is `display: none`, so they cost nothing.
 - The **safety-ack panel is required** too. The engine only shows it for
-  techniques with `requiresSafetyAck` (today: `wim`), and fills
+  techniques with `requiresSafetyAck` (today: `wim`) and fills
   `[data-role="safety-ack-body"]` from that technique's contraindications.
 - `[data-role="technique-info"]` is filled from the technique. Add `data-static`
   to it if you want to write that copy yourself.
 - **App root.** `data-breathing-app` must sit on an element containing the whole
   timer UI. If your page has technique buttons **outside** the
   `.breathing-section`, move `data-breathing-app` up to the common ancestor (see
-  `index.html`, where it is on `<main>`).
+  `index.html`, where it is on `<main>`). The engine also writes `data-phase`
+  and `--phase-duration` onto that element.
 - **Two timers on one page** (comparison pages): duplicate the section, give each
   a different `data-technique`, wrap them in `<div class="timer-pair">`, and
-  **suffix every `id`** (`label-sound-a` / `label-sound-b`,
-  `session-duration-a` / `session-duration-b`, and the matching `for`/
-  `aria-labelledby`). `data-role` values stay the same — they are scoped per root.
+  **suffix every `id`** (`timer-heading-a`, `label-sound-a`,
+  `session-duration-a`, …, and the matching `for` / `aria-labelledby`).
+  `data-role` values stay the same — they are scoped per root.
 - **Kiosk mode** (`data-kiosk`) requires `data-breathing-app` on the
   `.breathing-section` itself.
 
-## 4. Technique switcher
+### Technique pills
+
+Plain text labels, one per technique. Each pill wears its own technique's
+accent dot automatically from `data-technique`; you add no colour.
+
+```html
+<div class="technique-buttons" data-role="technique-buttons" role="group" aria-labelledby="technique-picker-heading">
+    <button class="technique-btn active" type="button" data-action="select-technique" data-technique="478" aria-pressed="true">Deep Sleep</button>
+    <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false">Focus &amp; Grounding</button>
+    <button class="technique-btn" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="false">Heart Coherence</button>
+    <button class="technique-btn" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="false">Cyclic Sighing</button>
+    <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false">Extended Exhale</button>
+    <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false">Quick Calm</button>
+    <button class="technique-btn" type="button" data-action="select-technique" data-technique="wim" aria-pressed="false">Energizing Breath</button>
+</div>
+```
+
+## 5. Technique switcher
 
 Put it directly after the timer section. Mark the current page with
-`aria-current="page"` and drop that page's own link target.
+`aria-current="page"`. **No emoji in the labels.**
 
 ```html
 <nav class="technique-switcher" aria-label="Other breathing timers">
-    <a href="/4-7-8-breathing">🌙 4-7-8</a>
-    <a href="/box-breathing" aria-current="page">🌿 Box</a>
-    <a href="/heart-coherence-breathing">💗 Coherence</a>
-    <a href="/cyclic-sighing">🌊 Cyclic sighing</a>
-    <a href="/extended-exhale-breathing">🌅 Extended exhale</a>
-    <a href="/triangle-breathing">☁️ Triangle</a>
-    <a href="/energizing-breath">☀️ Energizing</a>
+    <a href="/4-7-8-breathing">4-7-8</a>
+    <a href="/box-breathing" aria-current="page">Box</a>
+    <a href="/heart-coherence-breathing">Coherence</a>
+    <a href="/cyclic-sighing">Cyclic sighing</a>
+    <a href="/extended-exhale-breathing">Extended exhale</a>
+    <a href="/triangle-breathing">Triangle</a>
+    <a href="/energizing-breath">Energizing</a>
     <a href="/timer">All timers</a>
 </nav>
 ```
 
-## 5. Prose container
+## 6. Prose container
 
 ```html
 <article class="prose">
@@ -354,18 +477,7 @@ Put it directly after the timer section. Mark the current page with
                 <h3>1. Sit down</h3>
                 <p>…</p>
             </div>
-            <div class="step">
-                <h3>2. Breathe in for four</h3>
-                <p>…</p>
-            </div>
         </div>
-    </section>
-
-    <section>
-        <h2>Who should be careful</h2>
-        <ul>
-            <li>…</li>
-        </ul>
     </section>
 
     <section>
@@ -375,31 +487,252 @@ Put it directly after the timer section. Mark the current page with
             <p>Answer exactly as written in the FAQPage JSON-LD.</p>
         </div>
     </section>
-
-    <section>
-        <h2>A note on what this is</h2>
-        <p>Nothing here is medical care and none of it replaces treatment. Read the
-        <a href="/legal/medical-disclaimer">medical disclaimer</a>.</p>
-    </section>
 </article>
 ```
 
 Available classes inside `.article-page`: `.lead`, `.steps-container` + `.step`,
 `.faq-item`, `.cta-block`, `.cta-block-final`, `.cta-button`,
 `.cta-button-large`, `.cta-subtext`, `.related-techniques`, `.card-grid` +
-`.link-card`, `.breadcrumb`.
+`.link-card`, `.breadcrumb`, `.callout`, `.callout--caution`, `.crisis-block`,
+`.citations`, `.table-scroll` + `.data-table`.
 
 Copy rules: at least 500 words of real prose on any indexable content page,
 900+ on a technique landing page. Second person, short sentences, no hype, no
-exclamation marks. Every breath-hold or fast-breathing technique gets an explicit
-contraindication block. Never write "studies show" without a citation you opened
-yourself with WebFetch and quoted in your structured return.
+exclamation marks. Every breath-hold or fast-breathing technique gets an
+explicit contraindication block. Never write "studies show" without a citation
+you opened yourself with WebFetch and quoted in your structured return.
 
-## 6. JSON-LD patterns
+## 7. Callout, crisis block, citations, tables
+
+### Contraindication callout — 3px `--warn` left rule on leaf
+
+```html
+<div class="callout callout--caution">
+    <h3>Who should be careful</h3>
+    <p>This pattern holds the breath twice per cycle…</p>
+    <ul>
+        <li>…</li>
+    </ul>
+</div>
+```
+
+A neutral aside uses `<div class="callout">` on its own (an `--edge` left rule).
+
+### Crisis block — 1px `--bad` border on leaf
+
+Required near the top of `/breathing-exercises-anxiety` and
+`/breathing-exercises-for-panic-attacks`. Those pages carry **zero**
+monetisation surfaces and `<body data-no-ads="true" data-no-asks="true">`.
+
+```html
+<div class="crisis-block">
+    <h2>If you need a person right now</h2>
+    <p>A breathing timer is not the right tool for a crisis. These lines are.</p>
+    <ul>
+        <li><strong>Lebanon</strong> — Embrace Lifeline: <a href="tel:1564">1564</a></li>
+        <li><strong>United States and Canada</strong> — call or text <a href="tel:988">988</a></li>
+        <li><strong>United Kingdom and Ireland</strong> — Samaritans: <a href="tel:116123">116 123</a></li>
+        <li><strong>Anywhere else</strong> — <a href="https://findahelpline.com" target="_blank" rel="noopener noreferrer">findahelpline.com</a></li>
+    </ul>
+</div>
+```
+
+### Citations
+
+```html
+<section class="citations">
+    <h2>Sources</h2>
+    <ol>
+        <li>Author A, Author B. Title of the paper. <em>Journal</em>, 2023. <a href="https://…">https://…</a></li>
+    </ol>
+</section>
+```
+
+### Tables
+
+Wrap every table so it scrolls inside its own box rather than pushing the page
+sideways. Numeric columns get `class="num"` for tabular figures.
+
+```html
+<div class="table-scroll">
+    <table class="data-table">
+        <thead><tr><th>Pattern</th><th>Cycle</th><th class="num">Breaths / min</th></tr></thead>
+        <tbody><tr><td>Box</td><td>4-4-4-4</td><td class="num">3.75</td></tr></tbody>
+    </table>
+</div>
+```
+
+## 8. Footer
+
+Four link columns, an authorship byline naming a person, then the legal row.
+Drop the link to the page you are on. On the crisis-safe pages, remove the
+`/pro` and `/for-practitioners` links.
+
+```html
+<footer class="footer">
+    <div class="footer-cols">
+        <nav class="footer-nav" aria-label="Breathing timers">
+            <p class="footer-heading">Timers</p>
+            <a href="/timer">All timers</a>
+            <a href="/4-7-8-breathing">4-7-8 breathing</a>
+            <a href="/box-breathing">Box breathing</a>
+            <a href="/heart-coherence-breathing">Heart coherence</a>
+            <a href="/cyclic-sighing">Cyclic sighing</a>
+            <a href="/extended-exhale-breathing">Extended exhale</a>
+            <a href="/triangle-breathing">Triangle breathing</a>
+            <a href="/energizing-breath">Energizing breath</a>
+        </nav>
+
+        <nav class="footer-nav" aria-label="Guides">
+            <p class="footer-heading">Guides</p>
+            <a href="/breathing-exercises-anxiety">For anxious moments</a>
+            <a href="/breathing-exercises-for-sleep">For sleep</a>
+            <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+            <a href="/breathing-exercises-for-focus">For focus</a>
+            <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+            <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+        </nav>
+
+        <nav class="footer-nav" aria-label="Compare and research">
+            <p class="footer-heading">Compare</p>
+            <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+            <a href="/breathing-apps-compared">Apps compared</a>
+            <a href="/science">What the research says</a>
+        </nav>
+
+        <nav class="footer-nav" aria-label="About and products">
+            <p class="footer-heading">The site</p>
+            <a href="/about">About</a>
+            <a href="/pro">Pro</a>
+            <a href="/for-practitioners">For practitioners</a>
+            <a href="/embed">Embed the timer</a>
+            <a href="/handouts">Printable handouts</a>
+        </nav>
+    </div>
+
+    <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
+
+    <div class="legal-links">
+        <a href="/legal/privacy-policy">Privacy Policy</a>
+        <a href="/legal/terms-of-service">Terms of Service</a>
+        <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
+        <a href="mailto:contact@helpmebreath.com">Contact</a>
+    </div>
+</footer>
+```
+
+The old "Made for a calmer, more mindful world." line and the bullet separators
+between the legal links are gone: the byline names a person, and the legal row
+spaces itself.
+
+## 9. Support and upgrade links
+
+Never `alert()`, never Ko-fi, Buy Me a Coffee, PayPal, Stripe, Gumroad, Lemon
+Squeezy, Polar, Creem or Freemius. **Patreon stays, as a plain secondary link —
+no `patreon-btn` class, no brand red.**
+
+```html
+<div class="support-options">
+    <a href="https://www.patreon.com/GeorgesRayess" target="_blank" rel="noopener noreferrer"
+       data-action="support" data-support-label="patreon">Support on Patreon</a>
+    <a class="pro-link" href="/pro"
+       data-action="support" data-support-label="pro">Unlock Pro — one payment, forever</a>
+</div>
+```
+
+Checkout buttons belong to the Pro agent:
+`<button class="checkout-btn" data-action="checkout" data-sku="practitioner">`.
+
+## 10. Pricing matrix (`/pro`, `/for-practitioners`)
+
+A full feature matrix, not a row of cards. The **Practitioner** column is the
+featured one: flagged, tinted with `--track`, and the only filled primary
+button. `--clay` appears here and nowhere near the timer.
+
+Rows, in this order: all seven techniques · custom patterns · streaks + export ·
+soundscapes · night mode · ad-free · commercial-use licence · white-label embed
+(1 vs 10 domains) · client links · printable handouts · class mode ·
+compliance pack · named invoice with a VAT field.
+
+```html
+<div class="table-scroll">
+    <table class="pricing-matrix">
+        <thead>
+            <tr>
+                <th scope="col"><span class="sr-only">Feature</span></th>
+                <th scope="col">
+                    <span class="tier-name">Free</span>
+                    <span class="price-figure">$0</span>
+                    <span class="price-period">forever</span>
+                </th>
+                <th scope="col">
+                    <span class="tier-name">Pro</span>
+                    <span class="price-figure">$19</span>
+                    <span class="price-period">once, lifetime</span>
+                    <button class="checkout-btn checkout-btn--secondary" type="button" data-action="checkout" data-sku="lifetime">Get Pro</button>
+                </th>
+                <th scope="col" class="col-featured">
+                    <span class="tier-flag">Most practitioners</span>
+                    <span class="tier-name">Practitioner</span>
+                    <span class="price-figure">$99</span>
+                    <span class="price-period">per year</span>
+                    <button class="checkout-btn" type="button" data-action="checkout" data-sku="practitioner">Get Practitioner</button>
+                </th>
+                <th scope="col">
+                    <span class="tier-name">Studio</span>
+                    <span class="price-figure">$199</span>
+                    <span class="price-period">per year</span>
+                    <button class="checkout-btn checkout-btn--secondary" type="button" data-action="checkout" data-sku="studio">Get Studio</button>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">All seven techniques</th>
+                <td>Yes</td><td>Yes</td><td class="col-featured">Yes</td><td>Yes</td>
+            </tr>
+            <tr>
+                <th scope="row">White-label embed</th>
+                <td>—</td><td>—</td><td class="col-featured">1 domain</td><td>10 domains</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<p class="tax-note">Prices are in US dollars and are invoiced. Sales are made by our merchant of record, who collects any VAT or sales tax that applies where you are. Every purchase carries a 14-day unconditional refund.</p>
+```
+
+Write "Yes", "—" or the actual limit as words. Never a tick emoji.
+
+## 11. Ad slot
+
+```html
+<div class="ad-slot" data-ad-slot="in-content-1" aria-hidden="true"></div>
+<div class="ad-slot ad-slot--leaderboard" data-ad-slot="leaderboard-1" aria-hidden="true"></div>
+```
+
+1px dashed `--edge` on paper with an "Advertisement" label in `--graphite`.
+Height is reserved in CSS (280px, or 90px for the leaderboard variant) so
+toggling measures CLS 0. `body.session-active .ad-slot { display: none }` hides
+them while someone is breathing.
+
+**Allowed:** content pages, use-case pages and comparison pages — below the fold,
+never between the Begin button and the circle. At most two in-content units per
+page. Add `<script type="module" src="/js/ads.js"></script>`.
+
+**Forbidden:** `/`, `/timer`, any technique landing page's timer viewport, `/pro`,
+`/pro/thanks`, `/for-practitioners`, `/embed`, `/breathing-exercises-anxiety`,
+`/breathing-exercises-for-panic-attacks`.
+
+Any monetisation ask that is not an ad slot (tip button, upgrade card, capture
+form) gets `data-ask="…"` so the same CSS rule hides it during a session.
+
+## 12. JSON-LD patterns
 
 Every page gets a **BreadcrumbList**. Technique pages add **HowTo** and
 **FAQPage**. Articles add **Article**/**BlogPosting**. `Product`/`Offer` belongs
 only on `/pro`. Every FAQ question and answer must also appear as visible text.
+`Organization.logo` stays `https://helpmebreath.com/images/logo.png`.
 
 ### BreadcrumbList (every page)
 
@@ -476,7 +809,7 @@ only on `/pro`. Every FAQ question and answer must also appear as visible text.
   "description": "…",
   "image": "https://helpmebreath.com/images/og/box-breathing.jpg",
   "datePublished": "2026-09-09",
-  "dateModified": "2026-09-09",
+  "dateModified": "2026-09-10",
   "author": { "@type": "Person", "name": "Georges Rayess", "url": "https://helpmebreath.com/about" },
   "publisher": {
     "@type": "Organization",
@@ -488,117 +821,95 @@ only on `/pro`. Every FAQ question and answer must also appear as visible text.
 </script>
 ```
 
-## 7. Ad slot
+## 13. Forbidden-pattern checklist
 
-```html
-<div class="ad-slot" data-ad-slot="in-content-1" aria-hidden="true"></div>
-<div class="ad-slot ad-slot--leaderboard" data-ad-slot="leaderboard-1" aria-hidden="true"></div>
-```
+Run against every page you touch. Every one of these must return nothing.
 
-Height is reserved in CSS (280px, or 90px for the leaderboard variant) so
-toggling measures CLS 0. `body.session-active .ad-slot { display: none }` hides
-them while someone is breathing.
+- [ ] `Quicksand`
+- [ ] `linear-gradient`
+- [ ] `radial-gradient`
+- [ ] `backdrop-filter`
+- [ ] `text-shadow`
+- [ ] `nature-bg`
+- [ ] `natural-element`
+- [ ] `breathing-particles`
+- [ ] `breathing-aura`
+- [ ] `fluid-effect`
+- [ ] `breathing-svg-filter`
+- [ ] `particle-float`
+- [ ] `patreon-btn`
+- [ ] `filter:` with a `blur(` — `backdrop-filter` is not the only one that hides
+- [ ] the old palette hexes anywhere in the file: `#8b5cf6`, `#1e1b4b`, `#f96854`
+- [ ] any emoji codepoint. The two that hide in old markup are the gear
+      (`U+2699`, on the settings button — now an inline SVG) and the lungs
+      (`U+1FAC1`, in the old favicon data URI). They are written here as
+      codepoints on purpose: this checklist has to pass its own emoji scan.
+- [ ] `theme-color` still `#8b5cf6`
+- [ ] an emoji favicon `data:` URI
+- [ ] a `box-shadow` that is not `var(--shadow-sheet)` or `var(--shadow-lift)`
+- [ ] a hard-coded hex in a page `<style>` block instead of a token
+- [ ] `--rule` used as a control boundary, or `--edge` used as a text colour
+- [ ] `--clay` anywhere on a timer screen
+- [ ] a font-weight below 400
+- [ ] a font-size below 11px
+- [ ] a serif face on anything clickable
 
-**Allowed:** content pages, use-case pages and comparison pages — below the fold,
-never between the Begin button and the circle. At most two in-content units per
-page. Add `<script type="module" src="/js/ads.js"></script>`.
+## 13a. If your page needs its own `<style>` block
 
-**Forbidden:** `/`, `/timer`, any technique landing page's timer viewport, `/pro`,
-`/pro/thanks`, `/for-practitioners`, `/embed`, `/breathing-exercises-anxiety`,
-`/breathing-exercises-for-panic-attacks`. On the crisis-safe pages, also set
-`<body data-no-ads="true" data-no-asks="true">` and load no `ads.js` at all.
+Page-specific CSS is allowed (in the page, or `css/<page>.css` above 150 lines).
+Four rules, because these are the ones that break the identity quietly:
 
-Any monetisation ask that is not an ad slot (tip button, upgrade card, capture
-form) gets `data-ask="…"` so the same CSS rule hides it during a session.
+1. **Every colour is a `var(--token)`.** No hex, no `rgb()`, no named colour.
+   If you need a colour the system does not have, you need a token, which means
+   an `integration_request` — not a local hex.
+2. **Never define a colour that only exists inside a media query or a `.night`
+   block.** The token sets already flip for you. A rule like
+   `@media (prefers-color-scheme: dark) { .my-thing { color: #ccc } }` is the
+   exact bug this identity is built to avoid: it will be wrong for the visitor
+   who has set `body.day`, and wrong again when a token changes.
+   The one exception is `@media print`, which is not a theme but a different
+   physical substrate: `css/styles.css` §10 and `css/print.css` re-declare the
+   whole token set there in literal ink-on-paper values. Do not copy that
+   pattern for anything on a screen.
+3. **`--rule` is decoration, `--edge` is a boundary you can operate.** If a
+   person can click, tap, type into or focus the thing, its border is `--edge`.
+4. **Do not restyle the phase word, the timer digits or any `.control-btn`.**
+   The phase word is the largest type on a timer screen and the timer digits are
+   sans with tabular figures; a page-level override that breaks either of those
+   is a design-system change, not a page change.
 
-## 8. Footer
+Also: `--clay` never appears on a timer screen, nothing is smaller than 11px,
+nothing is lighter than weight 400, and anything clickable is `var(--ui)`.
 
-```html
-<footer class="footer">
-    <p>Made for a calmer, more mindful world.</p>
-
-    <nav class="footer-nav" aria-label="Breathing timers">
-        <a href="/timer">All timers</a>
-        <a href="/4-7-8-breathing">4-7-8 breathing</a>
-        <a href="/box-breathing">Box breathing</a>
-        <a href="/heart-coherence-breathing">Heart coherence</a>
-        <a href="/cyclic-sighing">Cyclic sighing</a>
-        <a href="/extended-exhale-breathing">Extended exhale</a>
-        <a href="/triangle-breathing">Triangle breathing</a>
-        <a href="/energizing-breath">Energizing breath</a>
-    </nav>
-
-    <nav class="footer-nav" aria-label="Guides and comparisons">
-        <a href="/breathing-exercises-anxiety">For anxious moments</a>
-        <a href="/breathing-exercises-for-sleep">For sleep</a>
-        <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-        <a href="/breathing-exercises-for-focus">For focus</a>
-        <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-        <a href="/breathing-apps-compared">Apps compared</a>
-        <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-    </nav>
-
-    <nav class="footer-nav" aria-label="About and products">
-        <a href="/science">What the research says</a>
-        <a href="/about">About</a>
-        <a href="/pro">Pro</a>
-        <a href="/for-practitioners">For practitioners</a>
-        <a href="/embed">Embed the timer</a>
-    </nav>
-
-    <div class="legal-links">
-        <a href="/legal/privacy-policy">Privacy Policy</a>
-        <span aria-hidden="true" style="opacity: 0.5">•</span>
-        <a href="/legal/terms-of-service">Terms of Service</a>
-        <span aria-hidden="true" style="opacity: 0.5">•</span>
-        <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-        <span aria-hidden="true" style="opacity: 0.5">•</span>
-        <a href="mailto:contact@helpmebreath.com">Contact</a>
-    </div>
-</footer>
-```
-
-Drop the link to the page you are on. On the crisis-safe pages, remove the `/pro`
-and `/for-practitioners` links.
-
-## 9. Support and upgrade links
-
-Never `alert()`, never Ko-fi, Buy Me a Coffee, PayPal, Stripe, Gumroad, Lemon
-Squeezy, Polar, Creem or Freemius. Only these two, and only outside a session:
-
-```html
-<a class="patreon-btn" href="https://www.patreon.com/GeorgesRayess"
-   target="_blank" rel="noopener noreferrer"
-   data-action="support" data-support-label="patreon">Support on Patreon</a>
-
-<a class="pro-link" href="/pro"
-   data-action="support" data-support-label="pro">Unlock Pro — one payment, forever</a>
-```
-
-Checkout buttons belong to the Pro agent:
-`<button data-action="checkout" data-sku="practitioner">`.
-
-## 10. Checklist before you hand a page over
+## 14. Checklist before you hand a page over
 
 - [ ] `<html lang="en">`, charset, viewport present.
 - [ ] `<title>` ≤ 65 chars; not the bare "breathing exercise" / "deep breathing" head term.
 - [ ] Meta description 50–165 chars, and the same string in OG and Twitter tags.
 - [ ] Absolute canonical to the clean URL; no other page claims it.
 - [ ] OG title/description/type/url/image/site_name + `twitter:card` all present.
+- [ ] The four favicon links and both `theme-color` metas, dark one first.
+- [ ] The Newsreader + IBM Plex Sans font link, preload + `<noscript>` twin.
 - [ ] Exactly one `<h1>`; heading levels do not skip.
 - [ ] Consent + GA4 block pasted verbatim, defaults before config.
 - [ ] Every JSON-LD block parses (`JSON.parse`) and every FAQ answer also appears as visible text.
-- [ ] Timer section pasted whole: every `data-role`, both `data-slot` containers, the safety-ack panel, the live region.
+- [ ] Site header present, identical to §2, with `aria-current="page"` on one nav link.
+- [ ] Timer section pasted whole: the app bar, every `data-role` including `phase-count`, the guides SVG, the notch, both `data-slot` containers, the safety-ack panel, the live region.
 - [ ] `data-breathing-app` is on an element containing the technique buttons, if the page has any.
 - [ ] Ids are unique — suffixed per timer when a page has two.
-- [ ] Technique switcher present with `aria-current="page"` on this page.
+- [ ] Technique switcher present with `aria-current="page"` on this page, plain text labels.
+- [ ] Four-column footer, byline, legal row.
 - [ ] ≥ 500 words of real prose (≥ 900 on a technique landing page).
 - [ ] Contraindication block for any hold or fast-breathing technique.
 - [ ] Medical disclaimer link present.
+- [ ] No invented medical reviewer.
 - [ ] No inline `onclick`; every control uses `data-action`.
 - [ ] No AdSense script tag pasted by hand; `js/ads.js` only, and only where ads are allowed.
-- [ ] Crisis-safe pages: `data-no-ads="true" data-no-asks="true"`, zero monetisation, crisis lines near the top.
+- [ ] Crisis-safe pages: `data-no-ads="true" data-no-asks="true"`, zero monetisation, crisis lines near the top including Embrace 1564.
 - [ ] Root-relative asset paths; clean-URL links only.
+- [ ] §13 forbidden-pattern checklist all clear.
+- [ ] Any page `<style>` block obeys §13a: tokens only, no colour defined solely
+      inside a media or `.night` block, `--edge` on anything operable.
 - [ ] If the file was copied from `templates/technique-page.template.html`, the `noindex` meta is **deleted**.
 - [ ] `node tools/site-check.mjs` reports no ERROR mentioning your file.
 - [ ] `node tools/build-sitemap.mjs` lists your page (it will not if the canonical is missing).

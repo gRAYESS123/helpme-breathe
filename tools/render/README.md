@@ -150,8 +150,9 @@ Pinterest descriptions live in `batch.json` (`pinDescription`), already under
 500 characters and already carrying the page link. Copy them straight across.
 
 The evergreen 1000×1500 pins for the technique and use-case pages are a separate
-thing: they come from `tools/generate-images.py` and live in `images/pins/`,
-because those ship with the site.
+thing: they come from `node tools/brand/build-assets.mjs --only=pins` (see
+`tools/README-brand.md`) and live in `images/pins/`, because those ship with the
+site.
 
 ---
 
@@ -213,7 +214,7 @@ Before anything goes public:
 
 `render.html` is a `noindex` capture surface. It reuses `css/styles.css` and the
 real breathing engine in kiosk mode, hides every control, and makes exactly one
-third-party request: Google Fonts, for Quicksand. Do not add analytics, ads or
+third-party request: Google Fonts, for Newsreader and IBM Plex Sans. Do not add analytics, ads or
 anything else to it — whatever it loads ends up inside a video that gets
 published.
 
@@ -234,8 +235,9 @@ Open the same URL in a normal browser:
 `js/app.js` failed — check the browser console.
 
 **Fonts look wrong**
-Quicksand comes from Google Fonts, so the render machine needs network access.
-Without it the page falls back to a system sans-serif and the captures look off.
+Newsreader and IBM Plex Sans come from Google Fonts, so the render machine needs
+network access.
+Without it the page falls back to a system serif and the captures look off.
 The tool checks: `render.html` records what actually painted in
 `data-render-font`, and every job whose capture came out in a fallback face
 prints a warning. If you see that warning, throw the batch away and render it

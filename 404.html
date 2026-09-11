@@ -5,57 +5,316 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page Not Found | Help Me Breathe</title>
     <meta name="robots" content="noindex">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
+
+    <!--
+      This page is deliberately self-contained: a 404 has to render even when
+      css/styles.css is the thing that failed to load. The token block below is
+      the same Paper and Ink palette as css/styles.css, declared locally.
+      Every colour here is a token; nothing is defined only inside the dark
+      media query. See docs/BRAND.md.
+    -->
     <style>
+        :root {
+            --paper: #F5F1E8;
+            --leaf: #FFFDF7;
+            --ink: #1C2320;
+            --graphite: #575F58;
+            --rule: #E3DCCC;
+            --edge: #83887E;
+            --green: #0F5136;
+            --chalk: #FFFFFF;
+
+            --display: 'Newsreader', ui-serif, Georgia, 'Times New Roman', serif;
+            --ui: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                  'Helvetica Neue', Arial, sans-serif;
+
+            --fs-micro: 0.6875rem;
+            --fs-small: 0.8125rem;
+            --radius: 8px;
+            --hit: 44px;
+            --page: 62rem;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body:not(.day) {
+                --paper: #15191A;
+                --leaf: #1E2426;
+                --ink: #EDE7DA;
+                --graphite: #A7AEA4;
+                --rule: #2E3536;
+                --edge: #767D77;
+                --green: #5FBF92;
+                --chalk: #15191A;
+                color-scheme: dark;
+            }
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Quicksand', 'Segoe UI', system-ui, sans-serif;
+            font-family: var(--ui);
+            font-weight: 400;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--ink);
+            background: var(--paper);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a { color: var(--green); }
+
+        :focus-visible {
+            outline: 2px solid var(--green);
+            outline-offset: 2px;
+        }
+
+        /* ---------------------------------------------------- site header -- */
+
+        .site-header {
+            background: var(--leaf);
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .site-header-inner {
+            width: 100%;
+            max-width: var(--page);
+            margin: 0 auto;
+            padding: 0 1.25rem;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem 1rem;
+        }
+
+        .lockup {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            color: var(--ink);
+            padding: 0.5rem 0;
+            flex: 0 0 auto;
+        }
+
+        .lockup-mark {
+            display: block;
+            width: 26px;
+            height: 26px;
+            color: var(--green);
+            flex: 0 0 auto;
+        }
+
+        .wordmark {
+            font-family: var(--display);
+            font-weight: 500;
+            font-size: 1.0625rem;
+            letter-spacing: -0.012em;
+            line-height: 1;
+            white-space: nowrap;
+            color: var(--ink);
+        }
+
+        .site-nav {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.35rem 1.15rem;
+            margin-left: auto;
+        }
+
+        .site-nav a {
+            font-size: var(--fs-small);
+            font-weight: 500;
+            color: var(--graphite);
+            text-decoration: none;
+            padding: 0.6rem 0;
+            display: inline-block;
+        }
+
+        .site-nav a:hover { color: var(--ink); }
+
+        /* ---------------------------------------------------------- main --- */
+
+        main {
+            flex: 1 0 auto;
+            width: 100%;
+            max-width: var(--page);
+            margin: 0 auto;
+            padding: 3rem 1.25rem;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 2rem;
-            color: #fff;
-            background: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
         }
-        .card { max-width: 460px; }
-        .orb {
-            width: 120px; height: 120px; margin: 0 auto 2rem;
-            border-radius: 50%;
-            background: radial-gradient(circle at 35% 35%, #c7d2fe 0%, #8b5cf6 70%);
-            box-shadow: 0 0 60px #8b5cf6;
-            animation: breathe 8s ease-in-out infinite;
+
+        .card { max-width: 34rem; }
+
+        .mark {
+            display: block;
+            width: 112px;
+            height: 112px;
+            margin: 0 auto 2rem;
+            color: var(--green);
+            animation: mark-breathe 8s infinite;
+            transform-origin: 50% 50%;
         }
-        @keyframes breathe {
-            0%, 100% { transform: scale(0.85); }
-            50% { transform: scale(1.1); }
+
+        @keyframes mark-breathe {
+            0%   { transform: scale(0.86); animation-timing-function: cubic-bezier(.33, 0, .20, 1); }
+            50%  { transform: scale(1);    animation-timing-function: cubic-bezier(.42, 0, .30, 1); }
+            100% { transform: scale(0.86); }
         }
-        .code { font-size: 0.875rem; letter-spacing: 0.2em; color: #c7d2fe; margin-bottom: 0.5rem; }
-        h1 { font-size: 1.75rem; font-weight: 300; margin-bottom: 1rem; letter-spacing: 0.05em; }
-        p { color: #c7d2fe; line-height: 1.6; margin-bottom: 2rem; }
-        .links { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-        a {
-            display: inline-block; padding: 0.875rem 1.75rem;
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px; color: #fff; text-decoration: none;
-            font-weight: 500; transition: background 0.3s ease;
+
+        .code {
+            font-size: var(--fs-micro);
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--graphite);
+            margin-bottom: 0.6rem;
+            font-variant-numeric: tabular-nums;
         }
-        a:hover { background: rgba(255, 255, 255, 0.2); }
-        @media (prefers-reduced-motion: reduce) { .orb { animation: none; } }
+
+        h1 {
+            font-family: var(--display);
+            font-weight: 500;
+            font-size: 2rem;
+            line-height: 1.2;
+            letter-spacing: -0.012em;
+            margin-bottom: 0.85rem;
+            color: var(--ink);
+        }
+
+        .card p.body-copy {
+            color: var(--graphite);
+            margin-bottom: 2rem;
+        }
+
+        .links {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: var(--hit);
+            padding: 0.75rem 1.35rem;
+            font-family: var(--ui);
+            font-size: 0.9375rem;
+            font-weight: 500;
+            border-radius: var(--radius);
+            border: 1px solid var(--edge);
+            background: var(--leaf);
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        .btn:hover { border-color: var(--ink); }
+
+        .btn--primary {
+            background: var(--green);
+            border-color: var(--green);
+            color: var(--chalk);
+        }
+
+        .btn--primary:hover { border-color: var(--green); }
+
+        /* -------------------------------------------------------- footer --- */
+
+        .footer {
+            width: 100%;
+            max-width: var(--page);
+            margin: 0 auto;
+            padding: 1.5rem 1.25rem 2rem;
+            border-top: 1px solid var(--ink);
+            font-size: var(--fs-small);
+            color: var(--graphite);
+        }
+
+        .footer-byline { margin-bottom: 0.75rem; }
+
+        .legal-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.25rem;
+        }
+
+        .legal-links a { color: var(--graphite); text-decoration: none; }
+
+        .legal-links a:hover { color: var(--ink); text-decoration: underline; }
+
+        @media (max-width: 420px) {
+            .wordmark { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mark { animation: none; transform: scale(0.93); }
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="orb"></div>
-        <p class="code">ERROR 404</p>
-        <h1>This page drifted away</h1>
-        <p>We couldn't find what you're looking for. Take a breath and head back to the guided timer.</p>
-        <div class="links">
-            <a href="/">Breathing Timer</a>
-            <a href="/4-7-8-breathing-technique">4-7-8 Guide</a>
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <nav class="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
         </div>
-    </div>
+    </header>
+
+    <main id="main">
+        <div class="card">
+            <svg class="mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+            </svg>
+            <p class="code">Error 404</p>
+            <h1>This page drifted away</h1>
+            <p class="body-copy">We couldn't find what you're looking for. Take a breath and head back to the guided timer.</p>
+            <div class="links">
+                <a class="btn btn--primary" href="/">Breathing Timer</a>
+                <a class="btn" href="/4-7-8-breathing-technique">4-7-8 Guide</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
+        <div class="legal-links">
+            <a href="/legal/privacy-policy">Privacy Policy</a>
+            <a href="/legal/terms-of-service">Terms of Service</a>
+            <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
+            <a href="mailto:contact@helpmebreath.com">Contact</a>
+        </div>
+    </footer>
 </body>
 </html>

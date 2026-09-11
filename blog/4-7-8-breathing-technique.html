@@ -3,23 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- SEO OPTIMIZED: Title for 4-7-8 technique -->
-    <title>4-7-8 Breathing Technique | Step-by-Step Guide to Better Sleep</title>
-    
-    <!-- SEO OPTIMIZED: Meta description with CTA -->
-    <meta name="description" content="Learn the 4-7-8 breathing technique with a built-in timer and audio cues. Fall asleep faster and reduce stress in minutes. Try it free.">
-    
-    <link rel="canonical" href="https://helpmebreath.com/4-7-8-breathing-technique">
-    
-    <meta name="keywords" content="4-7-8 breathing technique, breathing for sleep, deep sleep breathing, breathing exercises before bed, relaxation breathing">
-    <meta name="author" content="Help Me Breathe">
-    <meta name="robots" content="index, follow">
 
-    <!-- Favicon + theme -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-    <meta name="theme-color" content="#8b5cf6">
+    <title>4-7-8 Breathing Technique | Step-by-Step Guide to Better Sleep</title>
+    <meta name="description" content="Learn the 4-7-8 breathing technique with a built-in timer and audio cues. Fall asleep faster and reduce stress in minutes. Try it free.">
+
+    <link rel="canonical" href="https://helpmebreath.com/4-7-8-breathing-technique">
+
+    <meta name="author" content="Georges Rayess">
+    <meta name="robots" content="index, follow">
 
     <!-- Open Graph -->
     <meta property="og:title" content="4-7-8 Breathing Technique | Step-by-Step Guide to Better Sleep">
@@ -34,6 +25,52 @@
     <meta name="twitter:title" content="4-7-8 Breathing Technique | Step-by-Step Guide to Better Sleep">
     <meta name="twitter:description" content="Master the 4-7-8 breathing technique for better sleep and anxiety relief.">
     <meta name="twitter:image" content="https://helpmebreath.com/images/4-7-8-breathing-guide-og.jpg">
+
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
+
+    <!-- PERFORMANCE: font origins + render-critical CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="/css/styles.css" as="style">
+    <link rel="stylesheet" href="/css/styles.css">
+
+    <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate.
+         Loaded without blocking render; display=swap prevents invisible text. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
+
+    <!--
+      Google Consent Mode v2. The DENIED defaults must be pushed before
+      gtag('config', …) runs, and ES modules are deferred, so this block stays
+      inline. js/consent.js then replays the visitor's stored choice and owns
+      the banner. Copy this block verbatim onto every page.
+    -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'wait_for_update': 500
+        });
+        gtag('js', new Date());
+        gtag('config', 'G-09WY9JD4YM', {
+            'anonymize_ip': true,
+            'cookie_expires': 63072000
+        });
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
 
     <!-- HowTo Structured Data -->
     <script type="application/ld+json">
@@ -113,9 +150,9 @@
       "datePublished": "2025-01-12",
       "dateModified": "2026-05-31",
       "author": {
-        "@type": "Organization",
-        "name": "Help Me Breathe",
-        "url": "https://helpmebreath.com/"
+        "@type": "Person",
+        "name": "Georges Rayess",
+        "url": "https://helpmebreath.com/about"
       },
       "publisher": {
         "@type": "Organization",
@@ -187,42 +224,48 @@
       ]
     }
     </script>
-    
-    <!-- PERFORMANCE: Preconnect to font origins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link rel="stylesheet" href="../css/styles.css">
-
-    <!-- Fonts: load without blocking render -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
 </head>
 <body class="theme-478 article-page">
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides" aria-current="page">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
+
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
                     <li>4-7-8 Breathing Technique</li>
                 </ol>
             </nav>
+            <h1>4-7-8 Breathing Technique: Step-by-Step Guide to Better Sleep</h1>
+            <p class="lead">The 4-7-8 breathing technique is a simple yet powerful method for achieving deep relaxation and better sleep. Developed by Dr. Andrew Weil, this practice can help you fall asleep faster, reduce anxiety, and activate your body's natural relaxation response.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Published <time datetime="2025-01-12">2025-01-12</time> &middot; Updated <time datetime="2026-05-31">2026-05-31</time> &middot; 5 min read</p>
+            </div>
         </header>
 
-        <main>
-            <article>
-                <header>
-                    <h1>4-7-8 Breathing Technique: Step-by-Step Guide to Better Sleep</h1>
-                    <p class="article-meta">
-                        <time datetime="2025-01-12">January 12, 2025</time> • 
-                        <span>5 min read</span>
-                    </p>
-                </header>
-
-                <section>
-                    <p class="lead">The 4-7-8 breathing technique is a simple yet powerful method for achieving deep relaxation and better sleep. Developed by Dr. Andrew Weil, this practice can help you fall asleep faster, reduce anxiety, and activate your body's natural relaxation response.</p>
-                </section>
-
+        <main id="main">
+            <article class="prose">
                 <!-- CTA Block Above the Fold -->
                 <div class="cta-block">
                     <h2>Try the 4-7-8 Technique Now</h2>
@@ -233,7 +276,7 @@
                 <section>
                     <h2>How the 4-7-8 Breathing Technique Works</h2>
                     <p>The 4-7-8 technique works by <strong>activating your parasympathetic nervous system</strong> – your body's "rest and digest" mode. This helps counteract the stress response and promotes a state of calm.</p>
-                    
+
                     <h3>Scientific Benefits</h3>
                     <ul>
                         <li><strong>Improved sleep quality:</strong> Research shows deep breathing can reduce the time it takes to fall asleep</li>
@@ -243,11 +286,23 @@
                     </ul>
                 </section>
 
+                <div class="callout callout--caution">
+                    <h3>Before you use the seven-count hold</h3>
+                    <p>4-7-8 holds the breath for seven seconds every round, so this section is not boilerplate.</p>
+                    <ul>
+                        <li>Talk to a clinician first if you are pregnant, or if you live with a cardiovascular condition, uncontrolled high blood pressure, epilepsy, a respiratory condition such as asthma or COPD, or glaucoma, or if you have had surgery recently.</li>
+                        <li>If you live with panic attacks or panic disorder, holding the breath can feel like the beginning of one. <a href="/cyclic-sighing">Cyclic sighing</a> gives you the long out-breath without any hold.</li>
+                        <li>Practice sitting or lying down. Never while driving, cycling, swimming or in a bath.</li>
+                        <li>Stop if you feel dizzy, light-headed, tingly or short of breath, and breathe normally until it passes. That feeling is a reason to shorten the pattern, not to push through it.</li>
+                        <li>This is a relaxation exercise. It is not treatment for insomnia, anxiety or anything else. See our <a href="/legal/medical-disclaimer">medical disclaimer</a>.</li>
+                    </ul>
+                </div>
+
                 <section>
                     <h2>Step-by-Step Instructions</h2>
-                    
+
                     <div class="steps-container">
-                        <div class="step">
+                        <div class="step" id="step1">
                             <h3>Step 1: Get Comfortable</h3>
                             <p>Find a quiet space and sit or lie down comfortably. Place the tip of your tongue against the tissue ridge behind your upper front teeth throughout the exercise.</p>
                         </div>
@@ -297,9 +352,11 @@
                     </ul>
                 </section>
 
+                <div class="ad-slot" data-ad-slot="in-content-1" aria-hidden="true"></div>
+
                 <section>
                     <h2>Frequently Asked Questions</h2>
-                    
+
                     <div class="faq-item">
                         <h3>Is the 4-7-8 breathing technique safe during pregnancy?</h3>
                         <p>While breathing exercises are generally safe, pregnant women should consult their healthcare provider before starting any new breathing practice, including the 4-7-8 technique.</p>
@@ -319,15 +376,16 @@
                 <section>
                     <h2>Scientific Research</h2>
                     <p>The 4-7-8 technique is based on pranayama breathing practices and modern research on the nervous system. Studies have shown that controlled breathing exercises can:</p>
-                    
+
                     <ul>
                         <li>Reduce cortisol levels (stress hormone)</li>
                         <li>Improve heart rate variability</li>
                         <li>Activate the parasympathetic nervous system</li>
                         <li>Improve sleep quality and duration</li>
                     </ul>
-                    
+
                     <p><em>Sources: <a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">PubMed research on breathing exercises and sleep</a></em></p>
+                    <p>For the studies we have actually read, with their sample sizes and limits written down next to their findings, see <a href="/science">what the research says</a>.</p>
                 </section>
 
                 <!-- Final CTA -->
@@ -339,7 +397,7 @@
                 </div>
             </article>
 
-            <aside>
+            <aside class="prose" aria-label="Related reading">
                 <div class="related-techniques">
                     <h3>Other Breathing Techniques</h3>
                     <ul>
@@ -350,6 +408,61 @@
                 </div>
             </aside>
         </main>
+
+        <footer class="footer">
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
+
+            <div class="legal-links">
+                <a href="/legal/privacy-policy">Privacy Policy</a>
+                <a href="/legal/terms-of-service">Terms of Service</a>
+                <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
+                <a href="mailto:contact@helpmebreath.com">Contact</a>
+            </div>
+        </footer>
     </div>
+
+    <script type="module" src="/js/consent.js"></script>
+    <script type="module" src="/js/app.js"></script>
+    <script type="module" src="/js/pro/index.js"></script>
+    <script type="module" src="/js/ads.js"></script>
 </body>
 </html>

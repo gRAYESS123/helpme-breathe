@@ -6,7 +6,8 @@
  *   - no global element ids: every lookup is `[data-role="…"]` scoped to the root
  *   - settings and session history persisted through js/storage.js
  *   - an ARIA live region announcing each phase
- *   - prefers-reduced-motion honoured (no scale animation; colour/opacity instead)
+ *   - prefers-reduced-motion honoured (the circle holds one size, a pacing ring
+ *     draws round it, and the progress bar advances in whole-second steps)
  *   - a one-tap safety acknowledgement for techniques that need one
  *   - kiosk / projector mode with Screen Wake Lock
  *   - CustomEvents on `document` so other modules never reach into the engine
@@ -217,6 +218,19 @@ function phaseKind(phase) {
   return first || String((phase && phase.name) || '').toLowerCase();
 }
 
+/**
+ * The value written to `data-phase` on the app root and on the circle.
+ * Same as phaseKind, except that cyclic sighing's short second inhale is its
+ * own kind ('topup') — the CSS needs it, and it also guarantees that two
+ * consecutive phases never share a value, which is what makes the
+ * phase-word cross-fade and the reduced-motion pacing ring restart.
+ */
+function phaseState(phase) {
+  const classes = String((phase && phase.class) || '').trim().split(/\s+/);
+  if (classes.indexOf('inhale-short') !== -1) return 'topup';
+  return phaseKind(phase);
+}
+
 /* ========================================================================== *
  * createBreathingApp
  * ========================================================================== */
@@ -262,6 +276,7 @@ export function createBreathingApp(rootEl, options = {}) {
   const el = {
     circle: q('circle'),
     circleText: q('circle-text'),
+    phaseCount: q('phase-count'),
     breathingText: q('breathing-text'),
     timer: q('timer'),
     progressFill: q('progress-fill'),
@@ -362,6 +377,12 @@ export function createBreathingApp(rootEl, options = {}) {
    * whole list is applied and removed together.
    */
   function applyPhaseClasses(phase) {
+    // data-phase goes on the app root as well as on the circle: the phase word,
+    // the count and the reduced-motion pacing ring all live outside the circle
+    // now, and CSS closes the notch on a hold from this attribute.
+    const kind = phaseState(phase);
+    rootEl.dataset.phase = kind;
+    rootEl.style.setProperty('--phase-duration', `${Number(phase && phase.duration) || 0}s`);
     if (!el.circle) return;
     for (const cls of phaseClasses) el.circle.classList.remove(cls);
     phaseClasses = String((phase && phase.class) || '')
@@ -369,10 +390,12 @@ export function createBreathingApp(rootEl, options = {}) {
       .split(/\s+/)
       .filter(Boolean);
     for (const cls of phaseClasses) el.circle.classList.add(cls);
-    el.circle.dataset.phase = phaseKind(phase);
+    el.circle.dataset.phase = kind;
   }
 
   function clearPhaseClasses() {
+    delete rootEl.dataset.phase;
+    rootEl.style.removeProperty('--phase-duration');
     if (!el.circle) return;
     for (const cls of phaseClasses) el.circle.classList.remove(cls);
     phaseClasses = [];
@@ -385,6 +408,14 @@ export function createBreathingApp(rootEl, options = {}) {
     // Force a reflow so the animation restarts from 0 with the new technique.
     void el.circle.offsetHeight;
     el.circle.style.animation = '';
+    // Clearing the `animation` shorthand also clears the inline
+    // animation-duration applyCircleClass() just set. For the seven built-ins
+    // css/styles.css carries the same value on .technique-<key>, but a custom
+    // pattern (js/pro/patterns.js) has no technique-* class and would fall back
+    // to the 10s default, so the circle would run at the wrong pace. Put the
+    // real cycle length back.
+    const cycle = cycleSeconds(state.phases);
+    if (cycle > 0) el.circle.style.animationDuration = `${cycle}s`;
   }
 
   function renderTechniqueCopy() {
@@ -430,6 +461,7 @@ export function createBreathingApp(rootEl, options = {}) {
 
   function resetDisplay() {
     setText(el.circleText, 'Ready');
+    setText(el.phaseCount, '');
     setText(el.breathingText, 'Press Begin to start your practice');
     setText(el.timer, '00:00');
     if (el.progressFill) el.progressFill.style.width = '0%';
@@ -480,6 +512,7 @@ export function createBreathingApp(rootEl, options = {}) {
     if (state.phaseIndex === 0) state.breaths += 1;
 
     setText(el.circleText, phase.name);
+    setText(el.phaseCount, String(Math.max(1, Math.ceil(phase.duration))));
     setText(el.breathingText, phase.text);
     applyPhaseClasses(phase);
 
@@ -514,8 +547,15 @@ export function createBreathingApp(rootEl, options = {}) {
 
     const phaseElapsed = state.phaseCarry + (t - state.phaseAnchor) / 1000;
     const phaseProgress = clamp(phaseElapsed / phase.duration, 0, 1);
-    if (el.progressFill) el.progressFill.style.width = `${phaseProgress * 100}%`;
-    setText(el.progressTime, `${Math.ceil(Math.max(phase.duration - phaseElapsed, 0))}s`);
+    // Reduced motion: the bar still advances, but in whole-second steps rather
+    // than as a continuous slide.
+    const shownProgress = prefersReducedMotion()
+      ? clamp(Math.floor(phaseElapsed) / phase.duration, 0, 1)
+      : phaseProgress;
+    if (el.progressFill) el.progressFill.style.width = `${shownProgress * 100}%`;
+    const remainingInPhase = Math.max(0, Math.ceil(phase.duration - phaseElapsed));
+    setText(el.progressTime, `${remainingInPhase}s`);
+    setText(el.phaseCount, String(Math.max(1, remainingInPhase)));
 
     const elapsed = state.sessionCarry + (t - state.sessionAnchor) / 1000;
     setText(el.timer, formatClock(elapsed));
@@ -575,6 +615,43 @@ export function createBreathingApp(rootEl, options = {}) {
       root: rootEl,
       instance: api,
     };
+  }
+
+  /* A one-line suggestion, offered once, after a session that began late.
+     Armed at start so a session that runs past midnight still counts as late,
+     never rendered during a session, and never on a `data-no-asks` page. */
+  let nightHintArmed = false;
+
+  function armNightHint() {
+    const hour = new Date().getHours();
+    const body = document.body;
+    nightHintArmed =
+      (hour >= 21 || hour < 6) &&
+      !!body &&
+      body.dataset.noAsks !== 'true' &&
+      !body.classList.contains('night') &&
+      !body.classList.contains('day') &&
+      storage.getFlag('night-hint-dismissed') !== true;
+  }
+
+  function showNightHint() {
+    if (!nightHintArmed) return;
+    nightHintArmed = false;
+    const slot = rootEl.querySelector('[data-slot="post-session"]');
+    if (!slot || slot.querySelector('.night-hint')) return;
+    const line = document.createElement('p');
+    line.className = 'night-hint';
+    line.append(document.createTextNode('Practising this late? Night mode dims the whole page.'));
+    const dismiss = document.createElement('button');
+    dismiss.type = 'button';
+    dismiss.className = 'night-hint-dismiss';
+    dismiss.textContent = 'No thanks';
+    dismiss.addEventListener('click', () => {
+      storage.setFlag('night-hint-dismissed', true);
+      line.remove();
+    });
+    line.appendChild(dismiss);
+    slot.appendChild(line);
   }
 
   function showSafetyAck() {
@@ -645,6 +722,7 @@ export function createBreathingApp(rootEl, options = {}) {
     enterPhase(state.sessionAnchor);
     startTicker();
 
+    armNightHint();
     emit('hmb:session-start', { ...baseDetail(), duration: state.duration });
     track(EVENTS.SESSION_START, {
       technique: state.key,
@@ -751,6 +829,8 @@ export function createBreathingApp(rootEl, options = {}) {
         track(EVENTS.SESSION_ABANDON, { technique: techniqueKey, seconds, breaths });
       }
     }
+
+    showNightHint();
 
     resetTimer = window.setTimeout(() => {
       resetTimer = null;
@@ -1199,6 +1279,24 @@ function registerServiceWorker() {
   });
 }
 
+/**
+ * The site header collapses its nav behind a menu button on narrow screens.
+ * One delegated listener, registered once per page; it touches nothing the
+ * breathing engine owns.
+ */
+function wireSiteNav() {
+  document.addEventListener('click', (event) => {
+    const toggle = event.target.closest('[data-action="toggle-nav"]');
+    if (!toggle) return;
+    event.preventDefault();
+    const nav = document.getElementById(toggle.getAttribute('aria-controls') || 'site-nav');
+    if (!nav) return;
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    nav.classList.toggle('is-open', open);
+  });
+}
+
 function wireSupportAndInstall() {
   document.addEventListener('click', (event) => {
     const support = event.target.closest('[data-action="support"]');
@@ -1239,6 +1337,7 @@ function initAll() {
 
 if (typeof document !== 'undefined') {
   document.addEventListener('keydown', onGlobalKeydown);
+  wireSiteNav();
   wireSupportAndInstall();
   registerServiceWorker();
 

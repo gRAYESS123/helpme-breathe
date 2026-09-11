@@ -9,10 +9,11 @@
    `.hmb-page-break` collapsed) live in each page's own <style> block, because
    a media="print" sheet is not applied on screen at all.
 
-   The site's theme classes set `--text-primary: #ffffff` on a dark gradient.
-   Printers do not print the gradient, so those tokens have to be reset here or
-   the page comes out white-on-white. That reset is the first thing in the print
-   block and it is deliberate.
+   Paper and Ink already prints close to correctly — a warm white ground and
+   charcoal ink. The reset at the top of the print block still flattens the
+   palette to true black on true white, drops the technique rim to grey and
+   kills both shadows, because a leaflet handed to a client should not depend
+   on a printer rendering #F5F1E8 or a coloured rim faithfully.
    ========================================================================== */
 
 /* ------------------------------------------------------------------- paper */
@@ -36,7 +37,28 @@
     :root,
     html,
     body,
-    body[class*='theme-'] {
+    body[class*='theme-'],
+    body.night,
+    body.day {
+        --paper: #ffffff !important;
+        --leaf: #ffffff !important;
+        --ink: #111111 !important;
+        --graphite: #444444 !important;
+        --rule: #c9c9c9 !important;
+        --edge: #767676 !important;
+        --track: #e4e4e4 !important;
+        --green: #111111 !important;
+        --chalk: #ffffff !important;
+        --clay: #111111 !important;
+        --ok: #111111 !important;
+        --warn: #111111 !important;
+        --bad: #111111 !important;
+        --rim: #444444 !important;
+        --fill: #ffffff !important;
+        --shadow-sheet: none !important;
+        --shadow-lift: none !important;
+
+        /* legacy aliases, still read by pages not yet converted */
         --bg-primary: #ffffff !important;
         --text-primary: #111111 !important;
         --text-secondary: #444444 !important;
@@ -54,29 +76,38 @@
     }
 
     body {
-        font-family: 'Quicksand', 'Segoe UI', system-ui, sans-serif;
+        font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
         font-size: 10.5pt;
         line-height: 1.5;
         overflow: visible !important;
     }
 
     /* Decoration, navigation and anything interactive is not paper. */
-    .nature-bg,
-    .natural-element,
+    .site-header,
+    .site-nav,
+    .nav-toggle,
     .skip-link,
     .keyboard-hint,
     .cookie-consent,
+    #cookieConsent,
+    .app-bar,
     .settings-btn,
     .settings-panel,
     .controls,
-    .breathing-particles,
-    .breathing-aura,
+    .tools-row,
+    .technique-buttons,
+    .breathing-guides,
     .donation-section,
     .support-card,
     .ad-slot,
     .technique-switcher,
     .footer-nav,
+    .footer-cols,
     .breadcrumb,
+    /* The site nav bar never belongs on paper, on any page. Pages that are
+       print-first (the handout sheets, the compliance documents) additionally
+       mark their footer .hmb-no-print. */
+    .site-header,
     .hmb-no-print,
     [data-no-print] {
         display: none !important;
@@ -96,7 +127,7 @@
         padding: 0 !important;
     }
 
-    /* The glass card system: keep the structure, drop the glass. */
+    /* Keep the structure of a card, drop everything that is not ink. */
     .article-page article,
     .article-page .prose,
     .technique-page .prose,
@@ -104,9 +135,11 @@
     .link-card,
     .post-session-card,
     .handout-sheet,
+    .breathing-section,
+    .pro-panel,
+    .callout,
     .doc-sheet {
         background: #ffffff !important;
-        backdrop-filter: none !important;
         box-shadow: none !important;
         border-radius: 0 !important;
         max-width: none !important;

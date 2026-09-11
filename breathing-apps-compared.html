@@ -17,22 +17,25 @@
     <meta property="og:description" content="What breathing apps really cost in 2026, what each free tier does, and when a plain pacer is enough. Prices checked 10 September 2026, with sources.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://helpmebreath.com/breathing-apps-compared">
-    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/breathing-apps-compared.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Breathing Apps Compared: Free vs Paid (2026)">
     <meta name="twitter:description" content="What breathing apps really cost in 2026, what each free tier does, and when a plain pacer is enough. Prices checked 10 September 2026, with sources.">
-    <meta name="twitter:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/breathing-apps-compared.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,10 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate.
+         Loaded without blocking render; display=swap prevents invisible text. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -95,7 +100,7 @@
       "@type": "Article",
       "headline": "Breathing apps compared: free versus paid in 2026",
       "description": "What breathing apps really cost in 2026, what each free tier does, and when a plain pacer is enough. Prices checked 10 September 2026, with sources.",
-      "image": "https://helpmebreath.com/images/og-breathing-timer.jpg",
+      "image": "https://helpmebreath.com/images/og/breathing-apps-compared.jpg",
       "datePublished": "2026-09-09",
       "dateModified": "2026-09-10",
       "author": {
@@ -176,166 +181,122 @@
     </script>
 
     <style>
-        .affiliate-disclosure {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-left: 3px solid var(--theme-primary);
-            border-radius: 0 14px 14px 0;
-            padding: 1.1rem 1.35rem;
-            margin: 0 0 1.75rem;
-            backdrop-filter: blur(8px);
-        }
+        /* Page-scoped rules for the app comparison. Tokens only, and no colour
+           defined inside a media or .night block: the token sets already flip.
+           See docs/PAGE_CONTRACT.md 13a. */
+
+        /* The disclosure is the shared .callout with a tamed heading: a
+           disclosure is scanned, so its heading is sans, not display. */
+        .affiliate-disclosure { margin: 0 0 1.75rem; }
+
         .affiliate-disclosure h2 {
-            font-size: 0.95rem;
+            font-family: var(--ui);
+            font-size: 1rem;
             font-weight: 600;
-            letter-spacing: 0.02em;
-            margin-bottom: 0.45rem;
-            color: var(--text-primary);
+            margin: 0 0 0.4rem;
+            letter-spacing: 0;
+            line-height: 1.35;
+            color: var(--ink);
         }
-        .affiliate-disclosure p {
-            font-size: 0.92rem;
-            line-height: 1.65;
-            color: var(--text-secondary);
-            margin: 0;
-        }
-        .compare-scroll {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin: 1rem 0 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            background: var(--surface);
-        }
-        table.compare {
-            border-collapse: collapse;
-            width: 100%;
-            min-width: 720px;
-            font-size: 0.92rem;
-        }
-        table.compare caption {
+
+        .affiliate-disclosure p { margin: 0; color: var(--graphite); }
+
+        /* The price table keeps its columns readable inside .table-scroll. */
+        .table-scroll .data-table { min-width: 45rem; }
+
+        .data-table caption {
             caption-side: top;
             text-align: left;
-            padding: 0.9rem 1rem 0.35rem;
-            color: var(--text-secondary);
-            font-size: 0.86rem;
-            line-height: 1.55;
+            padding: 0 0 0.75rem;
+            font-family: var(--ui);
+            font-size: var(--fs-small);
+            line-height: 1.6;
+            color: var(--graphite);
         }
-        table.compare th,
-        table.compare td {
-            text-align: left;
-            padding: 0.7rem 0.85rem;
-            border-bottom: 1px solid var(--border);
-            vertical-align: top;
-            line-height: 1.55;
-            color: var(--text-secondary);
-        }
-        table.compare thead th {
-            color: var(--text-primary);
-            font-weight: 600;
+
+        .data-table td { color: var(--graphite); }
+
+        .data-table th[scope="row"] {
+            font-size: var(--fs-small);
+            text-transform: none;
+            letter-spacing: 0;
             white-space: nowrap;
+            color: var(--ink);
         }
-        table.compare tbody th {
-            color: var(--text-primary);
-            font-weight: 600;
-            white-space: nowrap;
+
+        /* Our own row is marked with a rule, not with a colour alone. */
+        .data-table tbody tr.is-ours th {
+            border-left: 3px solid var(--green);
+            padding-left: 0.6rem;
         }
-        table.compare tbody tr:last-child th,
-        table.compare tbody tr:last-child td {
-            border-bottom: none;
-        }
-        table.compare tbody tr.is-ours th {
-            box-shadow: inset 3px 0 0 var(--theme-primary);
-        }
-        table.compare tbody tr.is-ours th,
-        table.compare tbody tr.is-ours td {
-            color: var(--text-primary);
-        }
-        .sources-list {
-            list-style: none;
-            margin: 0.75rem 0 0;
-            padding: 0;
-        }
+
+        .data-table tbody tr.is-ours td { color: var(--ink); }
+
+        .sources-list { list-style: none; margin: 0.75rem 0 0; padding: 0; }
+
         .sources-list li {
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--rule);
             padding: 0.65rem 0;
+            margin: 0;
+            font-size: var(--fs-small);
             line-height: 1.65;
-            color: var(--text-secondary);
-            font-size: 0.92rem;
+            color: var(--graphite);
         }
-        .sources-list li:first-child { border-top: none; }
-        .sources-list strong { color: var(--text-primary); }
-        .article-page article ol {
-            margin: 0 0 1rem 1.25rem;
-            color: var(--text-secondary);
-        }
-        .article-page article ol li {
-            line-height: 1.7;
-            margin-bottom: 0.6rem;
-            padding-left: 0.25rem;
-        }
-        .callout {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-left: 3px solid var(--theme-primary);
-            border-radius: 0 14px 14px 0;
-            padding: 1.15rem 1.4rem;
-            margin: 1rem 0;
-        }
-        .callout h3 {
-            margin-bottom: 0.5rem;
-        }
-        .callout ul {
-            margin-bottom: 0;
-        }
+
+        .sources-list li:first-child { border-top: 0; }
+
         .partner-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 1.15rem 1.4rem;
+            background: var(--leaf);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sheet);
+            padding: 1.15rem 1.35rem;
             margin: 1.25rem 0;
         }
-        .partner-card p:last-child {
-            margin-bottom: 0;
-        }
+
+        .partner-card h3 { margin-top: 0.35rem; }
+
+        .partner-card p:last-child { margin-bottom: 0; }
+
         .partner-card .sponsored-tag {
             display: inline-block;
-            font-size: 0.72rem;
-            letter-spacing: 0.08em;
+            font-family: var(--ui);
+            font-size: var(--fs-micro);
+            font-weight: 500;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-            border-radius: 999px;
+            color: var(--graphite);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius-pill);
             padding: 0.15rem 0.6rem;
-            margin-bottom: 0.5rem;
-        }
-        @media (max-width: 640px) {
-            table.compare { font-size: 0.86rem; }
-            table.compare th, table.compare td { padding: 0.6rem 0.7rem; }
         }
     </style>
 </head>
 <body class="theme-coherent article-page technique-page">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element leaf leaf-3"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element ripple ripple-3"></div>
-    <div class="natural-element cloud cloud-1"></div>
-    <div class="natural-element sun-ray sun-ray-1"></div>
-    <div class="natural-element sun-ray sun-ray-2"></div>
-    <div class="natural-element sun-ray sun-ray-3"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides" aria-current="page">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
@@ -343,14 +304,16 @@
                     <li>Breathing apps compared</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Breathing apps compared: free vs paid</h1>
-                <p class="subtitle">Current prices, what each free tier really gives you, and the honest answer to whether you need to pay at all.</p>
+            <h1>Breathing apps compared: free vs paid</h1>
+            <p class="lead">Current prices, what each free tier really gives you, and the honest answer to whether you need to pay at all.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Published 2026-09-09 &middot; Updated 2026-09-10</p>
             </div>
         </header>
 
         <main id="main">
-            <div class="affiliate-disclosure">
+            <div class="callout affiliate-disclosure">
                 <h2>Disclosure: how this page could make money</h2>
                 <p>Four links on this page can pay us, and they all point at two companies. The <strong>Headspace</strong> links and the <strong>moonbird</strong> links are affiliate links, marked <strong>sponsored</strong>, and if you subscribe or buy after clicking one we may earn a commission at no extra cost to you. Nothing else here is paid for, sponsored, gifted or reviewed in exchange for anything. Calm, Breathwrk, Othership and Breathe+ are named and priced but carry no commercial link from us, and none of them pays us a cent; where this page cites an App Store listing as a price source, that citation is a plain unpaid link. Prices were read by hand off each vendor's own listing on <strong>10 September 2026</strong> and every source is written out at the foot of this page. The recommendation this page arrives at is the free option, which happens to be the one you are standing on — so read the money above with that in mind, in both directions.</p>
             </div>
@@ -362,7 +325,15 @@
                      data-duration="300"
                      aria-labelledby="timer-heading">
 
-                <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">⚙️</button>
+                <div class="app-bar">
+                    <h2 id="timer-heading" data-role="technique-title">Heart Coherence</h2>
+                    <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+                            <circle cx="12" cy="12" r="3.2"/>
+                            <path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
+                        </svg>
+                    </button>
+                </div>
 
                 <div class="settings-panel" data-role="settings-panel">
                     <div class="setting-item">
@@ -386,22 +357,18 @@
                     </div>
                 </div>
 
-                <h2 id="timer-heading" data-role="technique-title">💗 Heart Coherence</h2>
-
                 <div class="breathing-container">
-                    <div class="breathing-aura"></div>
+                    <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
+                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
+                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                    </svg>
                     <div class="breathing-circle technique-coherent" data-role="circle">
-                        <div class="circle-text-container">
-                            <span data-role="circle-text">Ready</span>
-                        </div>
+                        <span class="circle-notch" aria-hidden="true"></span>
                     </div>
-                    <div class="breathing-particles" aria-hidden="true">
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
+                    <div class="circle-text-container">
+                        <span class="phase-word" data-role="circle-text">Ready</span>
+                        <span class="phase-count" data-role="phase-count"></span>
                     </div>
                 </div>
 
@@ -462,13 +429,13 @@
 
             <!-- ============ TECHNIQUE SWITCHER ============ -->
             <nav class="technique-switcher" aria-label="Other breathing timers">
-                <a href="/4-7-8-breathing">🌙 4-7-8</a>
-                <a href="/box-breathing">🌿 Box</a>
-                <a href="/heart-coherence-breathing">💗 Coherence</a>
-                <a href="/cyclic-sighing">🌊 Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">🌅 Extended exhale</a>
-                <a href="/triangle-breathing">☁️ Triangle</a>
-                <a href="/energizing-breath">☀️ Energizing</a>
+                <a href="/4-7-8-breathing">4-7-8</a>
+                <a href="/box-breathing">Box</a>
+                <a href="/heart-coherence-breathing">Coherence</a>
+                <a href="/cyclic-sighing">Cyclic sighing</a>
+                <a href="/extended-exhale-breathing">Extended exhale</a>
+                <a href="/triangle-breathing">Triangle</a>
+                <a href="/energizing-breath">Energizing</a>
                 <a href="/timer">All timers</a>
             </nav>
 
@@ -498,8 +465,8 @@
                     <h2>Breathing apps and prices, September 2026</h2>
                     <p>Everything in this table was read off the vendor's own listing on 10 September 2026, in US dollars unless stated. Prices differ by country, they change without warning, and buying inside an app can cost more than buying on the vendor's website. Where a listing does not label what a price buys, this table says so instead of guessing.</p>
 
-                    <div class="compare-scroll">
-                        <table class="compare">
+                    <div class="table-scroll">
+                        <table class="data-table">
                             <caption>Prices in US dollars from each app's US App Store listing, except moonbird, which is priced in euros on its own store. All six listings opened 10 September 2026. "Not verified" means the listing does not state it, and we would rather leave a gap than fill it with a guess.</caption>
                             <thead>
                                 <tr>
@@ -640,7 +607,7 @@
                 <section>
                     <h2>Before you buy anything that involves holds or fast breathing</h2>
                     <p>Most of the paid catalogues include patterns that go well beyond slow, even breathing: long breath retentions, rapid hyperventilation-style rounds, and "energizing" sessions. Those are not equivalent to a five-in, five-out pacer, and no app screens you before selling you one.</p>
-                    <div class="callout">
+                    <div class="callout callout--caution">
                         <h3>Do not practise breath holds or fast breathing, in any app, if any of these apply</h3>
                         <ul>
                             <li>You are pregnant.</li>
@@ -730,43 +697,51 @@
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">Extended exhale</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About and products">
-                <a href="/science">What the research says</a>
-                <a href="/about">About</a>
-                <a href="/pro">Pro</a>
-                <a href="/for-practitioners">For practitioners</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>

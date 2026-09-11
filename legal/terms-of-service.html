@@ -17,22 +17,25 @@
     <meta property="og:description" content="The terms for using Help Me Breathe: licence tiers and activation limits, an unconditional 14-day refund, embed rules, and the health disclaimer.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://helpmebreath.com/legal/terms-of-service">
-    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/terms-of-service.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Terms of Service">
     <meta name="twitter:description" content="The terms for using Help Me Breathe: licence tiers and activation limits, an unconditional 14-day refund, embed rules, and the health disclaimer.">
-    <meta name="twitter:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/terms-of-service.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,8 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -111,482 +114,401 @@
     </script>
 
     <style>
-        .legal-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .legal-content {
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            padding: 3rem;
-            border-radius: 30px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            margin-top: 2rem;
-        }
-
-        .legal-content h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        .legal-content h2 {
-            font-size: 1.5rem;
-            margin-top: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        .legal-content h3 {
-            font-size: 1.25rem;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            color: var(--text-primary);
-        }
-
-        .legal-content p {
-            line-height: 1.8;
-            margin-bottom: 1rem;
-            color: var(--text-secondary);
-        }
-
-        .legal-content ul {
-            margin: 1rem 0;
-            padding-left: 2rem;
-        }
-
-        .legal-content li {
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .legal-content strong {
-            color: var(--text-primary);
-        }
-
-        .legal-content a {
-            color: var(--text-primary);
-            text-decoration: underline;
-            transition: opacity 0.3s ease;
-        }
-
-        .legal-content a:hover {
-            opacity: 0.7;
-        }
-
-        .last-updated {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            opacity: 0.8;
-            margin-bottom: 2rem;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-primary);
-            text-decoration: none;
-            margin-bottom: 2rem;
-            transition: opacity 0.3s ease;
-        }
-
-        .back-link:hover {
-            opacity: 0.7;
-        }
-
-        .summary-box {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--theme-primary);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .summary-box h2 {
-            margin-top: 0;
-            font-size: 1.25rem;
-        }
-
-        .summary-box ul {
-            margin-bottom: 0;
-        }
-
-        .important-notice {
-            background: rgba(255, 66, 77, 0.1);
-            border: 1px solid rgba(255, 66, 77, 0.3);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .important-notice h2 {
-            color: #FF424D;
-            margin-top: 0;
-            font-size: 1.25rem;
-        }
-
-        .important-notice p:last-child {
-            margin-bottom: 0;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.5rem 0;
-            font-size: 0.9375rem;
-        }
-
-        .data-table th,
-        .data-table td {
-            text-align: left;
-            padding: 0.75rem 0.85rem;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-secondary);
-            line-height: 1.6;
-            vertical-align: top;
-        }
-
-        .data-table th {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .table-scroll {
-            overflow-x: auto;
-        }
-
-        .legal-nav {
-            margin-top: 3rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border);
-            font-size: 0.9375rem;
-        }
-
-        @media (max-width: 768px) {
-            .legal-content {
-                padding: 2rem 1.5rem;
-            }
-
-            .legal-content h1 {
-                font-size: 2rem;
-            }
-        }
+        /* `.callout > h2` and `.legal-nav` are now shared components in
+           css/styles.css section 7. Nothing page-scoped is left here. */
     </style>
 </head>
-<body class="theme-478" data-no-ads="true" data-no-asks="true">
+<body class="theme-478 article-page" data-no-ads="true" data-no-asks="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
-    <div class="legal-container">
-        <a href="/" class="back-link">← Back to Help Me Breathe</a>
-
-        <main id="main" class="legal-content">
+    <div class="container">
+        <header class="article-header">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    <li>Terms of service</li>
+                </ol>
+            </nav>
             <h1>Terms of Service</h1>
-            <p class="last-updated">Last updated <time datetime="2026-09-09">9 September 2026</time>. Published by Georges Rayess, an individual.</p>
-
-            <p>Help Me Breathe is a guided breathing timer at <a href="https://helpmebreath.com/">helpmebreath.com</a>. These terms are the agreement between you and <strong>Georges Rayess, an individual resident in Lebanon</strong>, who builds and publishes it. There is no company behind this site, and these terms do not pretend otherwise.</p>
-
-            <p>By using the site, the timer, the embeddable widget or anything you buy here, you accept these terms. If you do not accept them, please do not use the site. They are written in plain words on purpose. If a sentence here is unclear, write to <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and ask.</p>
-
-            <div class="summary-box">
-                <h2>The short version</h2>
-                <ul>
-                    <li>Every breathing technique, every session length and the embeddable widget stay <strong>free</strong>.</li>
-                    <li>What you buy is a <strong>licence to use the software</strong>, not ownership of it.</li>
-                    <li><strong>Fourteen days, unconditional refund.</strong> Ask by email. No reason needed.</li>
-                    <li>The seller named on your receipt is our <strong>merchant of record</strong>, not me.</li>
-                    <li>None of this is medical care. Read the <a href="/legal/medical-disclaimer">medical disclaimer</a>.</li>
-                </ul>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Last updated <time datetime="2026-09-09">9 September 2026</time>. Published by Georges Rayess, an individual.</p>
             </div>
+        </header>
+
+        <main id="main">
+            <article class="prose">
+                <section>
+                    <p class="lead">Help Me Breathe is a guided breathing timer at <a href="https://helpmebreath.com/">helpmebreath.com</a>. These terms are the agreement between you and <strong>Georges Rayess, an individual resident in Lebanon</strong>, who builds and publishes it. There is no company behind this site, and these terms do not pretend otherwise.</p>
+
+                    <p>By using the site, the timer, the embeddable widget or anything you buy here, you accept these terms. If you do not accept them, please do not use the site. They are written in plain words on purpose. If a sentence here is unclear, write to <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and ask.</p>
+
+                    <div class="callout">
+                        <h2>The short version</h2>
+                        <ul>
+                            <li>Every breathing technique, every session length and the embeddable widget stay <strong>free</strong>.</li>
+                            <li>What you buy is a <strong>licence to use the software</strong>, not ownership of it.</li>
+                            <li><strong>Fourteen days, unconditional refund.</strong> Ask by email. No reason needed.</li>
+                            <li>The seller named on your receipt is our <strong>merchant of record</strong>, not me.</li>
+                            <li>None of this is medical care. Read the <a href="/legal/medical-disclaimer">medical disclaimer</a>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="callout callout--caution">
+                        <h2>Health disclaimer</h2>
+                        <p>Help Me Breathe is a timer for general wellbeing and education. It is <strong>not medical advice, diagnosis or treatment</strong>, and it is not a substitute for care from a qualified health professional. Breath-holding and fast-breathing patterns are not right for everyone. Talk to your doctor before starting any breathing practice, especially if you are pregnant, or live with a cardiovascular condition, uncontrolled high blood pressure, epilepsy, a respiratory condition, glaucoma, a panic disorder, or if you have had recent surgery.</p>
+                        <p>If you feel dizzy, faint or unwell, stop and breathe normally. In an emergency, call your local emergency number. The full list of cautions is on the <a href="/legal/medical-disclaimer">medical disclaimer</a> page, and it forms part of these terms.</p>
+                    </div>
+                </section>
+
+                <section id="parties">
+                    <h2>1. Who these terms are with</h2>
+
+                    <p>The site is published by Georges Rayess, an individual, contactable at <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. In these terms, "we", "us" and "I" all mean the same person. "You" means whoever is using the site or holds a licence.</p>
+
+                    <p>There are no accounts, no logins and no passwords here. Your settings and your licence live in your own browser. What that means for your data is set out in the <a href="/legal/privacy-policy">Privacy Policy</a>, which forms part of these terms.</p>
+                </section>
+
+                <section id="who-may-use">
+                    <h2>2. Who may use the site</h2>
+
+                    <p>You must be at least 13 years old to use Help Me Breathe. If you are under 18, use it with the agreement of a parent or guardian. The site is not directed at children under 13.</p>
+
+                    <p>Use the site lawfully and leave it working for everyone else. You agree not to:</p>
+
+                    <ul>
+                        <li>use it in a way that breaks any law that applies to you;</li>
+                        <li>attack, probe or overload the site, the activation endpoint or the widget;</li>
+                        <li>upload or transmit malicious code;</li>
+                        <li>scrape the site with automated tools beyond ordinary search-engine crawling;</li>
+                        <li>strip, alter or hide the attribution on a free embed;</li>
+                        <li>resell, sublicense or repackage the code, the audio or the written guides as your own;</li>
+                        <li>impersonate me, this site, or a health professional.</li>
+                    </ul>
+                </section>
+
+                <section id="no-medical-claims">
+                    <h2>3. This is not medical care, and no medical claims</h2>
+
+                    <p>I do not claim that this timer treats, cures, prevents or diagnoses any condition. Nothing on the site is a promise of a health outcome. Where a page describes research, it names the study and links to it, and it says plainly what the evidence does and does not show.</p>
+
+                    <p><strong>If you use Help Me Breathe with other people, you must not make medical claims either.</strong> Do not present the timer, the widget, the handouts or the Protocol Pack as a treatment, a therapy, a diagnosis or a replacement for care. Do not imply that I endorse your practice, your programme or your clinical judgement. Do not use it in place of emergency care.</p>
+
+                    <p>You use the breathing patterns at your own risk, and you are responsible for deciding whether a pattern is safe for you or for the people you work with.</p>
+                </section>
+
+                <section id="free-tier">
+                    <h2>4. The free tier</h2>
+
+                    <p>All seven breathing techniques, every session length including unlimited, the audio and vibration cues, the offline install, saved settings, session history and the embeddable widget are free. They were free before there was anything to buy, and <strong>they stay free</strong>. Nothing that works today will be moved behind a payment later.</p>
+
+                    <p>The free tier is offered as it is, with no commitment about uptime. It carries advertising on some written guides, and no advertising at all inside the timer, inside the widget, or on the anxiety and panic-attack pages.</p>
+                </section>
+
+                <section id="licence">
+                    <h2>5. What a licence is</h2>
+
+                    <p>Paid tiers grant you a <strong>limited, non-exclusive, non-transferable licence to use</strong> Help Me Breathe's paid features. You are not buying the software, the source code, the audio, the artwork or the written material, and no ownership passes to you. All of it stays mine or my licensors'.</p>
+
+                    <p>A licence is personal to the buyer. It may not be shared, sold, lent, rented or passed to someone else, and a licence key may not be published anywhere.</p>
+
+                    <h3>5.1 The tiers</h3>
+
+                    <div class="table-scroll">
+                        <table class="data-table">
+                            <caption class="sr-only">Licence tiers, what each grants and its activation limit</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Tier</th>
+                                    <th scope="col">What the licence grants</th>
+                                    <th scope="col">Limit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">Free</th>
+                                    <td>Personal and non-commercial use of the site, the timer and the embeddable widget with its attribution link intact.</td>
+                                    <td>No limit</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Pro Lifetime</th>
+                                    <td>Personal use of the paid features — pattern builder and saved presets, streaks and export, soundscapes, night mode, no advertising — for as long as the site runs. Includes the Protocol Pack.</td>
+                                    <td class="num">6 devices</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Pro Monthly</th>
+                                    <td>The same paid features as Pro Lifetime, for as long as the subscription is paid. It renews until you cancel, and cancelling stops the next charge.</td>
+                                    <td class="num">6 devices</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Practitioner</th>
+                                    <td>Everything in Pro, plus a commercial-use grant, the white-label embed on your own domain, the co-branded client session link, class mode and the client handout pack. Renews yearly.</td>
+                                    <td class="num">25 devices, 1 domain</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Studio</th>
+                                    <td>The Practitioner licence for one organisation across several sites, plus an aggregate usage report. Renews yearly.</td>
+                                    <td class="num">25 devices, 10 domains</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Protocol Pack</th>
+                                    <td>Print-ready protocol cards and a practice log, for your own use. Included at no extra cost with Pro and Practitioner.</td>
+                                    <td>Personal use</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>5.2 Activation limits</h3>
+
+                    <p>An <strong>activation</strong> is one browser on one device. Your laptop, your phone and a studio tablet are three activations. Consumer licences — Pro Lifetime and Pro Monthly — allow <strong>six activations</strong>. Practitioner and Studio allow <strong>twenty-five</strong>. Studio also allows the white-label embed on up to <strong>ten domains</strong>; Practitioner allows one.</p>
 
-            <div class="important-notice">
-                <h2>⚠️ Health disclaimer</h2>
-                <p>Help Me Breathe is a timer for general wellbeing and education. It is <strong>not medical advice, diagnosis or treatment</strong>, and it is not a substitute for care from a qualified health professional. Breath-holding and fast-breathing patterns are not right for everyone. Talk to your doctor before starting any breathing practice, especially if you are pregnant, or live with a cardiovascular condition, uncontrolled high blood pressure, epilepsy, a respiratory condition, glaucoma, a panic disorder, or if you have had recent surgery.</p>
-                <p>If you feel dizzy, faint or unwell, stop and breathe normally. In an emergency, call your local emergency number. The full list of cautions is on the <a href="/legal/medical-disclaimer">medical disclaimer</a> page, and it forms part of these terms.</p>
-            </div>
-
-            <h2>1. Who these terms are with</h2>
+                    <p>Clearing your browser storage releases nothing automatically, so if you run out because you reinstalled or changed machines, email me and I will reset your count. That is a normal request, not a favour. Deliberately activating past your cap — sharing a key with a team, a class or the internet — is a breach of these terms.</p>
 
-            <p>The site is published by Georges Rayess, an individual, contactable at <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. In these terms, "we", "us" and "I" all mean the same person. "You" means whoever is using the site or holds a licence.</p>
+                    <h3>5.3 Keys and tokens</h3>
 
-            <p>There are no accounts, no logins and no passwords here. Your settings and your licence live in your own browser. What that means for your data is set out in the <a href="/legal/privacy-policy">Privacy Policy</a>, which forms part of these terms.</p>
+                    <p>Activation exchanges your licence key for a short signed token that your browser keeps. The token expires and refreshes quietly in the background. If the refresh cannot reach the server, <strong>a licence keeps working for fourteen days past expiry</strong> so an outage never locks you out mid-session.</p>
 
-            <h2>2. Who may use the site</h2>
+                    <p>Do not tamper with, forge or reverse-engineer a token, and do not work around the activation limits.</p>
+                </section>
 
-            <p>You must be at least 13 years old to use Help Me Breathe. If you are under 18, use it with the agreement of a parent or guardian. The site is not directed at children under 13.</p>
+                <section id="buying">
+                    <h2>6. Buying — the merchant of record</h2>
 
-            <p>Use the site lawfully and leave it working for everyone else. You agree not to:</p>
+                    <p>I do not sell to you directly. Paid licences are sold through a <strong>merchant of record</strong>, currently <strong>Paddle</strong>, with <strong>FastSpring</strong> as the alternative provider. The merchant of record is the <strong>legal seller</strong> of what you buy. It takes the payment, calculates and remits sales tax and VAT, issues your receipt and handles refunds and chargebacks. Its own terms apply to the transaction alongside these ones, and the company named on your receipt is the one you bought from.</p>
 
-            <ul>
-                <li>use it in a way that breaks any law that applies to you;</li>
-                <li>attack, probe or overload the site, the activation endpoint or the widget;</li>
-                <li>upload or transmit malicious code;</li>
-                <li>scrape the site with automated tools beyond ordinary search-engine crawling;</li>
-                <li>strip, alter or hide the attribution on a free embed;</li>
-                <li>resell, sublicense or repackage the code, the audio or the written guides as your own;</li>
-                <li>impersonate me, this site, or a health professional.</li>
-            </ul>
+                    <p>Prices are shown in US dollars unless your checkout says otherwise, and tax may be added at checkout depending on where you are. I never see or store your card details. What reaches me is an order reference, the tier, the email address you bought with and the country used for tax.</p>
 
-            <h2>3. This is not medical care, and no medical claims</h2>
+                    <p>Yearly licences renew automatically until cancelled. You can cancel from the link on your receipt, or by emailing me and I will do it for you. Cancelling stops the next charge; the licence runs to the end of the term you already paid for.</p>
+                </section>
 
-            <p>I do not claim that this timer treats, cures, prevents or diagnoses any condition. Nothing on the site is a promise of a health outcome. Where a page describes research, it names the study and links to it, and it says plainly what the evidence does and does not show.</p>
+                <section id="advertising">
+                    <h2>7. Advertising, affiliate links and other sites</h2>
 
-            <p><strong>If you use Help Me Breathe with other people, you must not make medical claims either.</strong> Do not present the timer, the widget, the handouts or the Protocol Pack as a treatment, a therapy, a diagnosis or a replacement for care. Do not imply that I endorse your practice, your programme or your clinical judgement. Do not use it in place of emergency care.</p>
+                    <p>Some written guides carry Google AdSense advertising. Ads never appear inside the timer, inside the widget, on the product pages, or on the anxiety and panic-attack pages, and <strong>anyone holding a paid licence sees no advertising anywhere</strong>. I do not control what an ad says and I do not endorse advertised products.</p>
 
-            <p>You use the breathing patterns at your own risk, and you are responsible for deciding whether a pattern is safe for you or for the people you work with.</p>
+                    <p>A few pages link to products I rate — currently Headspace and moonbird. Those are <strong>affiliate links</strong>, and <strong>I may earn a commission if you buy after clicking one</strong>, at no extra cost to you. The recommendation is not for sale, and the comparison pages still say when the free option is enough. Once you follow a link off this site, that company's terms and privacy policy govern what happens next, and I am not responsible for it.</p>
+                </section>
 
-            <h2>4. The free tier</h2>
+                <section id="embedding">
+                    <h2>8. The widget and embedding</h2>
 
-            <p>All seven breathing techniques, every session length including unlimited, the audio and vibration cues, the offline install, saved settings, session history and the embeddable widget are free. They were free before there was anything to buy, and <strong>they stay free</strong>. Nothing that works today will be moved behind a payment later.</p>
+                    <p>You may embed the breathing widget on your own site, including a site that makes money, free of charge. In return:</p>
 
-            <p>The free tier is offered as it is, with no commitment about uptime. It carries advertising on some written guides, and no advertising at all inside the timer, inside the widget, or on the anxiety and panic-attack pages.</p>
+                    <ul>
+                        <li><strong>The free embed must keep its attribution link.</strong> Do not remove it, hide it, cover it, shrink it out of sight or point it elsewhere. That link is always marked <code>nofollow noopener</code>, on every tier, and there is no paid option to change that.</li>
+                        <li><strong>Practitioner and Studio licences may remove the attribution</strong> — but only on the domains listed on the licence, and only while it is active. If the licence lapses, the frame goes back to showing attribution.</li>
+                        <li><strong>Do not copy, rehost, modify or redistribute the widget code.</strong> Embed it from this domain. Do not bundle it into a theme, a plugin, a template or a product you sell.</li>
+                        <li><strong>Do not frame the main site.</strong> Use the embed frame, which exists for exactly this. The rest of the site is served with a header that refuses framing.</li>
+                        <li>Do not use the widget on a page that is unlawful, hateful, or that presents breathing as a treatment for a medical condition.</li>
+                        <li>Do not add tracking to the frame or try to read what happens inside it. Nothing about your visitors is sent to me, and it should stay that way.</li>
+                    </ul>
 
-            <h2>5. What a licence is</h2>
+                    <p>I may ask you to remove an embed that breaks these rules, and I may block a domain that keeps breaking them.</p>
+                </section>
 
-            <p>Paid tiers grant you a <strong>limited, non-exclusive, non-transferable licence to use</strong> Help Me Breathe's paid features. You are not buying the software, the source code, the audio, the artwork or the written material, and no ownership passes to you. All of it stays mine or my licensors'.</p>
+                <section id="commercial-use">
+                    <h2>9. Commercial use — Practitioner and Studio</h2>
 
-            <p>A licence is personal to the buyer. It may not be shared, sold, lent, rented or passed to someone else, and a licence key may not be published anywhere.</p>
+                    <p>A Practitioner or Studio licence adds a <strong>commercial-use grant</strong>. With it you may use Help Me Breathe in paid work: one-to-one client sessions, group classes, workshops, courses and programmes you run yourself, in person or online. You may put the white-label embed on your own site, send clients a co-branded session link, and hand out the printable material with your name on it.</p>
 
-            <h3>5.1 The tiers</h3>
+                    <p>The limits are as simple as the grant:</p>
 
-            <div class="table-scroll">
-                <table class="data-table">
-                    <caption class="sr-only">Licence tiers, what each grants and its activation limit</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">Tier</th>
-                            <th scope="col">What the licence grants</th>
-                            <th scope="col">Limit</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row">Free</th>
-                            <td>Personal and non-commercial use of the site, the timer and the embeddable widget with its attribution link intact.</td>
-                            <td>No limit</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Pro Lifetime</th>
-                            <td>Personal use of the paid features — pattern builder and saved presets, streaks and export, soundscapes, night mode, no advertising — for as long as the site runs. Includes the Protocol Pack.</td>
-                            <td>6 devices</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Pro Monthly</th>
-                            <td>The same paid features as Pro Lifetime, for as long as the subscription is paid. It renews until you cancel, and cancelling stops the next charge.</td>
-                            <td>6 devices</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Practitioner</th>
-                            <td>Everything in Pro, plus a commercial-use grant, the white-label embed on your own domain, the co-branded client session link, class mode and the client handout pack. Renews yearly.</td>
-                            <td>25 devices, 1 domain</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Studio</th>
-                            <td>The Practitioner licence for one organisation across several sites, plus an aggregate usage report. Renews yearly.</td>
-                            <td>25 devices, 10 domains</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Protocol Pack</th>
-                            <td>Print-ready protocol cards and a practice log, for your own use. Included at no extra cost with Pro and Practitioner.</td>
-                            <td>Personal use</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                    <ul>
+                        <li><strong>Your own clients and classes only.</strong> The licence covers one practising individual, or, for Studio, one organisation and its named domains.</li>
+                        <li><strong>No resale.</strong> You may not sell, sublicense or give away access to the paid features, on their own or bundled into something else.</li>
+                        <li><strong>No wrapping it into a product.</strong> Do not build the timer into an app, a platform or a service you charge for, and do not offer it as a feature of your own software.</li>
+                        <li><strong>No white-labelling for third parties.</strong> Removing the attribution is for your own domains, not for sites you build for clients. Those need their own licence.</li>
+                        <li><strong>Your logo is yours to stand behind.</strong> If you set a logo on a white-label embed, you choose where it is hosted, and the visitor's browser fetches it from there. Point it at an address you control, and do not use it to load anything that tracks the people who visit the site you embedded on.</li>
+                        <li><strong>No claim of endorsement.</strong> You hold a licence; you are not certified, accredited, partnered or approved by me, and you may not say that you are.</li>
+                        <li><strong>You are the professional in the room.</strong> You are responsible for the safety, screening and consent of the people you work with, and for your own insurance and professional obligations. As the Privacy Policy explains, I never receive any data about your clients, so you are the controller of your own client relationship.</li>
+                    </ul>
+                </section>
 
-            <h3>5.2 Activation limits</h3>
+                <section id="refund-section">
+                    <h2 id="refund">10. The 14-day refund policy</h2>
 
-            <p>An <strong>activation</strong> is one browser on one device. Your laptop, your phone and a studio tablet are three activations. Consumer licences — Pro Lifetime and Pro Monthly — allow <strong>six activations</strong>. Practitioner and Studio allow <strong>twenty-five</strong>. Studio also allows the white-label embed on up to <strong>ten domains</strong>; Practitioner allows one.</p>
+                    <p><strong>Every purchase is covered by an unconditional 14-day refund.</strong> This is the one clause in this document with no small print.</p>
 
-            <p>Clearing your browser storage releases nothing automatically, so if you run out because you reinstalled or changed machines, email me and I will reset your count. That is a normal request, not a favour. Deliberately activating past your cap — sharing a key with a team, a class or the internet — is a breach of these terms.</p>
+                    <ul>
+                        <li>Ask within <strong>fourteen days of the charge</strong> and you get the full amount back.</li>
+                        <li><strong>No reason is needed.</strong> You will not be asked why, offered a discount to stay, or sent through a retention flow. "I changed my mind" is enough. So is nothing at all.</li>
+                        <li><strong>How to ask: email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a></strong> from the address you bought with, or quote the order reference on your receipt. There is no form.</li>
+                        <li><strong>The refund is issued by the merchant of record</strong> named on your receipt, back to the payment method you used. It usually lands within five to ten business days, depending on your bank.</li>
+                        <li>The licence stops when the refund is issued, and the key is deactivated. Please stop using the paid features and delete any printable material you downloaded.</li>
+                        <li>This applies to every tier, including a lifetime unlock and the Protocol Pack, and it applies to a first yearly renewal charge you did not expect.</li>
+                    </ul>
 
-            <h3>5.3 Keys and tokens</h3>
+                    <p>After fourteen days, one-time purchases are final. Yearly licences run to the end of the term already paid for and simply do not renew once you cancel. If something is broken, or a feature does not do what this site says it does, tell me at any time — that is a fault to fix, and outside the refund window I will still make it right rather than argue.</p>
 
-            <p>Activation exchanges your licence key for a short signed token that your browser keeps. The token expires and refreshes quietly in the background. If the refresh cannot reach the server, <strong>a licence keeps working for fourteen days past expiry</strong> so an outage never locks you out mid-session.</p>
+                    <p>Where the law where you live gives you stronger rights than this — a statutory right of withdrawal, for example — <strong>those rights apply on top of this policy, not instead of it</strong>. Nothing here takes away a consumer right you cannot waive.</p>
+                </section>
 
-            <p>Do not tamper with, forge or reverse-engineer a token, and do not work around the activation limits.</p>
+                <section id="provider-change">
+                    <h2>11. If the payment provider changes or stops</h2>
 
-            <h2>6. Buying — the merchant of record</h2>
+                    <p>A one-person project depends on a merchant of record, and providers do sometimes change terms, close accounts or leave markets. Here is what happens if that occurs, in advance and in writing:</p>
 
-            <p>I do not sell to you directly. Paid licences are sold through a <strong>merchant of record</strong>, currently <strong>Paddle</strong>, with <strong>FastSpring</strong> as the alternative provider. The merchant of record is the <strong>legal seller</strong> of what you buy. It takes the payment, calculates and remits sales tax and VAT, issues your receipt and handles refunds and chargebacks. Its own terms apply to the transaction alongside these ones, and the company named on your receipt is the one you bought from.</p>
+                    <ul>
+                        <li><strong>Already-activated lifetime licences keep working.</strong> Your token lives in your browser, and the fourteen-day offline grace path means the paid features keep running for at least a fortnight after the last successful refresh, even when nothing can be reached at all. That window is there to cover an outage or a handover, not to run forever unattended — the replacement key described below is what restores a lifetime licence for good.</li>
+                        <li><strong>Keys will be reissued.</strong> If I move to another provider, I will issue you a replacement key through the new one at no cost. Email me from the address you bought with.</li>
+                        <li><strong>Subscriptions stop cleanly.</strong> If a yearly or monthly licence cannot be renewed through a new provider, it simply ends at the end of its paid term and you are not charged again.</li>
+                        <li><strong>You will be told.</strong> A change of provider will be announced on the site and by email to buyers.</li>
+                    </ul>
 
-            <p>Prices are shown in US dollars unless your checkout says otherwise, and tax may be added at checkout depending on where you are. I never see or store your card details. What reaches me is an order reference, the tier, the email address you bought with and the country used for tax.</p>
+                    <p>This is a promise about intent and effort. It is not a guarantee that a third party will behave, and it does not make me liable for a provider's own failure.</p>
+                </section>
 
-            <p>Yearly licences renew automatically until cancelled. You can cancel from the link on your receipt, or by emailing me and I will do it for you. Cancelling stops the next charge; the licence runs to the end of the term you already paid for.</p>
+                <section id="ip">
+                    <h2>12. Intellectual property and your feedback</h2>
 
-            <h2>7. Advertising, affiliate links and other sites</h2>
+                    <p>The site, its code, its design, its written guides, its audio and its printable material are protected by copyright and remain mine or my licensors'. The name "Help Me Breathe" and the site's branding are mine. None of it may be used in another product, or in a way that suggests I endorse something, without written permission.</p>
 
-            <p>Some written guides carry Google AdSense advertising. Ads never appear inside the timer, inside the widget, on the product pages, or on the anxiety and panic-attack pages, and <strong>anyone holding a paid licence sees no advertising anywhere</strong>. I do not control what an ad says and I do not endorse advertised products.</p>
+                    <p>Breathing patterns themselves are not owned by anyone. Practise them, teach them and write about them freely. What these terms protect is this implementation of them.</p>
 
-            <p>A few pages link to products I rate — currently Headspace and moonbird. Those are <strong>affiliate links</strong>, and <strong>I may earn a commission if you buy after clicking one</strong>, at no extra cost to you. The recommendation is not for sale, and the comparison pages still say when the free option is enough. Once you follow a link off this site, that company's terms and privacy policy govern what happens next, and I am not responsible for it.</p>
+                    <p>If you send me an idea, a bug report or a suggestion, you give me a free, worldwide permission to use it in the product. You keep your idea; I just do not want a dispute over a feature request.</p>
+                </section>
 
-            <h2>8. The widget and embedding</h2>
+                <section id="availability">
+                    <h2>13. Availability and changes to the service</h2>
 
-            <p>You may embed the breathing widget on your own site, including a site that makes money, free of charge. In return:</p>
+                    <p>The site is offered as it is, with no promised uptime. I may add, change, move or remove features, and I may retire a feature that is not used. If a paid feature is retired while your licence is running, I will either replace it with something equivalent or refund a fair share of what you paid.</p>
 
-            <ul>
-                <li><strong>The free embed must keep its attribution link.</strong> Do not remove it, hide it, cover it, shrink it out of sight or point it elsewhere. That link is always marked <code>nofollow noopener</code>, on every tier, and there is no paid option to change that.</li>
-                <li><strong>Practitioner and Studio licences may remove the attribution</strong> — but only on the domains listed on the licence, and only while it is active. If the licence lapses, the frame goes back to showing attribution.</li>
-                <li><strong>Do not copy, rehost, modify or redistribute the widget code.</strong> Embed it from this domain. Do not bundle it into a theme, a plugin, a template or a product you sell.</li>
-                <li><strong>Do not frame the main site.</strong> Use the embed frame, which exists for exactly this. The rest of the site is served with a header that refuses framing.</li>
-                <li>Do not use the widget on a page that is unlawful, hateful, or that presents breathing as a treatment for a medical condition.</li>
-                <li>Do not add tracking to the frame or try to read what happens inside it. Nothing about your visitors is sent to me, and it should stay that way.</li>
-            </ul>
+                    <p>Existing free techniques are the exception: they stay, and they stay free.</p>
+                </section>
 
-            <p>I may ask you to remove an embed that breaks these rules, and I may block a domain that keeps breaking them.</p>
+                <section id="termination">
+                    <h2>14. Termination</h2>
 
-            <h2>9. Commercial use — Practitioner and Studio</h2>
+                    <p>You can stop using the site at any time. Clearing this site's storage removes your settings, your history and your licence token from that browser.</p>
 
-            <p>A Practitioner or Studio licence adds a <strong>commercial-use grant</strong>. With it you may use Help Me Breathe in paid work: one-to-one client sessions, group classes, workshops, courses and programmes you run yourself, in person or online. You may put the white-label embed on your own site, send clients a co-branded session link, and hand out the printable material with your name on it.</p>
+                    <p>I may suspend or end your licence, or block your access, if you materially breach these terms — sharing a key publicly, stripping attribution from a free embed, reselling access, attacking the service, or using the widget to make medical claims. Where the breach can be fixed, I will ask you to fix it first and give you a reasonable chance to do so. Where a licence is ended for a breach, no refund is due beyond the fourteen-day window. If I end your licence for any other reason, I will refund the unused part.</p>
 
-            <p>The limits are as simple as the grant:</p>
+                    <p>Sections 3, 10, 12, 15, 16, 17, 18 and 20 survive the end of this agreement, so a refund you were already owed is still owed.</p>
+                </section>
 
-            <ul>
-                <li><strong>Your own clients and classes only.</strong> The licence covers one practising individual, or, for Studio, one organisation and its named domains.</li>
-                <li><strong>No resale.</strong> You may not sell, sublicense or give away access to the paid features, on their own or bundled into something else.</li>
-                <li><strong>No wrapping it into a product.</strong> Do not build the timer into an app, a platform or a service you charge for, and do not offer it as a feature of your own software.</li>
-                <li><strong>No white-labelling for third parties.</strong> Removing the attribution is for your own domains, not for sites you build for clients. Those need their own licence.</li>
-                <li><strong>Your logo is yours to stand behind.</strong> If you set a logo on a white-label embed, you choose where it is hosted, and the visitor's browser fetches it from there. Point it at an address you control, and do not use it to load anything that tracks the people who visit the site you embedded on.</li>
-                <li><strong>No claim of endorsement.</strong> You hold a licence; you are not certified, accredited, partnered or approved by me, and you may not say that you are.</li>
-                <li><strong>You are the professional in the room.</strong> You are responsible for the safety, screening and consent of the people you work with, and for your own insurance and professional obligations. As the Privacy Policy explains, I never receive any data about your clients, so you are the controller of your own client relationship.</li>
-            </ul>
+                <section id="warranties">
+                    <h2>15. Disclaimer of warranties</h2>
 
-            <h2 id="refund">10. The 14-day refund policy</h2>
+                    <p>The service is provided "as is" and "as available", without warranties of any kind, whether express or implied, including any implied warranty of merchantability, fitness for a particular purpose or non-infringement. I do not warrant that the service will be uninterrupted, error-free, secure, or that any particular breathing practice will produce any particular result. Nothing in this section limits a warranty that the law where you live does not allow to be excluded.</p>
+                </section>
 
-            <p><strong>Every purchase is covered by an unconditional 14-day refund.</strong> This is the one clause in this document with no small print.</p>
+                <section id="liability">
+                    <h2>16. Limitation of liability</h2>
 
-            <ul>
-                <li>Ask within <strong>fourteen days of the charge</strong> and you get the full amount back.</li>
-                <li><strong>No reason is needed.</strong> You will not be asked why, offered a discount to stay, or sent through a retention flow. "I changed my mind" is enough. So is nothing at all.</li>
-                <li><strong>How to ask: email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a></strong> from the address you bought with, or quote the order reference on your receipt. There is no form.</li>
-                <li><strong>The refund is issued by the merchant of record</strong> named on your receipt, back to the payment method you used. It usually lands within five to ten business days, depending on your bank.</li>
-                <li>The licence stops when the refund is issued, and the key is deactivated. Please stop using the paid features and delete any printable material you downloaded.</li>
-                <li>This applies to every tier, including a lifetime unlock and the Protocol Pack, and it applies to a first yearly renewal charge you did not expect.</li>
-            </ul>
+                    <p>To the fullest extent the law allows, I am not liable for indirect, incidental, special, consequential or punitive damages, or for lost profits, lost data or lost opportunity, arising from your use of the service.</p>
 
-            <p>After fourteen days, one-time purchases are final. Yearly licences run to the end of the term already paid for and simply do not renew once you cancel. If something is broken, or a feature does not do what this site says it does, tell me at any time — that is a fault to fix, and outside the refund window I will still make it right rather than argue.</p>
+                    <p>To the fullest extent the law allows, my total liability for any claim connected to the service is limited to <strong>the amount you paid me in the twelve months before the claim</strong>, or twenty US dollars if you paid nothing.</p>
 
-            <p>Where the law where you live gives you stronger rights than this — a statutory right of withdrawal, for example — <strong>those rights apply on top of this policy, not instead of it</strong>. Nothing here takes away a consumer right you cannot waive.</p>
+                    <p>Nothing in these terms excludes liability for death or personal injury caused by negligence, for fraud, or for anything else that cannot lawfully be excluded. If you are a consumer, your statutory rights are unaffected.</p>
+                </section>
 
-            <h2>11. If the payment provider changes or stops</h2>
+                <section id="indemnity">
+                    <h2>17. Indemnity</h2>
 
-            <p>A one-person project depends on a merchant of record, and providers do sometimes change terms, close accounts or leave markets. Here is what happens if that occurs, in advance and in writing:</p>
+                    <p>If you use Help Me Breathe in your own commercial practice, you agree to cover me for claims, losses and reasonable costs that arise from your use of it with your clients, from your breach of these terms, or from anything you claim about the practice that these terms do not say.</p>
+                </section>
 
-            <ul>
-                <li><strong>Already-activated lifetime licences keep working.</strong> Your token lives in your browser, and the fourteen-day offline grace path means the paid features keep running for at least a fortnight after the last successful refresh, even when nothing can be reached at all. That window is there to cover an outage or a handover, not to run forever unattended — the replacement key described below is what restores a lifetime licence for good.</li>
-                <li><strong>Keys will be reissued.</strong> If I move to another provider, I will issue you a replacement key through the new one at no cost. Email me from the address you bought with.</li>
-                <li><strong>Subscriptions stop cleanly.</strong> If a yearly or monthly licence cannot be renewed through a new provider, it simply ends at the end of its paid term and you are not charged again.</li>
-                <li><strong>You will be told.</strong> A change of provider will be announced on the site and by email to buyers.</li>
-            </ul>
+                <section id="law">
+                    <h2>18. Governing law and disputes</h2>
 
-            <p>This is a promise about intent and effort. It is not a guarantee that a third party will behave, and it does not make me liable for a provider's own failure.</p>
+                    <p>These terms are governed by the laws of the <strong>Republic of Lebanon</strong>, without regard to conflict-of-law rules, and the courts of Beirut, Lebanon have jurisdiction over any dispute.</p>
 
-            <h2>12. Intellectual property and your feedback</h2>
+                    <p><strong>Before anything formal, we talk.</strong> If something goes wrong, email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> with what happened and what you want. I will answer within fourteen days, and both of us agree to try in good faith to settle it between ourselves for at least thirty days before starting proceedings. Most problems in a project this size are a refund and an apology, and that is usually the fastest answer for everyone.</p>
 
-            <p>The site, its code, its design, its written guides, its audio and its printable material are protected by copyright and remain mine or my licensors'. The name "Help Me Breathe" and the site's branding are mine. None of it may be used in another product, or in a way that suggests I endorse something, without written permission.</p>
+                    <p>If you are a consumer, this clause does not take away your right to bring a claim in the courts of the country where you live, or to rely on the mandatory consumer protections that apply there.</p>
+                </section>
 
-            <p>Breathing patterns themselves are not owned by anyone. Practise them, teach them and write about them freely. What these terms protect is this implementation of them.</p>
+                <section id="changes">
+                    <h2>19. Changes to these terms</h2>
 
-            <p>If you send me an idea, a bug report or a suggestion, you give me a free, worldwide permission to use it in the product. You keep your idea; I just do not want a dispute over a feature request.</p>
+                    <p>I will update this page when the facts change — a new tier, a different provider, a clearer sentence. The date at the top always says when it last changed. If a change is material, I will say so on the page, and buyers will be emailed. Continuing to use the site after a change means the updated terms apply. <strong>A change will never shorten the refund window on a purchase you have already made</strong>, and it will never move a free technique behind a payment.</p>
+                </section>
 
-            <h2>13. Availability and changes to the service</h2>
+                <section id="the-rest">
+                    <h2>20. The rest</h2>
 
-            <p>The site is offered as it is, with no promised uptime. I may add, change, move or remove features, and I may retire a feature that is not used. If a paid feature is retired while your licence is running, I will either replace it with something equivalent or refund a fair share of what you paid.</p>
+                    <p>If a court finds part of these terms unenforceable, the rest stays in force. If I do not enforce something straight away, I have not given up the right to enforce it later. You may not transfer your rights under these terms; I may transfer mine if the site changes hands, and your licence and your refund rights travel with it. These terms, the <a href="/legal/privacy-policy">Privacy Policy</a> and the <a href="/legal/medical-disclaimer">medical disclaimer</a> are the whole agreement between us about the service, and they replace anything said before.</p>
+                </section>
 
-            <p>Existing free techniques are the exception: they stay, and they stay free.</p>
+                <section id="contact">
+                    <h2>21. Contact</h2>
 
-            <h2>14. Termination</h2>
+                    <p>Questions, refunds, licence resets and complaints all go to the same place: <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. This site is <a href="https://helpmebreath.com/">helpmebreath.com</a>, published by Georges Rayess, an individual.</p>
 
-            <p>You can stop using the site at any time. Clearing this site's storage removes your settings, your history and your licence token from that browser.</p>
+                    <p>By using the service, you confirm that you have read these terms and agree to them.</p>
 
-            <p>I may suspend or end your licence, or block your access, if you materially breach these terms — sharing a key publicly, stripping attribution from a free embed, reselling access, attacking the service, or using the widget to make medical claims. Where the breach can be fixed, I will ask you to fix it first and give you a reasonable chance to do so. Where a licence is ended for a breach, no refund is due beyond the fourteen-day window. If I end your licence for any other reason, I will refund the unused part.</p>
-
-            <p>Sections 3, 10, 12, 15, 16, 17, 18 and 20 survive the end of this agreement, so a refund you were already owed is still owed.</p>
-
-            <h2>15. Disclaimer of warranties</h2>
-
-            <p>The service is provided "as is" and "as available", without warranties of any kind, whether express or implied, including any implied warranty of merchantability, fitness for a particular purpose or non-infringement. I do not warrant that the service will be uninterrupted, error-free, secure, or that any particular breathing practice will produce any particular result. Nothing in this section limits a warranty that the law where you live does not allow to be excluded.</p>
-
-            <h2>16. Limitation of liability</h2>
-
-            <p>To the fullest extent the law allows, I am not liable for indirect, incidental, special, consequential or punitive damages, or for lost profits, lost data or lost opportunity, arising from your use of the service.</p>
-
-            <p>To the fullest extent the law allows, my total liability for any claim connected to the service is limited to <strong>the amount you paid me in the twelve months before the claim</strong>, or twenty US dollars if you paid nothing.</p>
-
-            <p>Nothing in these terms excludes liability for death or personal injury caused by negligence, for fraud, or for anything else that cannot lawfully be excluded. If you are a consumer, your statutory rights are unaffected.</p>
-
-            <h2>17. Indemnity</h2>
-
-            <p>If you use Help Me Breathe in your own commercial practice, you agree to cover me for claims, losses and reasonable costs that arise from your use of it with your clients, from your breach of these terms, or from anything you claim about the practice that these terms do not say.</p>
-
-            <h2>18. Governing law and disputes</h2>
-
-            <p>These terms are governed by the laws of the <strong>Republic of Lebanon</strong>, without regard to conflict-of-law rules, and the courts of Beirut, Lebanon have jurisdiction over any dispute.</p>
-
-            <p><strong>Before anything formal, we talk.</strong> If something goes wrong, email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> with what happened and what you want. I will answer within fourteen days, and both of us agree to try in good faith to settle it between ourselves for at least thirty days before starting proceedings. Most problems in a project this size are a refund and an apology, and that is usually the fastest answer for everyone.</p>
-
-            <p>If you are a consumer, this clause does not take away your right to bring a claim in the courts of the country where you live, or to rely on the mandatory consumer protections that apply there.</p>
-
-            <h2>19. Changes to these terms</h2>
-
-            <p>I will update this page when the facts change — a new tier, a different provider, a clearer sentence. The date at the top always says when it last changed. If a change is material, I will say so on the page, and buyers will be emailed. Continuing to use the site after a change means the updated terms apply. <strong>A change will never shorten the refund window on a purchase you have already made</strong>, and it will never move a free technique behind a payment.</p>
-
-            <h2>20. The rest</h2>
-
-            <p>If a court finds part of these terms unenforceable, the rest stays in force. If I do not enforce something straight away, I have not given up the right to enforce it later. You may not transfer your rights under these terms; I may transfer mine if the site changes hands, and your licence and your refund rights travel with it. These terms, the <a href="/legal/privacy-policy">Privacy Policy</a> and the <a href="/legal/medical-disclaimer">medical disclaimer</a> are the whole agreement between us about the service, and they replace anything said before.</p>
-
-            <h2>21. Contact</h2>
-
-            <p>Questions, refunds, licence resets and complaints all go to the same place: <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. This site is <a href="https://helpmebreath.com/">helpmebreath.com</a>, published by Georges Rayess, an individual.</p>
-
-            <p>By using the service, you confirm that you have read these terms and agree to them.</p>
-
-            <p class="legal-nav">See also: <a href="/legal/privacy-policy">Privacy Policy</a> · <a href="/legal/medical-disclaimer">Medical Disclaimer</a> · <a href="/about">About this site</a></p>
+                    <p class="legal-nav">See also: <a href="/legal/privacy-policy">Privacy Policy</a> &middot; <a href="/legal/medical-disclaimer">Medical Disclaimer</a> &middot; <a href="/about">About this site</a></p>
+                </section>
+            </article>
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About and products">
-                <a href="/science">What the research says</a>
-                <a href="/about">About</a>
-                <a href="/pro">Pro</a>
-                <a href="/for-practitioners">For practitioners</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">&bull;</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">&bull;</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>
@@ -594,5 +516,6 @@
 
     <script type="module" src="/js/consent.js"></script>
     <script type="module" src="/js/app.js"></script>
+    <script type="module" src="/js/pro/index.js"></script>
 </body>
 </html>

@@ -103,6 +103,15 @@ const INFO = (file, line, rule, msg) => add('INFO', file, line, rule, msg);
 
 const SKIP_DIRS = new Set(['node_modules', '.git', '.vercel', '.next', '.cache', 'dist-cache']);
 
+/**
+ * Directories that live in the repo but are not the site. `docs/private` holds
+ * the brand concept boards: standalone design comps with no head, no canonical
+ * and demo form fields, deliberately. Auditing them as if they were pages
+ * buries the report in errors nobody will ever act on. Paths are posix-style
+ * and relative to ROOT; a prefix match skips the whole subtree.
+ */
+const SKIP_PATHS = ['docs/private'];
+
 /** posix-style path relative to ROOT */
 function rel(abs) {
   return path.relative(ROOT, abs).split(path.sep).join('/');
@@ -120,6 +129,8 @@ function walk(dir, acc = []) {
     const abs = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       if (SKIP_DIRS.has(entry.name)) continue;
+      const relDir = rel(abs);
+      if (SKIP_PATHS.some((p) => relDir === p || relDir.startsWith(p + '/'))) continue;
       walk(abs, acc);
     } else if (entry.isFile()) {
       acc.push(abs);

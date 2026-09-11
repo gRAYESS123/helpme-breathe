@@ -8,9 +8,10 @@
  *   - /api/* and cross-origin : never intercepted, never cached
  *
  * Bump CACHE_NAME on every deploy that changes CSS, JS or the app shell.
+ * Webfonts are cross-origin: never precached, never intercepted.
  * Changing this file is what triggers the service-worker update.
  */
-const CACHE_NAME = 'hmb-v2-2026-09-09b';
+const CACHE_NAME = 'hmb-v4-paper-and-ink-2026-09-10';
 const OFFLINE_URL = '/offline.html';
 
 // App shell. Install does NOT fail when one entry 404s (a page can ship later);
@@ -26,8 +27,22 @@ const PRECACHE_URLS = [
   '/js/analytics.js',
   '/js/entitlements.js',
   '/js/consent.js',
+  '/js/config.js',
+  '/js/checkout.js',
   '/js/pro/index.js',
+  '/js/pro/patterns.js',
+  '/js/pro/streaks.js',
+  '/js/pro/paywall.js',
+  '/js/pro/capture.js',
+  '/js/pro/night.js',
+  '/js/pro/soundscapes.js',
+  '/css/pro.css',
+  '/css/print.css',
   '/manifest.json',
+  '/favicon.svg',
+  '/favicon-32.png',
+  '/favicon-16.png',
+  '/images/logo.svg',
   '/images/icon-192.png',
   '/images/icon-512.png',
   '/images/apple-touch-icon.png'

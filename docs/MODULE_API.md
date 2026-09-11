@@ -60,12 +60,14 @@ import {
 {
   key: '478',
   slug: '4-7-8-breathing',        // clean URL of its landing page, no leading slash
-  name: '🌙 Deep Sleep',           // display name, includes the emoji
+  name: 'Deep Sleep',             // display name, plain text — never an emoji
   shortName: '4-7-8',             // for pills, tables and tight spaces
-  emoji: '🌙',
-  title: 'Deep Sleep & Relaxation', // plain-language heading, no emoji
+  emoji: '',                      // retained but ALWAYS empty; see Appendix A
+  title: '4-7-8 breathing',       // the pattern's plain name
   theme: 'theme-478',             // class the engine puts on <body>
   circleClass: 'technique-478',   // class the engine puts on the circle
+  rim: '#33407F',                 // day rim hex — for surfaces that cannot
+  fill: '#C5C5E0',                // reach css/styles.css. See Appendix A.
   phases: [
     { name: 'Inhale', duration: 4, class: 'inhale', text: '…', frequency: 174.61 },
     { name: 'Hold',   duration: 7, class: 'hold',   text: '…', frequency: 0 },
@@ -79,8 +81,15 @@ import {
 }
 ```
 
-`title` is an addition to the shape sketched in `AGENT_BRIEF.md §4`; it exists so
-a page can print a heading without an emoji in it. Everything else matches.
+`title` is an addition to the shape sketched in `AGENT_BRIEF.md §4`; it is the
+pattern's plain name (`'Box breathing'`), as against `name`, which is the pill
+label a person picks from (`'Focus & Grounding'`). It is what the embed frame
+puts in `document.title`, what the technique-info card heads itself with, and
+what the streak table and the printable-card prompt name a session by, so it has
+to read as a noun phrase in a sentence. `rim` and `fill` are the
+other addition. `emoji` survives only so that nothing reading it throws; it is
+the empty string on all seven techniques and will never be non-empty again.
+Everything else matches.
 
 `sources` is deliberately empty. A citation may only appear on a page whose
 author opened the source with WebFetch and quoted the supporting sentence.
@@ -103,7 +112,7 @@ the circle, so `.inhale-short` styling works.
 
 Never write "Wim Hof" in a title, H1, meta description or slug. The `wim` key and
 the `theme-wim` class are internal names only; the display name is
-`☀️ Energizing Breath`.
+`Energizing Breath`.
 
 ### `techniqueForPath(pathname)`
 
@@ -448,3 +457,86 @@ A one-line placeholder that exports `PRO_MODULE_READY = false`. The Pro agent
 replaces it with the real entry module (patterns, streaks, paywall, capture,
 night mode, soundscapes). Every app page already loads it, so shipping the real
 module needs no HTML change.
+
+---
+
+## Appendix A — Paper and Ink additions (2026-09-10)
+
+Everything below is **additive**. No existing export, `data-role`, `data-action`,
+`data-slot`, event or class name changed. See `docs/BRAND.md` for the design
+rationale and `docs/PAGE_CONTRACT.md` for the markup to paste.
+
+### `js/techniques.js`
+
+- `technique.name` is now **plain text**; the leading emoji is gone.
+  Anything rendering `name` — the app bar heading, the pills, the embed frame —
+  gets clean text with no stripping.
+- `technique.emoji` is retained as an **empty string** on all seven techniques.
+  The field stays so that nothing reading it breaks; it will never be non-empty
+  again.
+- `technique.phases[].text` was rewritten to plain instruction copy
+  (`'Breathe in for four'` rather than `"Draw in earth's grounding energy..."`).
+  Same shape, same count, same durations.
+- **New:** `technique.rim` and `technique.fill` — the technique's **day** accent
+  pair as hex strings, e.g. `{ rim: '#33407F', fill: '#C5C5E0' }`.
+
+  The site itself does **not** read these: `css/styles.css` owns the pair as
+  `--rim-<key>` / `--fill-<key>` tokens and `body.theme-<key>` swaps them. Read
+  `rim`/`fill` only from a surface that cannot reach the stylesheet — the render
+  harness, a canvas, a white-label embed that inlines its own colours. Night
+  values live only in CSS, because at night every fill collapses to the one dark
+  surface value.
+
+### `js/app.js`
+
+New behaviour, all inside the existing lifecycle:
+
+- **`data-phase` on the app root.** At every phase boundary the engine writes
+  `data-phase` to **both** the circle (as before) and the element carrying
+  `data-breathing-app`. The phase word, the count and the reduced-motion pacing
+  ring live outside the circle now, so they need the attribute on a common
+  ancestor. It is removed again on reset.
+- **A fourth phase value: `topup`.** `data-phase` is `inhale` | `hold` |
+  `exhale` | `topup`, where `topup` is cyclic sighing's short second inhale
+  (`class: 'inhale inhale-short'`). Two consecutive phases therefore never share
+  a value, which is what lets a CSS animation restart on every boundary.
+  `hmb:phase`'s `phaseKind` detail is unchanged and still reports `inhale` for
+  the top-up.
+- **`--phase-duration` on the app root.** Set to the current phase's length in
+  seconds (`'4s'`) at every boundary, removed on reset. The reduced-motion
+  pacing ring animates over it.
+- **`[data-role="phase-count"]`.** Optional span inside the circle text block.
+  When present the engine writes the whole seconds remaining in the current
+  phase into it, at the phase boundary and on every tick. Absent, nothing
+  happens and nothing breaks.
+- **Whole-second progress under reduced motion.** With
+  `prefers-reduced-motion: reduce`, `[data-role="progress-fill"]` advances in
+  whole-second steps instead of continuously. The underlying timing is
+  unchanged; only the rendered width is quantised.
+- **A night-mode suggestion.** If a session *starts* between 21:00 and 06:00
+  local, and `<body>` carries neither `.night` nor `.day`, and
+  `data-no-asks` is not set, and the visitor has not dismissed it before, then
+  *after* that session a single line is appended to
+  `[data-slot="post-session"]`:
+  `<p class="night-hint">` with a `.night-hint-dismiss` button. Dismissing sets
+  the storage flag `hmb.flag.night-hint-dismissed`. It never renders during a
+  session and it carries no `data-ask`, so it does not suppress the email
+  capture card.
+- **`[data-action="toggle-nav"]`.** One delegated document-level listener,
+  registered once per page alongside the other page-level wiring. Clicking an
+  element with that action toggles `aria-expanded` on it and `.is-open` on the
+  element named by its `aria-controls` (the site header's `#site-nav`). It
+  touches nothing the breathing engine owns.
+
+### CSS contract notes for anyone editing `css/styles.css`
+
+- The **cycle length of each pattern is declared in CSS** as
+  `animation-duration` on `.breathing-circle.technique-<key>`, as well as inline
+  by `applyCircleClass()`. `restartCircleAnimation()` clears the whole
+  `animation` shorthand to force a restart, which also clears the inline
+  duration — so CSS carries the canonical value. **Change a phase duration in
+  `js/techniques.js` and you must change the matching `animation-duration`.**
+- Token aliases (`--theme-primary`, `--text-primary`, …) are declared on `body`,
+  not on `:root`, so that they resolve against the live token set. Custom
+  properties resolve at computed-value time on the element that declares them;
+  declaring an alias on `:root` would freeze it to the day palette.

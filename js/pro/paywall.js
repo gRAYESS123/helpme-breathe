@@ -37,8 +37,8 @@ const FEATURE_COPY = {
     line: 'The last seven days are free. Streaks, the 12-week heatmap, the per-technique breakdown and the CSV export are part of Pro.',
   },
   night: {
-    name: 'Night mode',
-    line: 'A near-black screen with warm, dimmed text for practising in the dark — and the screen stays awake while you breathe.',
+    name: 'The night switch',
+    line: 'The page already follows your device, free. Pro adds the switch, so you can hold it dark on a bright phone or light on a dark one — and it keeps the screen awake while you breathe.',
   },
   soundscapes: {
     name: 'Ambient soundscapes',

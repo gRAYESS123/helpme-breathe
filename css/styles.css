@@ -1,1207 +1,2238 @@
-/* OPTIMIZED CSS - Performance improvements and fixed text rotation */
+/* ==========================================================================
+   Help Me Breathe — "Paper and Ink"
+   css/styles.css — the whole design system for the site.
+
+   Reading order
+     1  :root — day tokens, the seven technique rim/fill pairs, legacy aliases
+     2  @media (prefers-color-scheme: dark) — night tokens, guarded by :not(.day)
+     3  body.night — the manual night override (wins over the media query)
+     4  Base, type scale, links, focus, utilities
+     5  Site header, footer, cookie banner
+     6  The breathing screen
+     7  Article / prose system, callouts, tables, pricing, ad slot
+     8  Utilities and legacy shims
+     9  prefers-reduced-motion — targeted, never a blanket transition kill
+    10  Print basics
+
+   Rules this file keeps to (docs/BRAND.md is the public statement of them):
+     - Every colour is a token. No component defines a colour that exists only
+       inside a media query or a .night block.
+     - --rule is a decorative hairline. A control's boundary is --edge.
+     - 1px borders. Radius 8px on buttons and panels, 999px on pills.
+     - Two shadows exist: --shadow-sheet and --shadow-lift. Nothing else.
+     - No gradients, no blur filters, no glow, no shadowed type, no emoji.
+     - Newsreader for display; IBM Plex Sans for anything a person operates.
+       The moment a line of type is clickable, it is sans.
+   ========================================================================== */
+
+/* ==========================================================================
+   1 — DAY TOKENS
+   ========================================================================== */
+
+:root {
+    /* ---- the one brand palette (day) ---- */
+    --paper: #F5F1E8;   /* page ground — warm leaflet stock                  */
+    --leaf: #FFFDF7;    /* surface — the sheet laid on the stock             */
+    --ink: #1C2320;     /* text — charcoal with a green undertone            */
+    --graphite: #575F58; /* muted text                                       */
+    --rule: #E3DCCC;    /* decorative hairline ONLY — never a control edge   */
+    --edge: #83887E;    /* control outlines: buttons, inputs, toggles, pills */
+    --track: #DFD8C7;   /* progress trough, input wells                      */
+    --green: #0F5136;   /* primary: Begin, links, focus ring, active nav     */
+    --chalk: #FFFFFF;   /* ink on primary                                    */
+    --clay: #8A4B24;    /* commerce accent — paid surfaces only              */
+    --ok: #1B6B45;
+    --warn: #7E5406;
+    --bad: #A32721;
+
+    /* ---- the seven technique pairs (day) ----
+       RIM carries every text and control duty (>= 5.3:1 on paper).
+       FILL is the circle interior: L* 80.3, ~1.50:1 on paper. Decoration,
+       never a boundary. Hue angles are documented in docs/BRAND.md. */
+    --rim-478: #33407F;      --fill-478: #C5C5E0;
+    --rim-box: #6E3C69;      --fill-box: #DABFD6;
+    --rim-coherent: #8C2F49; --fill-coherent: #E5BDC4;
+    --rim-sigh: #125A62;     --fill-sigh: #A2CFD5;
+    --rim-extended: #7A5310; --fill-extended: #D8C4AD;
+    --rim-triangle: #2C5273; --fill-triangle: #B5C9E2;
+    --rim-wim: #993A20;      --fill-wim: #E4BFB4;
+
+    /* ---- the only two shadows in the system ---- */
+    --shadow-sheet: 0 1px 0 rgba(28, 35, 32, 0.05);
+    --shadow-lift: 0 1px 0 rgba(28, 35, 32, 0.05), 0 10px 28px -20px rgba(28, 35, 32, 0.45);
+
+    /* ---- type ---- */
+    --display: 'Newsreader', ui-serif, Georgia, 'Times New Roman', serif;
+    --ui: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+
+    --fs-micro: 0.6875rem;  /* 11px — the floor. Nothing smaller, anywhere.  */
+    --fs-small: 0.8125rem;  /* 13px                                          */
+    --fs-body: 1rem;
+
+    /* ---- geometry ---- */
+    --radius: 8px;
+    --radius-pill: 999px;
+    --hit: 44px;            /* minimum rendered control height               */
+    --measure: 68ch;
+    --page: 62rem;
+
+    /* the breathing stage; the circle is 81.25% of it */
+    --stage: 320px;
+    --pacer-c: 704;         /* 2 * pi * 112, the pacing ring's circumference  */
+}
+
+/* ==========================================================================
+   2 — NIGHT BY PREFERENCE
+   Honoured for every visitor. `body.day` opts back out; `body.night` (section 3)
+   opts in manually and wins because it comes later at equal specificity.
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+    body:not(.day) {
+        --paper: #15191A;
+        --leaf: #1E2426;
+        --ink: #EDE7DA;
+        --graphite: #A7AEA4;
+        --rule: #2E3536;
+        --edge: #767D77;
+        --track: #2B3233;
+        --green: #5FBF92;
+        --chalk: #15191A;
+        --clay: #D9A279;
+        --ok: #6FCB9B;
+        --warn: #E0B25C;
+        --bad: #F0918A;
+
+        /* The rim carries the hue at night. Every fill collapses to the one
+           dark surface value — a dark ground cannot carry seven tints, and a
+           light filled disc at 2 a.m. is a torch in the face. */
+        --rim-478: #93A2E8;      --fill-478: #1E2426;
+        --rim-box: #D59CCB;      --fill-box: #1E2426;
+        --rim-coherent: #F2909F; --fill-coherent: #1E2426;
+        --rim-sigh: #5FC7D1;     --fill-sigh: #1E2426;
+        --rim-extended: #E0B25C; --fill-extended: #1E2426;
+        --rim-triangle: #8FBBE3; --fill-triangle: #1E2426;
+        --rim-wim: #F0916B;      --fill-wim: #1E2426;
+
+        --shadow-sheet: 0 1px 0 rgba(0, 0, 0, 0.4);
+        --shadow-lift: 0 1px 0 rgba(0, 0, 0, 0.4), 0 10px 28px -20px rgba(0, 0, 0, 0.9);
+
+        color-scheme: dark;
+    }
+}
+
+/* ==========================================================================
+   3 — NIGHT, CHOSEN. js/pro/night.js sets body.night / body.day.
+   ========================================================================== */
+
+body.night {
+    --paper: #15191A;
+    --leaf: #1E2426;
+    --ink: #EDE7DA;
+    --graphite: #A7AEA4;
+    --rule: #2E3536;
+    --edge: #767D77;
+    --track: #2B3233;
+    --green: #5FBF92;
+    --chalk: #15191A;
+    --clay: #D9A279;
+    --ok: #6FCB9B;
+    --warn: #E0B25C;
+    --bad: #F0918A;
+
+    --rim-478: #93A2E8;      --fill-478: #1E2426;
+    --rim-box: #D59CCB;      --fill-box: #1E2426;
+    --rim-coherent: #F2909F; --fill-coherent: #1E2426;
+    --rim-sigh: #5FC7D1;     --fill-sigh: #1E2426;
+    --rim-extended: #E0B25C; --fill-extended: #1E2426;
+    --rim-triangle: #8FBBE3; --fill-triangle: #1E2426;
+    --rim-wim: #F0916B;      --fill-wim: #1E2426;
+
+    --shadow-sheet: 0 1px 0 rgba(0, 0, 0, 0.4);
+    --shadow-lift: 0 1px 0 rgba(0, 0, 0, 0.4), 0 10px 28px -20px rgba(0, 0, 0, 0.9);
+
+    color-scheme: dark;
+}
+
+/* :not(.night) so that the nonsense state of both classes at once resolves
+   consistently to night: body.night above already wins for every token, and
+   without this guard color-scheme alone would flip to light and mismatch. */
+body.day:not(.night) {
+    color-scheme: light;
+}
+
+/* ==========================================================================
+   4 — BASE
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
 
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
-:root {
-    --bg-primary: #f8fafc;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --white: #ffffff;
-    --surface: rgba(255, 255, 255, 0.92);
-    --border: rgba(0, 0, 0, 0.06);
-    --shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.15);
-    
-    /* Dynamic theme colors */
-    --theme-primary: #8b5cf6;
-    --theme-secondary: #c7d2fe;
-    --theme-glow: #8b5cf6;
-    --progress-color: #a78bfa;
+html {
+    color-scheme: light dark;
+    -webkit-text-size-adjust: 100%;
 }
 
+/* Custom-property aliases live on `body`, not on :root, so that they resolve
+   against whichever token set is active on the body element. The old names are
+   kept so that every page not yet converted still renders. */
 body {
-    font-family: 'Quicksand', sans-serif;
-    background: var(--bg-primary);
+    /* the live technique pair — body.theme-* swaps these two */
+    --rim: var(--rim-478);
+    --fill: var(--fill-478);
+
+    /* legacy aliases (do not use in new work) */
+    --bg-primary: var(--paper);
+    --text-primary: var(--ink);
+    --text-secondary: var(--graphite);
+    --white: var(--chalk);
+    --surface: var(--leaf);
+    --border: var(--rule);
+    --shadow: var(--shadow-sheet);
+    --theme-primary: var(--rim);
+    --theme-secondary: var(--fill);
+    --theme-glow: transparent;
+    --progress-color: var(--rim);
+
+    font-family: var(--ui);
+    font-size: var(--fs-body);
+    font-weight: 400;
+    line-height: 1.65;
+    color: var(--ink);
+    background: var(--paper);
     min-height: 100vh;
-    color: var(--text-primary);
-    transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
     overflow-x: hidden;
-    overflow-y: auto;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
-/* OPTIMIZED: Simplified theme system */
-body.theme-478 {
-    background: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
-    background-attachment: fixed;
-    --text-primary: #ffffff;
-    --text-secondary: #c7d2fe;
-    --surface: rgba(255, 255, 255, 0.08);
-    --border: rgba(255, 255, 255, 0.15);
-    --theme-primary: #8b5cf6;
-    --theme-secondary: #c7d2fe;
-    --theme-glow: #8b5cf6;
-    --progress-color: #a78bfa;
-}
+/* The seven technique scopes. They set the pair and nothing else. */
+body.theme-478 { --rim: var(--rim-478); --fill: var(--fill-478); }
+body.theme-box { --rim: var(--rim-box); --fill: var(--fill-box); }
+body.theme-coherent { --rim: var(--rim-coherent); --fill: var(--fill-coherent); }
+body.theme-sigh { --rim: var(--rim-sigh); --fill: var(--fill-sigh); }
+body.theme-extended { --rim: var(--rim-extended); --fill: var(--fill-extended); }
+body.theme-triangle { --rim: var(--rim-triangle); --fill: var(--fill-triangle); }
+body.theme-wim { --rim: var(--rim-wim); --fill: var(--fill-wim); }
 
-/* Contrast note (hard rule 12, 4.5:1): --text-secondary was #a7f3d0, which
-   measures 4.28:1 on the lightest gradient stop (#047857) and fails. #d1fae5
-   measures 4.84:1 there. Only the text token changed; the gradient is intact. */
-body.theme-box {
-    background: linear-gradient(180deg, #064e3b 0%, #065f46 50%, #047857 100%);
-    background-attachment: fixed;
-    --text-primary: #ffffff;
-    --text-secondary: #d1fae5;
-    --surface: rgba(255, 255, 255, 0.08);
-    --border: rgba(255, 255, 255, 0.15);
-    --theme-primary: #22c55e;
-    --theme-secondary: #a7f3d0;
-    --theme-glow: #22c55e;
-    --progress-color: #6ee7b7;
-}
+/* ---------------------------------------------------------------- type ---- */
 
-/* Contrast note (hard rule 12): --text-secondary was #fecdd3 = 4.46:1 on the
-   lightest stop (#be123c). #ffe4e6 measures 5.24:1. Gradient unchanged. */
-body.theme-coherent {
-    background: linear-gradient(180deg, #831843 0%, #9f1239 50%, #be123c 100%);
-    background-attachment: fixed;
-    --text-primary: #ffffff;
-    --text-secondary: #ffe4e6;
-    --surface: rgba(255, 255, 255, 0.08);
-    --border: rgba(255, 255, 255, 0.15);
-    --theme-primary: #ec4899;
-    --theme-secondary: #fecdd3;
-    --theme-glow: #ec4899;
-    --progress-color: #fda4af;
-}
-
-/* Contrast note (hard rule 12): the old last stop #0284c7 (sky-600) failed for
-   BOTH tokens — white measured 4.10:1 and #bae6fd only 3.09:1. The ramp now ends
-   one step darker at #0369a1 (sky-700) and --text-secondary is #e0f2fe, giving
-   5.93:1 for white and 5.17:1 for the secondary. Same hue, same sky identity. */
-body.theme-triangle {
-    background: linear-gradient(180deg, #0c4a6e 0%, #075985 50%, #0369a1 100%);
-    background-attachment: fixed;
-    --text-primary: #ffffff;
-    --text-secondary: #e0f2fe;
-    --surface: rgba(255, 255, 255, 0.08);
-    --border: rgba(255, 255, 255, 0.15);
-    --theme-primary: #38bdf8;
-    --theme-secondary: #bae6fd;
-    --theme-glow: #38bdf8;
-    --progress-color: #7dd3fc;
-}
-
-/* Contrast note (hard rule 12) — OWNER REVIEW.
-   The old ramp (#d97706 / #ea580c / #f59e0b) was the only light background on
-   the site and failed badly: white body text measured 3.19 / 2.63 / 2.15:1 and
-   --text-secondary #fed7aa measured 2.35 / 1.63 / 1.59:1. This is the technique
-   that carries the safety acknowledgement, so its copy has to be legible.
-   The ramp is now a sunrise red-to-orange that keeps the warm, energizing
-   identity while matching every other theme's dark ground: white measures
-   9.9 / 7.31 / 5.02:1 and --text-secondary #fff7ed measures 8.9 / 6.88 / 4.73:1.
-   The circle, glow and progress colours are untouched, so the "sun" reads the
-   same. Revert by restoring the two commented values above if the owner
-   prefers the old look. */
-body.theme-wim {
-    background: linear-gradient(180deg, #7f1d1d 0%, #9a3412 50%, #b45309 100%);
-    background-attachment: fixed;
-    --text-primary: #ffffff;
-    --text-secondary: #fff7ed;
-    --surface: rgba(255, 255, 255, 0.08);
-    --border: rgba(255, 255, 255, 0.15);
-    --theme-primary: #fbbf24;
-    --theme-secondary: #fed7aa;
-    --theme-glow: #fbbf24;
-    --progress-color: #fcd34d;
-}
-
-/* Nature background - simplified for performance */
-.nature-bg {
-    position: fixed;
-    inset: 0;
-    z-index: -3;
-    opacity: 0.4;
-    transition: opacity 2s ease;
-}
-
-body.theme-478 .nature-bg {
-    background: radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
-}
-
-body.theme-box .nature-bg {
-    background: radial-gradient(ellipse at bottom, rgba(34, 197, 94, 0.1) 0%, transparent 60%);
-}
-
-body.theme-coherent .nature-bg {
-    background: radial-gradient(ellipse at center, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
-}
-
-body.theme-triangle .nature-bg {
-    background: radial-gradient(ellipse at top, rgba(56, 189, 248, 0.08) 0%, transparent 60%);
-}
-
-body.theme-wim .nature-bg {
-    background: radial-gradient(circle at 50% 30%, rgba(251, 191, 36, 0.1) 0%, transparent 50%);
-}
-
-/* OPTIMIZED: Simplified natural elements for better performance */
-.natural-element {
-    position: fixed;
-    pointer-events: none;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 2s ease;
-    will-change: transform;
-}
-
-/* Only show elements for current theme */
-body.theme-478 .star { display: block; opacity: 0.4; }
-body.theme-box .leaf { display: block; opacity: 0.3; }
-body.theme-coherent .ripple { display: block; opacity: 0.35; }
-body.theme-triangle .cloud { display: block; opacity: 0.3; }
-body.theme-wim .sun-ray { display: block; opacity: 0.4; }
-
-/* Hide elements for other themes */
-body:not(.theme-478) .star,
-body:not(.theme-box) .leaf,
-body:not(.theme-coherent) .ripple,
-body:not(.theme-triangle) .cloud,
-body:not(.theme-wim) .sun-ray {
-    display: none;
-}
-
-/* Simplified animations for stars */
-.star {
-    width: 3px;
-    height: 3px;
-    background: white;
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    animation: twinkle 4s ease-in-out infinite;
-}
-
-.star-1 { top: 15%; left: 20%; animation-delay: 0s; }
-.star-2 { top: 25%; right: 30%; animation-delay: 1s; }
-.star-3 { top: 40%; left: 40%; animation-delay: 2s; }
-.star-4 { top: 30%; right: 15%; animation-delay: 3s; }
-
-@keyframes twinkle {
-    0%, 100% { opacity: 0.2; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.2); }
-}
-
-/* Basic layout */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-    position: relative;
-    z-index: 1;
-}
-
-header {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
-.header-content {
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    padding: 3rem 2rem;
-    border-radius: 30px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    position: relative;
-    overflow: hidden;
+h1, h2 {
+    font-family: var(--display);
+    font-weight: 500;
+    letter-spacing: -0.012em;
+    line-height: 1.16;
+    color: var(--ink);
 }
 
 h1 {
-    font-size: 3rem;
-    font-weight: 300;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-    letter-spacing: 0.05em;
+    font-size: clamp(1.6rem, 1.15rem + 1.6vw, 2.25rem);
+    margin: 0 0 0.5rem;
 }
 
-.subtitle {
-    font-size: 1.125rem;
-    color: var(--text-secondary);
-    font-weight: 400;
-    line-height: 1.6;
+h2 {
+    font-size: clamp(1.3rem, 1.05rem + 0.9vw, 1.6rem);
+    margin: 2rem 0 0.75rem;
+}
+
+h3, h4, h5, h6 {
+    font-family: var(--ui);
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--ink);
+}
+
+h3 { font-size: 1.0625rem; margin: 1.5rem 0 0.5rem; }
+h4 { font-size: 0.9375rem; margin: 1.25rem 0 0.4rem; }
+h5, h6 { font-size: var(--fs-small); margin: 1rem 0 0.35rem; }
+
+p { margin: 0 0 1rem; }
+
+strong { font-weight: 600; color: var(--ink); }
+
+small { font-size: var(--fs-small); }
+
+a {
+    color: var(--green);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+}
+
+a:hover { text-decoration-thickness: 2px; }
+
+ul, ol { padding-left: 1.25rem; margin: 0 0 1rem; }
+li { margin: 0 0 0.4rem; }
+
+kbd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: var(--fs-micro);
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    padding: 0.1em 0.35em;
+    background: var(--leaf);
+    color: var(--ink);
+}
+
+code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.875em;
+    background: var(--track);
+    border-radius: 4px;
+    padding: 0.1em 0.3em;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin: 2rem 0;
+}
+
+img { max-width: 100%; height: auto; }
+
+img[loading="lazy"] { opacity: 1; }
+
+/* ------------------------------------------------------------- focus ------ */
+
+:where(a, button, input, select, textarea, summary, [tabindex], [role="button"]):focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+    background: var(--green);
+    color: var(--chalk);
+    padding: 0.75rem 1rem;
+    border-radius: 0 0 var(--radius) 0;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: var(--fs-small);
+}
+
+.skip-link:focus {
+    left: 0;
+}
+
+/* ------------------------------------------------------- layout shells ---- */
+
+.container {
+    width: 100%;
+    max-width: var(--page);
+    margin: 0 auto;
+    padding: 0 1.25rem 3rem;
 }
 
 .main-content {
     display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 2rem;
+    grid-template-columns: minmax(0, 1fr) 19rem;
+    gap: 1.75rem;
+    align-items: start;
 }
 
-.breathing-section {
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    padding: 3rem;
-    border-radius: 30px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    text-align: center;
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+header .header-content {
+    padding: 2rem 0 1.5rem;
+}
+
+.subtitle {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--graphite);
+    max-width: 56ch;
+    margin: 0;
+}
+
+/* ==========================================================================
+   5 — SITE HEADER, FOOTER, COOKIE BANNER
+   ========================================================================== */
+
+.site-header {
+    background: var(--leaf);
+    border-bottom: 1px solid var(--rule);
     position: relative;
-    overflow: visible;
+    z-index: 20;
 }
 
-/* Settings */
-.settings-btn {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    cursor: pointer;
+.site-header-inner {
+    width: 100%;
+    max-width: var(--page);
+    margin: 0 auto;
+    padding: 0 1.25rem;
+    min-height: 60px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    font-size: 1.2rem;
-    color: var(--text-primary);
+    gap: 1rem;
 }
 
-.settings-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: rotate(90deg);
+.lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;      /* stroke width x 4 at the header's 26px mark */
+    text-decoration: none;
+    color: var(--ink);
+    padding: 0.5rem 0;
+    flex: 0 0 auto;
 }
+
+.lockup:hover { text-decoration: none; }
+
+.lockup-mark {
+    display: block;
+    width: 26px;
+    height: 26px;
+    color: var(--green);
+    flex: 0 0 auto;
+}
+
+.wordmark {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 1.0625rem;
+    letter-spacing: -0.012em;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--ink);
+}
+
+.site-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.15rem;
+    margin-left: auto;
+}
+
+.site-nav a {
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--graphite);
+    text-decoration: none;
+    padding: 0.75rem 0;
+    display: inline-block;
+    border-bottom: 2px solid transparent;
+}
+
+.site-nav a:hover {
+    color: var(--ink);
+}
+
+.site-nav a[aria-current="page"] {
+    color: var(--green);
+    border-bottom-color: var(--green);
+}
+
+.nav-toggle {
+    display: none;
+    margin-left: auto;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: var(--hit);
+    padding: 0.5rem 0.85rem;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+@media (max-width: 640px) {
+    .nav-toggle { display: inline-flex; }
+
+    .site-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        margin: 0;
+        background: var(--leaf);
+        border-bottom: 1px solid var(--rule);
+        box-shadow: var(--shadow-lift);
+        padding: 0.25rem 1.25rem 0.75rem;
+    }
+
+    .site-nav.is-open { display: flex; }
+
+    .site-nav a {
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--rule);
+    }
+
+    .site-nav a:last-child { border-bottom: 0; }
+
+    .site-nav a[aria-current="page"] { border-bottom-color: var(--rule); }
+}
+
+@media (max-width: 420px) {
+    .wordmark { display: none; }
+}
+
+/* ------------------------------------------------------------- footer ----- */
+
+.footer {
+    border-top: 1px solid var(--ink);
+    margin-top: 3rem;
+    padding: 2rem 0 0;
+    font-size: var(--fs-small);
+    color: var(--graphite);
+}
+
+.footer-cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.footer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.footer-nav h2,
+.footer-nav .footer-heading {
+    font-family: var(--ui);
+    font-size: var(--fs-micro);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--graphite);
+    margin: 0 0 0.35rem;
+}
+
+.footer a {
+    color: var(--graphite);
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+}
+
+.footer-byline {
+    border-top: 1px solid var(--rule);
+    padding-top: 1rem;
+    margin-bottom: 0.75rem;
+    color: var(--graphite);
+    max-width: var(--measure);
+}
+
+.footer-byline a { color: var(--green); text-decoration: underline; }
+
+.legal-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+    padding: 0.5rem 0 1.5rem;
+    font-size: var(--fs-micro);
+}
+
+.legal-links a { color: var(--graphite); }
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+    padding-bottom: 0.75rem;
+}
+
+/* ------------------------------------------------------ cookie banner ----- */
+
+#cookieConsent {
+    position: fixed;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 60;
+    max-width: 34rem;
+    margin: 0 auto;
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lift);
+    padding: 1rem 1.15rem;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 240ms ease, transform 240ms ease;
+    pointer-events: none;
+}
+
+#cookieConsent.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+#cookieConsent p {
+    font-size: var(--fs-small);
+    line-height: 1.6;
+    color: var(--ink);
+    margin: 0 0 0.85rem;
+}
+
+#cookieConsent a { color: var(--green); }
+
+.cookie-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* Decline is listed first and carries exactly the same weight as Accept. */
+.cookie-btn {
+    flex: 1 1 9rem;
+    min-height: var(--hit);
+    padding: 0.6rem 1rem;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+.cookie-btn:hover { border-color: var(--ink); }
+
+.cookie-btn.secondary {
+    color: var(--ink);
+    background: var(--leaf);
+    border-color: var(--edge);
+}
+
+/* ==========================================================================
+   6 — THE BREATHING SCREEN
+   ========================================================================== */
+
+.breathing-section {
+    position: relative;
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sheet);
+    padding: 0 1.25rem 1.75rem;
+    text-align: center;
+    margin: 0 0 1.75rem;
+}
+
+/* The app bar: technique title left, settings gear right, hairline beneath.
+   It sits directly under the site header so the two read as one header stack.
+   The gear stays inside the app root because the engine scopes every
+   [data-role] lookup to that root and a page may carry two timers. */
+.app-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 54px;
+    margin: 0 -1.25rem 1.5rem;
+    padding: 0.5rem 1.25rem;
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+}
+
+[data-role="technique-title"],
+.app-bar h2 {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 1.25rem;
+    letter-spacing: -0.012em;
+    margin: 0;
+    color: var(--ink);
+}
+
+.settings-btn {
+    flex: 0 0 auto;
+    width: var(--hit);
+    height: var(--hit);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.settings-btn:hover { border-color: var(--ink); }
+
+.settings-btn svg { width: 20px; height: 20px; display: block; }
+
+/* -------------------------------------------------- settings: a form ----- */
 
 .settings-panel {
+    display: none;
     position: absolute;
-    top: 4.5rem;
-    right: 1.5rem;
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: var(--shadow);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
-    z-index: 10;
-    min-width: 220px;
+    top: 3.6rem;
+    right: 1.25rem;
+    z-index: 30;
+    width: min(20rem, calc(100% - 2.5rem));
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lift);
+    padding: 0.35rem 1rem;
+    text-align: left;
 }
 
-.settings-panel.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
+.settings-panel.show { display: block; }
 
 .setting-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1rem;
+    gap: 1rem;
+    min-height: 48px;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--rule);
 }
 
-.setting-item:last-child {
-    margin-bottom: 0;
-}
+.setting-item:last-child { border-bottom: 0; }
 
 .setting-label {
-    font-size: 0.875rem;
-    color: var(--text-primary);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--ink);
 }
 
 .toggle-switch {
+    flex: 0 0 auto;
     position: relative;
-    width: 44px;
-    height: 24px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
+    width: 52px;
+    height: 30px;
+    border-radius: var(--radius-pill);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: background-color 200ms ease, border-color 200ms ease;
 }
 
-.toggle-switch.active {
-    background: var(--theme-primary);
+/* The track is 30px so it reads as a printed switch, but the thing you can
+   actually hit is 44px tall. */
+.toggle-switch::before {
+    content: '';
+    position: absolute;
+    inset: -7px 0;
 }
 
 .toggle-switch::after {
     content: '';
     position: absolute;
-    width: 20px;
-    height: 20px;
-    background: var(--text-primary);
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
-    top: 2px;
-    left: 2px;
-    transition: transform 0.3s ease;
+    background: var(--edge);
+    transition: transform 200ms ease, background-color 200ms ease;
+}
+
+.toggle-switch.active {
+    background: var(--green);
+    border-color: var(--green);
 }
 
 .toggle-switch.active::after {
-    transform: translateX(20px);
+    background: var(--chalk);
+    transform: translateX(22px);
 }
 
-/* Duration selector */
 .duration-select {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.5rem;
-    font-size: 0.875rem;
+    flex: 0 1 10rem;
+    min-height: var(--hit);
+    padding: 0.5rem 0.6rem;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    color: var(--ink);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
     cursor: pointer;
-    width: 120px;
 }
 
 .duration-select option {
-    background: #1e1b4b;
-    color: #ffffff;
+    background: var(--leaf);
+    color: var(--ink);
 }
 
-/* OPTIMIZED: Breathing circle with properly synced animations */
+/* --------------------------------------------- the mark, alive ----------- */
+
 .breathing-container {
     position: relative;
-    width: 320px;
-    height: 320px;
-    margin: 2rem auto;
-    transform: translateZ(0);
-    will-change: contents;
+    width: min(var(--stage), 78vw);
+    aspect-ratio: 1 / 1;
+    margin: 1.5rem auto 1.25rem;
 }
 
-.breathing-svg-filter {
+/* Two fixed dotted calipers: the outer marks full inhale, the inner marks full
+   exhale. The live circle travels between them. The third ring is the
+   reduced-motion pacer and is hidden unless that preference is set. */
+.breathing-guides {
     position: absolute;
-    width: 0;
-    height: 0;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
     pointer-events: none;
+}
+
+.caliper {
+    fill: none;
+    stroke: var(--edge);
+    stroke-width: 1;
+    stroke-dasharray: 2 5;
+    /* These two marks say where full inhale and full exhale are, so they have
+       to be visible. At 0.5 the stroke collapsed to ~1.9:1 on leaf, and even
+       0.9 fell to 2.79:1 on --paper (which is the kiosk ground). No opacity:
+       --edge is already the faintest value allowed on a boundary, and a
+       1px 2-5 dash reads as a caliper without being dimmed further. */
+    opacity: 1;
+}
+
+.pacer-ring {
+    fill: none;
+    stroke: var(--rim);
+    stroke-width: 3;
+    stroke-linecap: butt;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    visibility: hidden;
 }
 
 .breathing-circle {
-    width: 240px;
-    height: 240px;
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    width: 81.25%;
+    height: 81.25%;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, var(--theme-secondary) 0%, var(--theme-primary) 70%);
-    box-shadow: 0 0 60px var(--theme-glow);
+    background: var(--fill);
+    border: 3px solid var(--rim);
+    transform: translate(-50%, -50%) scale(0.72);
+    z-index: 0;
+    display: grid;
+    place-items: center;
+    transition: background-color 400ms ease, border-color 400ms ease;
+    animation-duration: 10s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-play-state: paused;
     will-change: transform;
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
 }
 
-/* FIXED: Text container that stays completely stable and visible */
+.breathing-circle.active { animation-play-state: running; }
+
+/* The notch at twelve o'clock is the mark's gap: a bar in the page ground laid
+   over the rim. It closes while the pattern holds, so the ring completes
+   itself for as long as you hold your breath. */
+.circle-notch {
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    width: 34%;
+    height: 3px;
+    transform: translateX(-50%);
+    z-index: 1;
+    background: var(--leaf);
+    opacity: 1;
+    pointer-events: none;
+    transition: opacity 240ms linear;
+}
+
+/* The gap closes while the pattern holds, so the ring completes itself for as
+   long as you hold your breath, and reopens when the hold ends. Symmetric, and
+   it needs no knowledge of which phase came before. */
+[data-phase="hold"] .circle-notch { opacity: 0; }
+
+/* The phase word sits OUTSIDE the circle, so it never scales with it and stays
+   the largest, steadiest thing on the screen. (Pages still carrying the old
+   nesting — the container inside the circle — centre correctly too, because
+   the circle is a centring grid.) */
 .circle-text-container {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    height: 100%;
+    inset: 0;
+    z-index: 2;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 10;
-    /* Ensure text never rotates or animates */
-    animation: none !important;
-    transform-style: flat;
+    gap: 0.1rem;
     pointer-events: none;
+    padding: 0 1rem;
 }
 
-.circle-text-container #circleText {
-    font-size: 1.25rem;
+.breathing-circle > .circle-text-container { position: static; inset: auto; }
+
+/* The phase word is the largest type on this screen. */
+.phase-word,
+.circle-text-container [data-role="circle-text"] {
+    font-family: var(--display);
     font-weight: 500;
-    color: var(--text-primary);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    z-index: 10;
-    /* Ensure text is always visible and upright */
-    position: relative;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    transform: none !important;
-    animation: none !important;
-    pointer-events: none;
+    font-size: clamp(1.9rem, 1.3rem + 2.2vw, 2.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.012em;
+    color: var(--ink);
     white-space: nowrap;
 }
 
-/* SYNCED BREATHING ANIMATIONS - Perfectly match breathing phase timings */
+.phase-count,
+[data-role="phase-count"] {
+    display: block;
+    min-height: 1.3em;
+    font-family: var(--ui);
+    font-size: 1rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+    color: var(--graphite);
+}
 
-/* 4-7-8 Breathing: 4s inhale, 7s hold, 8s exhale = 19s total */
+/* Phase-word cross-fade, 160ms, opacity only. A distinct animation name per
+   phase kind is what makes it restart; consecutive phases always differ. */
+[data-phase="inhale"] .phase-word { animation: hmb-word-i 160ms linear; }
+[data-phase="hold"] .phase-word { animation: hmb-word-h 160ms linear; }
+[data-phase="exhale"] .phase-word { animation: hmb-word-e 160ms linear; }
+[data-phase="topup"] .phase-word { animation: hmb-word-t 160ms linear; }
+
+@keyframes hmb-word-i { from { opacity: 0; } to { opacity: 1; } }
+@keyframes hmb-word-h { from { opacity: 0; } to { opacity: 1; } }
+@keyframes hmb-word-e { from { opacity: 0; } to { opacity: 1; } }
+@keyframes hmb-word-t { from { opacity: 0; } to { opacity: 1; } }
+
+/* ------------------------------------------------- the seven patterns ---- */
+/* Scale is the whole animation: 0.72 at empty, 1.00 at full.
+   Inhale  cubic-bezier(.33, 0, .20, 1)
+   Exhale  cubic-bezier(.42, 0, .30, 1)
+   Holds are still, with a 0.4% drift so the frame never reads as crashed.
+   Percentages are the phase boundaries of each cycle. The cycle length is
+   declared here as well as inline by js/app.js: the engine clears the whole
+   `animation` shorthand to force a restart on a technique swap, which also
+   clears its own inline duration, so CSS has to carry the canonical value.
+   If a pattern's phase durations ever change in js/techniques.js, change the
+   matching animation-duration here too. */
+
+/* 4-7-8 — 4s in, 7s hold, 8s out (19s) */
+.breathing-circle.technique-478 { animation-name: breathe-478; animation-duration: 19s; }
 @keyframes breathe-478 {
-    0% { 
-        transform: translate(-50%, -50%) scale(0.7);
-        border-radius: 50%;
-    }
-    21.05% { /* 4s / 19s = 21.05% - End of inhale */
-        transform: translate(-50%, -50%) scale(1.3);
-        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
-    }
-    57.89% { /* 11s / 19s = 57.89% - End of hold */
-        transform: translate(-50%, -50%) scale(1.3);
-        border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%;
-    }
-    100% { /* 19s / 19s = 100% - End of exhale */
-        transform: translate(-50%, -50%) scale(0.7);
-        border-radius: 50%;
-    }
+    0% { transform: translate(-50%, -50%) scale(0.72); animation-timing-function: cubic-bezier(.33, 0, .20, 1); }
+    21.053% { transform: translate(-50%, -50%) scale(1); animation-timing-function: linear; }
+    57.895% { transform: translate(-50%, -50%) scale(0.996); animation-timing-function: cubic-bezier(.42, 0, .30, 1); }
+    100% { transform: translate(-50%, -50%) scale(0.72); }
 }
 
-/* Box Breathing: 4s inhale, 4s hold, 4s exhale, 4s hold = 16s total */
+/* Box — 4/4/4/4 (16s) */
+.breathing-circle.technique-box { animation-name: breathe-box; animation-duration: 16s; }
 @keyframes breathe-box {
-    0% { 
-        transform: translate(-50%, -50%) scale(0.8);
-        border-radius: 50%;
-    }
-    25% { /* 4s / 16s = 25% - End of inhale */
-        transform: translate(-50%, -50%) scale(1.2);
-        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
-    }
-    50% { /* 8s / 16s = 50% - End of first hold */
-        transform: translate(-50%, -50%) scale(1.2);
-        border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%;
-    }
-    75% { /* 12s / 16s = 75% - End of exhale */
-        transform: translate(-50%, -50%) scale(0.8);
-        border-radius: 55% 45% 50% 50% / 50% 50% 45% 55%;
-    }
-    100% { /* 16s / 16s = 100% - End of second hold */
-        transform: translate(-50%, -50%) scale(0.8);
-        border-radius: 50%;
-    }
+    0% { transform: translate(-50%, -50%) scale(0.72); animation-timing-function: cubic-bezier(.33, 0, .20, 1); }
+    25% { transform: translate(-50%, -50%) scale(1); animation-timing-function: linear; }
+    50% { transform: translate(-50%, -50%) scale(0.996); animation-timing-function: cubic-bezier(.42, 0, .30, 1); }
+    75% { transform: translate(-50%, -50%) scale(0.72); animation-timing-function: linear; }
+    100% { transform: translate(-50%, -50%) scale(0.723); }
 }
 
-/* Heart Coherence: 5s inhale, 5s exhale = 10s total */
+/* Heart coherence — 5 in, 5 out (10s) */
+.breathing-circle.technique-coherent { animation-name: breathe-coherent; animation-duration: 10s; }
 @keyframes breathe-coherent {
-    0% { 
-        transform: translate(-50%, -50%) scale(0.8);
-        border-radius: 50%;
-    }
-    50% { /* 5s / 10s = 50% - End of inhale */
-        transform: translate(-50%, -50%) scale(1.2);
-        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
-    }
-    100% { /* 10s / 10s = 100% - End of exhale */
-        transform: translate(-50%, -50%) scale(0.8);
-        border-radius: 50%;
-    }
+    0% { transform: translate(-50%, -50%) scale(0.72); animation-timing-function: cubic-bezier(.33, 0, .20, 1); }
+    50% { transform: translate(-50%, -50%) scale(1); animation-timing-function: cubic-bezier(.42, 0, .30, 1); }
+    100% { transform: translate(-50%, -50%) scale(0.72); }
 }
 
-/* Triangle Breathing: 3s inhale, 3s hold, 3s exhale = 9s total */
+/* Cyclic sighing — 2 in, 1 top-up (overshoots to 1.08), 6 out (9s) */
+.breathing-circle.technique-sigh { animation-name: breathe-sigh; animation-duration: 9s; }
+@keyframes breathe-sigh {
+    0% { transform: translate(-50%, -50%) scale(0.72); animation-timing-function: cubic-bezier(.33, 0, .20, 1); }
+    22.222% { transform: translate(-50%, -50%) scale(1); animation-timing-function: cubic-bezier(.33, 0, .20, 1); }
+    33.333% { transform: translate(-50%, -50%) scale(1.08); animation-timing-function: cubic-bezier(.42, 0, .30, 1); }
+    100% { transform: translate(-50%, -50%) scale(0.72); }
+}
+
+/* Extended exhale — 4 in, 6 out (10s) */
+.breathing-circle.technique-extended { animation-name: breathe-extended; animation-duration: 10s; }
+@keyframes breathe-extended {
+    0% { transform: translate(-50%, -50%) scale(0.72); animation-timing-function: cubic-bezier(.33, 0, .20, 1); }
+    40% { transform: translate(-50%, -50%) scale(1); animation-timing-function: cubic-bezier(.42, 0, .30, 1); }
+    100% { transform: translate(-50%, -50%) scale(0.72); }
+}
+
+/* Triangle — 3/3/3 (9s) */
+.breathing-circle.technique-triangle { animation-name: breathe-triangle; animation-duration: 9s; }
 @keyframes breathe-triangle {
-    0% { 
-        transform: translate(-50%, -50%) scale(0.8);
-        border-radius: 50%;
-    }
-    33.33% { /* 3s / 9s = 33.33% - End of inhale */
-        transform: translate(-50%, -50%) scale(1.2);
-        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
-    }
-    66.67% { /* 6s / 9s = 66.67% - End of hold */
-        transform: translate(-50%, -50%) scale(1.2);
-        border-radius: 40% 60% 55% 45% / 60% 40% 60% 40%;
-    }
-    100% { /* 9s / 9s = 100% - End of exhale */
-        transform: translate(-50%, -50%) scale(0.8);
-        border-radius: 50%;
-    }
+    0% { transform: translate(-50%, -50%) scale(0.72); animation-timing-function: cubic-bezier(.33, 0, .20, 1); }
+    33.333% { transform: translate(-50%, -50%) scale(1); animation-timing-function: linear; }
+    66.667% { transform: translate(-50%, -50%) scale(0.996); animation-timing-function: cubic-bezier(.42, 0, .30, 1); }
+    100% { transform: translate(-50%, -50%) scale(0.72); }
 }
 
-/* Wim Hof: 2s inhale, 1s exhale = 3s total */
+/* Energizing — 2 in, 1 out (3s) */
+.breathing-circle.technique-wim { animation-name: breathe-wim; animation-duration: 3s; }
 @keyframes breathe-wim {
-    0% { 
-        transform: translate(-50%, -50%) scale(0.9);
-        border-radius: 50%;
-    }
-    66.67% { /* 2s / 3s = 66.67% - End of inhale */
-        transform: translate(-50%, -50%) scale(1.1);
-        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
-    }
-    100% { /* 3s / 3s = 100% - End of exhale */
-        transform: translate(-50%, -50%) scale(0.9);
-        border-radius: 50%;
-    }
+    0% { transform: translate(-50%, -50%) scale(0.72); animation-timing-function: cubic-bezier(.33, 0, .20, 1); }
+    66.667% { transform: translate(-50%, -50%) scale(1); animation-timing-function: cubic-bezier(.42, 0, .30, 1); }
+    100% { transform: translate(-50%, -50%) scale(0.72); }
 }
 
-/* Apply technique-specific animations with proper timing */
-.breathing-circle.technique-478.active {
-    animation: breathe-478 19s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+/* Custom patterns (js/pro/patterns.js) get the same simple in-out shape. */
+.breathing-circle:not([class*="technique-"]) { animation-name: breathe-coherent; animation-duration: 10s; }
+
+/* ------------------------------------------------------- the read-outs --- */
+
+.breathing-text {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--graphite);
+    margin: 0 auto 1.25rem;
+    max-width: 40ch;
+    min-height: 3em;
 }
 
-.breathing-circle.technique-box.active {
-    animation: breathe-box 16s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.breathing-circle.technique-coherent.active {
-    animation: breathe-coherent 10s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.breathing-circle.technique-triangle.active {
-    animation: breathe-triangle 9s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.breathing-circle.technique-wim.active {
-    animation: breathe-wim 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Mobile: Simple scaling animation */
-@media (max-width: 767px) {
-    .breathing-circle {
-        filter: none !important;
-    }
-    
-    /* !important is required: the per-technique selectors (.technique-478.active,
-       etc.) are more specific and would otherwise keep their full animation. */
-    .breathing-circle.active {
-        animation-name: breathe-simple !important;
-    }
-
-    @keyframes breathe-simple {
-        0%, 100% { 
-            transform: translate(-50%, -50%) scale(0.8);
-            border-radius: 50%;
-        }
-        50% { 
-            transform: translate(-50%, -50%) scale(1.2);
-            border-radius: 50%;
-        }
-    }
-}
-
-/* Technique-specific durations for other elements */
-.breathing-circle.technique-478 { --breath-cycle-duration: 19s; }
-.breathing-circle.technique-box { --breath-cycle-duration: 16s; }
-.breathing-circle.technique-coherent { --breath-cycle-duration: 10s; }
-.breathing-circle.technique-triangle { --breath-cycle-duration: 9s; }
-.breathing-circle.technique-wim { --breath-cycle-duration: 3s; }
-
-/* OPTIMIZED: Simplified aura */
-.breathing-aura {
-    position: absolute;
-    inset: -40px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--theme-glow) 0%, transparent 60%);
-    opacity: 0;
-    transition: opacity 1s ease;
-    pointer-events: none;
-    filter: blur(30px);
-}
-
-.breathing-circle.active ~ .breathing-aura {
-    opacity: 0.3;
-    animation: aura-pulse 4s ease-in-out infinite;
-}
-
-@keyframes aura-pulse {
-    0%, 100% { transform: scale(1); opacity: 0.3; }
-    50% { transform: scale(1.2); opacity: 0.5; }
-}
-
-/* Session progress indicators */
 .session-info {
-    display: none;
-    margin: 1rem 0;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    text-align: center;
+    max-width: 26rem;
+    margin: 0 auto 0.75rem;
 }
 
 .session-progress {
-    width: 100%;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    height: 3px;
+    background: var(--track);
+    border-radius: var(--radius-pill);
     overflow: hidden;
-    margin-bottom: 0.5rem;
 }
 
 .session-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--theme-primary), var(--theme-secondary));
-    border-radius: 4px;
     width: 0%;
-    transition: width 0.3s ease;
+    /* --graphite, not --edge: the fill has to read against --track, and
+       #83887E on #DFD8C7 is only 2.55:1. --graphite clears 5.42:1 in day and
+       4.44:1 at night, so the session's progress is legible in both. */
+    background: var(--graphite);
+    transition: width 300ms linear;
 }
 
 .session-time-remaining {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin-top: 0.5rem;
+    margin-top: 0.4rem;
+    font-size: var(--fs-micro);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--graphite);
 }
 
-/* Text and controls */
-.breathing-text {
-    font-size: 1.125rem;
-    margin: 2rem 0;
-    color: var(--text-primary);
-    font-weight: 400;
-    min-height: 1.5em;
-}
-
-.controls {
-    margin: 2rem 0;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-.control-btn, .technique-btn, .donate-btn, .patreon-btn {
-    padding: 0.875rem 1.75rem;
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: 110px;
+.progress-bar {
     position: relative;
-    overflow: hidden;
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
+    height: 4px;
+    max-width: 26rem;
+    margin: 1.5rem auto 1.9rem;
+    background: var(--track);
+    border-radius: var(--radius-pill);
 }
 
-.control-btn:hover, .technique-btn:hover, .donate-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--rim);
+    border-radius: var(--radius-pill);
+    transition: width 100ms linear, background-color 400ms ease;
 }
 
-.control-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.patreon-btn {
-    background: #FF424D;
-    color: white;
-    width: 100%;
-    margin-top: 0.5rem;
-}
-
-.patreon-btn:hover {
-    background: #E93E47;
-    transform: scale(1.02);
-    box-shadow: 0 4px 20px rgba(255, 66, 77, 0.3);
+.progress-time {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.35rem;
+    font-size: var(--fs-micro);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+    color: var(--graphite);
 }
 
 .timer {
-    font-size: 2rem;
-    font-weight: 300;
-    margin: 1.5rem 0;
-    color: var(--text-primary);
-    letter-spacing: 0.1em;
+    font-family: var(--ui);
+    font-size: 1.75rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 0 0 0.25rem;
+    line-height: 1.1;
 }
 
-/* Session stats */
 .session-stats {
     display: flex;
     justify-content: center;
-    gap: 2rem;
-    margin: 1rem 0;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
+    gap: 2.25rem;
+    margin: 1rem 0 0.5rem;
 }
 
 .stat-item {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 0.1rem;
 }
 
 .stat-value {
-    font-size: 1.125rem;
-    color: var(--text-primary);
-    font-weight: 500;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
 }
 
 .stat-label {
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
+    font-size: var(--fs-micro);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--graphite);
 }
 
-/* Progress bar */
-.progress-bar {
-    width: 100%;
-    height: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50px;
-    margin: 2rem 0;
-    overflow: hidden;
-    position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
+/* --------------------------------------------------------- the controls -- */
 
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--progress-color) 0%, rgba(255, 255, 255, 0.4) 50%, var(--progress-color) 100%);
-    border-radius: 50px;
-    width: 0%;
-    transition: width 100ms linear;
-}
-
-.progress-time {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 0.625rem;
-    color: var(--text-primary);
-    font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.progress-bar:hover .progress-time {
-    opacity: 1;
-}
-
-.technique-info {
-    background: rgba(255, 255, 255, 0.06);
-    padding: 2rem;
-    border-radius: 20px;
-    margin: 2rem 0;
-    text-align: left;
-    border: 1px solid var(--border);
-    backdrop-filter: blur(10px);
-}
-
-.technique-info h3 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-}
-
-.technique-info p {
-    line-height: 1.7;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-/* Sidebar */
-.sidebar {
+.controls {
     display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    margin: 1.5rem 0 0;
 }
 
-.card {
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    border-radius: 24px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
+.control-btn {
+    min-height: var(--hit);
+    padding: 0.7rem 1.35rem;
+    font-family: var(--ui);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
 }
 
-.card:hover {
-    transform: translateY(-4px);
-}
+.control-btn:hover:not(:disabled) { border-color: var(--ink); }
 
-.technique-selector {
-    padding: 2rem;
-}
-
-.technique-selector h3 {
-    font-size: 1.25rem;
+/* Begin is primary until a session runs. */
+.control-btn[data-role="start"] {
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--chalk);
     font-weight: 600;
-    margin-bottom: 1.5rem;
-    color: var(--text-primary);
 }
+
+.control-btn[data-role="start"]:hover:not(:disabled) {
+    background: var(--ink);
+    border-color: var(--ink);
+}
+
+/* Pause becomes the primary control for as long as a session is running. */
+.control-btn[data-role="pause"]:not(:disabled) {
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--chalk);
+    font-weight: 600;
+}
+
+.control-btn[data-role="pause"]:not(:disabled):hover {
+    background: var(--ink);
+    border-color: var(--ink);
+}
+
+.control-btn:disabled {
+    color: var(--graphite);
+    background: var(--leaf);
+    border-color: var(--rule);
+    cursor: not-allowed;
+    font-weight: 500;
+}
+
+/* ------------------------------------------------------------ the pills -- */
 
 .technique-buttons {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1.5rem 0 0;
 }
 
 .technique-btn {
-    text-align: left;
     position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: var(--hit);
+    padding: 0.6rem 1rem;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: border-color 200ms ease, background-color 200ms ease;
 }
 
+.technique-btn::before {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--edge);
+    flex: 0 0 auto;
+}
+
+/* The inner half of the doubled border. Transparent until the pill is active,
+   so nothing moves when the state changes. */
 .technique-btn::after {
     content: '';
     position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 4px;
-    background: var(--progress-color);
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    border-radius: 2px;
+    inset: 1px;
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    pointer-events: none;
 }
 
-.technique-btn:hover {
-    transform: translateX(4px);
-}
+.technique-btn:hover { border-color: var(--ink); }
 
-.technique-btn.active {
-    background: rgba(255, 255, 255, 0.15);
-    font-weight: 600;
-}
+.technique-btn.active { font-weight: 600; }
 
-.technique-btn.active::after {
-    transform: translateX(0);
-}
+/* Each pill wears its own technique's rim, not the page's current one. */
+.technique-btn[data-technique="478"]::before { background: var(--rim-478); }
+.technique-btn[data-technique="box"]::before { background: var(--rim-box); }
+.technique-btn[data-technique="coherent"]::before { background: var(--rim-coherent); }
+.technique-btn[data-technique="sigh"]::before { background: var(--rim-sigh); }
+.technique-btn[data-technique="extended"]::before { background: var(--rim-extended); }
+.technique-btn[data-technique="triangle"]::before { background: var(--rim-triangle); }
+.technique-btn[data-technique="wim"]::before { background: var(--rim-wim); }
 
-.donation-section {
-    padding: 2rem;
-    text-align: center;
-}
+.technique-btn.active[data-technique="478"] { border-color: var(--rim-478); }
+.technique-btn.active[data-technique="478"]::after { border-color: var(--rim-478); }
+.technique-btn.active[data-technique="box"] { border-color: var(--rim-box); }
+.technique-btn.active[data-technique="box"]::after { border-color: var(--rim-box); }
+.technique-btn.active[data-technique="coherent"] { border-color: var(--rim-coherent); }
+.technique-btn.active[data-technique="coherent"]::after { border-color: var(--rim-coherent); }
+.technique-btn.active[data-technique="sigh"] { border-color: var(--rim-sigh); }
+.technique-btn.active[data-technique="sigh"]::after { border-color: var(--rim-sigh); }
+.technique-btn.active[data-technique="extended"] { border-color: var(--rim-extended); }
+.technique-btn.active[data-technique="extended"]::after { border-color: var(--rim-extended); }
+.technique-btn.active[data-technique="triangle"] { border-color: var(--rim-triangle); }
+.technique-btn.active[data-technique="triangle"]::after { border-color: var(--rim-triangle); }
+.technique-btn.active[data-technique="wim"] { border-color: var(--rim-wim); }
+.technique-btn.active[data-technique="wim"]::after { border-color: var(--rim-wim); }
 
-.donation-section h3 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-}
+/* ------------------------------------------------------------ tools row -- */
 
-.donation-section p {
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
-    font-size: 0.875rem;
-    line-height: 1.6;
-}
-
-.donation-options {
+.tools-row {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.or-divider {
-    text-align: center;
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-    margin: 0.5rem 0;
-    opacity: 0.7;
-}
-
-/* Footer */
-.footer {
-    text-align: center;
-    padding: 2rem;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    margin-top: 3rem;
-}
-
-.footer a {
-    color: var(--text-primary);
-    text-decoration: none;
-    transition: opacity 0.3s ease;
-}
-
-.footer a:hover {
-    opacity: 0.7;
-}
-
-.social-links {
-    margin-top: 1rem;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-.legal-links {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    font-size: 0.8125rem;
-}
-
-.legal-links a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.legal-links a:hover {
-    color: var(--text-primary);
-}
-
-/* Cookie consent */
-#cookieConsent {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    padding: 1.5rem;
-    text-align: center;
-    border-top: 1px solid var(--border);
-    z-index: 1000;
-    transform: translateY(100%);
-    transition: transform 0.3s ease;
-    opacity: 0;
-    visibility: hidden;
-}
-
-#cookieConsent.show {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible;
-}
-
-#cookieConsent p {
-    margin: 0 0 1rem 0;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-#cookieConsent a {
-    color: var(--text-primary);
-    text-decoration: underline;
-}
-
-.cookie-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
     flex-wrap: wrap;
+    justify-content: center;
+    gap: 0;
+    margin: 1.5rem 0 0;
+    border-top: 1px solid var(--rule);
 }
 
-.cookie-btn {
-    background: var(--text-primary);
-    color: var(--bg-primary);
-    border: none;
-    padding: 0.5rem 2rem;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.875rem;
+.tools-row:empty { border-top: 0; }
+
+.tools-row .tool-btn {
+    min-height: var(--hit);
+    padding: 0.75rem 1rem;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
     font-weight: 500;
-    transition: opacity 0.3s ease;
+    color: var(--graphite);
+    background: none;
+    border: 0;
+    border-right: 1px solid var(--rule);
+    cursor: pointer;
 }
 
-.cookie-btn:hover {
-    opacity: 0.9;
+.tools-row .tool-btn:last-child { border-right: 0; }
+
+.tools-row .tool-btn:hover { color: var(--ink); }
+
+.tools-row .tool-btn.is-on { color: var(--ink); font-weight: 600; }
+
+/* ------------------------------------------------- safety acknowledgement */
+
+.safety-ack {
+    margin: 1.5rem 0 0;
+    padding: 1.1rem 1.25rem;
+    text-align: left;
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-left: 3px solid var(--warn);
+    border-radius: var(--radius);
 }
 
-.cookie-btn.secondary {
-    background: transparent;
-    color: var(--text-primary);
-    border: 1px solid var(--border);
+.safety-ack h3 { margin: 0 0 0.6rem; font-size: 1rem; }
+
+.safety-ack ul { margin: 0 0 0.9rem; padding-left: 1.15rem; }
+
+.safety-ack li { font-size: var(--fs-small); line-height: 1.6; color: var(--ink); }
+
+.safety-ack .safety-ack-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-/* Keyboard hint */
+.safety-ack-actions .control-btn:first-child {
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--chalk);
+    font-weight: 600;
+}
+
+/* --------------------------------------------------- post-session cards -- */
+
+.post-session-card {
+    position: relative;
+    margin: 1.5rem 0 0;
+    padding: 1.25rem;
+    text-align: left;
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sheet);
+}
+
+.post-session-card h3,
+.post-session-card h2 {
+    font-family: var(--ui);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 0.5rem;
+    padding-right: 2.5rem;
+}
+
+.post-session-card p {
+    font-size: var(--fs-small);
+    line-height: 1.65;
+    color: var(--graphite);
+    margin: 0 0 0.75rem;
+}
+
+.post-session-card .card-dismiss {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: var(--hit);
+    height: var(--hit);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    color: var(--graphite);
+    background: none;
+    border: 0;
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+.post-session-card .card-dismiss:hover { color: var(--ink); }
+
+.post-session-card form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.post-session-card input[type='email'],
+.post-session-card input[type='text'] {
+    flex: 1 1 14rem;
+    min-height: var(--hit);
+    padding: 0.6rem 0.75rem;
+    font-family: var(--ui);
+    font-size: 0.9375rem;
+    color: var(--ink);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+}
+
+.post-session-card input::placeholder { color: var(--graphite); }
+
+.post-session-card button[type='submit'] {
+    min-height: var(--hit);
+    padding: 0.6rem 1.2rem;
+    font-family: var(--ui);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--chalk);
+    background: var(--green);
+    border: 1px solid var(--green);
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+.post-session-card button[type='submit']:hover { background: var(--ink); border-color: var(--ink); }
+
+.post-session-card .form-note {
+    flex: 1 1 100%;
+    font-size: var(--fs-micro);
+    line-height: 1.55;
+    color: var(--graphite);
+    margin: 0.25rem 0 0;
+}
+
+.post-session-card .form-error {
+    flex: 1 1 100%;
+    font-size: var(--fs-small);
+    color: var(--bad);
+    margin: 0.35rem 0 0;
+    min-height: 1.2em;
+}
+
+/* The one-line night-mode suggestion js/app.js drops into the post-session
+   slot after a late session. */
+.night-hint {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1rem 0 0;
+    padding: 0.75rem 1rem;
+    font-size: var(--fs-small);
+    color: var(--graphite);
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+}
+
+.night-hint-dismiss {
+    margin-left: auto;
+    min-height: 32px;
+    padding: 0.25rem 0.6rem;
+    font-family: var(--ui);
+    font-size: var(--fs-micro);
+    font-weight: 500;
+    color: var(--graphite);
+    background: none;
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+.night-hint-dismiss:hover { color: var(--ink); border-color: var(--ink); }
+
+body.session-active .night-hint { display: none; }
+
+/* ------------------------------------------------------- technique info -- */
+
+.technique-info {
+    margin: 1.75rem 0 0;
+    padding: 1.25rem;
+    text-align: left;
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--rim);
+    border-radius: var(--radius);
+    transition: border-top-color 400ms ease;
+}
+
+.technique-info h3 { margin: 0 0 0.5rem; font-size: 1.0625rem; }
+
+.technique-info p { margin: 0; font-size: var(--fs-small); line-height: 1.7; color: var(--graphite); }
+
+/* ---------------------------------------------------------- keyboard ----- */
+
 .keyboard-hint {
     position: fixed;
-    bottom: 2rem;
     left: 50%;
-    transform: translateX(-50%);
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    padding: 0.75rem 1.5rem;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    font-size: 0.75rem;
-    color: var(--text-secondary);
+    bottom: 1rem;
+    transform: translateX(-50%) translateY(8px);
+    z-index: 40;
+    padding: 0.55rem 0.9rem;
+    font-size: var(--fs-micro);
+    color: var(--graphite);
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lift);
     opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
+    pointer-events: none;
+    transition: opacity 300ms ease, transform 300ms ease;
 }
 
-.keyboard-hint.show {
-    opacity: 1;
-    visibility: visible;
+.keyboard-hint.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 640px) {
+    .keyboard-hint { display: none; }
 }
 
-.keyboard-hint kbd {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    margin: 0 0.25rem;
-    font-family: monospace;
+/* ------------------------------------------------------------- kiosk ----- */
+
+.kiosk .breathing-section,
+.breathing-section.kiosk {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: var(--paper);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem 1.25rem;
 }
 
-#technique-title {
-    font-size: 1.5rem;
-    font-weight: 300;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-    letter-spacing: 0.05em;
+.kiosk .app-bar,
+.breathing-section.kiosk .app-bar,
+.kiosk .technique-buttons,
+.breathing-section.kiosk .technique-buttons,
+.kiosk .session-stats,
+.breathing-section.kiosk .session-stats,
+.kiosk .tools-row,
+.breathing-section.kiosk .tools-row,
+.kiosk .technique-info,
+.breathing-section.kiosk .technique-info {
+    display: none;
 }
 
-/* OPTIMIZED: Mobile responsive */
-@media (max-width: 768px) {
-    .breathing-aura,
-    .breathing-particles,
-    .natural-element {
-        display: none;
-    }
-    
-    .container {
-        padding: 1rem;
-        min-height: 100vh;
-    }
-    
-    .main-content {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-    
-    .breathing-section {
-        order: -1;
-        padding: 2rem 1.5rem;
-    }
-    
-    .header-content {
-        padding: 2rem 1.5rem;
-    }
-    
-    h1 {
-        font-size: 2rem;
-    }
-    
-    .subtitle {
-        font-size: 1rem;
-    }
-    
-    .breathing-container {
-        width: 280px;
-        height: 280px;
-        margin: 1rem auto;
-    }
-    
-    .breathing-circle {
-        width: 200px;
-        height: 200px;
-    }
-    
-    .controls {
-        flex-wrap: wrap;
-        gap: 0.75rem;
-    }
-    
-    .control-btn {
-        flex: 1;
-        min-width: 90px;
-        padding: 0.75rem 1.25rem;
-    }
-    
-    .technique-buttons {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        gap: 0.5rem;
-        padding-bottom: 0.5rem;
-    }
-    
-    .technique-btn {
-        flex: 0 0 auto;
-        scroll-snap-align: start;
-        min-width: 140px;
-        padding: 0.75rem 1rem;
-        font-size: 0.8125rem;
-    }
-    
-    .keyboard-hint {
-        display: none;
-    }
-    
-    .legal-links {
-        flex-wrap: wrap;
-        gap: 0.75rem 1.5rem;
-    }
-    
-    #cookieConsent {
-        padding: 1rem;
-    }
-    
-    .cookie-buttons {
-        flex-direction: column;
-        width: 100%;
-        max-width: 200px;
-        margin: 0 auto;
-    }
-    
-    .cookie-btn {
-        width: 100%;
-    }
-    
-    .settings-panel {
-        right: 0.5rem;
-        left: 0.5rem;
-        min-width: auto;
-        max-width: none;
-    }
-    
-    .duration-select {
-        width: 100px;
-        font-size: 0.8rem;
-    }
+.kiosk .breathing-container,
+.breathing-section.kiosk .breathing-container {
+    width: min(560px, 62vh);
 }
 
-@media (max-width: 480px) {
-    .breathing-container {
-        width: 240px;
-        height: 240px;
-    }
-    
-    .breathing-circle {
-        width: 180px;
-        height: 180px;
-    }
-    
-    .breathing-text {
-        font-size: 1rem;
-        margin: 1rem 0;
-    }
-    
-    .timer {
-        font-size: 1.75rem;
-    }
-    
-    .header-content,
-    .breathing-section,
-    .card {
-        padding: 1.5rem;
-    }
+.kiosk [data-role="timer"],
+.breathing-section.kiosk [data-role="timer"] { font-size: 2.75rem; }
+
+/* Kiosk lays the circle on the page ground, so the gap is cut in that. */
+.kiosk .circle-notch,
+.breathing-section.kiosk .circle-notch { background: var(--paper); }
+
+.kiosk [data-role="breathing-text"],
+.breathing-section.kiosk [data-role="breathing-text"] { font-size: 1.125rem; }
+
+/* --------------------------------------------------------- two timers ---- */
+
+/* `min(20rem, 100%)` rather than a bare `20rem`: at a 320px viewport the
+   container's side padding leaves less than 20rem, and a bare track would push
+   the whole page sideways. */
+.timer-pair {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+    gap: 1.25rem;
 }
 
-/* Reduced motion preferences */
-@media (prefers-reduced-motion: reduce) {
-    .breathing-circle,
-    .breathing-aura,
-    .particle-float,
-    .natural-element {
-        animation: none !important;
-    }
-    
-    .breathing-circle.active {
-        transform: translate(-50%, -50%) scale(1.1);
-    }
-    
-    * {
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-    }
+.timer-pair .breathing-section { margin-bottom: 0; }
+
+/* A comparison page carries two timers of different techniques. The shared
+   `--rim` / `--fill` pair comes from `body.theme-*`, which can only ever name
+   one of them, so each app root re-declares its own pair from its
+   `data-technique`. Every value is a token; nothing is defined per theme. */
+[data-breathing-app][data-technique="478"] { --rim: var(--rim-478); --fill: var(--fill-478); }
+[data-breathing-app][data-technique="box"] { --rim: var(--rim-box); --fill: var(--fill-box); }
+[data-breathing-app][data-technique="coherent"] { --rim: var(--rim-coherent); --fill: var(--fill-coherent); }
+[data-breathing-app][data-technique="sigh"] { --rim: var(--rim-sigh); --fill: var(--fill-sigh); }
+[data-breathing-app][data-technique="extended"] { --rim: var(--rim-extended); --fill: var(--fill-extended); }
+[data-breathing-app][data-technique="triangle"] { --rim: var(--rim-triangle); --fill: var(--fill-triangle); }
+[data-breathing-app][data-technique="wim"] { --rim: var(--rim-wim); --fill: var(--fill-wim); }
+
+/* ==========================================================================
+   7 — ARTICLE / PROSE SYSTEM
+   ========================================================================== */
+
+.article-page article,
+.prose {
+    max-width: var(--measure);
+    margin: 0 auto;
 }
+
+.technique-page .prose,
+.article-page .prose { margin-top: 2rem; }
+
+.article-page article section,
+.prose section { margin: 0 0 2.25rem; }
+
+.article-page article p,
+.article-page .prose p,
+.prose p {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--ink);
+}
+
+.article-page article li,
+.article-page .prose li,
+.prose li { font-size: 1.0625rem; line-height: 1.7; }
+
+.article-page article a,
+.prose a { color: var(--green); }
+
+.article-page h1 { margin-bottom: 0.75rem; }
+
+.article-header .lead,
+.article-page .lead,
+.prose .lead {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    letter-spacing: -0.008em;
+    color: var(--ink);
+    margin: 0 0 1.25rem;
+}
+
+/* ------------------------------------------------- article header block -- */
+
+.article-header {
+    padding: 2rem 0 0;
+    max-width: var(--measure);
+    margin: 0 auto;
+}
+
+.article-eyebrow,
+.article-page .breadcrumb,
+.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.85rem;
+    font-size: var(--fs-micro);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--graphite);
+}
+
+.breadcrumb li { margin: 0; }
+
+.breadcrumb a { color: var(--graphite); text-decoration: none; }
+
+.breadcrumb a:hover { color: var(--ink); text-decoration: underline; }
+
+.breadcrumb li:not(:last-child)::after {
+    content: '/';
+    margin-left: 0.35rem;
+    /* A separator glyph is type, not a hairline: it inherits --graphite from
+       .breadcrumb. --rule here would render it at 1.15:1 on leaf. */
+    color: inherit;
+}
+
+.article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin: 1.25rem 0 2rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    font-size: var(--fs-small);
+    color: var(--graphite);
+}
+
+.article-byline { margin: 0; }
+
+.article-byline strong { color: var(--ink); font-weight: 600; }
+
+.article-byline .article-role { color: var(--graphite); font-weight: 400; }
+
+.article-dates {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+/* ------------------------------------------------------------- steps ----- */
+
+.steps-container {
+    display: grid;
+    gap: 1rem;
+    margin: 1.25rem 0;
+}
+
+.step {
+    padding: 1.1rem 1.25rem;
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+}
+
+.step h3 { margin: 0 0 0.35rem; font-size: 1rem; }
+
+.step p { margin: 0; font-size: 0.9375rem; color: var(--graphite); }
+
+/* --------------------------------------------------------------- FAQ ----- */
+
+.faq-item {
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--rule);
+}
+
+.faq-item:last-child { border-bottom: 0; }
+
+.faq-item h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+
+.faq-item p { margin: 0; font-size: 1rem; color: var(--graphite); }
+
+/* ---------------------------------------------------------- callouts ----- */
+
+.callout {
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem;
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--edge);
+    border-radius: var(--radius);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+}
+
+/* A callout that lands before the page's first section heading has to carry an
+   `<h2>` to keep the heading order legal. It still reads as a callout head, not
+   as a display heading. */
+.callout h3,
+.callout > h2,
+.callout--caution > h2,
+.contraindications > h2 {
+    font-family: var(--ui);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.4rem;
+}
+
+.callout p:last-child { margin-bottom: 0; }
+
+/* Contraindications: the one callout with a warning rule. */
+.callout--caution,
+.contraindications {
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem;
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--warn);
+    border-radius: var(--radius);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+}
+
+.callout--caution h3,
+.contraindications h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+
+/* Crisis block: a full border, never a soft one. */
+.crisis-block {
+    margin: 1.5rem 0;
+    padding: 1.15rem 1.35rem;
+    background: var(--leaf);
+    border: 1px solid var(--bad);
+    border-radius: var(--radius);
+}
+
+.crisis-block h2,
+.crisis-block h3 {
+    font-family: var(--ui);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    color: var(--ink);
+}
+
+.crisis-block ul { list-style: none; padding: 0; margin: 0.5rem 0 0; }
+
+.crisis-block li {
+    font-size: 0.9375rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--rule);
+}
+
+.crisis-block li:last-child { border-bottom: 0; }
+
+.crisis-block strong { font-variant-numeric: tabular-nums; }
+
+/* Standing on its own as a sibling of `<article class="prose">` — its position
+   on /legal/medical-disclaimer — the block would otherwise run the full
+   container width while the prose beneath it sits at the reading measure. */
+main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
+
+/* ------------------------------------------------- definition lists ------ */
+
+/* Used by /about's policy list and by any page that answers a short list of
+   named questions. The term is operable-weight sans; the definition is prose. */
+.prose dl { margin: 1.25rem 0; }
+
+.prose dt {
+    font-family: var(--ui);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--ink);
+    margin-top: 1.1rem;
+}
+
+.prose dt:first-child { margin-top: 0; }
+
+.prose dd {
+    margin: 0.35rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    color: var(--graphite);
+}
+
+/* ---------------------------------------------- legal "see also" line ---- */
+
+/* `.article-page .prose p` is one specificity point heavier than a bare
+   `.prose .legal-nav`, so this has to match it or the line comes out at body
+   size in --ink. */
+.article-page .prose .legal-nav,
+.prose .legal-nav {
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    font-size: var(--fs-small);
+    color: var(--graphite);
+}
+
+/* -------------------------------------------------------- citations ------ */
+
+.citations {
+    margin: 2rem 0 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+}
+
+.citations h2,
+.citations h3 {
+    font-family: var(--ui);
+    font-size: var(--fs-micro);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--graphite);
+    margin: 0 0 0.75rem;
+}
+
+.citations ol { padding-left: 1.35rem; }
+
+.citations li {
+    font-size: var(--fs-small);
+    line-height: 1.6;
+    color: var(--graphite);
+    margin-bottom: 0.6rem;
+}
+
+.citations a { color: var(--green); word-break: break-word; }
+
+/* ------------------------------------------------------------ tables ----- */
+
+.table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 1.5rem 0;
+}
+
+.data-table,
+.article-page table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--fs-small);
+    font-family: var(--ui);
+}
+
+.data-table th,
+.data-table td,
+.article-page th,
+.article-page td {
+    text-align: left;
+    padding: 0.7rem 0.85rem 0.7rem 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    color: var(--ink);
+}
+
+.data-table th,
+.article-page th {
+    font-size: var(--fs-micro);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--graphite);
+}
+
+.data-table td.num,
+.data-table .num {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* -------------------------------------------------------- cards / grid --- */
+
+.card {
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sheet);
+    padding: 1.25rem;
+    text-align: left;
+}
+
+.card h3 { margin-top: 0; }
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 0.85rem;
+    margin: 1.25rem 0;
+}
+
+.link-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 1rem 1.15rem;
+    background: var(--leaf);
+    /* A link-card is a control you click, so its boundary is --edge. */
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--ink);
+}
+
+.link-card:hover { border-color: var(--ink); }
+
+.link-card strong { font-family: var(--ui); font-weight: 600; font-size: 0.9375rem; }
+
+.link-card span { font-size: var(--fs-small); line-height: 1.6; color: var(--graphite); }
+
+.technique-selector h3 { margin: 0 0 0.85rem; }
+
+.technique-selector .technique-buttons {
+    justify-content: flex-start;
+    margin-top: 0;
+}
+
+.support-card h3 { margin: 0 0 0.5rem; }
+
+.support-card p { font-size: var(--fs-small); color: var(--graphite); }
+
+/* The row shape is the default so the component works outside a `.card` too
+   (it sits in the prose on /about). Inside a support card it stacks. */
+.support-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.support-card .support-options {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+}
+
+.support-options a,
+.pro-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--hit);
+    padding: 0.6rem 1rem;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    text-decoration: none;
+    text-align: center;
+}
+
+.support-options a:hover,
+.pro-link:hover { border-color: var(--ink); text-decoration: none; }
+
+/* ------------------------------------------------- technique switcher ---- */
+
+.technique-switcher {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0 0 2rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+}
+
+.technique-switcher a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0.4rem 0.85rem;
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--graphite);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+}
+
+.technique-switcher a:hover { color: var(--ink); border-color: var(--ink); }
+
+.technique-switcher a[aria-current="page"] {
+    color: var(--ink);
+    border-color: var(--ink);
+    font-weight: 600;
+}
+
+.related-techniques,
+.article-page .related-techniques {
+    margin: 2rem 0;
+    padding: 1.25rem;
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+}
+
+.related-techniques h3 { margin: 0 0 0.6rem; }
+
+.related-techniques ul { list-style: none; padding: 0; margin: 0; }
+
+.related-techniques li { margin: 0 0 0.35rem; }
+
+/* ------------------------------------------------------------ CTA blocks - */
+
+.cta-block,
+.cta-block-final {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    text-align: center;
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+}
+
+.cta-block-final h2 { margin-top: 0; }
+
+.cta-button,
+.cta-button-large {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--hit);
+    padding: 0.7rem 1.5rem;
+    font-family: var(--ui);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--chalk);
+    background: var(--green);
+    border: 1px solid var(--green);
+    border-radius: var(--radius);
+    text-decoration: none;
+}
+
+.cta-button:hover,
+.cta-button-large:hover { background: var(--ink); border-color: var(--ink); text-decoration: none; }
+
+.cta-subtext {
+    margin: 0.75rem 0 0;
+    font-size: var(--fs-small);
+    color: var(--graphite);
+}
+
+/* -------------------------------------------------------- pricing -------- */
+/* --clay is the commerce accent. It appears here and on checkout buttons.
+   It never appears on the timer screen. */
+
+.pricing-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    min-width: 40rem;
+}
+
+.pricing-matrix th,
+.pricing-matrix td {
+    padding: 0.65rem 0.85rem;
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+    vertical-align: top;
+    color: var(--ink);
+}
+
+.pricing-matrix thead th {
+    border-bottom: 1px solid var(--ink);
+    vertical-align: bottom;
+}
+
+.pricing-matrix tbody th {
+    font-weight: 400;
+    color: var(--ink);
+    width: 40%;
+}
+
+.pricing-matrix td { text-align: center; }
+
+.pricing-matrix .col-featured {
+    background: var(--track);
+}
+
+/* The featured column's header cell is taller than the other three because it
+   carries the flag. Padding the head cells that lack a flag keeps all four
+   checkout buttons on one baseline. */
+.pricing-matrix thead th:not(.col-featured) { padding-top: 2.1rem; }
+
+/* The cells are bottom-aligned, so a one-line label and a three-line label
+   would leave the four buttons ragged along the top. Reserving three lines
+   makes every header button the same box whatever its label says. */
+.pricing-matrix thead .checkout-btn {
+    min-height: calc(3 * 1.35em + 1.2rem + 2px);
+}
+
+.pricing-matrix .tier-name {
+    display: block;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--graphite);
+    margin-bottom: 0.35rem;
+}
+
+.price-figure {
+    display: block;
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 1.6rem;
+    line-height: 1.1;
+    letter-spacing: -0.012em;
+    font-variant-numeric: tabular-nums;
+    color: var(--clay);
+}
+
+.price-period {
+    display: block;
+    font-size: var(--fs-micro);
+    color: var(--graphite);
+    margin-top: 0.2rem;
+}
+
+.tier-flag {
+    display: inline-block;
+    margin-bottom: 0.4rem;
+    padding: 0.15rem 0.5rem;
+    font-size: var(--fs-micro);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--chalk);
+    background: var(--clay);
+    border-radius: var(--radius-pill);
+}
+
+.checkout-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: var(--hit);
+    padding: 0.6rem 1rem;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    /* Explicit, because a <button> defaults to `normal` and an <a> inherits the
+       page's. Without it the pricing matrix's four header buttons — one link,
+       three buttons — measure differently and sit ragged. */
+    line-height: 1.35;
+    text-align: center;
+    color: var(--chalk);
+    background: var(--clay);
+    border: 1px solid var(--clay);
+    border-radius: var(--radius);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.checkout-btn:hover { background: var(--ink); border-color: var(--ink); text-decoration: none; }
+
+.checkout-btn--secondary {
+    color: var(--ink);
+    background: var(--leaf);
+    border-color: var(--edge);
+}
+
+.checkout-btn--secondary:hover { color: var(--ink); background: var(--leaf); border-color: var(--ink); }
+
+.tax-note {
+    max-width: var(--measure);
+    margin: 0.75rem 0 2rem;
+    font-size: var(--fs-micro);
+    line-height: 1.65;
+    color: var(--graphite);
+}
+
+/* ------------------------------------------------------------ ad slot ---- */
+
+.ad-slot {
+    position: relative;
+    display: block;
+    min-height: 280px;
+    margin: 2rem auto;
+    max-width: 100%;
+    background: var(--paper);
+    border: 1px dashed var(--edge);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.ad-slot::before {
+    content: 'Advertisement';
+    position: absolute;
+    top: 0.5rem;
+    left: 0.65rem;
+    font-family: var(--ui);
+    font-size: var(--fs-micro);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--graphite);
+}
+
+.ad-slot--leaderboard { min-height: 90px; }
+
+.ad-slot .adsbygoogle { display: block; width: 100%; }
+
+body.session-active .ad-slot,
+body.session-active [data-ask] { display: none; }
+
+/* ==========================================================================
+   8 — UTILITIES AND LEGACY SHIMS
+   ========================================================================== */
+
 .sr-only {
     position: absolute;
     width: 1px;
@@ -1214,860 +2245,6 @@ h1 {
     border: 0;
 }
 
-/* Focus styles for better accessibility */
-button:focus-visible,
-.technique-btn:focus-visible,
-.control-btn:focus-visible,
-.toggle-switch:focus-visible {
-    outline: 2px solid var(--theme-primary);
-    outline-offset: 2px;
-}
-
-/* Skip to main content link (add this to HTML if needed) */
-.skip-link {
-    position: absolute;
-    top: -40px;
-    left: 6px;
-    background: var(--theme-primary);
-    color: white;
-    padding: 8px;
-    text-decoration: none;
-    border-radius: 4px;
-    z-index: 1000;
-    transition: top 0.3s ease;
-}
-
-.skip-link:focus {
-    top: 6px;
-}
-
-/* Enhanced focus indicators for keyboard navigation */
-.technique-btn:focus,
-.control-btn:focus {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateX(2px);
-}
-
-/* Improved button states for accessibility */
-button[aria-pressed="true"] {
-    background: var(--theme-primary);
-    color: white;
-}
-
-/* Better contrast for text over background */
-.breathing-text {
-    background: rgba(0, 0, 0, 0.1);
-    padding: 0.5rem;
-    border-radius: 8px;
-    backdrop-filter: blur(10px);
-}
-
-/* Core Web Vitals optimization */
-.breathing-container {
-    contain: layout style paint;
-}
-
-.natural-element {
-    will-change: auto;
-}
-
-/* Lazy loading helper */
-img[loading="lazy"] {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-img[loading="lazy"].loaded {
-    opacity: 1;
-}
-
-/* Print styles */
-@media print {
-    .settings-btn,
-    .controls,
-    .donation-section,
-    .cookie-consent,
-    .keyboard-hint {
-        display: none !important;
-    }
-
-    .header-content {
-        background: white !important;
-        color: black !important;
-    }
-}
-
-/* Footer guides nav (homepage) */
-.footer-nav {
-    margin-top: 1rem;
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    font-size: 0.8125rem;
-}
-
-/* ==========================================================================
-   BLOG / ARTICLE PAGES  (scoped to .article-page so the homepage is untouched)
-   ========================================================================== */
-.article-page header {
-    text-align: left;
-    margin-bottom: 1.5rem;
-}
-
-/* Breadcrumb */
-.article-page .breadcrumb {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    max-width: 760px;
-    margin: 0 auto;
-}
-
-.article-page .breadcrumb li {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.article-page .breadcrumb li:not(:last-child)::after {
-    content: '›';
-    opacity: 0.6;
-}
-
-.article-page .breadcrumb a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.article-page .breadcrumb a:hover {
-    color: var(--text-primary);
-}
-
-/* Article card */
-.article-page article {
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-    padding: 3rem;
-    max-width: 760px;
-    margin: 0 auto;
-}
-
-.article-page article > header {
-    margin-bottom: 2rem;
-}
-
-.article-page h1 {
-    font-size: 2.25rem;
-    font-weight: 300;
-    line-height: 1.25;
-    margin-bottom: 1rem;
-    letter-spacing: 0.02em;
-}
-
-.article-page .article-meta {
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    margin: 0;
-}
-
-.article-page .lead {
-    font-size: 1.2rem;
-    line-height: 1.7;
-    color: var(--text-primary);
-    font-weight: 400;
-    margin-bottom: 1rem;
-}
-
-.article-page article section {
-    margin: 2.5rem 0;
-}
-
-.article-page h2 {
-    font-size: 1.5rem;
-    font-weight: 500;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-}
-
-.article-page h3 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
-}
-
-.article-page p {
-    line-height: 1.75;
-    color: var(--text-secondary);
-    margin-bottom: 1rem;
-}
-
-.article-page article ul {
-    margin: 0 0 1rem 1.25rem;
-    color: var(--text-secondary);
-}
-
-.article-page article li {
-    line-height: 1.7;
-    margin-bottom: 0.5rem;
-}
-
-.article-page strong {
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-.article-page article a {
-    color: var(--theme-secondary);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    transition: color 0.3s ease;
-}
-
-.article-page article a:hover {
-    color: var(--text-primary);
-}
-
-/* Step cards */
-.article-page .steps-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.article-page .step {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--theme-primary);
-    border-radius: 0 12px 12px 0;
-    padding: 1.25rem 1.5rem;
-}
-
-.article-page .step h3 {
-    margin-bottom: 0.35rem;
-}
-
-.article-page .step p {
-    margin-bottom: 0;
-}
-
-/* FAQ */
-.article-page .faq-item {
-    padding: 1.25rem 0;
-    border-bottom: 1px solid var(--border);
-}
-
-.article-page .faq-item:last-child {
-    border-bottom: none;
-}
-
-.article-page .faq-item h3 {
-    margin-bottom: 0.5rem;
-}
-
-.article-page .faq-item p {
-    margin-bottom: 0;
-}
-
-/* CTA blocks */
-.article-page .cta-block,
-.article-page .cta-block-final {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(139, 92, 246, 0.1));
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 2rem;
-    margin: 2.5rem 0;
-    text-align: center;
-}
-
-.article-page .cta-block h2,
-.article-page .cta-block-final h2 {
-    margin-bottom: 0.5rem;
-}
-
-.article-page .cta-block p,
-.article-page .cta-block-final p {
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
-}
-
-.article-page .cta-button,
-.article-page .cta-button-large {
-    display: inline-block;
-    background: var(--theme-primary);
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    border-radius: 25px;
-    padding: 0.875rem 2rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.article-page .cta-button-large {
-    padding: 1.125rem 2.75rem;
-    font-size: 1.0625rem;
-}
-
-.article-page .cta-button:hover,
-.article-page .cta-button-large:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
-    color: #fff;
-}
-
-.article-page .cta-subtext {
-    margin: 1rem 0 0;
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    opacity: 0.85;
-}
-
-/* Related techniques (aside) */
-.article-page aside {
-    max-width: 760px;
-    margin: 1.5rem auto 0;
-}
-
-.article-page .related-techniques {
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-    padding: 2rem;
-}
-
-.article-page .related-techniques h3 {
-    margin-bottom: 1rem;
-}
-
-.article-page .related-techniques ul {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin: 0;
-}
-
-.article-page .related-techniques a {
-    color: var(--theme-secondary);
-    text-decoration: none;
-    text-underline-offset: 2px;
-}
-
-.article-page .related-techniques a:hover {
-    color: var(--text-primary);
-    text-decoration: underline;
-}
-
-@media (max-width: 768px) {
-    .article-page article {
-        padding: 1.75rem 1.5rem;
-    }
-
-    .article-page h1 {
-        font-size: 1.75rem;
-    }
-
-    .article-page .related-techniques {
-        padding: 1.5rem;
-    }
-}
-
-/* ==========================================================================
-   v2 ADDITIONS — new themes, slots, page systems.
-   Everything above this line is unchanged. Extend, do not redesign.
-   ========================================================================== */
-
-[hidden] {
-    display: none !important;
-}
-
-/* --------------------------------------------------------------------------
-   THEME: cyclic sighing (teal / sea)
-   White body text on the lightest stop (#115e59) measures 7.6:1;
-   --text-secondary #99f6e4 on the same stop measures 6.0:1.
-   -------------------------------------------------------------------------- */
-body.theme-sigh {
-    background: linear-gradient(180deg, #042f2e 0%, #134e4a 50%, #115e59 100%);
-    background-attachment: fixed;
-    --text-primary: #ffffff;
-    --text-secondary: #99f6e4;
-    --surface: rgba(255, 255, 255, 0.08);
-    --border: rgba(255, 255, 255, 0.15);
-    --theme-primary: #2dd4bf;
-    --theme-secondary: #ccfbf1;
-    --theme-glow: #2dd4bf;
-    --progress-color: #5eead4;
-}
-
-body.theme-sigh .nature-bg {
-    background: radial-gradient(ellipse at 50% 90%, rgba(45, 212, 191, 0.12) 0%, transparent 60%);
-}
-
-/* --------------------------------------------------------------------------
-   THEME: extended exhale (amber dusk)
-   White body text on the lightest stop (#92400e) measures 7.1:1;
-   --text-secondary #fde68a on the same stop measures 5.7:1.
-   -------------------------------------------------------------------------- */
-body.theme-extended {
-    background: linear-gradient(180deg, #431407 0%, #7c2d12 50%, #92400e 100%);
-    background-attachment: fixed;
-    --text-primary: #ffffff;
-    --text-secondary: #fde68a;
-    --surface: rgba(255, 255, 255, 0.08);
-    --border: rgba(255, 255, 255, 0.15);
-    --theme-primary: #f59e0b;
-    --theme-secondary: #fcd34d;
-    --theme-glow: #f59e0b;
-    --progress-color: #fbbf24;
-}
-
-body.theme-extended .nature-bg {
-    background: radial-gradient(ellipse at 50% 15%, rgba(245, 158, 11, 0.12) 0%, transparent 60%);
-}
-
-/* Neither new theme owns a decorative element layer, so hide them all. */
-body.theme-sigh .natural-element,
-body.theme-extended .natural-element {
-    display: none;
-}
-
-/* Circles ------------------------------------------------------------------ */
-.breathing-circle.technique-sigh {
-    background: radial-gradient(circle at 35% 35%, #ccfbf1 0%, #2dd4bf 55%, #0d9488 100%);
-    --breath-cycle-duration: 9s;
-}
-
-.breathing-circle.technique-extended {
-    background: radial-gradient(circle at 35% 35%, #fef3c7 0%, #fbbf24 55%, #d97706 100%);
-    --breath-cycle-duration: 10s;
-}
-
-/* Cyclic sighing: 2s inhale, 1s top-up inhale, 6s exhale = 9s total */
-@keyframes breathe-sigh {
-    0% {
-        transform: translate(-50%, -50%) scale(0.75);
-        border-radius: 50%;
-    }
-    22.22% { /* 2s / 9s — end of the first inhale */
-        transform: translate(-50%, -50%) scale(1.18);
-        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
-    }
-    33.33% { /* 3s / 9s — end of the short top-up inhale */
-        transform: translate(-50%, -50%) scale(1.3);
-        border-radius: 42% 58% 52% 48% / 48% 52% 48% 52%;
-    }
-    100% { /* 9s / 9s — end of the long exhale */
-        transform: translate(-50%, -50%) scale(0.75);
-        border-radius: 50%;
-    }
-}
-
-/* Extended exhale: 4s inhale, 6s exhale = 10s total */
-@keyframes breathe-extended {
-    0% {
-        transform: translate(-50%, -50%) scale(0.8);
-        border-radius: 50%;
-    }
-    40% { /* 4s / 10s — end of inhale */
-        transform: translate(-50%, -50%) scale(1.25);
-        border-radius: 45% 55% 60% 40% / 40% 60% 40% 60%;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(0.8);
-        border-radius: 50%;
-    }
-}
-
-.breathing-circle.technique-sigh.active {
-    animation: breathe-sigh 9s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.breathing-circle.technique-extended.active {
-    animation: breathe-extended 10s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* The short top-up inhale in cyclic sighing gets a brief extra glow so the two
-   consecutive inhale phases are visually distinguishable. */
-.breathing-circle.inhale-short {
-    box-shadow: 0 0 90px var(--theme-glow), 0 0 30px rgba(255, 255, 255, 0.35);
-}
-
-/* --------------------------------------------------------------------------
-   Session suppression: no ads and no asks while someone is breathing.
-   -------------------------------------------------------------------------- */
-body.session-active .ad-slot,
-body.session-active [data-ask] {
-    display: none !important;
-}
-
-/* --------------------------------------------------------------------------
-   Ad slots. Height is reserved so toggling them measures CLS 0.
-   Allowed on content and comparison pages only, below the fold.
-   -------------------------------------------------------------------------- */
-.ad-slot {
-    min-height: 280px;
-    max-width: 760px;
-    margin: 2.5rem auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.03);
-    overflow: hidden;
-}
-
-.ad-slot::before {
-    content: 'Advertisement';
-    display: block;
-    font-size: 0.6875rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    opacity: 0.55;
-    margin-bottom: 0.5rem;
-}
-
-.ad-slot .adsbygoogle {
-    width: 100%;
-}
-
-.ad-slot--leaderboard {
-    min-height: 90px;
-}
-
-/* --------------------------------------------------------------------------
-   Engine slots. Empty slots take no space until a module fills them.
-   -------------------------------------------------------------------------- */
-[data-slot]:empty {
-    display: none;
-}
-
-.tools-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    justify-content: center;
-    margin: 0 0 1rem;
-}
-
-.tools-row .tool-btn {
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text-primary);
-    font-family: inherit;
-    font-size: 0.8125rem;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.tools-row .tool-btn:hover {
-    background: rgba(255, 255, 255, 0.16);
-}
-
-/* --------------------------------------------------------------------------
-   Post-session card (the Pro agent renders paywall + capture cards in here)
-   -------------------------------------------------------------------------- */
-.post-session-card {
-    position: relative;
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    padding: 1.75rem 1.75rem 1.5rem;
-    margin: 1.5rem 0 0;
-    text-align: left;
-}
-
-.post-session-card h3 {
-    font-size: 1.0625rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-    padding-right: 2rem;
-}
-
-.post-session-card p {
-    font-size: 0.875rem;
-    line-height: 1.65;
-    color: var(--text-secondary);
-    margin-bottom: 1rem;
-}
-
-.post-session-card .card-dismiss {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text-primary);
-    font-size: 1rem;
-    line-height: 1;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.post-session-card .card-dismiss:hover {
-    background: rgba(255, 255, 255, 0.18);
-}
-
-.post-session-card form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.625rem;
-}
-
-.post-session-card input[type='email'],
-.post-session-card input[type='text'] {
-    flex: 1 1 200px;
-    min-width: 0;
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-    font-family: inherit;
-    font-size: 0.875rem;
-}
-
-.post-session-card input::placeholder {
-    color: var(--text-secondary);
-    opacity: 0.75;
-}
-
-.post-session-card button[type='submit'] {
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    border: none;
-    background: var(--theme-primary);
-    color: #fff;
-    font-family: inherit;
-    font-weight: 600;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.post-session-card button[type='submit']:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-}
-
-.post-session-card .form-note {
-    flex: 1 1 100%;
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    margin: 0.25rem 0 0;
-}
-
-.post-session-card .form-error {
-    flex: 1 1 100%;
-    font-size: 0.8125rem;
-    color: #fecaca;
-    margin: 0.25rem 0 0;
-}
-
-/* --------------------------------------------------------------------------
-   Safety acknowledgement panel (techniques with requiresSafetyAck)
-   -------------------------------------------------------------------------- */
-.safety-ack {
-    display: block;
-    text-align: left;
-    background: rgba(0, 0, 0, 0.28);
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--theme-primary);
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin: 1.5rem 0;
-}
-
-.safety-ack h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.75rem;
-}
-
-.safety-ack p,
-.safety-ack li {
-    font-size: 0.875rem;
-    line-height: 1.65;
-    color: var(--text-primary);
-}
-
-.safety-ack ul {
-    margin: 0 0 1rem 1.1rem;
-}
-
-.safety-ack li {
-    margin-bottom: 0.5rem;
-}
-
-.safety-ack .safety-ack-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-}
-
-/* --------------------------------------------------------------------------
-   Technique pages: timer on top, prose below, switcher strip between.
-   -------------------------------------------------------------------------- */
-.technique-page .main-content {
-    display: block;
-}
-
-.technique-page .breathing-section {
-    max-width: 760px;
-    margin: 0 auto;
-}
-
-.technique-page article,
-.technique-page .prose {
-    background: var(--surface);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-    padding: 3rem;
-    max-width: 760px;
-    margin: 2rem auto 0;
-}
-
-.technique-switcher {
-    max-width: 760px;
-    margin: 1.5rem auto 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    justify-content: center;
-}
-
-.technique-switcher a {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text-primary);
-    text-decoration: none;
-    font-size: 0.8125rem;
-    transition: background 0.3s ease, transform 0.3s ease;
-}
-
-.technique-switcher a:hover {
-    background: rgba(255, 255, 255, 0.18);
-    transform: translateY(-1px);
-}
-
-.technique-switcher a[aria-current='page'] {
-    background: var(--theme-primary);
-    color: #fff;
-    font-weight: 600;
-}
-
-/* Card grid used by /timer and other hub pages */
-.card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1rem;
-    margin: 1.5rem 0;
-}
-
-.link-card {
-    display: block;
-    padding: 1.25rem;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--text-primary);
-    text-decoration: none;
-    transition: transform 0.3s ease, background 0.3s ease;
-}
-
-.link-card:hover {
-    transform: translateY(-3px);
-    background: rgba(255, 255, 255, 0.12);
-    color: var(--text-primary);
-}
-
-.link-card strong {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 0.35rem;
-}
-
-.link-card span {
-    display: block;
-    font-size: 0.8125rem;
-    line-height: 1.55;
-    color: var(--text-secondary);
-}
-
-/* --------------------------------------------------------------------------
-   Support card (replaces the old donation alert dead end)
-   -------------------------------------------------------------------------- */
-.support-card {
-    padding: 2rem;
-    text-align: center;
-}
-
-.support-card h3 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-}
-
-.support-card p {
-    color: var(--text-secondary);
-    margin-bottom: 1.25rem;
-    font-size: 0.875rem;
-    line-height: 1.6;
-}
-
-.support-card .support-options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.pro-link {
-    display: inline-block;
-    padding: 0.875rem 1.5rem;
-    border-radius: 25px;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-    text-decoration: none;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: background 0.3s ease, transform 0.3s ease;
-}
-
-.pro-link:hover {
-    background: rgba(255, 255, 255, 0.18);
-    transform: translateY(-2px);
-}
-
-/* --------------------------------------------------------------------------
-   Screen-reader-only live region
-   -------------------------------------------------------------------------- */
 .live-region {
     position: absolute;
     width: 1px;
@@ -2076,224 +2253,207 @@ body.session-active [data-ask] {
     margin: -1px;
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
-    clip-path: inset(50%);
     white-space: nowrap;
     border: 0;
 }
 
-/* --------------------------------------------------------------------------
-   Focus visibility on every interactive element
-   -------------------------------------------------------------------------- */
-a:focus-visible,
-button:focus-visible,
-select:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-summary:focus-visible,
-[tabindex]:focus-visible,
-[role='button']:focus-visible {
-    outline: 3px solid var(--theme-primary);
-    outline-offset: 2px;
-    border-radius: 6px;
+[data-slot]:empty { display: none; }
+
+[hidden] { display: none !important; }
+
+.num,
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* Legacy names still used by pages that have not been converted yet. */
+.donation-section {
+    margin: 2rem 0;
+    padding: 1.25rem;
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
 }
 
-/* --------------------------------------------------------------------------
-   Kiosk / projector mode
-   -------------------------------------------------------------------------- */
-.breathing-section.kiosk {
-    max-width: none;
-    min-height: 100vh;
+.donation-section h3 { margin: 0 0 0.5rem; }
+
+.donation-section p { font-size: var(--fs-small); color: var(--graphite); }
+
+.donation-options {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+}
+
+.donate-btn {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0;
-    padding: 2rem;
-}
-
-.breathing-section.kiosk .settings-btn,
-.breathing-section.kiosk .settings-panel,
-.breathing-section.kiosk .controls,
-.breathing-section.kiosk .session-stats,
-.breathing-section.kiosk .progress-bar,
-.breathing-section.kiosk .technique-info,
-.breathing-section.kiosk [data-slot],
-.breathing-section.kiosk .technique-buttons {
-    display: none !important;
-}
-
-.breathing-section.kiosk .breathing-container {
-    width: min(70vh, 70vw);
-    height: min(70vh, 70vw);
-}
-
-.breathing-section.kiosk .breathing-circle {
-    width: min(56vh, 56vw);
-    height: min(56vh, 56vw);
-}
-
-.breathing-section.kiosk [data-role='circle-text'] {
-    font-size: clamp(2rem, 7vw, 5rem);
-    font-weight: 600;
-}
-
-.breathing-section.kiosk [data-role='breathing-text'] {
-    font-size: clamp(1.25rem, 3.5vw, 2.5rem);
-    background: none;
-}
-
-.breathing-section.kiosk [data-role='timer'] {
-    font-size: clamp(1.5rem, 4vw, 3rem);
-}
-
-/* --------------------------------------------------------------------------
-   Reduced motion: no scale animation anywhere. The phase is carried by
-   colour and opacity instead, which the engine sets via data-phase.
-   -------------------------------------------------------------------------- */
-@media (prefers-reduced-motion: reduce) {
-    .breathing-circle,
-    .breathing-circle.active,
-    .breathing-circle.technique-sigh.active,
-    .breathing-circle.technique-extended.active {
-        animation: none !important;
-        transform: translate(-50%, -50%) scale(1) !important;
-        transition: opacity 600ms linear, filter 600ms linear !important;
-    }
-
-    .breathing-circle[data-phase='inhale'] {
-        opacity: 1;
-        filter: brightness(1.15);
-    }
-
-    .breathing-circle[data-phase='hold'] {
-        opacity: 0.85;
-        filter: brightness(1);
-    }
-
-    .breathing-circle[data-phase='exhale'] {
-        opacity: 0.6;
-        filter: brightness(0.8);
-    }
-
-    .breathing-aura,
-    .breathing-particles {
-        display: none;
-    }
-
-    .technique-switcher a:hover,
-    .link-card:hover,
-    .post-session-card button[type='submit']:hover,
-    .pro-link:hover {
-        transform: none;
-    }
-}
-
-/* --------------------------------------------------------------------------
-   Responsive tidy-up for the new blocks
-   -------------------------------------------------------------------------- */
-@media (max-width: 768px) {
-    .technique-page article,
-    .technique-page .prose {
-        padding: 1.75rem 1.5rem;
-    }
-
-    .ad-slot {
-        margin: 2rem auto;
-    }
-
-    .post-session-card {
-        padding: 1.5rem 1.25rem 1.25rem;
-    }
-
-    .card-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* --------------------------------------------------------------------------
-   data-role equivalents of the two id-based rules above. The engine no longer
-   uses ids (multiple timers can share a page), so these carry the same styling.
-   -------------------------------------------------------------------------- */
-.circle-text-container [data-role='circle-text'] {
-    font-size: 1.25rem;
+    min-height: var(--hit);
+    padding: 0.6rem 1rem;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
     font-weight: 500;
-    color: var(--text-primary);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    z-index: 10;
-    position: relative;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    transform: none !important;
-    animation: none !important;
-    pointer-events: none;
-    white-space: nowrap;
+    color: var(--ink);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    text-decoration: none;
 }
 
-[data-role='technique-title'] {
-    font-size: 1.5rem;
-    font-weight: 300;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-    letter-spacing: 0.05em;
+.or-divider {
+    font-size: var(--fs-micro);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--graphite);
+    text-align: center;
+    margin: 0.5rem 0;
 }
 
-/* Kiosk styling also applies when the kiosk class lands on an ancestor root. */
-.kiosk .breathing-section {
-    max-width: none;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0;
-    padding: 2rem;
+/* ------------------------------------------------------------ responsive - */
+
+@media (max-width: 900px) {
+    .main-content {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
-.kiosk .settings-btn,
-.kiosk .settings-panel,
-.kiosk .controls,
-.kiosk .session-stats,
-.kiosk .progress-bar,
-.kiosk .technique-info,
-.kiosk .sidebar,
-.kiosk [data-slot],
-.kiosk .technique-buttons {
-    display: none !important;
+@media (max-width: 640px) {
+    .container { padding: 0 1rem 2.5rem; }
+
+    .breathing-section { padding: 0 1rem 1.5rem; }
+
+    .app-bar { margin: 0 -1rem 1.25rem; padding: 0.5rem 1rem; }
+
+    .settings-panel { right: 1rem; top: 3.4rem; }
+
+    .session-stats { gap: 1.5rem; }
+
+    .controls .control-btn { flex: 1 1 8rem; }
+
+    .article-meta { flex-direction: column; align-items: flex-start; }
+
+    .article-dates { text-align: left; }
+
+    .pricing-matrix { min-width: 32rem; }
 }
 
-.kiosk .breathing-container {
-    width: min(70vh, 70vw);
-    height: min(70vh, 70vw);
+@media (max-width: 380px) {
+    .technique-btn { padding: 0.55rem 0.75rem; }
+
+    .session-stats { gap: 1.1rem; }
 }
 
-.kiosk .breathing-circle {
-    width: min(56vh, 56vw);
-    height: min(56vh, 56vw);
+/* ==========================================================================
+   9 — REDUCED MOTION
+   Targeted, never blanket. The pacing metaphor changes; nothing a person needs
+   is removed. Audio and vibration cues are not touched by this media query.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    /* The circle holds one size. */
+    .breathing-circle {
+        animation: none !important;
+        transform: translate(-50%, -50%) scale(0.86) !important;
+    }
+
+    /* The pace is carried by a ring drawn around the circle's circumference
+       over the phase duration, linearly. js/app.js sets --phase-duration at
+       every phase boundary; the four animation names guarantee a restart. */
+    .pacer-ring {
+        visibility: visible;
+        stroke-dasharray: var(--pacer-c);
+        stroke-dashoffset: var(--pacer-c);
+        animation-duration: var(--phase-duration, 4s);
+        animation-timing-function: linear;
+        animation-fill-mode: forwards;
+        animation-iteration-count: 1;
+    }
+
+    [data-phase="inhale"] .pacer-ring { animation-name: hmb-pace-i; }
+    [data-phase="hold"] .pacer-ring { animation-name: hmb-pace-h; }
+    [data-phase="exhale"] .pacer-ring { animation-name: hmb-pace-e; }
+    [data-phase="topup"] .pacer-ring { animation-name: hmb-pace-t; }
+
+    @keyframes hmb-pace-i { to { stroke-dashoffset: 0; } }
+    @keyframes hmb-pace-h { to { stroke-dashoffset: 0; } }
+    @keyframes hmb-pace-e { to { stroke-dashoffset: 0; } }
+    @keyframes hmb-pace-t { to { stroke-dashoffset: 0; } }
+
+    /* The notch still opens and closes — instantly. */
+    .circle-notch { transition: none; }
+
+    /* The progress bar still advances; js/app.js quantises it to whole
+       seconds under this preference, so no easing is wanted here. */
+    .progress-fill,
+    .session-progress-fill { transition: none; }
+
+    /* Hover translations and the technique cross-fade go. The phase-word
+       fade stays: it is the cue that a phase changed. */
+    .cookie-btn,
+    .control-btn,
+    .technique-btn,
+    .toggle-switch,
+    .toggle-switch::after,
+    .technique-info,
+    .breathing-circle {
+        transition: none;
+    }
+
+    .keyboard-hint { transition: opacity 300ms ease; }
 }
 
-.kiosk .circle-text-container [data-role='circle-text'] {
-    font-size: clamp(2rem, 7vw, 5rem);
-    font-weight: 600;
-}
+/* ==========================================================================
+   10 — PRINT BASICS
+   The practitioner surfaces load css/print.css for the full treatment; this is
+   the floor so that any page prints legibly.
+   ========================================================================== */
 
-.kiosk [data-role='breathing-text'] {
-    font-size: clamp(1.25rem, 3.5vw, 2.5rem);
-    background: none;
-}
+@media print {
+    :root,
+    body,
+    body[class*='theme-'],
+    body.night {
+        --paper: #FFFFFF;
+        --leaf: #FFFFFF;
+        --ink: #111111;
+        --graphite: #444444;
+        --rule: #C9C9C9;
+        --edge: #767676;
+        --track: #E4E4E4;
+        --green: #111111;
+        --chalk: #FFFFFF;
+        --clay: #111111;
+        --rim: #444444;
+        --fill: #FFFFFF;
+        --shadow-sheet: none;
+        --shadow-lift: none;
+        background: #FFFFFF;
+        color: #111111;
+    }
 
-.kiosk [data-role='timer'] {
-    font-size: clamp(1.5rem, 4vw, 3rem);
-}
+    .site-header,
+    .site-nav,
+    .nav-toggle,
+    .skip-link,
+    .keyboard-hint,
+    .settings-btn,
+    .settings-panel,
+    .controls,
+    .tools-row,
+    .technique-switcher,
+    .footer-nav,
+    .ad-slot,
+    .support-card,
+    .donation-section,
+    #cookieConsent,
+    [data-slot],
+    [data-no-print] {
+        display: none !important;
+    }
 
-/* Two timers side by side (comparison pages) */
-.timer-pair {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    align-items: start;
-}
+    .breathing-circle { animation: none !important; }
 
-.timer-pair .breathing-section {
-    padding: 2rem 1.5rem;
+    .container { max-width: none; padding: 0; }
+
+    a { color: #111111; text-decoration: underline; }
 }

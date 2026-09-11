@@ -12,28 +12,41 @@
     <meta name="author" content="Georges Rayess">
     <meta name="robots" content="noindex, nofollow">
 
+    <!-- Open Graph -->
     <meta property="og:title" content="Security Overview — Help Me Breathe">
     <meta property="og:description" content="How Help Me Breathe is built and run: architecture, data flows, hosting and TLS, subprocessors, the licence token, accessibility, support and disclosure.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpmebreath.com/compliance/security-overview">
-    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/security-overview.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
-    <meta name="twitter:card" content="summary_large_image">
 
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Security Overview — Help Me Breathe">
+    <meta name="twitter:description" content="How Help Me Breathe is built and run: architecture, data flows, hosting and TLS, subprocessors, the licence token, accessibility, support and disclosure.">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/security-overview.jpg">
+
+    <!-- Favicon: the ring with a gap. No emoji anywhere. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
+    <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
+    <!-- PERFORMANCE: font origins + render-critical CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/print.css" media="print">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -67,27 +80,40 @@
     </script>
 
     <style>
-        /* The two screen-side rules /css/print.css used to carry. They live
-           here so print.css can load with media="print" and stop blocking the
-           first paint of this page. */
+        /* Page-local layout for the compliance documents.
+           Paper and Ink rules: every colour is a token; nothing is defined only
+           inside a media query or a .night block; --rule is a decorative
+           hairline and --edge is the boundary of anything a person operates.
+           css/print.css owns the paper side of every .doc-* class; these are
+           the screen rules only. */
+
+        /* The two screen-side rules /css/print.css cannot carry, because a
+           media="print" sheet is not applied on screen at all. */
         .hmb-print-only { display: none !important; }
         .hmb-page-break { display: none; }
 
-        .doc-sheet { max-width: 820px; }
+        .doc-sheet {
+            max-width: 820px;
+            /* css/print.css resets this margin to 0 on paper. */
+            margin: 1.5rem auto 0;
+        }
 
         .doc-kicker {
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
             margin: 0 0 0.35rem;
+            font-family: var(--ui);
+            font-size: var(--fs-micro);
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--graphite);
         }
 
         .doc-meta {
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 1.1rem 1.3rem;
             margin-bottom: 2rem;
+            padding: 1.1rem 1.3rem;
+            background: var(--leaf);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
         }
 
         .doc-meta dl {
@@ -95,52 +121,81 @@
             grid-template-columns: minmax(140px, 200px) 1fr;
             gap: 0.45rem 1rem;
             margin: 0;
-            font-size: 0.9rem;
+            font-size: var(--fs-small);
         }
 
-        .doc-meta dt { font-weight: 600; }
-        .doc-meta dd { margin: 0; }
+        .doc-meta dt { font-weight: 600; color: var(--ink); }
+        .doc-meta dd { margin: 0; color: var(--ink); }
 
         .doc-callout {
-            border-left: 3px solid var(--theme-primary);
-            padding: 0.5rem 0 0.5rem 1.1rem;
             margin: 1.25rem 0;
+            padding: 1rem 1.25rem;
+            background: var(--leaf);
+            border: 1px solid var(--rule);
+            border-left: 3px solid var(--edge);
+            border-radius: var(--radius);
         }
+
+        .doc-callout p:last-child { margin-bottom: 0; }
 
         .doc-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
             margin-top: 1rem;
-            display: block;
-            overflow-x: auto;
+            font-family: var(--ui);
+            font-size: var(--fs-small);
         }
 
         .doc-table th,
         .doc-table td {
-            border: 1px solid var(--border);
-            padding: 0.55rem 0.7rem;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--rule);
             text-align: left;
             vertical-align: top;
+            color: var(--ink);
         }
 
+        /* .article-page th in css/styles.css sets uppercase micro graphite for
+           every table heading. That is right for a data table and wrong for a
+           row header in a document, so the row headers are reset here and only
+           the column headers keep the label treatment. */
+        .doc-table th {
+            font-size: var(--fs-small);
+            font-weight: 600;
+            letter-spacing: 0;
+            text-transform: none;
+            color: var(--ink);
+        }
+
+        .doc-table thead th {
+            font-size: var(--fs-micro);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--graphite);
+        }
+
+        /* A data flow, set as one line of monospace in an input well. */
         .flow-line {
-            font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-            font-size: 0.85rem;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 0.6rem 0.85rem;
             margin: 0.5rem 0;
+            padding: 0.65rem 0.85rem;
             overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: var(--fs-small);
+            line-height: 1.7;
+            color: var(--ink);
+            background: var(--track);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
         }
 
-        .doc-foot {
-            border-top: 1px solid var(--border);
-            margin-top: 2rem;
-            padding-top: 0.8rem;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
+        .page-label {
+            margin-top: 2.5rem;
+            font-family: var(--ui);
+            font-size: var(--fs-micro);
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--graphite);
         }
 
         .doc-actions {
@@ -151,31 +206,57 @@
         }
 
         .doc-btn {
-            font-family: inherit;
-            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: var(--hit);
+            padding: 0.6rem 1.25rem;
+            font-family: var(--ui);
+            font-size: 0.9375rem;
             font-weight: 600;
-            padding: 0.7rem 1.3rem;
-            border-radius: 999px;
-            border: 1px solid var(--theme-primary);
-            background: var(--theme-primary);
-            color: #ffffff;
+            color: var(--chalk);
+            background: var(--green);
+            border: 1px solid var(--green);
+            border-radius: var(--radius);
             cursor: pointer;
         }
 
-        .page-label {
-            font-size: 0.75rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            margin-top: 2.5rem;
+        .doc-btn:hover { background: var(--ink); border-color: var(--ink); }
+
+        .doc-foot {
+            margin-top: 2rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid var(--rule);
+            font-size: var(--fs-small);
+            color: var(--graphite);
         }
     </style>
 </head>
 <body class="article-page compliance-page" data-no-ads="true" data-no-asks="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners" aria-current="page">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
+
     <div class="container">
-        <header class="hmb-no-print">
+        <header class="article-header hmb-no-print">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
@@ -183,10 +264,8 @@
                     <li>Security overview</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Security Overview</h1>
-                <p class="subtitle">Two pages on how this is built, where the data goes, and what a one-person operation can and cannot promise.</p>
-            </div>
+            <h1>Security Overview</h1>
+            <p class="lead">Two pages on how this is built, where the data goes, and what a one-person operation can and cannot promise.</p>
         </header>
 
         <main id="main">
@@ -233,9 +312,9 @@
                     <p>The session runs entirely in the page. Phase timing, cue tones and vibration are all local. Settings and session history are written to that browser's own local storage under the <code>hmb.</code> prefix and are never read by a server.</p>
 
                     <p><strong>A client opens a co-branded session link.</strong></p>
-                    <div class="flow-line">browser → CDN: GET /s/?c=&lt;base64url config&gt; → HTML, CSS, JS<br>browser → Google Fonts: the Quicksand typeface. Then: nothing.</div>
+                    <div class="flow-line">browser → CDN: GET /s/?c=&lt;base64url config&gt; → HTML, CSS, JS<br>browser → Google Fonts: the site's typefaces. Then: nothing.</div>
                     <p>The entire configuration — technique, length, practitioner name, message, optional logo URL and licence token — is encoded in the query string, so no server needs to remember it. The page decodes it in the browser. Every decoded field is written with <code>textContent</code> rather than as markup, only <code>https</code> image URLs are accepted, and the payload is length-capped, because this is attacker-controllable input rendered on our own domain.</p>
-                    <p>This page differs from the embedded widget in one respect, and it is listed rather than glossed: it requests the Quicksand typeface from Google Fonts, so Google's font servers see the reader's IP address and user agent. Nothing about the session is sent with that request, and the page works if it is blocked. A practitioner's own logo, if the link carries one, is fetched by the reader's browser from the practitioner's own server. The widget under <code>/embed/v1/</code> makes neither request.</p>
+                    <p>This page differs from the embedded widget in one respect, and it is listed rather than glossed: it requests the site's typefaces from Google Fonts, so Google's font servers see the reader's IP address and user agent. Nothing about the session is sent with that request, and the page works if it is blocked. A practitioner's own logo, if the link carries one, is fetched by the reader's browser from the practitioner's own server. The widget under <code>/embed/v1/</code> makes neither request.</p>
 
                     <p><strong>A practitioner activates a licence.</strong></p>
                     <div class="flow-line">browser → POST /api/license { key } → { token }   ·   token stored in localStorage['hmb.license']</div>
@@ -265,34 +344,36 @@
                 <section class="doc-section">
                     <h2>4. Subprocessors</h2>
                     <p>Four, listed with what each one can see. The same list appears in clause 7 of the <a href="/compliance/dpa">Data Processing Addendum</a>, and changes are notified to licence holders at least ten days ahead.</p>
-                    <table class="doc-table">
-                        <caption class="sr-only">Subprocessors and what each can see</caption>
-                        <thead>
-                            <tr><th scope="col">Provider</th><th scope="col">Role</th><th scope="col">Data it can see</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Vercel Inc., United States</td>
-                                <td>Hosting, CDN, serverless runtime</td>
-                                <td>Ordinary request logs: IP address, user agent, URL, timestamp. Vercel publishes its own <a href="https://vercel.com/legal/dpa">Data Processing Addendum</a> and keeps its subprocessor list on its trust centre.</td>
-                            </tr>
-                            <tr>
-                                <td>The merchant of record</td>
-                                <td>Sells the licence as the seller on record, takes payment, handles sales tax and VAT, issues receipts, processes refunds</td>
-                                <td>Your name, email address, billing country, payment method, and any business name or tax identifier you enter. The company named on your receipt is the current merchant of record; this page is updated if it changes.</td>
-                            </tr>
-                            <tr>
-                                <td>Google LLC (Analytics 4 and Google Fonts)</td>
-                                <td>Aggregate visit statistics for the public pages; hosting of the Quicksand typeface used on the public pages and on client session links</td>
-                                <td>Standard analytics data, only after a visitor accepts analytics in the cookie banner. Consent Mode v2 defaults are denied. Analytics never loads inside the widget or a client session link. Separately, Google's font servers see the IP address and user agent of anyone who loads a public page or a client session link, because the Quicksand typeface is hosted there; the embedded widget requests no font.</td>
-                            </tr>
-                            <tr>
-                                <td>The email delivery provider</td>
-                                <td>Delivers licence keys and receipts; hosts the contact mailbox</td>
-                                <td>Your email address and the content of messages between you and the Provider.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-scroll">
+                        <table class="doc-table">
+                            <caption class="sr-only">Subprocessors and what each can see</caption>
+                            <thead>
+                                <tr><th scope="col">Provider</th><th scope="col">Role</th><th scope="col">Data it can see</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Vercel Inc., United States</td>
+                                    <td>Hosting, CDN, serverless runtime</td>
+                                    <td>Ordinary request logs: IP address, user agent, URL, timestamp. Vercel publishes its own <a href="https://vercel.com/legal/dpa">Data Processing Addendum</a> and keeps its subprocessor list on its trust centre.</td>
+                                </tr>
+                                <tr>
+                                    <td>The merchant of record</td>
+                                    <td>Sells the licence as the seller on record, takes payment, handles sales tax and VAT, issues receipts, processes refunds</td>
+                                    <td>Your name, email address, billing country, payment method, and any business name or tax identifier you enter. The company named on your receipt is the current merchant of record; this page is updated if it changes.</td>
+                                </tr>
+                                <tr>
+                                    <td>Google LLC (Analytics 4 and Google Fonts)</td>
+                                    <td>Aggregate visit statistics for the public pages; hosting of the typefaces used on the public pages and on client session links</td>
+                                    <td>Standard analytics data, only after a visitor accepts analytics in the cookie banner. Consent Mode v2 defaults are denied. Analytics never loads inside the widget or a client session link. Separately, Google's font servers see the IP address and user agent of anyone who loads a public page or a client session link, because the site's typefaces are hosted there; the embedded widget requests no font.</td>
+                                </tr>
+                                <tr>
+                                    <td>The email delivery provider</td>
+                                    <td>Delivers licence keys and receipts; hosts the contact mailbox</td>
+                                    <td>Your email address and the content of messages between you and the Provider.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <p>Nothing in this list receives client data, because no part of the product collects any.</p>
                 </section>
 
@@ -318,7 +399,7 @@
                 <section class="doc-section">
                     <h2>6. Accessibility posture</h2>
                     <p>Real work has been done here, and no formal conformance claim is made. Both halves of that sentence are deliberate.</p>
-                    <p>What has been done: the timer is fully operable from the keyboard, including starting, pausing, stopping and switching technique; phase changes are announced through an ARIA live region so a screen reader user hears "Inhale for four seconds" rather than nothing; text meets a 4.5:1 contrast ratio against its background, and several of the theme colours were changed specifically to reach it; <code>prefers-reduced-motion</code> is honoured, and with it set the circle changes brightness and opacity instead of animating its scale; there is no flashing content anywhere, at any rate; every page has a skip link, one <code>h1</code>, headings that do not skip levels, and visible focus styles.</p>
+                    <p>What has been done: the timer is fully operable from the keyboard, including starting, pausing, stopping and switching technique; phase changes are announced through an ARIA live region so a screen reader user hears "Inhale for four seconds" rather than nothing; text meets a 4.5:1 contrast ratio against its background, and several of the theme colours were changed specifically to reach it; <code>prefers-reduced-motion</code> is honoured, and with it set the circle holds one size while a ring drawn around its circumference carries the pace, with the per-second count and the progress bar still advancing; there is no flashing content anywhere, at any rate; every page has a skip link, one <code>h1</code>, headings that do not skip levels, and visible focus styles.</p>
                     <p>What is not claimed: there is no published WCAG 2.2 or EN 301 549 conformance statement, and there will not be one until an independent audit has been paid for and passed. A conformance claim is a legally operative statement, and making one without an audit behind it would be dishonest. If you need a Voluntary Product Accessibility Template or an accessibility conformance report for a procurement process, none exists.</p>
                     <p>If you hit an accessibility problem, email it to <a href="mailto:contact@helpmebreath.com?subject=Accessibility">contact@helpmebreath.com</a>. Accessibility bugs go to the front of the queue.</p>
                 </section>
@@ -371,26 +452,59 @@
         </main>
 
         <footer class="footer hmb-no-print">
-            <nav class="footer-nav" aria-label="Practitioner documents">
-                <a href="/for-practitioners">For practitioners</a>
-                <a href="/handouts">Client handouts</a>
-                <a href="/compliance/dpa">Data Processing Addendum</a>
-                <a href="/compliance/privacy-attestation">Privacy attestation</a>
-            </nav>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>
     </div>
 
     <script type="module" src="/js/consent.js"></script>
+    <script type="module" src="/js/app.js"></script>
 
     <script type="module">
         const printButton = document.querySelector('[data-role="print"]');

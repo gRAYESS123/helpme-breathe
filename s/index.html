@@ -16,19 +16,26 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="referrer" content="strict-origin-when-cross-origin">
 
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
+    <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
+    <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <!-- Newsreader for display, IBM Plex Sans for anything you operate. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <script>
     /*
@@ -164,13 +171,17 @@
     </script>
 
     <style>
-        /* Page-specific co-branding. Uses the existing custom properties. */
+        /* Page-local co-branding for a prescribed session.
+           docs/PAGE_CONTRACT.md section 13a: tokens only, no literal colour,
+           nothing defined solely inside a media or .night block, --edge on
+           anything a person can operate. */
+
         .session-brand {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 0.75rem;
-            margin-bottom: 1rem;
+            margin: 0 0 1rem;
         }
 
         /* A `display` declaration here outranks the UA's [hidden] rule, so the
@@ -186,58 +197,66 @@
             max-width: 220px;
             width: auto;
             height: auto;
-            border-radius: 8px;
+            border-radius: var(--radius);
         }
 
         .session-message {
             max-width: 46ch;
-            margin: 0.75rem auto 0;
+            margin: 1rem 0 0;
             padding: 1rem 1.25rem;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            color: var(--text-secondary);
+            background: var(--leaf);
+            border: 1px solid var(--rule);
+            border-left: 3px solid var(--rim);
+            border-radius: var(--radius);
+            color: var(--ink);
             font-size: 0.9375rem;
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
         /* Contraindications (hard rule 4). Collapsed so it does not crowd the
            timer, but always present and never removed by white-labelling. */
         .session-safety {
             max-width: 46ch;
-            margin: 1.25rem auto 0;
-            text-align: left;
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-            border-top: 1px solid var(--border);
+            margin: 1.5rem auto 0;
             padding-top: 0.75rem;
+            text-align: left;
+            font-family: var(--ui);
+            font-size: var(--fs-small);
+            line-height: 1.6;
+            color: var(--graphite);
+            border-top: 1px solid var(--rule);
         }
 
         .session-safety summary {
             cursor: pointer;
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--ink);
             list-style-position: inside;
+            padding: 0.25rem 0;
         }
 
-        .session-safety p { margin: 0.5rem 0 0; line-height: 1.55; }
+        .session-safety p { margin: 0.5rem 0 0; }
 
-        .session-safety ul { margin: 0.5rem 0 0 1.1rem; line-height: 1.5; }
+        .session-safety ul { margin: 0.5rem 0 0 1.1rem; }
 
         .session-safety ul[hidden] { display: none; }
 
         .session-safety li { margin-bottom: 0.25rem; }
 
         .session-footer {
+            border-top: 1px solid var(--ink);
+            margin-top: 3rem;
+            padding: 1.5rem 0 2.5rem;
             text-align: center;
-            padding: 2rem 1rem 3rem;
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
+            font-size: var(--fs-small);
+            color: var(--graphite);
         }
 
-        .session-footer p { margin-bottom: 0.5rem; }
+        .session-footer p { margin: 0 0 0.5rem; }
 
-        .session-footer a { color: inherit; }
+        .session-footer p:last-child { margin-bottom: 0; }
+
+        .session-footer a { color: var(--green); }
 
         .session-attrib[hidden] { display: none; }
 
@@ -252,23 +271,41 @@
 <body class="theme-478 technique-page" data-no-ads="true" data-no-asks="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
+    <!--
+      PERSISTENT SITE HEADER (docs/PAGE_CONTRACT.md section 2).
 
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
+      A verified Practitioner or Studio licence removes everything marked
+      data-session-chrome, along with the attribution line in the footer:
+      white-labelling takes our name off the page. It never touches the safety
+      block or the medical-disclaimer line, which stay on every version.
+    -->
+    <header class="site-header" data-session-chrome>
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer" aria-current="page">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
-            <div class="header-content">
-                <p class="session-brand" data-session-brand hidden>
-                    <img data-session-logo alt="Practitioner logo" hidden>
-                </p>
-                <h1 data-session-heading>A breathing session for you</h1>
-                <p class="subtitle">Find somewhere you will not be interrupted, then press begin.</p>
-                <p class="session-message" data-session-message hidden></p>
-            </div>
+        <header class="article-header">
+            <p class="session-brand" data-session-brand hidden>
+                <img data-session-logo alt="Practitioner logo" hidden>
+            </p>
+            <h1 data-session-heading>A breathing session for you</h1>
+            <p class="lead">Find somewhere you will not be interrupted, then press begin.</p>
+            <p class="session-message" data-session-message hidden></p>
         </header>
 
         <main id="main">
@@ -279,8 +316,18 @@
                      data-lock-technique
                      aria-labelledby="timer-heading">
 
-                <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">⚙️</button>
+                <div class="app-bar">
+                    <h2 id="timer-heading" data-role="technique-title">Guided breathing</h2>
+                    <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+                            <circle cx="12" cy="12" r="3.2"/>
+                            <path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
+                        </svg>
+                    </button>
+                </div>
 
+                <!-- No session-length control: the practitioner chose the
+                     length when they built the link. -->
                 <div class="settings-panel" data-role="settings-panel">
                     <div class="setting-item">
                         <span class="setting-label" id="label-sound">Sound</span>
@@ -292,22 +339,18 @@
                     </div>
                 </div>
 
-                <h2 id="timer-heading" data-role="technique-title">Guided breathing</h2>
-
                 <div class="breathing-container">
-                    <div class="breathing-aura"></div>
+                    <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
+                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
+                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                    </svg>
                     <div class="breathing-circle technique-478" data-role="circle">
-                        <div class="circle-text-container">
-                            <span data-role="circle-text">Ready</span>
-                        </div>
+                        <span class="circle-notch" aria-hidden="true"></span>
                     </div>
-                    <div class="breathing-particles" aria-hidden="true">
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
+                    <div class="circle-text-container">
+                        <span class="phase-word" data-role="circle-text">Ready</span>
+                        <span class="phase-count" data-role="phase-count"></span>
                     </div>
                 </div>
 
@@ -395,6 +438,8 @@
             <p>Paced breathing is not medical care and does not replace treatment.
             Read the <a href="/legal/medical-disclaimer">medical disclaimer</a> and the
             <a href="/legal/privacy-policy">privacy policy</a>.</p>
+            <p data-session-chrome>Written and maintained by Georges Rayess. Not a clinician
+            &mdash; <a href="/about">what that means for what you read here</a>.</p>
         </footer>
     </div>
 
@@ -420,18 +465,22 @@
 
         if (!cfg.accent) return;
 
-        // Inline on <body> so it beats the `body.theme-*` rules in styles.css.
-        var accent = '#' + cfg.accent;
-        var r = parseInt(cfg.accent.slice(0, 2), 16);
-        var g = parseInt(cfg.accent.slice(2, 4), 16);
-        var b = parseInt(cfg.accent.slice(4, 6), 16);
-        function lighten(v) { return Math.round(v + (255 - v) * 0.55); }
-
+        /*
+         * The practitioner's accent replaces the technique's rim — the ring
+         * around the circle, the progress fill, the rule on their note. It is
+         * set inline on <body> so it beats the `body.theme-*` rules in
+         * styles.css.
+         *
+         * The circle's interior becomes the plain surface colour rather than a
+         * tint mixed from the accent. That keeps the phase word at --ink on
+         * --leaf whatever colour a practice happens to use, and it means a
+         * visitor in night mode never gets a light filled disc at two in the
+         * morning. `var(--leaf)` is written through so it re-resolves when the
+         * token set flips.
+         */
         var style = document.body.style;
-        style.setProperty('--theme-primary', accent);
-        style.setProperty('--theme-glow', accent);
-        style.setProperty('--progress-color', accent);
-        style.setProperty('--theme-secondary', 'rgb(' + lighten(r) + ',' + lighten(g) + ',' + lighten(b) + ')');
+        style.setProperty('--rim', '#' + cfg.accent);
+        style.setProperty('--fill', 'var(--leaf)');
     }());
     </script>
 
@@ -549,6 +598,17 @@
 
             const attribution = document.querySelector('[data-session-attrib]');
             if (attribution) attribution.remove();
+
+            /*
+             * White-labelling takes our name off the page, so the site header
+             * and the authorship byline go with the attribution line. Nothing
+             * marked data-session-chrome carries safety information: the
+             * contraindication panel, the medical-disclaimer line and the
+             * privacy-policy link are outside it and stay on every version.
+             */
+            for (const chrome of document.querySelectorAll('[data-session-chrome]')) {
+                chrome.remove();
+            }
 
             if (cfg.logo && logo && brandRow) {
                 logo.setAttribute('src', cfg.logo);

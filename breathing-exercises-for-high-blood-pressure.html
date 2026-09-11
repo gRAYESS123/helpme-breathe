@@ -17,22 +17,25 @@
     <meta property="og:description" content="What the research does and does not show about slow breathing and high blood pressure, with a free 10-minute coherent breathing timer. Not a treatment.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://helpmebreath.com/breathing-exercises-for-high-blood-pressure">
-    <meta property="og:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta property="og:image" content="https://helpmebreath.com/images/og/breathing-exercises-for-high-blood-pressure.jpg">
     <meta property="og:site_name" content="Help Me Breathe">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Breathing Exercises and Blood Pressure — What the Evidence Shows">
     <meta name="twitter:description" content="What the research does and does not show about slow breathing and high blood pressure, with a free 10-minute coherent breathing timer. Not a treatment.">
-    <meta name="twitter:image" content="https://helpmebreath.com/images/og-breathing-timer.jpg">
+    <meta name="twitter:image" content="https://helpmebreath.com/images/og/breathing-exercises-for-high-blood-pressure.jpg">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +43,8 @@
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -63,54 +66,34 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
 
     <style>
-        /* Page-scoped: the safety notice that sits above the timer, and the
-           study cards in the evidence section. Uses existing theme tokens only. */
+        /* Page-local. Tokens only: no hex, no rgb(), and nothing defined solely
+           inside a media query or a .night block — the token sets already flip.
+           Two things need it: the disclaimer that sits above the timer (it is
+           outside .prose, so it has no measure of its own), and the four study
+           cards in the evidence section. */
+
         .bp-notice {
-            max-width: 760px;
-            margin: 0 auto 1.5rem;
-            background: var(--surface);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--theme-primary);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            padding: 1.5rem 1.75rem;
+            max-width: var(--measure);
+            margin: 2rem auto 1.5rem;
         }
 
         .bp-notice h2 {
+            margin: 0 0 0.5rem;
             font-size: 1.0625rem;
-            font-weight: 600;
-            margin: 0 0 0.75rem;
-            color: var(--text-primary);
         }
 
-        .bp-notice p {
-            font-size: 0.9375rem;
-            line-height: 1.7;
-            color: var(--text-primary);
-            margin: 0 0 0.75rem;
-        }
-
-        .bp-notice p:last-child {
-            margin-bottom: 0;
-        }
-
-        .bp-notice a {
-            color: var(--text-primary);
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
-
+        /* A study card is a sheet lying on the stock, like .step. */
         .article-page .study {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 1.25rem 1.5rem;
+            padding: 1.1rem 1.25rem;
             margin: 0 0 1rem;
+            background: var(--leaf);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
         }
 
         .article-page .study h3 {
-            margin-top: 0;
+            margin: 0 0 0.5rem;
+            font-size: 1rem;
         }
 
         .article-page .study p:last-child {
@@ -118,15 +101,9 @@
         }
 
         .article-page .study-ref {
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-        }
-
-        @media (max-width: 768px) {
-            .bp-notice {
-                padding: 1.25rem;
-                border-radius: 16px;
-            }
+            font-size: var(--fs-small);
+            line-height: 1.6;
+            color: var(--graphite);
         }
     </style>
 
@@ -164,7 +141,7 @@
       "@type": "Article",
       "headline": "Breathing Exercises and Blood Pressure — What the Evidence Shows",
       "description": "What the research does and does not show about slow breathing and high blood pressure, with a free 10-minute coherent breathing timer. Not a treatment.",
-      "image": "https://helpmebreath.com/images/og-breathing-timer.jpg",
+      "image": "https://helpmebreath.com/images/og/breathing-exercises-for-high-blood-pressure.jpg",
       "datePublished": "2026-09-09",
       "dateModified": "2026-09-10",
       "author": {
@@ -253,25 +230,28 @@
 <body class="theme-coherent article-page technique-page">
     <a class="skip-link" href="#main">Skip to main content</a>
 
-    <div class="nature-bg"></div>
-
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element leaf leaf-3"></div>
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element ripple ripple-3"></div>
-    <div class="natural-element cloud cloud-1"></div>
-    <div class="natural-element sun-ray sun-ray-1"></div>
-    <div class="natural-element sun-ray sun-ray-2"></div>
-    <div class="natural-element sun-ray sun-ray-3"></div>
+    <!-- ============ PERSISTENT SITE HEADER ============ -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides" aria-current="page">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
 
     <div class="container">
-        <header>
+        <header class="article-header">
             <nav aria-label="Breadcrumb">
                 <ol class="breadcrumb">
                     <li><a href="/">Home</a></li>
@@ -279,15 +259,17 @@
                     <li>Breathing and blood pressure</li>
                 </ol>
             </nav>
-            <div class="header-content">
-                <h1>Breathing Exercises and Blood Pressure</h1>
-                <p class="subtitle">What the research does and does not show, and a ten-minute slow-breathing timer you can use while you read it.</p>
+            <h1>Breathing Exercises and Blood Pressure</h1>
+            <p class="lead">What the research does and does not show, and a ten-minute slow-breathing timer you can use while you read it.</p>
+            <div class="article-meta">
+                <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
+                <p class="article-dates">Published 2026-09-09 &middot; Updated 2026-09-10</p>
             </div>
         </header>
 
         <main id="main">
             <!-- ============ PROMINENT DISCLAIMER, ABOVE THE TIMER ============ -->
-            <aside class="bp-notice" aria-labelledby="bp-notice-heading">
+            <aside class="callout callout--caution bp-notice" aria-labelledby="bp-notice-heading">
                 <h2 id="bp-notice-heading">Read this before you use the timer</h2>
                 <p><strong>This is not a treatment for high blood pressure, and it is not a substitute for medication or medical care.</strong> Help Me Breathe is a breathing timer, not a medical device, and nothing on this page is a diagnosis or a prescription.</p>
                 <p><strong>Do not change, reduce, skip or stop any prescribed medication because of anything you read here or any reading you take at home.</strong> Medication decisions belong to the clinician who prescribed it. If your blood pressure is high, or you are worried about it, that is a conversation to have with a doctor or a pharmacist.</p>
@@ -302,7 +284,15 @@
                      data-lock-technique
                      aria-labelledby="timer-heading">
 
-                <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">⚙️</button>
+                <div class="app-bar">
+                    <h2 id="timer-heading" data-role="technique-title">Slow breathing at six breaths a minute</h2>
+                    <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
+                            <circle cx="12" cy="12" r="3.2"/>
+                            <path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
+                        </svg>
+                    </button>
+                </div>
 
                 <div class="settings-panel" data-role="settings-panel">
                     <div class="setting-item">
@@ -326,22 +316,18 @@
                     </div>
                 </div>
 
-                <h2 id="timer-heading" data-role="technique-title">Slow breathing at six breaths a minute</h2>
-
                 <div class="breathing-container">
-                    <div class="breathing-aura"></div>
+                    <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+                        <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
+                        <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
+                        <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                    </svg>
                     <div class="breathing-circle technique-coherent" data-role="circle">
-                        <div class="circle-text-container">
-                            <span data-role="circle-text">Ready</span>
-                        </div>
+                        <span class="circle-notch" aria-hidden="true"></span>
                     </div>
-                    <div class="breathing-particles" aria-hidden="true">
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
-                        <span class="particle-float"></span>
+                    <div class="circle-text-container">
+                        <span class="phase-word" data-role="circle-text">Ready</span>
+                        <span class="phase-count" data-role="phase-count"></span>
                     </div>
                 </div>
 
@@ -376,6 +362,7 @@
                     </div>
                 </div>
 
+                <!-- SLOT: Pro tools -->
                 <div class="tools-row" data-slot="tools"></div>
 
                 <div class="controls">
@@ -393,6 +380,7 @@
                     </div>
                 </div>
 
+                <!-- SLOT: post-session cards -->
                 <div data-slot="post-session"></div>
 
                 <div class="technique-info" data-role="technique-info"></div>
@@ -402,13 +390,13 @@
 
             <!-- ============ TECHNIQUE SWITCHER ============ -->
             <nav class="technique-switcher" aria-label="Other breathing timers">
-                <a href="/4-7-8-breathing">🌙 4-7-8</a>
-                <a href="/box-breathing">🌿 Box</a>
-                <a href="/heart-coherence-breathing">💗 Coherence</a>
-                <a href="/cyclic-sighing">🌊 Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">🌅 Extended exhale</a>
-                <a href="/triangle-breathing">☁️ Triangle</a>
-                <a href="/energizing-breath">☀️ Energizing</a>
+                <a href="/4-7-8-breathing">4-7-8</a>
+                <a href="/box-breathing">Box</a>
+                <a href="/heart-coherence-breathing">Coherence</a>
+                <a href="/cyclic-sighing">Cyclic sighing</a>
+                <a href="/extended-exhale-breathing">Extended exhale</a>
+                <a href="/triangle-breathing">Triangle</a>
+                <a href="/energizing-breath">Energizing</a>
                 <a href="/timer">All timers</a>
             </nav>
 
@@ -492,17 +480,19 @@
 
                 <section>
                     <h2>Who should be careful</h2>
-                    <p>Coherent breathing at six breaths a minute involves no breath-holding and no fast breathing, which makes it one of the gentler patterns on this site. It is still worth checking with your doctor or pharmacist before you start anything new if any of the following apply to you.</p>
-                    <ul>
-                        <li>Your blood pressure is not yet controlled, or your clinician has told you it is being actively adjusted.</li>
-                        <li>You have a heart condition, an arrhythmia, or a history of stroke or heart attack.</li>
-                        <li>You have a respiratory condition such as asthma or COPD, or you get breathless easily.</li>
-                        <li>You are pregnant, or recently gave birth.</li>
-                        <li>You have had recent surgery, or you have glaucoma or raised intracranial pressure.</li>
-                        <li>You have panic disorder, or paying attention to your breathing tends to make you more anxious rather than less.</li>
-                        <li>You take medication that lowers your blood pressure enough that you sometimes feel faint on standing.</li>
-                    </ul>
-                    <p>None of that is a reason to be frightened of breathing slowly. It is a reason to ask someone who knows your history before you make it a habit. Whatever you decide, do not use any breathing pattern that involves holding your breath or breathing quickly if your blood pressure is uncontrolled — that includes the energizing pattern on this site.</p>
+                    <div class="callout callout--caution">
+                        <p>Coherent breathing at six breaths a minute involves no breath-holding and no fast breathing, which makes it one of the gentler patterns on this site. It is still worth checking with your doctor or pharmacist before you start anything new if any of the following apply to you.</p>
+                        <ul>
+                            <li>Your blood pressure is not yet controlled, or your clinician has told you it is being actively adjusted.</li>
+                            <li>You have a heart condition, an arrhythmia, or a history of stroke or heart attack.</li>
+                            <li>You have a respiratory condition such as asthma or COPD, or you get breathless easily.</li>
+                            <li>You are pregnant, or recently gave birth.</li>
+                            <li>You have had recent surgery, or you have glaucoma or raised intracranial pressure.</li>
+                            <li>You have panic disorder, or paying attention to your breathing tends to make you more anxious rather than less.</li>
+                            <li>You take medication that lowers your blood pressure enough that you sometimes feel faint on standing.</li>
+                        </ul>
+                        <p>None of that is a reason to be frightened of breathing slowly. It is a reason to ask someone who knows your history before you make it a habit. Whatever you decide, do not use any breathing pattern that involves holding your breath or breathing quickly if your blood pressure is uncontrolled — that includes the energizing pattern on this site.</p>
+                    </div>
                 </section>
 
                 <section>
@@ -574,44 +564,51 @@
         </main>
 
         <footer class="footer">
-            <p>Made for a calmer, more mindful world.</p>
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Breathing timers">
-                <a href="/timer">All timers</a>
-                <a href="/4-7-8-breathing">4-7-8 breathing</a>
-                <a href="/box-breathing">Box breathing</a>
-                <a href="/heart-coherence-breathing">Heart coherence</a>
-                <a href="/cyclic-sighing">Cyclic sighing</a>
-                <a href="/extended-exhale-breathing">Extended exhale</a>
-                <a href="/triangle-breathing">Triangle breathing</a>
-                <a href="/energizing-breath">Energizing breath</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="Guides and comparisons">
-                <a href="/breathing-exercises-anxiety">For anxious moments</a>
-                <a href="/breathing-exercises-for-sleep">For sleep</a>
-                <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
-                <a href="/breathing-exercises-for-focus">For focus</a>
-                <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
-                <a href="/breathing-apps-compared">Apps compared</a>
-                <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
-            </nav>
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
 
-            <nav class="footer-nav" aria-label="About and products">
-                <a href="/science">What the research says</a>
-                <a href="/about">About</a>
-                <a href="/pro">Pro</a>
-                <a href="/for-practitioners">For practitioners</a>
-                <a href="/embed">Embed the timer</a>
-            </nav>
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician — <a href="/about">what that means for what you read here</a>.</p>
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/terms-of-service">Terms of Service</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
-                <span aria-hidden="true" style="opacity: 0.5">•</span>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
         </footer>

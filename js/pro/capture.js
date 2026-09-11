@@ -1,8 +1,8 @@
 /**
  * js/pro/capture.js — the post-session email capture card.
  *
- * One inline glass card, never a modal, never an overlay, never on top of the
- * breathing circle. It appears in the completing instance's
+ * One inline card on the page's own stock, never a modal, never an overlay,
+ * never on top of the breathing circle. It appears in the completing instance's
  * `[data-slot="post-session"]` after a completed session, offering the printable
  * card for the technique that was just practised.
  *

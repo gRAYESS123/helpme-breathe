@@ -36,23 +36,29 @@
       Caption and sub are written with textContent, so anything in the query
       string is inert text — never markup.
 
-      Third-party requests: Google Fonts only. No analytics, no consent script,
+      Third-party requests: Google Fonts only (Newsreader + IBM Plex Sans).
+      No analytics, no consent script,
       no ads, no Pro modules. Keep it that way; a capture surface that phones
       home would put a tracker inside every clip we publish.
     -->
     <meta name="robots" content="noindex, nofollow">
     <meta name="referrer" content="strict-origin-when-cross-origin">
 
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>🫁</text></svg>">
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/css/styles.css">
-    <!-- Render-blocking on purpose: the capture must not start before Quicksand is ready. -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap">
+    <!-- Render-blocking on purpose: a capture must not start before Newsreader
+         and IBM Plex Sans are ready, or the clip comes out in a system face. -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
 
     <style>
         /* ------------------------------------------------------------------
@@ -62,6 +68,10 @@
            into the real site if this file is ever copied. Sizes are absolute
            pixels, not viewport units: the recorder fixes the viewport, and a
            fixed pixel layout renders identically at every capture.
+
+           docs/PAGE_CONTRACT.md section 13a: every colour is a var(--token),
+           nothing is defined only inside a media or .night block, and the phase
+           word, the circle and the controls are not restyled beyond size.
            ------------------------------------------------------------------ */
         html,
         body.render-body {
@@ -73,43 +83,43 @@
         }
 
         body.render-body {
-            background-attachment: scroll;
+            background: var(--paper);
             -webkit-font-smoothing: antialiased;
         }
 
         /* Per-size scale. story = 1080x1920, pin = 1000x1500, square = 1080x1080. */
         body.render-story {
-            --r-circle: 640px;
-            --r-container: 900px;
+            --r-stage: 900px;
             --r-caption: 68px;
             --r-caption-max: 900px;
             --r-sub: 32px;
             --r-phase: 34px;
-            --r-circle-text: 62px;
+            --r-word: 96px;
+            --r-count: 44px;
             --r-wordmark: 26px;
             --r-gap: 56px;
         }
 
         body.render-pin {
-            --r-circle: 520px;
-            --r-container: 720px;
+            --r-stage: 720px;
             --r-caption: 60px;
             --r-caption-max: 820px;
             --r-sub: 29px;
             --r-phase: 31px;
-            --r-circle-text: 52px;
+            --r-word: 80px;
+            --r-count: 38px;
             --r-wordmark: 24px;
             --r-gap: 44px;
         }
 
         body.render-square {
-            --r-circle: 430px;
-            --r-container: 600px;
+            --r-stage: 600px;
             --r-caption: 52px;
             --r-caption-max: 860px;
             --r-sub: 26px;
             --r-phase: 28px;
-            --r-circle-text: 44px;
+            --r-word: 66px;
+            --r-count: 32px;
             --r-wordmark: 22px;
             --r-gap: 32px;
         }
@@ -130,8 +140,6 @@
             background: none;
             border: 0;
             box-shadow: none;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
             border-radius: 0;
             margin: 0;
             padding: 0 5%;
@@ -146,6 +154,7 @@
         }
 
         /* Chrome that has no place in a capture. */
+        body.render-body .app-bar,
         body.render-body .settings-btn,
         body.render-body .settings-panel,
         body.render-body .controls,
@@ -154,12 +163,13 @@
         body.render-body .session-info,
         body.render-body .technique-info,
         body.render-body .safety-ack,
+        body.render-body .tools-row,
         body.render-body [data-slot],
         body.render-body .technique-buttons,
         body.render-body .keyboard-hint,
         body.render-body [data-role="timer"],
         body.render-body footer,
-        body.render-body .site-footer,
+        body.render-body .site-header,
         /* js/app.js -> js/analytics.js -> js/consent.js builds this banner on
            import. Nothing here is ever consented to or tracked, but the banner
            would otherwise sit in the bottom of every capture. */
@@ -182,15 +192,15 @@
         }
 
         .render-caption {
+            font-family: var(--display);
             font-size: var(--r-caption);
-            font-weight: 300;
+            font-weight: 400;
             line-height: 1.18;
-            letter-spacing: -0.01em;
-            color: var(--text-primary);
+            letter-spacing: -0.012em;
+            color: var(--ink);
             max-width: var(--r-caption-max);
             margin: 0 0 var(--r-gap);
             text-wrap: balance;
-            text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
         }
 
         .render-caption:empty {
@@ -198,33 +208,30 @@
         }
 
         body.render-body .breathing-container {
-            width: var(--r-container);
-            height: var(--r-container);
+            width: var(--r-stage);
+            height: var(--r-stage);
             margin: 0;
             flex: none;
-            /* styles.css sets `contain: layout style paint` for scroll
-               performance. Paint containment clips the circle's glow to the
-               container box, which shows up as a hard rectangle in a still. */
-            contain: none;
         }
 
-        body.render-body .breathing-circle {
-            width: var(--r-circle);
-            height: var(--r-circle);
-            box-shadow: 0 0 140px var(--theme-glow), 0 0 48px rgba(255, 255, 255, 0.28);
-        }
-
+        /* The phase word is the largest thing in the frame, as it is on the
+           site. Only the size changes here; the face, weight and colour are
+           the design system's. */
+        body.render-body .phase-word,
         body.render-body [data-role="circle-text"] {
-            font-size: var(--r-circle-text);
-            font-weight: 500;
-            letter-spacing: 0.01em;
+            font-size: var(--r-word);
+        }
+
+        body.render-body [data-role="phase-count"] {
+            font-size: var(--r-count);
         }
 
         body.render-body [data-role="breathing-text"] {
+            font-family: var(--ui);
             font-size: var(--r-phase);
             font-weight: 400;
             line-height: 1.4;
-            color: var(--text-secondary);
+            color: var(--graphite);
             background: none;
             border: 0;
             box-shadow: none;
@@ -241,11 +248,11 @@
         }
 
         .render-sub {
+            font-family: var(--ui);
             font-size: var(--r-sub);
             font-weight: 400;
             line-height: 1.4;
-            color: var(--text-secondary);
-            opacity: 0.92;
+            color: var(--graphite);
             margin: calc(var(--r-gap) * 0.5) 0 0;
             max-width: var(--r-caption-max);
         }
@@ -254,46 +261,46 @@
             display: none;
         }
 
-        .render-wordmark {
-            font-size: var(--r-wordmark);
-            font-weight: 500;
-            letter-spacing: 0.14em;
-            text-transform: lowercase;
-            color: var(--text-secondary);
-            opacity: 0.7;
+        /* The lockup, at capture scale: the ring and the wordmark, nothing else. */
+        .render-lockup {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: calc(var(--r-wordmark) * 0.55);
             margin: calc(var(--r-gap) * 1.4) 0 0;
         }
 
-        /* The recorder never scrolls, so nothing may sit outside the viewport. */
-        body.render-body .nature-bg {
-            opacity: 0.45;
+        .render-lockup svg {
+            display: block;
+            width: calc(var(--r-wordmark) * 1.35);
+            height: calc(var(--r-wordmark) * 1.35);
+            color: var(--green);
+        }
+
+        .render-wordmark {
+            font-family: var(--display);
+            font-size: var(--r-wordmark);
+            font-weight: 500;
+            letter-spacing: -0.012em;
+            line-height: 1;
+            color: var(--graphite);
+            margin: 0;
         }
     </style>
 </head>
-<body class="render-body render-story theme-478" data-lock-theme data-no-ads="true" data-no-asks="true">
+<!-- `day` pins the day token set. Night is honoured for every visitor on the
+     real site, but a capture surface has to be deterministic: two render
+     machines with different OS colour-scheme settings must not produce
+     clips that look nothing like each other. -->
+<body class="render-body render-story day theme-478" data-lock-theme data-no-ads="true" data-no-asks="true">
 
-    <div class="nature-bg"></div>
-
-    <!-- Theme-specific natural elements, same set and class names as index.html. -->
-    <div class="natural-element star star-1"></div>
-    <div class="natural-element star star-2"></div>
-    <div class="natural-element star star-3"></div>
-    <div class="natural-element star star-4"></div>
-
-    <div class="natural-element leaf leaf-1"></div>
-    <div class="natural-element leaf leaf-2"></div>
-    <div class="natural-element leaf leaf-3"></div>
-
-    <div class="natural-element ripple ripple-1"></div>
-    <div class="natural-element ripple ripple-2"></div>
-    <div class="natural-element ripple ripple-3"></div>
-
-    <div class="natural-element cloud cloud-1"></div>
-
-    <div class="natural-element sun-ray sun-ray-1"></div>
-    <div class="natural-element sun-ray sun-ray-2"></div>
-    <div class="natural-element sun-ray sun-ray-3"></div>
-
+    <!--
+      No site header here. This document is a capture surface: a headless
+      Chromium points at it and records the circle, so a persistent header would
+      appear in every clip and still pixel we publish. It is noindex, it is
+      never linked from the site, and no person browses it. Every other page in
+      the repo carries the header from docs/PAGE_CONTRACT.md section 2.
+    -->
     <main class="render-main">
 
         <section class="breathing-section"
@@ -329,12 +336,24 @@
 
             <h2 id="timer-heading" data-role="technique-title">Guided breathing</h2>
 
+            <!--
+              The mark, alive: a ring with a 3px rim, two dotted calipers for
+              full inhale and full exhale, and a notch at twelve o'clock that
+              closes while the pattern holds. The phase word and its count sit
+              outside the circle so they never scale with it.
+            -->
             <div class="breathing-container">
-                <div class="breathing-aura"></div>
+                <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+                    <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
+                    <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
+                    <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                </svg>
                 <div class="breathing-circle technique-478" data-role="circle">
-                    <div class="circle-text-container">
-                        <span data-role="circle-text">Ready</span>
-                    </div>
+                    <span class="circle-notch" aria-hidden="true"></span>
+                </div>
+                <div class="circle-text-container">
+                    <span class="phase-word" data-role="circle-text">Ready</span>
+                    <span class="phase-count" data-role="phase-count"></span>
                 </div>
             </div>
 
@@ -393,7 +412,12 @@
 
             <p class="render-sub" data-role="render-sub"></p>
 
-            <p class="render-wordmark">helpmebreath.com</p>
+            <p class="render-lockup">
+                <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="render-wordmark">Help Me Breathe</span>
+            </p>
 
             <p class="live-region" data-role="live-region" aria-live="polite" aria-atomic="true"></p>
         </section>
@@ -548,19 +572,24 @@
     /*
      * Font readiness.
      *
-     * Quicksand comes from Google Fonts. A machine with no network still paints
-     * the page, just in a system sans-serif, and a whole batch can come out in
-     * the wrong typeface without anyone noticing. Report what actually loaded in
-     * data-render-font so render-short.mjs can warn, and hold the capture flag
-     * until the fonts have settled either way — with a 4s ceiling, because a
-     * font that never resolves must not stall the recorder.
+     * Newsreader comes from Google Fonts and sets the caption and the phase
+     * word — the two largest things in any capture. A machine with no network
+     * still paints the page, just in a system serif, and a whole batch can come
+     * out in the wrong typeface without anyone noticing. Report what actually
+     * loaded in data-render-font so render-short.mjs can warn, and hold the
+     * capture flag until the fonts have settled either way — with a 4s ceiling,
+     * because a font that never resolves must not stall the recorder.
+     *
+     * NOTE for tools/render/render-short.mjs: the healthy value is now
+     * "newsreader", not "quicksand". That check lives in a file this agent does
+     * not own and is filed as an integration request.
      */
     async function fontState() {
         const timeout = new Promise((resolve) => window.setTimeout(() => resolve('timeout'), 4000));
         try {
             const settled = await Promise.race([document.fonts.ready.then(() => 'ready'), timeout]);
             if (settled === 'timeout') return 'timeout';
-            return document.fonts.check('300 68px Quicksand') ? 'quicksand' : 'fallback';
+            return document.fonts.check('500 68px Newsreader') ? 'newsreader' : 'fallback';
         } catch (err) {
             return 'unknown';
         }
