@@ -276,13 +276,12 @@
          * /account — the signed-in account page.
          *
          * Design: docs/private/ACCOUNTS_BILLING_DESIGN.md §4.2, §4.3, §5.7,
-         * §5.8, §5.9, §7.4, §9.3, §11.1, §11.5, §12, §13.
+         * §5.8, §5.9, §7.4, §11.1, §11.5, §12, §13.
          *
          * Every network call goes through apiFetch() from js/auth.js, which
          * adds the Supabase bearer and the device-mirror header. Nothing here
          * reads a cookie, names a price the server did not send, or puts an
-         * identifier in a query string — with the single documented exception
-         * of `token_id` on the rotate GET (§9.3).
+         * identifier in a query string.
          *
          * Every failure ends as one sentence in an .account-error region.
          * There is no alert(), no confirm() and no stack trace on screen.

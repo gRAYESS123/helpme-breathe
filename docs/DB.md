@@ -375,13 +375,15 @@ deleting an account would reset the free-trial limit".
 
 Owned by task 5 (`api/cron/reconcile.js`), authenticated by `CRON_SECRET`.
 
-1. For every `subscriptions` row with `needs_reconcile = true`, **or** touched
-   by a `webhook_events` row with `status = 'failed'`, **or** whose
-   `access_until` is in the past while `status in ('trialing','active')`:
-   call `provider.getSubscription()`, rewrite authoritative state through the
-   same §6.5 mapping, clear the flag.
-2. Re-drive `webhook_events` rows with `status = 'failed'` and `attempts < 10`,
-   oldest first, capped at 50 per run.
+1. Re-drive `webhook_events` rows with `status = 'failed'` and `attempts < 10`,
+   oldest first, capped at 50 per run: re-parse the kept payload through the
+   adapter, re-claim (`attempts += 1`), apply. This runs **first** so that a
+   re-driven event which turns out to be older than its row (and therefore
+   flags it) is repaired by the next pass in the same run.
+2. For every `subscriptions` row with `needs_reconcile = true`, **or** whose
+   `access_until` is in the past while `status in ('trialing','active')`
+   (capped at 50 per run): call `provider.getSubscription()`, rewrite
+   authoritative state through the same §6.5 mapping, clear the flag.
 3. Emit a console error (visible in Vercel logs) for anything still failed
    after 10 attempts, and for any `subscriptions` row with `user_id is null and
    detached_at is null` — a true orphan.

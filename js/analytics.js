@@ -23,7 +23,6 @@ export const EVENTS = Object.freeze({
   CHECKOUT_OPEN: 'checkout_open',
   CAPTURE_SHOWN: 'capture_shown',
   CAPTURE_SUBMIT: 'capture_submit',
-  SUPPORT_CLICK: 'support_click',
   PWA_INSTALL: 'pwa_install',
   OUTBOUND_AFFILIATE_CLICK: 'outbound_affiliate_click',
   // Accounts, trial and subscription (design section 12). Never with an

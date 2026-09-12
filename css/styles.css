@@ -2164,21 +2164,6 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
     outline-offset: 3px;
 }
 
-/* A one-line hint above a scroller, so nobody misses a column that starts
-   off-screen. Hidden once the viewport is wide enough to show the whole table. */
-.table-hint {
-    margin: 1.25rem 0 -0.75rem;
-    font-family: var(--ui);
-    font-size: var(--fs-micro);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--graphite);
-}
-
-@media (min-width: 60rem) {
-    .table-hint { display: none; }
-}
-
 .data-table,
 .article-page table {
     width: 100%;
@@ -2261,47 +2246,6 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
     justify-content: flex-start;
     margin-top: 0;
 }
-
-.support-card h3 { margin: 0 0 0.5rem; }
-
-.support-card p { font-size: var(--fs-small); color: var(--graphite); }
-
-/* The row shape is the default so the component works outside a `.card` too
-   (it sits in the prose on /about). Inside a support card it stacks. */
-.support-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-top: 1.25rem;
-}
-
-.support-card .support-options {
-    flex-direction: column;
-    flex-wrap: nowrap;
-    gap: 0.5rem;
-    margin-top: 0.85rem;
-}
-
-.support-options a,
-.pro-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: var(--hit);
-    padding: 0.6rem 1rem;
-    font-family: var(--ui);
-    font-size: var(--fs-small);
-    font-weight: 500;
-    color: var(--ink);
-    background: var(--leaf);
-    border: 1px solid var(--edge);
-    border-radius: var(--radius);
-    text-decoration: none;
-    text-align: center;
-}
-
-.support-options a:hover,
-.pro-link:hover { border-color: var(--ink); text-decoration: none; }
 
 /* ------------------------------------------------- technique switcher ---- */
 
@@ -2403,57 +2347,6 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
 /* --clay is the commerce accent. It appears here and on checkout buttons.
    It never appears on the timer screen. */
 
-.pricing-matrix {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--ui);
-    font-size: var(--fs-small);
-    min-width: 40rem;
-}
-
-.pricing-matrix th,
-.pricing-matrix td {
-    padding: 0.65rem 0.85rem;
-    border-bottom: 1px solid var(--rule);
-    text-align: left;
-    vertical-align: top;
-    color: var(--ink);
-}
-
-.pricing-matrix thead th {
-    border-bottom: 1px solid var(--ink);
-    vertical-align: bottom;
-}
-
-.pricing-matrix tbody th {
-    font-weight: 400;
-    color: var(--ink);
-    width: 40%;
-}
-
-.pricing-matrix td { text-align: center; }
-
-.pricing-matrix .col-featured {
-    background: var(--track);
-}
-
-.pricing-matrix thead th:not(.col-featured) { padding-top: 2.1rem; }
-
-.pricing-matrix thead .checkout-btn {
-    min-height: calc(3 * 1.35em + 1.2rem + 2px);
-}
-
-.pricing-matrix .tier-name {
-    display: block;
-    font-family: var(--ui);
-    font-size: var(--fs-small);
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--graphite);
-    margin-bottom: 0.35rem;
-}
-
 .price-figure {
     display: block;
     font-family: var(--display);
@@ -2470,19 +2363,6 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
     font-size: var(--fs-micro);
     color: var(--graphite);
     margin-top: 0.2rem;
-}
-
-.tier-flag {
-    display: inline-block;
-    margin-bottom: 0.4rem;
-    padding: 0.15rem 0.5rem;
-    font-size: var(--fs-micro);
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--chalk);
-    background: var(--clay);
-    border-radius: var(--radius-pill);
 }
 
 .checkout-btn {
@@ -2506,64 +2386,6 @@ main > .crisis-block { max-width: var(--measure); margin: 2rem auto; }
 }
 
 .checkout-btn:hover { background: var(--ink); border-color: var(--ink); text-decoration: none; }
-
-.checkout-btn--secondary {
-    color: var(--ink);
-    background: var(--leaf);
-    border-color: var(--edge);
-}
-
-.checkout-btn--secondary:hover { color: var(--ink); background: var(--leaf); border-color: var(--ink); }
-
-@media (max-width: 44rem) {
-    .pricing-matrix {
-        display: block;
-        min-width: 0;
-        width: max-content;
-    }
-
-    .pricing-matrix thead,
-    .pricing-matrix tbody { display: block; }
-
-    .pricing-matrix tr {
-        display: flex;
-        align-items: stretch;
-    }
-
-    .pricing-matrix thead tr { align-items: flex-end; }
-
-    .pricing-matrix th,
-    .pricing-matrix td {
-        flex: 0 0 10.5rem;
-        display: block;
-    }
-
-    .pricing-matrix thead th:not(.col-featured) { padding-top: 0.65rem; }
-    .pricing-matrix thead .checkout-btn { min-height: var(--hit); }
-
-    .pricing-matrix thead th:first-child,
-    .pricing-matrix tbody th[scope="row"] {
-        flex: 0 0 9rem;
-        width: auto;
-        order: 0;
-        position: sticky;
-        left: 0;
-        background: var(--paper);
-    }
-
-    .pricing-matrix tr > *:nth-child(4) { order: 1; }
-    .pricing-matrix tr > *:nth-child(3) { order: 2; }
-    .pricing-matrix tr > *:nth-child(5) { order: 3; }
-    .pricing-matrix tr > *:nth-child(2) { order: 4; }
-}
-
-.tax-note {
-    max-width: var(--measure);
-    margin: 0.75rem 0 2rem;
-    font-size: var(--fs-micro);
-    line-height: 1.65;
-    color: var(--graphite);
-}
 
 /* ------------------------------------------------------------ ad slot ---- */
 
@@ -2637,51 +2459,6 @@ body[data-tier="pro"] .ad-slot { display: none; }
 .num,
 .tabular { font-variant-numeric: tabular-nums; }
 
-/* Legacy names still used by pages that have not been converted yet. */
-.donation-section {
-    margin: 2rem 0;
-    padding: 1.25rem;
-    background: var(--leaf);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius);
-}
-
-.donation-section h3 { margin: 0 0 0.5rem; }
-
-.donation-section p { font-size: var(--fs-small); color: var(--graphite); }
-
-.donation-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.85rem;
-}
-
-.donate-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: var(--hit);
-    padding: 0.6rem 1rem;
-    font-family: var(--ui);
-    font-size: var(--fs-small);
-    font-weight: 500;
-    color: var(--ink);
-    background: var(--leaf);
-    border: 1px solid var(--edge);
-    border-radius: var(--radius);
-    text-decoration: none;
-}
-
-.or-divider {
-    font-size: var(--fs-micro);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--graphite);
-    text-align: center;
-    margin: 0.5rem 0;
-}
-
 /* ------------------------------------------------------------ responsive - */
 
 @media (max-width: 640px) {
@@ -2719,8 +2496,6 @@ body[data-tier="pro"] .ad-slot { display: none; }
     .article-meta { flex-direction: column; align-items: flex-start; }
 
     .article-dates { text-align: left; }
-
-    .pricing-matrix { min-width: 32rem; }
 
     .footer { margin-top: 3rem; }
 }
@@ -2820,8 +2595,6 @@ body[data-tier="pro"] .ad-slot { display: none; }
     .technique-switcher,
     .footer-nav,
     .ad-slot,
-    .support-card,
-    .donation-section,
     .plan-band,
     #cookieConsent,
     [data-slot],

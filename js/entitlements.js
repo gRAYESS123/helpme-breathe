@@ -40,7 +40,15 @@
  * auth module is loaded lazily and defensively: it imports supabase-js from a
  * CDN, and a blocked or offline CDN must never take the breathing timer down
  * with it. Signed-in state falls back to the last /api/me snapshot until the
- * auth module reports in.
+ * auth module reports in. The one static import from js/auth.js is
+ * `configured()`, which only reads js/config.js — js/auth.js fetches
+ * supabase-js with a dynamic import of its own, so that edge adds no CDN
+ * dependency to the timer pages.
+ *
+ * The free-session gate arms only once sign-in exists. While SUPABASE in
+ * js/config.js is empty, requireTimer() lets every session through and the
+ * session beacon stays off the network, so a visitor is never shown a sign-in
+ * card that leads to "Accounts are not open yet".
  *
  * Storage keys: hmb.ent, hmb.ent.snapshot, hmb.did. The retired hmb.license and
  * hmb.license.key are deleted on first load (§11.1 grandfather shim).
@@ -49,6 +57,7 @@
 import { TIMER_FREE_SESSIONS } from './config.js';
 import { completedSessionCount, getFlag, setFlag } from './storage.js';
 import { track, EVENTS } from './analytics.js';
+import { configured as authConfigured } from './auth.js';
 
 const TOKEN_KEY = 'hmb.ent';
 const SNAPSHOT_KEY = 'hmb.ent.snapshot';
@@ -294,9 +303,10 @@ function isOnline() {
 }
 
 /**
- * Load js/auth.js lazily. It is the only module that knows Supabase exists and
- * it imports supabase-js from a CDN, so a static import here would make every
- * timer page depend on that CDN answering. If it cannot load, this module
+ * Load js/auth.js lazily for everything except `configured()`, which is the
+ * one static import above. auth.js is the only module that knows Supabase
+ * exists; it fetches supabase-js from a CDN behind its own dynamic import, so
+ * no timer page depends on that CDN answering. If it cannot load, this module
  * behaves as "signed out until told otherwise" and the timer keeps working.
  * @returns {Promise<object|null>}
  */
@@ -457,10 +467,13 @@ function freeSessionsUsed() {
 /**
  * POST the free-session beacon for one completed session. Called from the
  * `hmb:session-complete` listener below; exported so the engine may call it
- * explicitly instead. Either way, one completion counts once.
+ * explicitly instead. Either way, one completion counts once. Skipped
+ * entirely while sign-in is not configured: the gate is inert then, and
+ * /api/session/count has nothing to count against.
  * @returns {Promise<number|null>} the server's count, or null
  */
 export async function recordFreeSession() {
+  if (!authConfigured()) return null;
   const now = Date.now();
   if (now - lastBeaconAt < 2000) return null;
   lastBeaconAt = now;
@@ -601,12 +614,17 @@ function openTimerPage() {
  * gate dispatched `hmb:signin` and `'no_subscription'` when it dispatched
  * `hmb:paywall` (feature `'timer'`). `context.technique` is only for analytics.
  *
+ * The gate arms only once sign-in exists (SUPABASE filled in, js/auth.js
+ * `configured()`). Until then every session passes, so nobody is sent to a
+ * sign-in card that can only say "Accounts are not open yet".
+ *
  * @param {{technique?:string}} [context]
  * @returns {boolean}
  */
 export function requireTimer(context = {}) {
   if (!hasDocument) return true;
   if (openTimerPage()) return true; // crisis pages
+  if (!authConfigured()) return true; // sign-in does not exist yet: nothing to gate behind
   if (isPro()) return true;
   const used = freeSessionsUsed(); // device counter, server-authoritative when online
   if (used < TIMER_FREE_SESSIONS) return true; // D1

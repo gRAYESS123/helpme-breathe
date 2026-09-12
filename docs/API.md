@@ -790,7 +790,7 @@ node --test tools/entitlement.test.mjs
 node --check api/me.js                # and every other file under api/
 node tools/keygen.mjs                 # prints a secret, writes nothing
 node tools/site-check.mjs             # the whole-site linter
-npm test                              # runs everything under tools/
+npm test                              # node --test "tools/*.test.mjs": every suite under tools/, these five included
 ```
 
 No test touches the network and none needs an environment variable. Every
@@ -798,13 +798,17 @@ endpoint exports a `create…Handler(deps)` factory for exactly this reason, and
 provider adapters take `fetchImpl` on their context. `MOR_API_BASE` and
 `EMAIL_API_BASE` point the adapters at a stub host.
 
-`tools/site-check.mjs` also enforces four rules that belong to this model:
-`data-open-timer` may appear only on the two crisis pages, and must appear on
-both of them; no payment company may be named outside `api/_lib/providers/`, `api/_lib/env.js`, `js/config.js`
-and `js/checkout.js`; "free forever", "always free", "no sign-up" and unqualified
-"no account" are refused as copy; and `isAccessibleForFree: false` may not appear
-in structured data, because only the interactive timer is gated and never the
-prose.
+`tools/site-check.mjs` also enforces the rules that belong to this model, each
+under its own rule id: `open-timer-allowlist` / `open-timer-missing`
+(`data-open-timer` may appear only on the two crisis pages, and must appear on
+both of them); `provider-outside-seam` (no payment company may be named in
+`api/` or `js/` outside `api/_lib/providers/`, `api/_lib/env.js`, `js/config.js`
+and `js/checkout.js`); `second-plan` (no trace of a practitioner plan or a plan
+switch); `copy-truth` ("free forever", "always free", "no sign-up" and
+unqualified "no account" are refused as copy); and `paywall-markup`
+(`isAccessibleForFree: false` may not appear in structured data, because only
+the interactive timer is gated and never the prose). See
+`tools/README-site-check.md`.
 
 To exercise the real thing, run `vercel dev` with a `.env` holding sandbox
 credentials. A sandbox provider key is refused on a production deployment before

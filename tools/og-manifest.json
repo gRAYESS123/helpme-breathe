@@ -13,7 +13,7 @@
     ],
     "sub_lines": [
       "Guided breathing for sleep,",
-      "stress and focus. Free."
+      "stress and focus."
     ]
   },
   {
@@ -30,7 +30,7 @@
     ],
     "sub_lines": [
       "Guided breathing for sleep,",
-      "stress and focus. Free."
+      "stress and focus."
     ]
   },
   {
@@ -69,6 +69,24 @@
     ]
   },
   {
+    "file": "images/og/guides.jpg",
+    "layout": "og",
+    "size": [
+      1200,
+      630
+    ],
+    "theme": "478",
+    "kicker": "Five situations · three deeper reads",
+    "title_lines": [
+      "Breathing Guides",
+      "by Situation"
+    ],
+    "sub_lines": [
+      "Anxious moments, sleep, panic,",
+      "focus and blood pressure"
+    ]
+  },
+  {
     "file": "images/og/box-breathing.jpg",
     "layout": "og",
     "size": [
@@ -83,7 +101,7 @@
     ],
     "sub_lines": [
       "Equal counts in, hold, out, hold",
-      "— with a free guided timer"
+      "— with a guided timer"
     ]
   },
   {
@@ -209,7 +227,8 @@
     "sub_lines": [
       "Five slow patterns with a free",
       "guided timer on the page"
-    ]
+    ],
+    "footer": "Free · No account · Offline"
   },
   {
     "file": "images/og/breathing-exercises-for-sleep.jpg",
@@ -245,7 +264,8 @@
     "sub_lines": [
       "Something steady to follow",
       "in the first minute"
-    ]
+    ],
+    "footer": "Free · No account · Offline"
   },
   {
     "file": "images/og/breathing-exercises-for-focus.jpg",
@@ -351,8 +371,8 @@
       "Me Breathe"
     ],
     "sub_lines": [
-      "Free breathing tools, built by",
-      "one person who needed them"
+      "Guided breathing, built by",
+      "one person who needed it"
     ]
   },
   {
@@ -427,6 +447,24 @@
     ]
   },
   {
+    "file": "images/og/refund-policy.jpg",
+    "layout": "og",
+    "size": [
+      1200,
+      630
+    ],
+    "theme": "neutral",
+    "kicker": "Refunds",
+    "title_lines": [
+      "Refund Policy"
+    ],
+    "sub_lines": [
+      "Fourteen days, unconditional,",
+      "in full. One email to ask."
+    ],
+    "footer": "Cancel any time · 14-day refund"
+  },
+  {
     "file": "images/pins/4-7-8-breathing.jpg",
     "layout": "pin",
     "size": [
@@ -441,8 +479,8 @@
       "Out for eight."
     ],
     "sub_lines": [
-      "A free guided timer",
-      "counts it for you"
+      "A guided timer counts it for you,",
+      "three sessions free"
     ]
   },
   {
@@ -586,7 +624,7 @@
       "your eyes"
     ],
     "sub_lines": [
-      "Free guided timer,",
+      "Three sessions free,",
       "works offline"
     ]
   },

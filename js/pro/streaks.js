@@ -3,8 +3,8 @@
  * a per-technique breakdown and a CSV export.
  *
  * Everything is computed in the browser from `storage.getHistory()`. Nothing is
- * uploaded, there is no account, and the CSV is built with a Blob so no server
- * is involved.
+ * uploaded (history never leaves the device, account or not), and the CSV is
+ * built with a Blob so no server is involved.
  *
  * Free tier sees the last seven days plus a dimmed heatmap teaser and a Pro
  * badge — dimmed, never blurred: the identity carries no blur. Pro sees the

@@ -55,8 +55,6 @@ const SKIP_DIRS = new Set([
   '.git',
   '.vercel',
   '.next',
-  'embed',
-  's',
   'templates',
   'docs',
   'api',

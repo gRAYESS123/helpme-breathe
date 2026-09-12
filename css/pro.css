@@ -452,9 +452,6 @@
     color: var(--ok);
 }
 
-.checkout-waitlist-host {
-    margin: 1rem 0 0;
-}
 
 /* --------------------------------------------------------------------------
    Night mode. Every token is already swapped by css/styles.css when

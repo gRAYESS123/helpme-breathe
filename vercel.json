@@ -6,11 +6,30 @@
     {
       "source": "/4-7-8-breathing-technique",
       "destination": "/blog/4-7-8-breathing-technique.html"
+    },
+    {
+      "source": "/favicon.ico",
+      "destination": "/favicon-32.png"
     }
   ],
   "redirects": [
     {
       "source": "/breathing-techniques",
+      "destination": "/timer",
+      "permanent": true
+    },
+    {
+      "source": "/for-practitioners",
+      "destination": "/pro",
+      "permanent": true
+    },
+    {
+      "source": "/handouts",
+      "destination": "/guides",
+      "permanent": true
+    },
+    {
+      "source": "/embed/:path*",
       "destination": "/timer",
       "permanent": true
     }

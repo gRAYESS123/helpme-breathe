@@ -245,8 +245,8 @@ console for a name that is not in it.
 
 `session_start`, `session_complete`, `session_abandon`, `technique_select`,
 `settings_open`, `third_session_reached`, `paywall_view`, `paywall_click`,
-`checkout_open`, `capture_shown`, `capture_submit`, `support_click`,
-`pwa_install`, `outbound_affiliate_click`.
+`checkout_open`, `capture_shown`, `capture_submit`, `pwa_install`,
+`outbound_affiliate_click`.
 
 **Accounts, trial and subscription**
 
@@ -259,7 +259,8 @@ console for a name that is not in it.
 
 The activation events of the retired licence model (`activate_attempt`,
 `activate_success`, `activate_fail`, `restore_success`) are **gone** and must not
-come back.
+come back. So is `support_click` (removed 2026-09-12 with the dead support
+wiring): there is no support ask on the site.
 
 Never pass an email address, a user id, a device id, a token, a provider customer
 id, or free-text user input as a param.
@@ -652,8 +653,8 @@ Delegated from the root. Never use inline `onclick`.
 `start`, `pause`, `stop`, `select-technique` (with `data-technique="box"`),
 `toggle-settings`, `safety-ack-confirm`, `safety-ack-cancel`.
 
-Plus one page-level action, delegated from `document`: `support` (fires
-`support_click`; add `data-support-label="patreon"` to name it).
+There is no `support` action: the site carries no support ask
+(`docs/PAGE_CONTRACT.md` §9).
 
 ### Slots
 

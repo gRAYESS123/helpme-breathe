@@ -33,10 +33,10 @@ colour of the page.
 | `--graphite` | `#575F58` | Muted text: captions, metadata, labels. |
 | `--rule` | `#E3DCCC` | **Decorative hairline only.** Never a control's boundary. The one deliberate exception is `.control-btn:disabled`, where the point is that the control is *not* operable — a disabled control is the single state WCAG 1.4.11 exempts, and giving it an `--edge` boundary would make it look live. |
 | `--edge` | `#83887E` | **Control outlines**: buttons, inputs, toggles, pills, tools, the settings button. |
-| `--track` | `#DFD8C7` | Progress trough, input wells, the featured pricing column. |
+| `--track` | `#DFD8C7` | Progress trough, input wells. |
 | `--green` | `#0F5136` | Primary: the Begin button, links, the focus ring, the active nav item. |
 | `--chalk` | `#FFFFFF` | Ink on primary. |
-| `--clay` | `#8A4B24` | **Commerce accent.** Paid surfaces only — price figures and checkout buttons on `/pro`. Never on the timer screen. |
+| `--clay` | `#8A4B24` | **Commerce accent.** Paid surfaces only — price figures and checkout buttons on `/pro`, and the same two elements in the home page's `.plan-band`. Never on the timer screen. |
 | `--ok` | `#1B6B45` | Success. |
 | `--warn` | `#7E5406` | Caution: the contraindication rule. |
 | `--bad` | `#A32721` | Danger: the crisis block border, form errors. |
@@ -551,4 +551,5 @@ turns out badly.
    the build on `var(--clay)` under any selector scoped to `.breathing-section`,
    `[data-slot="post-session"]`, `.post-session-card` or `.paywall-card`. The
    on-timer offer speaks in the neutral voice: `--ink` price, `--green` button.
-   `--clay` stays on `/pro`.
+   `--clay` stays on `/pro` (and on the home page's `.plan-band` price figure
+   and button, which point there).

@@ -332,14 +332,12 @@
         const rid = typeof captured.rid === 'string' && /^[0-9a-f-]{8,64}$/i.test(captured.rid) ? captured.rid : '';
         const hintedPlan = captured.plan === 'yearly' || captured.plan === 'monthly' ? captured.plan : '';
 
-        const CHECKOUT = config.CHECKOUT && typeof config.CHECKOUT === 'object' ? config.CHECKOUT : {};
+        const PLANS = config.PLANS && typeof config.PLANS === 'object' ? config.PLANS : {};
         const LIST = {
-            monthly: Number(config.PRICES && config.PRICES.monthly) || 10,
-            yearly: Number(config.PRICES && config.PRICES.yearly) || 100,
+            monthly: Number(PLANS.monthly && PLANS.monthly.price) || 10,
+            yearly: Number(PLANS.yearly && PLANS.yearly.price) || 100,
         };
-        const trialDays = CHECKOUT.trialDays !== undefined
-            ? Number(CHECKOUT.trialDays) || 0
-            : (config.TRIAL_DAYS !== undefined ? Number(config.TRIAL_DAYS) || 0 : 3);
+        const trialDays = PLANS.trialDays !== undefined ? Number(PLANS.trialDays) || 0 : 3;
 
         const POLL_MS = 2000;
         const POLL_FOR_MS = 30000;

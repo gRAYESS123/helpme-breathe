@@ -1403,15 +1403,7 @@ function wireSiteNav() {
   });
 }
 
-function wireSupportAndInstall() {
-  document.addEventListener('click', (event) => {
-    const support = event.target.closest('[data-action="support"]');
-    if (!support) return;
-    track(EVENTS.SUPPORT_CLICK, {
-      label: support.getAttribute('data-support-label') || support.textContent.trim().slice(0, 40),
-    });
-  });
-
+function wireInstallTracking() {
   window.addEventListener('beforeinstallprompt', () => {
     track(EVENTS.PWA_INSTALL, { stage: 'available' });
   });
@@ -1444,7 +1436,7 @@ function initAll() {
 if (typeof document !== 'undefined') {
   document.addEventListener('keydown', onGlobalKeydown);
   wireSiteNav();
-  wireSupportAndInstall();
+  wireInstallTracking();
   registerServiceWorker();
 
   window.addEventListener('beforeunload', () => {

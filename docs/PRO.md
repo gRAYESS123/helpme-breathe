@@ -319,8 +319,10 @@ The retired activation events (`activate_attempt`, `activate_success`,
 - **No browser fingerprinting, ever.** The trial lock is a one-way hash of the
   email address plus a random identifier in a first-party cookie.
 - 14-day unconditional refund, stated on `/pro` and reachable from checkout.
-  `legal/terms-of-service.html` carries it as section 10; section 5 of the same
-  page carries the automatic-renewal block and the trial-to-paid block, and
-  `/pro` must show the same two disclosures, in the same words, before checkout.
+  `legal/terms-of-service.html` carries it as section 8 ("The 14-day refund
+  policy"), and `/legal/refund-policy` repeats it in full; section 5 of the same
+  page carries the automatic-renewal block (5.2) and the trial-to-paid block
+  (5.3), and `/pro` must show the same two disclosures, in the same words,
+  before checkout.
 - **Write the trial rule in exactly these words: "One free trial per person."**
   And the account rule as **"An account is for one person or one household."**

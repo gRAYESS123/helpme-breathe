@@ -174,8 +174,9 @@ Install ffmpeg and re-run before committing.
 ### Sizes
 
 Bitrate steps down automatically (48 → 40 → 32 → 24 kbps) until a file fits under
-400 KB, which is the ceiling `BUILD_SPEC.json` FEAT-12 asks for. The current
-build:
+400 KB, which is the ceiling FEAT-12 of the private build spec
+(`docs/private/BUILD_SPEC.json`, gitignored, not a public document) asks for.
+The current build:
 
 | | Opus (`.ogg`) | AAC (`.m4a`) |
 |---|---|---|
@@ -231,24 +232,25 @@ the breathing timer down with it.
 - **Crisis-safe pages.** On `<body data-no-asks="true">` a free visitor gets no
   Soundscapes button at all, so those pages carry no ask. A paying visitor keeps
   the feature.
-- **Offline.** As soon as a visitor is Pro — on activation, and again on every
-  later page load — the player copies `audio/manifest.json` and one file per bed
-  (the format this browser will actually decode, so about 1.9 MB) into a Cache
-  named `hmb-audio`, one file at a time in the background. Reads check that cache
-  before the network. That is what FEAT-12 means by "precaches the pack on first
-  Pro activation only": someone who activates and then loses signal has the pack
-  already, rather than only the beds they happened to play while online. It is
-  skipped when the browser reports `navigator.onLine === false` or
+- **Offline.** As soon as the entitlement says `pro` (a trial or a
+  subscription), and on every later page load, the player copies
+  `audio/manifest.json` and one file per bed (the format this browser will
+  actually decode, so about 1.9 MB) into a Cache named `hmb-audio`, one file at
+  a time in the background. Reads check that cache before the network. That is
+  what FEAT-12 means by precaching the pack for subscribers only: someone who
+  starts a trial on the train and then loses signal has the pack already,
+  rather than only the beds they happened to play while online. It is skipped
+  when the browser reports `navigator.onLine === false` or
   `connection.saveData`, and files already present are skipped, so the re-check
   costs nothing. **Nothing at all is cached here for a free visitor**, which is
   what keeps the free-tier cache exactly as small as it is today.
 
-  The re-check on every load is not belt-and-braces: `sw.js` deletes every cache
-  whose name is not the current shell cache in its `activate` handler, and
-  `hmb-audio` is one of those. Until that is fixed (see the integration note in
-  the Audio agent's return), a deploy that bumps `CACHE_NAME` wipes a customer's
-  offline pack, and this warm-up is what puts it back the next time they are
-  online.
+  `sw.js` keeps `hmb-audio` across shell-cache bumps: its `activate` handler
+  deletes every cache whose name is not in `KEEP_CACHES`, and that set holds
+  both the current `CACHE_NAME` and `hmb-audio`, so a deploy no longer wipes a
+  customer's offline pack. The per-load re-check only fills gaps: a browser may
+  still evict the cache under storage pressure, and a bed that is missing is
+  fetched again the next time the customer is online.
 - **Storage.** Choice, volume and whether the bed rides sessions live in
   `localStorage` under `hmb.soundscape`, written through `js/storage.js` like
   every other key on the site.

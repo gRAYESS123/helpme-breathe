@@ -11,7 +11,7 @@ node tools/site-check.mjs --json site-check.json
 
 | Flag | Default | Meaning |
 | --- | --- | --- |
-| `--root <dir>` | cwd | Site root to scan (`node_modules`, `.git`, `.vercel` are skipped) |
+| `--root <dir>` | cwd | Site root to scan. Skipped: any `node_modules`, `.git`, `.vercel`, `.next`, `.cache` or `dist-cache` directory, and the `docs/private` subtree (brand concept boards and private specs, not pages) |
 | `--base <url>` | `https://helpmebreath.com` | Canonical origin; drives canonical/sitemap/host checks |
 | `--json <file>` | – | Also write findings as `[{level, file, line, rule, message}]` |
 | `-h`, `--help` | – | Usage |
@@ -78,6 +78,21 @@ entry makes `cache.addAll()` reject and the SW install fail), `ads.txt` (INFO),
 `vercel.json` (valid JSON, every local rewrite/redirect destination exists), orphan
 pages, and an INFO roll-up of every outbound host.
 
+## Accounts-model and brand rules
+
+Added with the one-plan, one-account model (2026-09-11) and the Paper and Ink
+brand. Each finding names its rule id, and every one of these is an ERROR:
+
+| Rule id | What it refuses |
+| --- | --- |
+| `open-timer-allowlist` | `data-open-timer` on any `<body>` other than the two crisis pages (`breathing-exercises-anxiety.html`, `breathing-exercises-for-panic-attacks.html`). It runs the timer for anyone, forever, so it is a safety feature, not a config knob. |
+| `open-timer-missing` | Either crisis page without `data-open-timer="true"` on `<body>`. |
+| `provider-outside-seam` | A payment company named (outside comments) in any `api/**/*.js` or `js/**/*.js` file other than the seam: `api/_lib/providers/`, `api/_lib/env.js`, `js/config.js`, `js/checkout.js`. One env var must be able to swap the rail. |
+| `second-plan` | Any trace of a practitioner or therapist plan, or a switch for one, in `api/` or `js/` (owner decision 2026-09-12: one plan, no switch). |
+| `copy-truth` | "free forever", "always free", "no sign-up", and an unqualified "no account" in page text, `<title>`, `<meta content>` or JSON-LD. A short allowlist keeps the sentences that are still true ("the first three sessions need no account"). |
+| `paywall-markup` | `isAccessibleForFree: false`, or `hasPart` + `cssSelector` paywall markup, in JSON-LD. Only the interactive timer is gated, never the prose. |
+| `clay-on-timer` | `var(--clay)` in any `.css` rule whose selector is scoped to `.breathing-section`, `[data-slot="post-session"]`, `.post-session-card` or `.paywall-card`. The commerce accent belongs on `/pro`; the timer is not for sale (`docs/BRAND.md` §1 and §8). |
+
 ## Severity conventions
 
 * **ERROR** — breaks the deploy: broken link, wrong canonical, unparseable JSON/JSON-LD,
@@ -106,8 +121,10 @@ social-meta, meta-description and sitemap-membership checks are skipped for them
   unterminated `<script>`/`<style>` swallows the rest of the document, which is what a
   browser does too, but it means later checks on that file report nothing.
 * **Static only.** Nothing is fetched over the network: external links are recorded but
-  never verified, and JS-injected markup is invisible. Only `.html` files are scanned, so
-  placeholder text living in `js/scripts.js` or `css/styles.css` is not caught.
+  never verified, and JS-injected markup is invisible. The per-page checks run on `.html`
+  files only; `.css` files are read for `clay-on-timer` and `api/**/*.js` / `js/**/*.js`
+  for `provider-outside-seam` and `second-plan`, but nothing else in JS or CSS is checked,
+  so placeholder text living in `js/app.js` or `css/styles.css` is not caught.
 * **URL-model approximations.** Vercel's real precedence is redirects → filesystem →
   rewrites; this script tries the filesystem first, then rewrites, then redirects, which
   can differ if a redirect deliberately shadows an existing file. `has`/`missing`

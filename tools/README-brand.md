@@ -20,7 +20,7 @@ cd tools/render && npm install && npx playwright install chromium
 node tools/brand/build-assets.mjs
 ```
 
-That writes 44 files and then audits every one of them: the file exists, its
+That writes 46 files and then audits every one of them: the file exists, its
 pixel dimensions match the manifest, and no social card exceeds 150 KB. The run
 exits non-zero if any check fails.
 
