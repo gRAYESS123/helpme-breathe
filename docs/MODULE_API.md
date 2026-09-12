@@ -38,7 +38,7 @@ three account pages — `/signin`, `/auth/callback`, `/account` — load
 ## `js/techniques.js`
 
 Pure data and pure functions. No DOM, no storage, no network — safe to import
-from the app, a landing page, or the sandboxed embed frame.
+from the app or from a landing page.
 
 ```js
 import {
@@ -91,10 +91,10 @@ import {
 
 `title` is an addition to the shape sketched in `AGENT_BRIEF.md §4`; it is the
 pattern's plain name (`'Box breathing'`), as against `name`, which is the pill
-label a person picks from (`'Focus & Grounding'`). It is what the embed frame
-puts in `document.title`, what the technique-info card heads itself with, and
-what the streak table and the printable-card prompt name a session by, so it has
-to read as a noun phrase in a sentence. `rim` and `fill` are the
+label a person picks from (`'Focus & Grounding'`). It is what the technique-info
+card heads itself with, and what the streak table and the printable-card prompt
+name a session by, so it has to read as a noun phrase in a sentence. `rim` and
+`fill` are the
 other addition. `emoji` survives only so that nothing reading it throws; it is
 the empty string on all seven techniques and will never be non-empty again.
 Everything else matches.
@@ -246,7 +246,7 @@ console for a name that is not in it.
 `session_start`, `session_complete`, `session_abandon`, `technique_select`,
 `settings_open`, `third_session_reached`, `paywall_view`, `paywall_click`,
 `checkout_open`, `capture_shown`, `capture_submit`, `support_click`,
-`pwa_install`, `outbound_affiliate_click`, `embed_snippet_copied`.
+`pwa_install`, `outbound_affiliate_click`.
 
 **Accounts, trial and subscription**
 
@@ -255,8 +255,7 @@ console for a name that is not in it.
 `trial_eligibility_check`, `trial_start`, `subscribe_start`, `trial_convert`,
 `subscription_past_due`, `subscription_canceled`, `manage_billing_click`,
 `cancel_screen_view`, `retention_offer_taken`, `cancel_confirm`,
-`embed_token_created`, `account_export`, `account_delete_request`,
-`plan_interval_toggle`.
+`account_export`, `account_delete_request`, `plan_interval_toggle`.
 
 The activation events of the retired licence model (`activate_attempt`,
 `activate_success`, `activate_fail`, `restore_success`) are **gone** and must not
@@ -290,7 +289,7 @@ import { SUPABASE, CHECKOUT, PLANS, TIMER_FREE_SESSIONS, MOR_LEGAL } from '/js/c
 
 `available` is `['monthly', 'yearly']`, `default` is `'monthly'`, `trialDays`
 is `3`, `refundDays` is `14`. Each plan definition is
-`{ key, label, price, currency, interval, per, commercial }` — US list prices,
+`{ key, label, price, currency, interval, per }` — US list prices,
 for copy only. What a person is actually charged comes from the provider's own
 price preview and receipt.
 
@@ -365,7 +364,7 @@ The **only** module that knows tiers exist. Every paid feature gate calls
 read the entitlement token, and nothing else may decide what a visitor may use.
 
 ```js
-import { tier, isPro, isPractitioner, requirePro, requireTimer, requireAccount,
+import { tier, isPro, requirePro, requireTimer, requireAccount,
          signedIn, account, status, refresh, restore, onChange,
          getLicenseInfo, parseToken, readDeviceMirror, recordFreeSession } from '/js/entitlements.js';
 ```
@@ -376,7 +375,6 @@ import { tier, isPro, isPractitioner, requirePro, requireTimer, requireAccount,
 |---|---|---|
 | `tier()` | `'free' \| 'pro'` | There are no other tiers. |
 | `isPro()` | `boolean` | True for a live subscription: trialing, active, paused, or inside the past-due grace. |
-| `isPractitioner()` | `boolean` | Now the token's `com` (commercial) claim. Under one plan that equals `isPro()`. Still exported because `js/pro/*` and `/for-practitioners` call it. |
 | `requirePro(feature)` | `boolean` | When `false`, dispatches `hmb:paywall` with `{ feature }`. **The only paid-feature gate.** |
 | `restore()` | `string` (tier) | Re-reads the stored token. |
 | `onChange(cb)` | unsubscribe fn | `cb(tier, { exp, payload, status })`. |
@@ -411,7 +409,7 @@ sign in; `deactivate()` logs a deprecation and signs out through `js/auth.js`.
 The only place `TIMER_FREE_SESSIONS` is read. In order:
 
 1. A page carrying `<body data-open-timer>` always passes — the two crisis
-   pages, the embed frame and `/s/`. It is a safety feature, not a config knob.
+   pages, and nothing else. It is a safety feature, not a config knob.
 2. `isPro()` passes.
 3. A device inside its free-session allowance passes
    (`free_sessions_used < TIMER_FREE_SESSIONS`, server-authoritative when online
@@ -447,7 +445,7 @@ token), `hmb.did` (the device mirror). Offline-first:
    `hmb:auth` fires.
 
 Token v3: `base64url(JSON) + '.' + base64url(HMAC-SHA256)` over
-`{ v:3, typ:'ent', sub, tier, st, plan, com, pe, iat, exp, kid }` — the full
+`{ v:3, typ:'ent', sub, tier, st, plan, pe, iat, exp, kid }` — the full
 table is in [`docs/API.md`](API.md). Supabase proves *who*; this token proves
 *what they may do*.
 
@@ -529,8 +527,8 @@ It also stamps `body.timer-preview`, which is how `js/ads.js` knows to refuse a
 slot: the first thing a person sees on a timer page is never an ad next to a
 sign-in prompt.
 
-On a page carrying `data-open-timer` (the crisis pages, the embed frame, `/s/`)
-`requireTimer()` never fails, so this module never renders.
+On a page carrying `data-open-timer` (the two crisis pages) `requireTimer()`
+never fails, so this module never renders.
 
 ---
 
@@ -764,19 +762,16 @@ intercepted and never cached.
 /account          /account.html
 /signin           /signin.html
 /auth/callback    /auth/callback.html
-/embed/v1/frame   /embed/v1/frame.html
 ```
 
 The account and auth pages hold a signed-in person's state and must always come
-from the network; the embed frame is never cached because the white-label verdict
-is decided per request by `api/embed/frame.js` and inlined into the document.
+from the network.
 
 Two further rules: a navigation carrying **any** query string is not written to
 the cache, because `/pro/thanks` arrives with a checkout reservation id and
-`/s/?c=…` carries a practitioner's name and their note to a client — caching
-those would write them to CacheStorage keyed on the full URL. And the audio cache
-(`hmb-audio`) is never purged on activate: it holds roughly 4 MB a paying
-customer chose to download for offline use.
+caching it would write that id to CacheStorage keyed on the full URL. And the
+audio cache (`hmb-audio`) is never purged on activate: it holds roughly 4 MB a
+paying customer chose to download for offline use.
 
 Bump `CACHE_NAME` on every deploy that changes CSS, JS or the app shell.
 
@@ -791,8 +786,8 @@ rationale and `docs/PAGE_CONTRACT.md` for the markup to paste.
 ### `js/techniques.js`
 
 - `technique.name` is now **plain text**; the leading emoji is gone.
-  Anything rendering `name` — the app bar heading, the pills, the embed frame —
-  gets clean text with no stripping.
+  Anything rendering `name` — the app bar heading, the pills — gets clean text
+  with no stripping.
 - `technique.emoji` is retained as an **empty string** on all seven techniques.
   The field stays so that nothing reading it breaks; it will never be non-empty
   again.
@@ -805,7 +800,7 @@ rationale and `docs/PAGE_CONTRACT.md` for the markup to paste.
   The site itself does **not** read these: `css/styles.css` owns the pair as
   `--rim-<key>` / `--fill-<key>` tokens and `body.theme-<key>` swaps them. Read
   `rim`/`fill` only from a surface that cannot reach the stylesheet — the render
-  harness, a canvas, a white-label embed that inlines its own colours. Night
+  harness, or a canvas. Night
   values live only in CSS, because at night every fill collapses to the one dark
   surface value.
 

@@ -136,7 +136,6 @@
                 <a href="/timer">Timer</a>
                 <a href="/guides">Guides</a>
                 <a href="/science">Science</a>
-                <a href="/for-practitioners">For practitioners</a>
                 <a href="/pro">Pro</a>
             </nav>
         </div>
@@ -249,7 +248,7 @@
 
                     <p>Like every website, asking for a page means your browser sends a request. The host that serves this site receives your IP address, the page requested, your user-agent string and the referring page, and keeps short-lived operational logs for security and troubleshooting. This is ordinary web hosting, not a profile of you.</p>
 
-                    <p>Pages on this site also load the Newsreader and IBM Plex Sans typefaces from Google Fonts. That request reveals your IP address to Google. The embedded widget and the client session links deliberately do not, as explained in section 4.</p>
+                    <p>Pages on this site also load the Newsreader and IBM Plex Sans typefaces from Google Fonts. That request reveals your IP address to Google.</p>
 
                     <h3>3.2 Analytics — Google Analytics 4 with Consent Mode</h3>
 
@@ -265,7 +264,7 @@
 
                     <ul>
                         <li>Ads appear on <strong>content and comparison pages only</strong>, below the fold. Never inside the breathing viewport.</li>
-                        <li>There are <strong>no ads at all</strong> on the anxiety and panic-attack pages, on the product pages, on the sign-in and account pages, on the embedded widget, or on this page.</li>
+                        <li>There are <strong>no ads at all</strong> on the anxiety and panic-attack pages, on the product pages, on the sign-in and account pages, or on this page.</li>
                         <li>Ads are hidden while a breathing session is running, and never sit next to a sign-in prompt.</li>
                         <li><strong>Anyone with an active subscription sees no advertising anywhere on the site.</strong> The ad loader checks before it loads, and stops if you have one.</li>
                         <li>If you did not accept advertising cookies, the loader requests <strong>non-personalised ads</strong> instead.</li>
@@ -288,8 +287,7 @@
                         <li>your <strong>plan</strong>, its <strong>status</strong> and its <strong>period dates</strong> — when the trial or the current period started and when it ends, and any cancellation, pause or resume date;</li>
                         <li>the payment provider's <strong>subscription identifier and customer identifier</strong>, so a receipt, a cancellation or a refund can be matched to the right account;</li>
                         <li>the <strong>amount and currency</strong> the provider actually charges you, exactly as the provider states it, so your account page can show you the real figure rather than a guess;</li>
-                        <li>a short-lived record of each <strong>checkout you started</strong> — the plan, whether a trial was granted, and why — which expires after 30 minutes and is deleted a week later;</li>
-                        <li>if you use the white-label embed, the <strong>embed credentials</strong> you have created: the domains you registered, a label, the dates issued and a count of how often each was used.</li>
+                        <li>a short-lived record of each <strong>checkout you started</strong> — the plan, whether a trial was granted, and why — which expires after 30 minutes and is deleted a week later.</li>
                     </ul>
 
                     <p>What the account does <strong>not</strong> hold is as important: no card number, no expiry date, no security code, no billing address, no session history, no streak, no saved pattern and nothing about what you practised or when. Those stay in your browser, as section 2 describes. <strong>No card details ever reach us at all.</strong></p>
@@ -300,7 +298,7 @@
 
                     <p>I do not sell to you directly and I never touch your payment details. The subscription is sold through a <strong>merchant of record</strong>, which is the seller of record for the transaction: the contract of sale is between you and it. It takes the payment, calculates and remits sales tax and VAT, issues the receipt, runs the customer portal, and is the <strong>controller of your payment data in its own right</strong>. It then pays me. The service itself is provided by Georges Rayess.</p>
 
-                    <p>The provider will be named on this page, and on the <a href="/compliance/security-overview">security overview</a>, before checkout opens, and its own privacy notice will govern your payment data. The company named as seller on your receipt is the merchant of record for your purchase. Because it holds its own copy of your purchase record as a separate controller, a request to erase the payment record itself goes to it, not to me; section 10 explains how.</p>
+                    <p>The provider will be named on this page before checkout opens, and its own privacy notice will govern your payment data. The company named as seller on your receipt is the merchant of record for your purchase. Because it holds its own copy of your purchase record as a separate controller, a request to erase the payment record itself goes to it, not to me; section 10 explains how.</p>
 
                     <p>What reaches me is limited to what section 3.4 lists: your email address, your plan and its dates, the provider's subscription and customer identifiers, the country used for tax, and the amount and currency you were charged. When the provider tells this site about a payment, a renewal, a decline or a cancellation, that message is kept as a record for a limited time — section 9 gives the number — so that a dispute or a missed message can be checked against what actually happened. <strong>I never receive your card number.</strong></p>
 
@@ -325,29 +323,8 @@
                     <p>If you email me, I have your address and whatever you wrote, for as long as the conversation is useful and my records need to exist. I read that email in Lebanon. Support correspondence is not added to the mailing list.</p>
                 </section>
 
-                <section id="widget">
-                    <h2>4. The embedded widget and client links</h2>
-
-                    <p>The breathing widget that other sites embed, and the session links a practitioner sends a client, are deliberately sealed. Inside the frame there are <strong>no cookies, no analytics and no advertising</strong> — no web font, no tracking pixel, no consent script, no sign-in, no measurement of any kind. Visitors need no account. The frame loads its stylesheet and the timer code from this domain and nothing else, with two narrow exceptions that are worth naming rather than glossing over:</p>
-
-                    <ul>
-                        <li><strong>White-label verification.</strong> If an embed carries a subscriber's credential, this site's server checks it when the frame is served, and reads the address of the page that embedded it — which your browser sends as the referrer — to see whether that page is one of the domains the subscriber registered. That tells the frame whether to drop the attribution link. The check records a count against the subscriber's credential, and nothing about the visitor.</li>
-                        <li><strong>A practitioner's own logo.</strong> A white-label embed can show the practitioner's logo. If they host that image somewhere other than their own site, the visitor's browser fetches it from that host, which sees the visitor's IP address the way any image on any page does. That is the only outbound request the frame can ever make, the practitioner chooses the address, and it cannot happen on the free embed at all.</li>
-                    </ul>
-
-                    <p>Beyond those two, a visitor to a site that embeds the timer is not tracked by me in any way, and no per-visitor measurement will ever be added to the frame.</p>
-                </section>
-
-                <section id="practitioners">
-                    <h2>5. Practitioners and their clients</h2>
-
-                    <p>If you have an active subscription and use the timer with your own clients, classes or students, <strong>I process no data about those people</strong>. Their sessions run in their own browsers and stay there. There is no client record, no attendance log and no completion report.</p>
-
-                    <p>That means <strong>you are the controller of your own client relationship</strong> and of anything you choose to record about it. I am not a processor of your client data, because I never receive it. What I do hold for you is the account record in section 3.4. A signable <a href="/compliance/dpa">data processing addendum</a>, a dated <a href="/compliance/privacy-attestation">privacy attestation</a> and a <a href="/compliance/security-overview">security overview</a> covering all of this are published in the compliance pack.</p>
-                </section>
-
                 <section id="cookies">
-                    <h2>6. Cookies and similar technologies</h2>
+                    <h2>4. Cookies and similar technologies</h2>
 
                     <p>Your settings and your session history live in local storage, described in section 2, which is not a cookie and is not transmitted. Beyond that, this site sets <strong>two cookies of its own</strong>. Both are first-party, both carry the <code>__Host-</code> prefix, which means they can only be set by this site over HTTPS, and neither is used for advertising or measurement.</p>
 
@@ -401,13 +378,13 @@
                 </section>
 
                 <section id="affiliates">
-                    <h2>7. Affiliate links</h2>
+                    <h2>5. Affiliate links</h2>
 
                     <p>A small number of pages link to products I think are genuinely worth the money — currently <strong>Headspace</strong> and <strong>moonbird</strong>. Those are <strong>affiliate links</strong>, marked as sponsored, and if you buy after clicking one <strong>I may earn a commission at no extra cost to you</strong>. Clicking such a link takes you to that company's own site, where its own privacy policy and its own cookies apply, and it may set a cookie to attribute the sale. Nothing about you is sent to them by me. If you do not click, no data is shared. The recommendation on those pages is never for sale — the comparison page still concludes that the free option is enough for most people.</p>
                 </section>
 
                 <section id="legal-bases">
-                    <h2>8. Legal bases for processing — one per purpose</h2>
+                    <h2>6. Legal bases for processing — one per purpose</h2>
 
                     <p>For readers in the European Economic Area and the United Kingdom, each purpose below rests on exactly one basis. I do not hold two in reserve for the same thing, because a basis cannot be swapped after the fact.</p>
 
@@ -422,7 +399,7 @@
                 </section>
 
                 <section id="retention">
-                    <h2>9. How long things are kept</h2>
+                    <h2>7. How long things are kept</h2>
 
                     <p>Browser storage lives on your device until you clear it, and nothing expires it on a schedule. The rest has a number, and a weekly job on the server deletes what has passed it:</p>
 
@@ -432,7 +409,6 @@
                         <li><strong>Free-trial records</strong> — the one-way email hash, and the device record behind the <code>__Host-hmb_did</code> cookie, are kept for <strong>24 months from the last activity</strong> on that record, then deleted. The reason is plain: otherwise deleting an account, or clearing a device, would reset the free-trial limit and the rule would mean nothing. Twenty-four months is longer than anyone's patience for repeat trials and short enough to be defensible. Deleting your account removes your account identifier from these records but does not shorten the 24 months.</li>
                         <li><strong>Checkout records</strong> — each checkout you start expires after 30 minutes and is deleted <strong>7 days</strong> after that.</li>
                         <li><strong>Messages from the merchant of record</strong> — the body of each processed payment message is kept for <strong>30 days</strong> and then blanked; the bare record that it was received is kept for <strong>180 days</strong>. A message that could not be processed keeps its body until it has been, so that a missed payment can be put right.</li>
-                        <li><strong>Embed credentials</strong> — kept while the account exists; an expired or rotated credential is deleted 30 days after it stops working.</li>
                         <li><strong>The <code>__Host-hmb_did</code> cookie</strong> — 2 years. <strong>The <code>__Host-hmb_ent</code> cookie</strong> — 14 days.</li>
                         <li><strong>Rate-limit counters</strong> keyed on your account or your network — <strong>2 days</strong>.</li>
                         <li><strong>Mailing list entries</strong> — kept until you unsubscribe.</li>
@@ -442,34 +418,34 @@
                 </section>
 
                 <section id="rights">
-                    <h2>10. Your rights, and how to use them</h2>
+                    <h2>8. Your rights, and how to use them</h2>
 
                     <p>Depending on where you live, you may have the right to access the personal data held about you, to correct it, to delete it, to restrict or object to its processing, to receive it in a portable form, and to withdraw consent. Under the <strong>GDPR</strong> and the <strong>UK GDPR</strong> those rights are yours as a matter of law.</p>
 
                     <p>Under the <strong>California Consumer Privacy Act</strong>, as amended by the CPRA, California residents may also ask what personal information is collected, ask for it to be deleted or corrected, and opt out of sale or sharing. <strong>I do not sell personal information and I do not share it for cross-context behavioural advertising</strong>, so there is nothing to opt out of there. You will never be treated differently for exercising a right.</p>
 
-                    <h3>10.1 Getting a copy of your account</h3>
+                    <h3>8.1 Getting a copy of your account</h3>
 
-                    <p>Your account page has an <strong>Export my data</strong> control that hands you a file containing your account record, every subscription record with the provider's identifiers, and your embed credentials — and only your own data. It contains no hashes and no secret keys. The merchant of record holds its own copy of the purchase record and provides it separately.</p>
+                    <p>Your account page has an <strong>Export my data</strong> control that hands you a file containing your account record and every subscription record with the provider's identifiers, and only your own data. It contains no hashes and no secret keys. The merchant of record holds its own copy of the purchase record and provides it separately.</p>
 
-                    <h3>10.2 Deleting your account</h3>
+                    <h3>8.2 Deleting your account</h3>
 
                     <p>Your account page has a <strong>Delete my account</strong> control. This is what it does, in order, and it does it the same way if you ask by email:</p>
 
                     <ol>
                         <li>If a subscription is live, it is <strong>cancelled at the merchant of record first</strong>, and the cancellation is confirmed before anything else happens. An account is never deleted with billing left running behind it.</li>
                         <li>The subscription record is detached, as section 9 describes, and the provider's identifiers are kept so that a later refund or dispute can still be matched.</li>
-                        <li>Your account, your sign-in identities, your checkout records and your embed credentials are deleted.</li>
+                        <li>Your account, your sign-in identities and your checkout records are deleted.</li>
                         <li>Your account identifier is removed from the free-trial records; the email hash and the device record run out their 24 months.</li>
                     </ol>
 
                     <p>Two things it cannot do. It cannot delete an account while a payment dispute is open or a failed payment is outstanding — email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and we will sort it out by hand. And it cannot erase the payment record the <strong>merchant of record holds as a separate controller</strong>; for that, contact the seller named on your receipt directly, under its own privacy notice.</p>
 
-                    <h3>10.3 Objecting to the trial check</h3>
+                    <h3>8.3 Objecting to the trial check</h3>
 
                     <p>Because the free-trial check rests on legitimate interest, you may object to it. If you do, I will not run the check for you — which means I cannot offer you the trial, since the trial exists only because the check does — and you can subscribe at the ordinary price with the same 14-day unconditional refund, which is longer protection than the trial gives anyway. Email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and say so.</p>
 
-                    <h3>10.4 Everything else</h3>
+                    <h3>8.4 Everything else</h3>
 
                     <p><strong>For anything not covered by a control on your account page, email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a></strong> and say what you want. I will answer within thirty days, and sooner if it is simple. Write from the address on the account, or quote the order reference on your receipt, so I can be sure I am answering the right person. If you are unhappy with my answer, you may complain to your national data protection authority.</p>
 
@@ -477,31 +453,31 @@
                 </section>
 
                 <section id="children">
-                    <h2>11. Children</h2>
+                    <h2>9. Children</h2>
 
                     <p>This site is not directed at children under 13, and I do not knowingly collect personal information from them. Reading the site and running the free sessions needs no personal information from anyone. If you believe a child has sent me an email address or opened an account, write to <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and I will delete it.</p>
                 </section>
 
                 <section id="transfers">
-                    <h2>12. International transfers</h2>
+                    <h2>10. International transfers</h2>
 
                     <p>This is a small site with a global audience, so data crosses borders. Pages are served from a content delivery network with locations worldwide, and this site's own server functions run in that network. Account records are held in the European Union, as section 3.4 says. The merchant of record, the email platform and Google each operate their own international infrastructure and their own transfer safeguards, described in their own policies. The narrow set of account and subscription data reaches <strong>Lebanon</strong>, because that is where I read email and administer the site; Lebanon has not been the subject of a European Commission adequacy decision. Where you are in the EEA, the UK or Switzerland and need a transfer mechanism for that, ask before you buy and I will sign the European Commission's Standard Contractual Clauses and the UK International Data Transfer Addendum. I will not claim to have safeguards in place that have not actually been signed.</p>
                 </section>
 
                 <section id="security">
-                    <h2>13. Security</h2>
+                    <h2>11. Security</h2>
 
                     <p>The site is served over HTTPS. Secrets live in server environment variables, never in the code and never in a browser. There are no passwords to store, because sign-in is an email link, a code or a Google account. Sign-in tokens are checked on the server against the authentication service's published keys on every request that touches an account. The database tables that hold account, subscription and trial records accept no direct access from a browser at all; every read goes through this site's own server, which identifies you from your verified sign-in and never from anything the page claims about itself. Email addresses in the free-trial ledger are stored only as a keyed one-way hash, email addresses in logs only as a short hash prefix, and <strong>no payment data reaches this project at all</strong>. The account record is deliberately small, so a breach of it would expose an email address and a plan, not a practice history and not a card. No system is perfectly secure, and I will not promise that it is.</p>
                 </section>
 
                 <section id="changes">
-                    <h2>14. Changes to this policy</h2>
+                    <h2>12. Changes to this policy</h2>
 
                     <p>I will update this page when the facts change — a new provider, a new feature, a different ad partner. The date at the top always says when it last changed. If a change is material, I will say so clearly on the page rather than quietly editing a sentence, and account holders will be emailed. Continuing to use the site after a change means the updated policy applies.</p>
                 </section>
 
                 <section id="contact">
-                    <h2>15. Contact</h2>
+                    <h2>13. Contact</h2>
 
                     <p>Questions, requests and corrections: <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. This site is <a href="https://helpmebreath.com/">helpmebreath.com</a>, published by Georges Rayess, an individual.</p>
 
@@ -545,9 +521,7 @@
                     <p class="footer-heading">The site</p>
                     <a href="/about">About</a>
                     <a href="/pro">Pro</a>
-                    <a href="/for-practitioners">For practitioners</a>
-                    <a href="/embed">Embed the timer</a>
-                    <a href="/handouts">Printable handouts</a>
+                    <a href="/account">Your account</a>
                 </nav>
             </div>
 

@@ -20,7 +20,7 @@ cd tools/render && npm install && npx playwright install chromium
 node tools/brand/build-assets.mjs
 ```
 
-That writes 53 files and then audits every one of them: the file exists, its
+That writes 44 files and then audits every one of them: the file exists, its
 pixel dimensions match the manifest, and no social card exceeds 150 KB. The run
 exits non-zero if any check fails.
 
@@ -180,8 +180,7 @@ network access.** If it is offline the cards still render, but in Georgia and
 Arial — check one output before committing after any build on a flaky
 connection.
 
-Nothing about this affects the site or the embed widget: the embed loads no
-webfont at all, and these are static images.
+Nothing about this affects the site: these are static images.
 
 ## Dependencies
 

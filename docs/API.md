@@ -1,9 +1,9 @@
 # Help Me Breathe — the API
 
-Accounts, one subscription plan, and the embed credential that removes the
-attribution line. Everything runs on Vercel's Node runtime using Web-standard
-handlers, with **zero npm runtime dependencies**: `fetch` and WebCrypto only, so
-the same files port to Cloudflare Pages Functions with a two-line adapter.
+Accounts and one subscription plan. Everything runs on Vercel's Node runtime
+using Web-standard handlers, with **zero npm runtime dependencies**: `fetch` and
+WebCrypto only, so the same files port to Cloudflare Pages Functions with a
+two-line adapter.
 
 Identity is Supabase (email link, 6-digit code, or Google — no passwords). State
 is Postgres, reached over PostgREST with the secret key. The schema is
@@ -25,12 +25,9 @@ activation count, no SKU, no `MOR_PRODUCT_*` variable and no waitlist mode.
 | `/api/account/signout` | `POST` | none | Clears the entitlement cookie. |
 | `/api/account/export` | `GET` | Bearer JWT (live) | Data portability: a JSON attachment of everything we hold. |
 | `/api/account/delete` | `POST` | Bearer JWT (live) | Cancels at the provider first, then deletes the account. |
-| `/api/embed/token` | `GET`, `POST`, `DELETE` | Bearer JWT (live) | Mint, list, rotate and revoke embed credentials. |
-| `/api/embed/frame` | `GET` | none (credential in `?wl=`) | The white-label embed document, verdict decided at render time. |
-| `/api/entitlement` | `POST` | none | Is this embed credential live? Used by `/s/`. |
 | `/api/webhooks/mor` | `POST` | webhook signature | Every merchant-of-record event. |
 | `/api/cron/reconcile` | `GET` | `CRON_SECRET` | Hourly: re-drive failed events, rewrite flagged subscriptions. |
-| `/api/cron/retention` | `GET` | `CRON_SECRET` | Weekly: the nine retention statements. |
+| `/api/cron/retention` | `GET` | `CRON_SECRET` | Weekly: the eight retention statements. |
 | `/api/subscribe` | `POST` | none (same-origin) | Double opt-in email signup. Unchanged. |
 | `/api/health` | `GET` | none | Which environment variables are set. Booleans and names only. |
 
@@ -39,7 +36,6 @@ activation count, no SKU, no `MOR_PRODUCT_*` variable and no waitlist mode.
 ```
 api/
   me.js                       GET  /api/me
-  entitlement.js              POST /api/entitlement  (embed credential verifier)
   subscribe.js                POST /api/subscribe
   health.js                   GET  /api/health
   account/
@@ -50,9 +46,6 @@ api/
     eligibility.js
   session/
     count.js
-  embed/
-    token.js                  mint / list / rotate / revoke
-    frame.js                  the white-label frame document
   webhooks/
     mor.js                    one endpoint for every merchant of record
   cron/
@@ -76,7 +69,7 @@ api/
 tools/
   keygen.mjs                  prints a 64-character secret, writes nothing
   api.test.mjs  webhook.test.mjs  trialguard.test.mjs
-  supabase.test.mjs  entitlement.test.mjs  embed.test.mjs
+  supabase.test.mjs  entitlement.test.mjs
   site-check.mjs              the whole-site linter
 ```
 
@@ -113,7 +106,7 @@ Four kinds, and nothing else.
 | Kind | How | Used by |
 |---|---|---|
 | **Bearer JWT** | `Authorization: Bearer <Supabase access token>`, verified locally against the JWKS (`verifyAccessToken`). | `GET /api/me` — the hot path, called on every page load of a signed-in visitor. |
-| **Bearer JWT (live)** | The same, plus a round trip to Supabase's `/auth/v1/user` (`assertLiveUser` / `requireLiveUser`), so a session signed out or revoked inside its hour is refused. | Every money-touching call: trial eligibility, portal, cancel, pause, switch, export, delete, embed token. |
+| **Bearer JWT (live)** | The same, plus a round trip to Supabase's `/auth/v1/user` (`assertLiveUser` / `requireLiveUser`), so a session signed out or revoked inside its hour is refused. | Every money-touching call: trial eligibility, portal, cancel, pause, switch, export, delete. |
 | **Same-origin** | The `Origin` header must match the site, or an entry in `ALLOWED_ORIGINS` (`resolveSameOrigin`). | `POST /api/session/count`, `POST /api/subscribe`, and every billing and trial POST **in addition to** the JWT. |
 | **`CRON_SECRET`** | `Authorization: Bearer <CRON_SECRET>`, compared with `timingSafeEqual`. Vercel sends it on every cron invocation. | The two cron endpoints. |
 | **Webhook signature** | Verified by the adapter over the **raw request body** (`verifyWebhook(rawBody, headers, MOR_WEBHOOK_SECRET)`). | `POST /api/webhooks/mor`. |
@@ -128,9 +121,7 @@ Every JWT failure answers the same way — `401 { ok: false, reason:
 not answer, the status is `503` with `reason: 'auth_unavailable'` and a
 `Retry-After`, because that is our fault and not the caller's.
 
-CORS is same-origin everywhere except `POST /api/entitlement` and
-`GET /api/embed/frame`, which answer `Access-Control-Allow-Origin: *` without
-credentials. Every API response is `no-store`.
+CORS is same-origin on every endpoint. Every API response is `no-store`.
 
 ### Cookies
 
@@ -163,7 +154,7 @@ is deliberately ignored.
   "ok": true,
   "user": { "id": "…uuid…", "email": "person@example.com", "created_at": "2026-09-01T…" },
   "entitlement": {
-    "tier": "pro", "status": "active", "plan": "yearly", "commercial": true,
+    "tier": "pro", "status": "active", "plan": "yearly",
     "trial_ends_at": null, "current_period_end": "2027-09-11T…",
     "cancel_at": null, "access_until": "2027-09-13T…",
     "next_charge": { "amount": "100.00", "currency": "USD", "tax_inclusive": true, "at": "2027-09-11T…" },
@@ -276,11 +267,11 @@ with `transactionId` and the price was fixed on the server.
 Every 2xx sets `__Host-hmb_did`. The plan enum is `monthly` and `yearly` —
 two billing periods for the one plan. Anything else is `400 bad_plan`.
 
-> **2026-09-12.** The enum used to carry a third value, `practitioner_yearly`,
-> so that offering a separate practitioner plan would be a config change rather
-> than a migration. The owner closed that option permanently: one plan,
-> everything included. The value, its `MOR_PRICE_PRACTITIONER` price variable
-> and the flag that narrowed the `com` claim are gone from the server.
+> **2026-09-12.** The enum used to carry a third value, for a separate
+> professional plan, so that offering one would be a config change rather than a
+> migration. The owner closed that option permanently: one plan, everything
+> included, for individuals. The value and its price variable are gone from the
+> server, as is the whole layer that was built on top of them.
 
 ---
 
@@ -366,11 +357,11 @@ cleared. `js/auth.js` calls this after clearing the Supabase session and the
 ### `GET /api/account/export`
 
 Live bearer JWT. Returns `Content-Disposition: attachment` JSON containing the
-`profiles` row, every `subscriptions` row (provider ids included), every
-`embed_tokens` and `embed_credentials` row, and a note that the merchant of
-record holds its own copy as a separate controller. Field allowlists keep hashes
-and secrets out of it, and every query is keyed on the verified `sub`. Limit: 10
-a minute per IP.
+`profiles` row, every `subscriptions` row (provider ids included), and a note
+that the merchant of record holds its own copy as a separate controller. Those
+two tables are everything an account owns. Field allowlists keep hashes and
+secrets out of it, and every query is keyed on the verified `sub`. Limit: 10 a
+minute per IP.
 
 ### `POST /api/account/delete`
 
@@ -384,8 +375,7 @@ and no other:
 3. **Detach, do not cascade,** the subscription rows: `user_id = null`,
    `detached_at = now()`, provider ids kept — so a later webhook for a still-live
    subscription reconciles instead of becoming an orphan.
-4. Delete the `auth.users` row, cascading `profiles`, `embed_tokens`,
-   `embed_credentials` and `checkout_intents`.
+4. Delete the `auth.users` row, cascading `profiles` and `checkout_intents`.
 5. Null `trial_claims.user_id` and `devices.trial_user_id`, keeping the hashes
    until the 24-month ceiling — otherwise deleting an account would reset the
    free-trial limit.
@@ -400,95 +390,6 @@ Cancellation uses `effective_from: 'next_billing_period'`. A row whose
 | 502 | `{ ok: false, reason: "cancel_failed", message }` — **nothing was changed** |
 
 Limit: 5 a minute per IP.
-
----
-
-## The embed endpoints
-
-Full detail, including the snippets and the `/s/` link, is in
-[`docs/EMBED.md`](EMBED.md). The contract in brief:
-
-### `/api/embed/token` — `GET`, `POST`, `DELETE`
-
-Live bearer JWT on every method. Who may mint: any subscriber whose access has
-not lapsed and whose plan carries the `com` claim, decided by
-`ownerStanding()` — a thin wrapper over the same `entitlementFor()` that
-`/api/me` uses. One plan includes commercial use, so that is every live
-subscriber; the `commercial_plan_required` branch remains as the fallback if
-`ownerStanding()` ever answers pro-but-not-commercial.
-
-| Call | Body / query | Answers |
-|---|---|---|
-| `POST` | `{ domains: ["clinic.example"], label? }` | `{ ok, action: "create", token_id, jti, expires_at, token, domains, label, snippet, iframe_snippet }` |
-| `GET` | — | `{ ok, frame_path, groups: [{ token_id, label, domains, created_at, revoked_at, last_seen_at, hit_count, verify_count_30d, credentials: [...] }] }` |
-| `GET` | `?rotate=1&token_id=et_…` | `{ ok, action: "rotate", token_id, jti, expires_at, token, domains, superseded, overlap_ends_at, snippet, iframe_snippet }` |
-| `DELETE` | `{ token_id }` | `{ ok, token_id, revoked_at, credentials_revoked }` |
-
-A **group** (`token_id`, the `gid` claim) is what the subscriber sees on
-`/account`; each issued credential is its own row with its own `jti`. Rotating
-issues a fresh `jti` and stamps `superseded_at` on the live ones, which keep
-verifying for **48 hours**. Revoking stamps `revoked_at` on the group **and**
-each credential. Credentials expire 30 days after issue; at most 10 domains per
-group; wildcards and our own hostname are refused. Errors: `400` with a reason
-(`domains_required`, `too_many_domains`, `invalid_domain`,
-`wildcard_not_allowed`, `own_site_not_allowed`), `403 not_entitled`,
-`404 not_found`, `409 revoked`, `429`, `503 ledger_unavailable`. Limit: 30 calls
-an hour per subscriber, counted in Postgres.
-
-### `GET /api/embed/frame`
-
-The embed document, with the white-label verdict decided at **render time** and
-inlined as `window.__HMB_EMBED`. The embedding origin is observable on exactly
-one request — the fetch of the frame document itself — so the domain check
-happens here, from `Sec-Fetch-Dest`, `Sec-Fetch-Site` and `Referer`, and the
-runtime never re-asks.
-
-**Every failure is the free widget.** No referer, wrong host, missing fetch
-metadata, expired, revoked, rotated past its overlap, owner lapsed, malformed
-`wl`, ledger down, rate limited — each renders the ordinary attributed widget. A
-clinic's visitor never sees an error page because of a billing state they know
-nothing about.
-
-It answers at its own path rather than through a rewrite because Vercel gives
-the filesystem precedence over rewrites, and `embed/v1/frame.html` exists as a
-static file. `vercel.json` must therefore carry
-`"functions": { "api/embed/frame.js": { "includeFiles": "embed/v1/frame.html" } }`
-so the template ships inside the bundle; without it every request falls back to
-the static document, which is the free widget — safe, but never white-labelled.
-Limit: 120/min per IP, and exceeding it serves the free widget, never a 429 page.
-
-### `POST /api/entitlement`
-
-Is this embed credential live? Called by `/s/?c=…` and by nothing else — the
-frame does **not** call it.
-
-```json
-{ "token": "<the wl value>" }
-```
-```json
-{ "ok": true, "typ": "emb", "tier": "pro", "whitelabel": true, "gid": "et_…", "exp": 1789000000 }
-{ "ok": false, "reason": "expired" }
-```
-
-There is no `host` parameter and no `dom` comparison: `/s/` is served from our
-own origin, so the request is same-origin and `Origin`/`Referer` always say
-helpmebreath.com. A `host` in the body is ignored.
-
-Only v3 credentials with `typ: 'emb'` are accepted. The account entitlement
-token (`typ: 'ent'`) is a 14-day bearer credential for the signed-in browser and
-has no business inside a shareable link, so it is refused with `wrong_type`; a
-retired v1 licence token is refused the same way.
-
-A well-formed request always gets a **200** with the verdict in `ok`. Only a
-missing or malformed body (400) or a flood (429, at 120/min per IP) gets a
-non-200. `reason` is one of `missing`, `malformed`, `bad_signature`,
-`bad_payload`, `bad_version`, `kid_mismatch`, `wrong_type`, `expired`,
-`unavailable`, `unknown`, `mismatch`, `revoked`, `superseded`, `lapsed`,
-`not_commercial`. A verified render is counted, sampled 1-in-10.
-
-CORS is `*` with no credentials, deliberately: the answer exposes nothing the
-caller does not already hold — the payload half of a token is plain base64url
-JSON — and it never sets a cookie.
 
 ---
 
@@ -571,7 +472,7 @@ Answers `{ ok, ran_at, results }` with `200`, or `500` when a step failed.
 
 ### `/api/cron/retention` — weekly, `0 4 * * 1`
 
-Nine idempotent statements, in order: null webhook payloads older than 30 days
+Eight idempotent statements, in order: null webhook payloads older than 30 days
 **on `processed` rows only**; delete processed events older than 180 days; expire
 stale trial reservations; delete checkout intents 7 days past expiry; mark
 subscriptions `expired` 7 days past `access_until`; delete trial claims and
@@ -657,14 +558,14 @@ one-to-one. **Required** means "counted in `/api/health`'s `missing`".
 
 | Variable | Required | Notes |
 |---|---|---|
-| `LICENSE_SECRET` | yes | 64 characters from `node tools/keygen.mjs`. Signs every entitlement token and every embed credential. Rotating it signs every subscriber out of offline use until their next page load. |
+| `LICENSE_SECRET` | yes | 64 characters from `node tools/keygen.mjs`. Signs every entitlement token. Rotating it signs every subscriber out of offline use until their next page load. |
 | `SUPABASE_URL` | yes | `https://<ref>.supabase.co`. The same value goes into `js/config.js` (public). |
 | `SUPABASE_PUBLISHABLE_KEY` | yes | The publishable (anon) key. Public by design; the server copy is used only to call the auth API. |
 | `SUPABASE_SECRET_KEY` | yes | The secret (service role) key. Server only. Bypasses row level security. Never in the repo, never in a response. |
 | `TRIAL_PEPPER` | yes | 64 characters. HMAC key for the one-way email hash in the trial ledger. Rotating it resets every email trial lock. |
 | `DEVICE_PEPPER` | yes | 64 characters. HMAC key for the device cookie. Rotating it resets every free-session count and device trial signal. |
 | `TRIAL_ENABLED` | no | `true` offers the 3-day card-required trial; `false` sells a straight subscription. Read only by `api/trial/eligibility.js`. Anything but the literal `true` is off. |
-| `SITE_ORIGIN` | yes | The site's own origin, used to build callback URLs, embed snippets and the same-origin check. |
+| `SITE_ORIGIN` | yes | The site's own origin, used to build callback URLs and for the same-origin check. |
 | `MOR_PROVIDER` | no | `paddle` (default) or `fastspring`. One variable switches the whole payment rail. |
 | `MOR_API_KEY` | yes | Paddle: an API key beginning `pdl_live_apikey_` (or `pdl_sdbx_apikey_`). FastSpring: `username:password`. |
 | `MOR_API_BASE` | no | Overrides the provider's API base URL. Leave empty in production. |
@@ -780,19 +681,18 @@ verification never re-serialises — key order would change the bytes.
 
 ```json
 { "v": 3, "typ": "ent", "sub": "…uuid…", "tier": "pro", "st": "active",
-  "plan": "yearly", "com": 1, "pe": 1789000000,
+  "plan": "yearly", "pe": 1789000000,
   "iat": 1788000000, "exp": 1789209600, "kid": "9f2a1c04" }
 ```
 
 | Field | Meaning |
 |---|---|
 | `v` | Always `3`. |
-| `typ` | `ent` for an account token, `emb` for an embed credential. The two are never interchangeable. |
-| `sub` | The Supabase user id (`emb`: the issuing subscriber's). |
+| `typ` | Always `ent`. It is the only token type there is; a payload that says anything else is refused with `bad_type`. |
+| `sub` | The Supabase user id. |
 | `tier` | `pro` or `free`. |
 | `st` | `trialing` \| `active` \| `past_due` \| `paused` \| `canceled` \| `none`. |
 | `plan` | `monthly`, `yearly`, or `null`. |
-| `com` | `1` when the plan carries commercial rights. One plan includes everything, so that is every pro token; a free token is always `0`. |
 | `pe` | Trial end or period end, seconds. `0` when unknown. |
 | `iat`, `exp` | Seconds since epoch. |
 | `kid` | First 8 hex characters of `sha256(LICENSE_SECRET)`, so a rotation is detectable as `kid_mismatch` rather than a generic signature failure. |
@@ -801,11 +701,6 @@ verification never re-serialises — key order would change the bytes.
 `iat + 14 days` for a free one, which grants nothing. Those 14 days **are** the
 offline grace: there is no grace past `exp`, and the `access_until + 24h` cap
 means a cancelled subscriber cannot stay offline into extra days.
-
-An embed credential (`typ: 'emb'`) carries `{ v:3, typ:'emb', sub, gid, jti,
-dom[], iat, exp, kid }` and lives 30 days. Its ledger row is checked on every
-render, so a cancelled subscription stops white-labelling at the next page load
-regardless of `exp`.
 
 **Entitlement, in one sentence:** a user's effective entitlement is the maximum
 `access_until` across all their subscription rows, together with the status of
@@ -827,11 +722,10 @@ never recomputed at read time.
 ### Rotating `LICENSE_SECRET`
 
 Generate a new one with `node tools/keygen.mjs`, replace the variable, redeploy.
-Every existing token and every embed credential fails with `kid_mismatch`.
-Subscribers get a fresh token on their next `GET /api/me` — one page load, no
-action from them — but an **offline** subscriber drops to free until they are
-online again, and every issued embed credential stops white-labelling until its
-group is rotated from `/account`. Only rotate if you believe the secret leaked.
+Every existing token fails with `kid_mismatch`. Subscribers get a fresh token on
+their next `GET /api/me` — one page load, no action from them — but an
+**offline** subscriber drops to free until they are online again. Only rotate if
+you believe the secret leaked.
 There is no dual-secret grace period; adding one would keep the old secret
 around, which defeats the purpose.
 
@@ -858,16 +752,16 @@ issues.
 **Client-side enforcement is bypassable by design.** Every paid feature ships in
 the same static JavaScript as the free ones, so a determined person can open
 devtools and turn a flag on. The signature stops forgery, not inspection. What
-actually protects the business is that the plan is $10 a month, and that the
-things a bypass does not grant — a working embed credential, a client link that
-white-labels, an account that survives a cache clear — are server-side. **Do not
-build DRM on top of this.**
+actually protects the business is that the plan is $10 a month, and that the one
+thing a bypass does not grant — an account that survives a cache clear, with its
+history and its settings on every device — is server-side. **Do not build DRM on
+top of this.**
 
 **Rate limiting is two-tier.** Per-IP counters live in an in-memory `Map` inside
 a warm function instance: Vercel may run several and recycle them at any moment,
 so the real limit is "a few times the configured number". It stops a careless
-script; it is not a security control. Per-user limits that matter — minting
-credentials, cancelling, pausing — are counted in Postgres instead.
+script; it is not a security control. Per-user limits that matter — starting a
+trial, cancelling, pausing — are counted in Postgres instead.
 
 **The free-session counter is soft and says so.** It never denies anything by
 itself, clearing cookies resets it, and that is accepted: the alternative is
@@ -893,7 +787,6 @@ node --test tools/supabase.test.mjs   # the JWT verifier and the PostgREST helpe
 node --test tools/webhook.test.mjs    # the state machine and both adapters
 node --test tools/trialguard.test.mjs # the device cookie, the ledger, eligibility
 node --test tools/entitlement.test.mjs
-node --test tools/embed.test.mjs
 node --check api/me.js                # and every other file under api/
 node tools/keygen.mjs                 # prints a secret, writes nothing
 node tools/site-check.mjs             # the whole-site linter
@@ -906,9 +799,8 @@ provider adapters take `fetchImpl` on their context. `MOR_API_BASE` and
 `EMAIL_API_BASE` point the adapters at a stub host.
 
 `tools/site-check.mjs` also enforces four rules that belong to this model:
-`data-open-timer` may appear only on the two crisis pages, `embed/v1/frame.html`
-and `s/index.html` (and must appear on the two crisis pages); no payment company
-may be named outside `api/_lib/providers/`, `api/_lib/env.js`, `js/config.js`
+`data-open-timer` may appear only on the two crisis pages, and must appear on
+both of them; no payment company may be named outside `api/_lib/providers/`, `api/_lib/env.js`, `js/config.js`
 and `js/checkout.js`; "free forever", "always free", "no sign-up" and unqualified
 "no account" are refused as copy; and `isAccessibleForFree: false` may not appear
 in structured data, because only the interactive timer is gated and never the

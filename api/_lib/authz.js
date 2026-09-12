@@ -14,8 +14,7 @@
  * network once the keys are cached), which is what the hot path wants;
  * requireLiveUser adds the round-trip to /auth/v1/user so a session that was
  * signed out or revoked inside its hour is refused (design §4.5). Use the
- * live form for: start checkout, mint an embed token, cancel, pause, switch,
- * export, delete. Never on GET /api/me.
+ * live form for: start checkout, cancel, pause, switch, export, delete. Never on GET /api/me.
  *
  * Contract with the design (§3.3, §5.3, §7.1):
  *   - the user id comes from the verified token's `sub`, never from a body;

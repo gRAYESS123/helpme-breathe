@@ -2600,9 +2600,7 @@ body.session-active [data-ask] { display: none; }
 
 /* A paid tier gets no reserved ad space at all. js/entitlements.js stamps
    document.body.dataset.tier; js/ads.js also removes the nodes outright. */
-body[data-tier="pro"] .ad-slot,
-body[data-tier="practitioner"] .ad-slot,
-body[data-tier="studio"] .ad-slot { display: none; }
+body[data-tier="pro"] .ad-slot { display: none; }
 
 /* ==========================================================================
    9 — UTILITIES, LEGACY SHIMS, RESPONSIVE
@@ -2783,8 +2781,7 @@ body[data-tier="studio"] .ad-slot { display: none; }
 
 /* ==========================================================================
    11 — PRINT BASICS
-   The practitioner surfaces load css/print.css for the full treatment; this is
-   the floor so that any page prints legibly.
+   This is the floor so that any page prints legibly.
    ========================================================================== */
 
 @media print {

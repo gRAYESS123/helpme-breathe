@@ -194,12 +194,12 @@ test('timingSafeEqual compares by value, not by identity', () => {
 test('signToken/verifyToken round trip returns the exact payload', async () => {
   const kid = await kidFor(SECRET);
   const payload = buildPayload({
-    tier: 'practitioner',
+    tier: 'pro',
     sub: 'a1b2c3d4e5f6',
     kid,
     act: 3,
     days: 7,
-    domains: ['clinic.example'],
+    domains: ['example.test'],
   });
 
   const token = await signToken(payload, SECRET);

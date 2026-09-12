@@ -17,13 +17,17 @@ that owns that feature. Nothing else moves.
 
 ## 1. What is for sale
 
-**One plan, everything included, for individuals and practitioners alike.**
-Owner decision, 2026-09-11.
+**One plan, everything included, for one person.** Owner decision, 2026-09-11.
+
+Owner decision, 2026-09-12: the practitioner layer was removed from the product
+entirely. There is no practitioner plan, no practitioner page, no client
+handouts, no compliance pack, no client session links, no embed widget and no
+commercial-use right. Help Me Breathe is a personal guided-breathing timer.
 
 | What | Price | What it covers |
 |---|---|---|
-| Free | $0 | Every technique, every duration, audio and vibration cues, the offline PWA, saved settings, session history, the embeddable widget with attribution. **Three timer sessions on this device before the timer asks for an account.** |
-| The plan, monthly | $10/month (US list) | Everything, including every practitioner feature: commercial use, white-label embed, client links, class mode, branded handouts, the compliance pack |
+| Free | $0 | Every technique, every duration, audio and vibration cues, the offline PWA, saved settings, session history. **Three timer sessions on this device before the timer asks for an account.** |
+| The plan, monthly | $10/month (US list) | Everything: custom patterns and saved presets, streaks and a 12-week history with CSV export, ambient soundscapes, night mode, no ads, offline use |
 | The plan, yearly | $100/year (US list) | The same plan, billed once a year |
 
 Billed in advance and renewing automatically until cancelled; tax is added at
@@ -68,8 +72,8 @@ what a visitor may do.
 | Surface | Signed out, under 3 sessions | Signed out, 3 sessions used | Signed in, no subscription | Subscriber |
 |---|---|---|---|---|
 | The timer on `/`, `/timer`, a technique page | runs | **preview** + sign-in card | **preview** + checkout card | runs |
-| The two crisis pages, the embed frame, `/s/` | runs | runs | runs | runs |
-| Presets, streaks, night switch, soundscapes, shareable pattern links, branded handouts | locked, visible | locked, visible | locked, visible | unlocked |
+| The two crisis pages | runs | runs | runs | runs |
+| Presets, streaks, night switch, soundscapes, shareable pattern links | locked, visible | locked, visible | locked, visible | unlocked |
 | Everything that is prose | free | free | free | free |
 
 `TIMER_FREE_SESSIONS = 3` in `js/config.js` is read in exactly one place,
@@ -78,7 +82,7 @@ what a visitor may do.
 is **soft**: clearing cookies resets it. That is accepted — the alternative is
 fingerprinting, which hard rule 8 forbids.
 
-### `data-open-timer` — four surfaces, forever
+### `data-open-timer` — the two crisis pages, forever
 
 ```html
 <body data-open-timer="true">
@@ -86,15 +90,12 @@ fingerprinting, which hard rule 8 forbids.
 
 `requireTimer()` returns `true` immediately for any page carrying it. It is a
 **safety feature, not a config knob**, and `tools/site-check.mjs` fails the build
-if it appears anywhere but these four files, or is missing from the first two:
+if it appears anywhere but these two files, or is missing from either:
 
 - `breathing-exercises-anxiety.html`
 - `breathing-exercises-for-panic-attacks.html`
-- `embed/v1/frame.html`
-- `s/index.html`
 
-A person in a panic attack, a clinic's visitor, and a client who was sent a link
-never meet an account prompt.
+A person in a panic attack never meets an account prompt.
 
 ### The preview state
 
@@ -140,14 +141,14 @@ all, while a subscriber keeps every tool.
 | `/pro/thanks` | `pro/thanks.html` | Where checkout lands. It does **not** load the provider's checkout script — a visitor arriving with the provider's own transaction parameter would otherwise have a checkout re-open on top of their thank-you page. |
 | `/signin` | `signin.html` | Email link, 6-digit code, or Google. Carries `?next=` and `?intent=subscribe:<plan>` through. |
 | `/auth/callback` | `auth/callback.html` | Completes the sign-in and **resumes the intent**: a visitor who clicked Subscribe while signed out is taken straight into checkout on this page, with no further page load. |
-| `/account` | `account.html` | Your account, your plan, embed credentials, your data. |
+| `/account` | `account.html` | Your account, your plan, your data. |
 
 `/account` is where the plan is managed: the current status and next charge from
 `GET /api/me`; portal links minted on click by `POST /api/billing/portal`;
 pause (1 or 3 months), switch to yearly, and cancel — each stating, before the
-confirm button, exactly what will happen and on which date; the embed credential
-groups with mint, rotate and revoke; and the two data controls, export
-(`GET /api/account/export`) and delete (`POST /api/account/delete`).
+confirm button, exactly what will happen and on which date; and the two data
+controls, export (`GET /api/account/export`) and delete
+(`POST /api/account/delete`).
 
 `/signin`, `/auth/callback` and `/account` are in the service worker's
 never-cache list. They always come from the network.
@@ -167,9 +168,9 @@ subscribe('yearly');
 
 `data-plan` is `monthly` or `yearly` — the two intervals of the one plan. **A
 button never carries a price id**, and the browser never chooses a price.
-`data-sku` and the retired SKUs (`lifetime`, `practitioner`, `studio`, `pack`)
-are gone and must not come back; `checkout(sku)` survives only as an alias of
-`subscribe(plan)`.
+`data-sku` and the SKUs retired on 2026-09-11 (`lifetime`, `practitioner`,
+`studio`, `pack`) are gone and must not come back; `checkout(sku)` survives only
+as an alias of `subscribe(plan)`.
 
 What a click does:
 
@@ -240,8 +241,8 @@ the provider; entitlement tokens keep working until their `exp`.
 | `css/pro.css` | Panels, sliders, heatmap, night mode, the offer, preview and capture cards, and the `/pro` page furniture. |
 
 Feature names passed to `requirePro()`, each with its own card copy: `presets`,
-`streaks`, `night`, `soundscapes`, `share`, `handout-branding`. Plus `timer`,
-which `preview.js` answers.
+`streaks`, `night`, `soundscapes`, `share`. Plus `timer`, which `preview.js`
+answers.
 
 ### Storage keys this layer owns
 
@@ -281,8 +282,6 @@ free-text input.
 | `manage_billing_click` | `/account` | `{ target }` |
 | `cancel_screen_view` / `cancel_confirm` | `/account` | `{ status_at_cancel }` |
 | `retention_offer_taken` | `/account` | `{ offer: 'pause_1' \| 'pause_3' \| 'annual' }` |
-| `embed_token_created` | `/account` | the group, never a credential |
-| `embed_snippet_copied` | `/account`, `/embed` | `{ placement }` |
 | `account_export` / `account_delete_request` | `/account` | `{}` / `{ had_subscription }` |
 | `capture_shown` / `capture_submit` | `capture.js` | `{ technique, source }` |
 
@@ -300,8 +299,8 @@ The retired activation events (`activate_attempt`, `activate_success`,
 - **Every existing technique stays free**, and so does every word of prose. The
   plan adds tools around the practice; the gate is the timer's session count and
   the paid tools, never the content.
-- **The timer runs for anyone, forever, on the four `data-open-timer` surfaces.**
-  That list is enforced by `site-check` and is not negotiable.
+- **The timer runs for anyone, forever, on the two `data-open-timer` crisis
+  pages.** That list is enforced by `site-check` and is not negotiable.
 - No offer appears before the third completed session, and no offer appears
   twice.
 - No offer of any kind is shown to someone who already pays. `paywall.js` checks

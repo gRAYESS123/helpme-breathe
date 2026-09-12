@@ -26,7 +26,6 @@ export const EVENTS = Object.freeze({
   SUPPORT_CLICK: 'support_click',
   PWA_INSTALL: 'pwa_install',
   OUTBOUND_AFFILIATE_CLICK: 'outbound_affiliate_click',
-  EMBED_SNIPPET_COPIED: 'embed_snippet_copied',
   // Accounts, trial and subscription (design section 12). Never with an
   // email, a user id, a device id, a token or a provider customer id.
   SIGNIN_VIEW: 'signin_view',
@@ -47,7 +46,6 @@ export const EVENTS = Object.freeze({
   CANCEL_SCREEN_VIEW: 'cancel_screen_view',
   RETENTION_OFFER_TAKEN: 'retention_offer_taken',
   CANCEL_CONFIRM: 'cancel_confirm',
-  EMBED_TOKEN_CREATED: 'embed_token_created',
   ACCOUNT_EXPORT: 'account_export',
   ACCOUNT_DELETE_REQUEST: 'account_delete_request',
   PLAN_INTERVAL_TOGGLE: 'plan_interval_toggle',

@@ -19,7 +19,6 @@ import {
   accessUntilFor,
   buildEntitlementPayload,
   clearEntitlementCookie,
-  commercialFor,
   createStore,
   deviceCookie,
   entitlementCookie,
@@ -266,15 +265,12 @@ test('entitlementFor: maximum access_until across rows wins, with that row\'s st
   assert.equal(entitlementFor([unwritten], NOW).tier, 'free', 'a missing access_until grants nothing');
 });
 
-test('commercial claim: one plan, so every live pro entitlement is commercial', () => {
-  assert.equal(commercialFor('monthly'), true);
-  assert.equal(commercialFor('yearly'), true);
-  assert.equal(commercialFor(null), false);
-  assert.equal(commercialFor('practitioner_yearly'), false, 'a plan we do not sell carries nothing');
-  // No switch survives: a stray options object cannot narrow the claim.
-  assert.equal(commercialFor('monthly', { practitionerPlanOffered: true }), true);
+test('entitlement: one plan, so nothing narrows what a live pro entitlement carries', () => {
+  const live = entitlementFor([stored({ status: 'active' })], NOW);
+  assert.equal(live.tier, 'pro');
+  assert.ok(!('commercial' in live), 'the commercial claim is gone from the result');
   const lapsed = stored({ status: 'canceled', cancel_at: iso(NOW - DAY), canceled_at: iso(NOW - DAY) });
-  assert.equal(entitlementFor([lapsed], NOW).commercial, false, 'no commercial rights without access');
+  assert.equal(entitlementFor([lapsed], NOW).tier, 'free');
 });
 
 /* ------------------------------------------------------------ token v3 ----- */
@@ -283,12 +279,13 @@ test('token v3: shape and exp = min(iat + 14d, access_until + 24h)', async () =>
   const kid = await kidFor(SECRET);
   const iat = Math.floor(NOW / 1000);
   const soon = NOW + 3 * DAY;
-  const capped = buildEntitlementPayload({ sub: USER, tier: 'pro', status: 'canceled', plan: 'monthly', commercial: true, accessUntilMs: soon, periodEndMs: soon, kid, now: NOW });
+  const capped = buildEntitlementPayload({ sub: USER, tier: 'pro', status: 'canceled', plan: 'monthly', accessUntilMs: soon, periodEndMs: soon, kid, now: NOW });
   assert.equal(capped.v, 3);
   assert.equal(capped.typ, 'ent');
   assert.equal(capped.sub, USER);
   assert.equal(capped.st, 'canceled');
-  assert.equal(capped.com, 1);
+  assert.ok(!('com' in capped), 'the commercial claim is gone from the payload');
+  assert.deepEqual(Object.keys(capped).sort(), ['exp', 'iat', 'kid', 'pe', 'plan', 'st', 'sub', 'tier', 'typ', 'v']);
   assert.equal(capped.pe, Math.floor(soon / 1000));
   assert.equal(capped.iat, iat);
   assert.equal(capped.exp, Math.floor((soon + TOKEN_ACCESS_SLACK_MS) / 1000), 'capped at access_until + 24h');
@@ -298,7 +295,6 @@ test('token v3: shape and exp = min(iat + 14d, access_until + 24h)', async () =>
 
   const free = buildEntitlementPayload({ sub: USER, tier: 'free', status: 'none', kid, now: NOW });
   assert.equal(free.tier, 'free');
-  assert.equal(free.com, 0);
   assert.equal(free.pe, 0);
   assert.equal(free.plan, null);
   assert.equal(free.exp, iat + TOKEN_MAX_AGE_MS / 1000);
@@ -315,11 +311,10 @@ test('token v3: signs, verifies, and has NO grace past exp', async () => {
   assert.equal(atExp.reason, 'expired');
   const dayLater = await verifyEntitlementToken(token, SECRET, { now: payload.exp * 1000 + DAY });
   assert.equal(dayLater.ok, false, 'a cancelled subscriber does not get 28 offline days');
-  // Wrong typ is refused even with a good signature.
+  // `ent` is the only type there is: anything else is refused even with a good signature.
   const kid = await kidFor(SECRET);
-  const emb = await signToken({ v: 3, typ: 'emb', sub: USER, iat: payload.iat, exp: payload.exp, kid }, SECRET);
-  assert.equal((await verifyEntitlementToken(emb, SECRET, { now: NOW })).reason, 'bad_type');
-  assert.equal((await verifyEntitlementToken(emb, SECRET, { now: NOW, typ: 'emb' })).ok, true);
+  const other = await signToken({ v: 3, typ: 'other', sub: USER, iat: payload.iat, exp: payload.exp, kid }, SECRET);
+  assert.equal((await verifyEntitlementToken(other, SECRET, { now: NOW })).reason, 'bad_type');
 });
 
 test('cookies: exact attribute sets', () => {
@@ -385,7 +380,7 @@ test('/api/me: 200 with both Set-Cookie headers, §7.1 shape, next_charge from t
   assert.equal(body.entitlement.tier, 'pro');
   assert.equal(body.entitlement.status, 'active');
   assert.equal(body.entitlement.plan, 'monthly');
-  assert.equal(body.entitlement.commercial, true);
+  assert.ok(!('commercial' in body.entitlement), 'the commercial field is gone from /api/me');
   assert.equal(body.entitlement.provider, 'testfixture');
   assert.deepEqual(body.entitlement.next_charge, { amount: '9.99', currency: 'GBP', tax_inclusive: true, at: iso(NOW + 20 * DAY) });
   assert.ok(!('row' in body.entitlement), 'no internal row leaks');
@@ -511,8 +506,6 @@ function accountStore(state) {
   return {
     subscriptionsFor: async (id) => state.subscriptions.filter((r) => r.user_id === id),
     profileFor: async (id) => (state.profile && state.profile.id === id ? state.profile : null),
-    embedTokensFor: async (id) => state.embedTokens.filter((r) => r.user_id === id),
-    embedCredentialsFor: async (ids) => state.credentials.filter((r) => ids.includes(r.token_id)),
     detachSubscriptions: async (id, nowIso) => {
       state.calls.push(['detach', id, nowIso]);
       const mine = state.subscriptions.filter((r) => r.user_id === id);
@@ -536,8 +529,6 @@ function accountState(overrides = {}) {
       stored({ status: 'active' }),
       stored({ id: 'aaaaaaaa-0000-4000-8000-000000000009', user_id: OTHER_USER, provider_subscription_id: 'sub_TESTFIXTURE_OTHER' }),
     ],
-    embedTokens: [{ id: 'e1', user_id: USER, token_id: 'et_TESTFIXTURE1', domains: ['clinic.example'], label: 'Clinic', created_at: iso(NOW) }],
-    credentials: [{ jti: 'ec_TESTFIXTURE1', token_id: 'et_TESTFIXTURE1', issued_at: iso(NOW), expires_at: iso(NOW + 30 * DAY) }],
     ...overrides,
   };
 }
@@ -557,8 +548,7 @@ test('/api/account/export: attachment JSON with only this account\'s data', asyn
   assert.ok(!('secret_column_that_should_not_leak' in body.profile), 'profile fields are allowlisted');
   assert.equal(body.subscriptions.length, 1);
   assert.equal(body.subscriptions[0].provider_subscription_id, 'sub_TESTFIXTURE0001', 'provider ids included');
-  assert.equal(body.embed_tokens.length, 1);
-  assert.equal(body.embed_credentials.length, 1);
+  assert.deepEqual(Object.keys(body).sort(), ['account', 'exported_at', 'note', 'ok', 'profile', 'subscriptions'], 'profile + subscriptions and nothing else');
   assert.match(body.note, /merchant of record/);
   assert.ok(!JSON.stringify(body).includes('sub_TESTFIXTURE_OTHER'), 'no other user\'s data');
   const unauth = await GET(new Request('https://helpmebreath.com/api/account/export'));
@@ -682,9 +672,10 @@ test('/api/account/delete: 401 without a live user; 405 on GET', async () => {
 
 /* ----------------------------------------------------------- retention ----- */
 
-test('retention: nine steps, payload nulling restricted to processed rows', () => {
+test('retention: eight steps, payload nulling restricted to processed rows', () => {
   const steps = retentionSteps(NOW);
-  assert.equal(steps.length, 9);
+  assert.equal(steps.length, 8);
+  assert.ok(!steps.some((s) => /embed/.test(s.name) || /embed/.test(s.path)), 'no step touches a table that is gone');
   const nulling = steps[0];
   assert.equal(nulling.name, 'webhook_payloads_nulled');
   assert.equal(nulling.method, 'PATCH');
@@ -727,8 +718,8 @@ test('retention handler: bearer-gated, runs every step, reports counts, 500 if a
   assert.equal(body.ok, false);
   assert.equal(body.results.webhook_payloads_nulled, 2);
   assert.equal(body.results.rate_limits_deleted, 'failed');
-  assert.equal(body.results.embed_credentials_deleted, 2, 'later steps still ran');
-  assert.equal(seen.length, 9);
+  assert.equal(body.results.devices_deleted, 2, 'every other step still ran');
+  assert.equal(seen.length, 8);
   assert.deepEqual(seen[0], ['PATCH', 'webhook_events']);
 
   const healthy = createRetentionHandler({ db: async () => [], cronSecret: 'TESTFIXTURE-cron-secret', now: () => NOW });
@@ -760,14 +751,13 @@ test('createStore: PostgREST paths are keyed on the uuid and refuse anything els
   await store.subscriptionsFor(USER);
   await store.detachSubscriptions(USER, iso(NOW));
   await store.unlinkTrialLedger(USER);
-  await store.embedCredentialsFor(['et_ok', 'bad;drop']);
   assert.equal(seen[0][1], `subscriptions?user_id=eq.${USER}&select=*&order=created_at.asc`);
   assert.equal(seen[1][0], 'PATCH');
   assert.deepEqual(seen[1][2], { user_id: null, detached_at: iso(NOW) });
   assert.equal(seen[1][3], 'return=representation');
   assert.equal(seen[2][1], `trial_claims?user_id=eq.${USER}`);
   assert.equal(seen[3][1], `devices?trial_user_id=eq.${USER}`);
-  assert.equal(seen[4][1], 'embed_credentials?token_id=in.(et_ok)&select=*&order=issued_at.asc');
+  assert.equal(seen.length, 4, 'the store reaches four tables and no others');
   await assert.rejects(() => store.subscriptionsFor('1 or 1=1'), TypeError);
   assert.throws(() => createStore(null), TypeError);
 });

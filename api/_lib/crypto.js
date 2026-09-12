@@ -8,7 +8,7 @@
  * Token format (docs/AGENT_BRIEF.md §7, widened by docs/private/ACCOUNTS_BILLING_DESIGN.md §7.2):
  *   base64url(JSON payload) + "." + base64url(HMAC-SHA256 over that first segment)
  *   v1 payload = { v:1, tier, sub, iat, exp, kid, act, dom? }           (legacy licence token)
- *   v3 payload = { v:3, typ:'ent'|'emb', sub, tier, st, plan, com, pe, iat, exp, kid, ... }
+ *   v3 payload = { v:3, typ:'ent', sub, tier, st, plan, pe, iat, exp, kid }
  *   (v2 was never shipped.) `verifyToken()` accepts v === 1 || v === 3 and checks
  *   nothing else about the shape; api/_lib/entitlement.js owns the v3 fields.
  *
@@ -223,7 +223,7 @@ export async function signToken(payload, secret) {
 }
 
 /**
- * Verify a signed token (v1 licence token or v3 entitlement / embed credential).
+ * Verify a signed token (a v1 licence token or a v3 entitlement token).
  *
  * Checks run in this order so the failure reason is always the most specific
  * one available: shape -> signature -> version -> kid -> expiry.
@@ -293,8 +293,9 @@ export async function verifyToken(token, secret, options = {}) {
 }
 
 /**
- * Build the payload object for a token. Kept here so the exact field set lives
- * in one place; api/license.js and api/entitlement.js both use it.
+ * Build the v1 payload object. Kept here so the exact field set lives in one
+ * place. The v1 licence model is retired; api/_lib/entitlement.js builds the
+ * v3 payload that replaced it.
  *
  * @param {{tier:string, sub:string, kid:string, act:number, days:number, domains?:string[], now?:number}} input
  * @returns {object} { v, tier, sub, iat, exp, kid, act, dom? }

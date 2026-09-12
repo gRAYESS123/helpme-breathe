@@ -11,7 +11,6 @@
  *   tier(), isPro(), requirePro(feature), onChange(cb), restore(), parseToken(),
  *   getLicenseInfo(), and the `hmb:paywall` event.
  *
- * Changed: isPractitioner() now returns the token's `com` (commercial) claim.
  * Removed: activate(key) and deactivate() — both keep a one-release stub that
  * logs a deprecation so a page still in a service-worker cache does not throw.
  *
@@ -35,7 +34,7 @@
  *      `hmb:auth` fires. Fire-and-forget; a failure changes nothing.
  *
  * Token v3 (design §7.2): base64url(JSON) + '.' + base64url(HMAC-SHA256),
- *   { v:3, typ:'ent', sub, tier:'pro'|'free', st, plan, com:0|1, pe, iat, exp, kid }
+ *   { v:3, typ:'ent', sub, tier:'pro'|'free', st, plan, pe, iat, exp, kid }
  *
  * Supabase proves WHO (js/auth.js); this token proves WHAT they may do. The
  * auth module is loaded lazily and defensively: it imports supabase-js from a
@@ -213,9 +212,8 @@ function evaluate(token) {
   const payload = parseToken(token);
   const empty = { tier: 'free', exp: 0, payload: null, token: token || null, fresh: false };
   if (!payload) return empty;
-  // Only an account entitlement counts. An embed credential ('emb') or a
-  // retired v1 licence token in this slot is decoded for display and ignored
-  // as a tier.
+  // Only an account entitlement counts. A retired v1 licence token in this
+  // slot is decoded for display and ignored as a tier.
   const isEnt = Number(payload.v) === TOKEN_VERSION && (payload.typ === 'ent' || payload.typ == null);
   const claimed = isEnt && TIERS.includes(payload.tier) ? payload.tier : 'free';
   const expMs = toMs(payload.exp);
@@ -515,15 +513,6 @@ export function isPro() {
   return state.tier === 'pro';
 }
 
-/**
- * The commercial-rights claim. There is one plan and it includes commercial
- * use, so the server sets `com: 1` on every pro token and this equals isPro().
- * Still exported because js/pro/* and /for-practitioners call it.
- */
-export function isPractitioner() {
-  return isPro() && Number(state.payload && state.payload.com) === 1;
-}
-
 /** True when a Supabase session exists (or, before the auth module reports in, when the last /api/me had a user). */
 export function signedIn() {
   if (auth) {
@@ -596,7 +585,7 @@ export function requireAccount(featureName) {
 
 /**
  * `data-open-timer` is a safety feature, not a config knob: the two crisis
- * pages, the embed frame and /s/ run the timer for anyone, forever.
+ * pages run the timer for anyone, forever.
  */
 function openTimerPage() {
   const value = document.body && document.body.dataset ? document.body.dataset.openTimer : undefined;
@@ -617,7 +606,7 @@ function openTimerPage() {
  */
 export function requireTimer(context = {}) {
   if (!hasDocument) return true;
-  if (openTimerPage()) return true; // crisis pages, embed, /s/
+  if (openTimerPage()) return true; // crisis pages
   if (isPro()) return true;
   const used = freeSessionsUsed(); // device counter, server-authoritative when online
   if (used < TIMER_FREE_SESSIONS) return true; // D1
@@ -688,11 +677,11 @@ export function onChange(cb) {
  * so existing pages keep reading the same shape.
  *
  * @returns {{
- *   tier:string, isPro:boolean, isPractitioner:boolean, hasLicense:boolean,
+ *   tier:string, isPro:boolean, hasLicense:boolean,
  *   exp:number, expiresAt:string|null, inGrace:boolean, graceEndsAt:string|null,
  *   canRenewSilently:boolean, activations:number|null, reference:string|null,
  *   keyId:string|null, domains:string[]|null, issuedAt:string|null,
- *   status:string, plan:string|null, commercial:boolean, periodEnd:string|null,
+ *   status:string, plan:string|null, periodEnd:string|null,
  *   account:{id:string,email:string|null}|null, signedIn:boolean,
  *   trialAvailable:boolean|null, trialReason:string|null,
  *   nextCharge:object|null, accessUntil:string|null, freeSessionsUsed:number
@@ -708,7 +697,6 @@ export function getLicenseInfo() {
   return {
     tier: state.tier,
     isPro: isPro(),
-    isPractitioner: isPractitioner(),
     hasLicense: !!state.token,
     exp: state.exp,
     expiresAt: expDate ? expDate.toISOString() : null,
@@ -722,7 +710,6 @@ export function getLicenseInfo() {
     issuedAt: issuedMs ? new Date(issuedMs).toISOString() : null,
     status: status(),
     plan,
-    commercial: isPractitioner(),
     periodEnd: periodMs ? new Date(periodMs).toISOString() : null,
     account: account(),
     signedIn: signedIn(),

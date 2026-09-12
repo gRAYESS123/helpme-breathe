@@ -1588,7 +1588,7 @@ function checkAdsTxt() {
  *
  * A stylesheet rule whose selector is scoped to the breathing section or to the
  * post-session slot may not use var(--clay). The commerce accent belongs on
- * /pro, /for-practitioners and the pricing matrix; the timer is not for sale.
+ * /pro; the timer is not for sale.
  */
 function checkClayOnTimer() {
   const TIMER_SCOPES = ['.breathing-section', '[data-slot="post-session"]', '.post-session-card', '.paywall-card'];
@@ -1676,22 +1676,20 @@ function checkVercelJson() {
  * docs/private/ACCOUNTS_BILLING_DESIGN.md section 15, task 12).
  *
  *  1. `data-open-timer` is a safety feature, not a config knob: it runs the
- *     timer for anyone, forever. It belongs on exactly four surfaces and must
- *     be present on the two crisis pages.
+ *     timer for anyone, forever. It belongs on the two crisis pages only, and
+ *     must be present there.
  *  2. No provider is named in api/ or js/ outside the seam (the adapters, the
  *     env registry, js/config.js and js/checkout.js), so one env var can swap
  *     the payment rail. And no trace of a second plan: one plan, no switch.
  *  3. The "no account / free forever" promises that were true before accounts
  *     existed must not come back. A short allowlist covers the sentences that
- *     are still true (the first three sessions, the widget, the client links).
+ *     are still true (the first three sessions).
  *  4. Gated timer pages keep `isAccessibleForFree: true`; the prose is never
  *     paywalled, so paywall structured data would be a false signal.
  */
 const OPEN_TIMER_ALLOWED = new Set([
   'breathing-exercises-anxiety.html',
   'breathing-exercises-for-panic-attacks.html',
-  'embed/v1/frame.html',
-  's/index.html',
 ]);
 const OPEN_TIMER_REQUIRED = ['breathing-exercises-anxiety.html', 'breathing-exercises-for-panic-attacks.html'];
 const PROVIDER_SEAM = ['api/_lib/providers/', 'api/_lib/env.js', 'js/config.js', 'js/checkout.js'];
@@ -1708,10 +1706,8 @@ const NO_ACCOUNT_RE = /\bno account\b/gi;
 const NO_ACCOUNT_ALLOW = [
   /(first|three|3)\b[^.]{0,80}sessions?[^.]{0,60}no account/i,
   /no account (is )?(needed|required) for the first/i,
-  /(visitors?|clients?|students?|people|they|widget|frame|embed|links?|session links?|it) (need|needs|require|requires) no account/i,
   /(without|with) (an? )?account/i,
   /no account manager/i,
-  /no account is (ever )?created for (them|clients|students|visitors)/i,
   /about having no account/i,
   /no account,? (no client record|no database)/i,
 ];
@@ -1726,7 +1722,7 @@ function checkAccountsModel() {
         page.file,
         body.line,
         'open-timer-allowlist',
-        'data-open-timer runs the timer for anyone, forever; it is allowed only on the two crisis pages, embed/v1/frame.html and s/index.html',
+        'data-open-timer runs the timer for anyone, forever; it is allowed only on the two crisis pages',
       );
     }
   }

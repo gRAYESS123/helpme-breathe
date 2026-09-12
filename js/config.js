@@ -75,8 +75,7 @@ export const CHECKOUT = Object.freeze({
 });
 
 /**
- * PLANS. One plan, everything included, for individuals and for people who
- * teach breathing alike; two billing intervals. Owner decisions of 2026-09-11
+ * PLANS. One plan, everything included; two billing intervals. Owner decisions of 2026-09-11
  * and 2026-09-12: there is no practitioner or therapist plan and there will
  * not be one, so nothing here is a switch. Everything downstream reads
  * `PLANS.available`.
@@ -93,7 +92,6 @@ const PLAN_DEFINITIONS = Object.freeze({
     currency: 'USD',
     interval: 'month',
     per: 'a month',
-    commercial: true,
   }),
   yearly: Object.freeze({
     key: 'yearly',
@@ -102,7 +100,6 @@ const PLAN_DEFINITIONS = Object.freeze({
     currency: 'USD',
     interval: 'year',
     per: 'a year',
-    commercial: true,
   }),
 });
 

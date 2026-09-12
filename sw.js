@@ -11,7 +11,7 @@
  * Webfonts are cross-origin: never precached, never intercepted.
  * Changing this file is what triggers the service-worker update.
  */
-const CACHE_NAME = 'hmb-v5-accounts-2026-09-12';
+const CACHE_NAME = 'hmb-v6-one-plan-2026-09-12';
 const OFFLINE_URL = '/offline.html';
 
 /**
@@ -52,7 +52,6 @@ const PRECACHE_URLS = [
   '/js/pro/night.js',
   '/js/pro/soundscapes.js',
   '/css/pro.css',
-  '/css/print.css',
   '/manifest.json',
   '/favicon.svg',
   '/favicon-32.png',
@@ -91,10 +90,8 @@ self.addEventListener('activate', (event) => {
 });
 
 /**
- * Never intercepted, never cached: the API (including the white-label embed
- * frame at /api/embed/frame, whose verdict is per request), and the account
- * surfaces, which carry a person's sign-in state and must always come from the
- * network (design section 15, task 12).
+ * Never intercepted, never cached: the API, and the account surfaces, which
+ * carry a person's sign-in state and must always come from the network.
  */
 const NEVER_CACHE = new Set([
   '/account',
@@ -103,8 +100,6 @@ const NEVER_CACHE = new Set([
   '/signin.html',
   '/auth/callback',
   '/auth/callback.html',
-  '/embed/v1/frame.html',
-  '/embed/v1/frame',
 ]);
 
 function isCacheable(url) {
@@ -116,10 +111,9 @@ function isCacheable(url) {
 
 /**
  * A navigation worth keeping on disk. Anything carrying a query string is not:
- * /pro/thanks arrives with a checkout reservation id, and /s/?c=… carries a
- * practitioner's name and message. Caching those would write them to
- * CacheStorage keyed on the full URL. They still work — they simply come from
- * the network every time, which is what a one-off activation link wants anyway.
+ * /pro/thanks arrives with a checkout reservation id. Caching it would write
+ * that id to CacheStorage keyed on the full URL. It still works; it simply
+ * comes from the network every time.
  */
 function isCacheableNavigation(url) {
   if (url.search) return false;

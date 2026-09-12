@@ -1,5 +1,5 @@
 -- 0001_accounts_billing.sql
--- Help Me Breathe — accounts, subscriptions, trial ledger, embed tokens.
+-- Help Me Breathe — accounts, subscriptions and the trial ledger.
 -- Run once in the Supabase SQL editor, on a project created after 2025-10-01
 -- (asymmetric JWT signing keys by default).
 
@@ -123,7 +123,7 @@ create index if not exists trial_claims_user_idx   on public.trial_claims (user_
 create index if not exists trial_claims_device_idx on public.trial_claims (device_id);
 
 -- ------------------------------------------------------- checkout_intents --
--- THE SECURITY PIVOT. Commercial terms are decided here, server-side, and the
+-- THE SECURITY PIVOT. Price, plan and trial are decided here, server-side, and the
 -- browser only ever carries an opaque reservation_id. Nothing in custom_data is
 -- trusted on the way back (§5.4, §6.3).
 create table if not exists public.checkout_intents (
@@ -145,37 +145,6 @@ create table if not exists public.checkout_intents (
 
 create index if not exists checkout_intents_user_idx on public.checkout_intents (user_id, created_at desc);
 create index if not exists checkout_intents_txn_idx  on public.checkout_intents (provider, provider_transaction_id);
-
--- ------------------------------------------------------ embed credentials --
--- A subscriber manages a CREDENTIAL GROUP (embed_tokens). Each issued token is
--- its own row (embed_credentials) with its own jti, so rotation can expire the
--- old one after an overlap and revocation can kill every jti in the group.
-create table if not exists public.embed_tokens (
-  id            uuid primary key default gen_random_uuid(),
-  user_id       uuid not null references auth.users(id) on delete cascade,
-  token_id      text not null unique,       -- the group id, shown on /account
-  domains       text[] not null default '{}',
-  label         text,
-  created_at    timestamptz not null default now(),
-  revoked_at    timestamptz,
-  last_seen_at  timestamptz,
-  hit_count     bigint not null default 0,
-  verify_count_30d bigint not null default 0   -- so the owner can see outsized volume
-);
-
-create table if not exists public.embed_credentials (
-  jti          text primary key,
-  token_id     text not null references public.embed_tokens(token_id) on delete cascade,
-  issued_at    timestamptz not null default now(),
-  expires_at   timestamptz not null,
-  superseded_at timestamptz,        -- set on rotation; hard-expires 48h later
-  revoked_at   timestamptz,
-  last_seen_at timestamptz,
-  hit_count    bigint not null default 0
-);
-
-create index if not exists embed_tokens_user_idx on public.embed_tokens (user_id);
-create index if not exists embed_credentials_group_idx on public.embed_credentials (token_id);
 
 -- ---------------------------------------------------------- webhook_events --
 -- Idempotency, replay defence, RETRY LEDGER and a forensic trail for disputes.
@@ -236,8 +205,7 @@ do $$
 declare t text;
 begin
   foreach t in array array['profiles','subscriptions','devices','trial_claims',
-                           'checkout_intents','embed_tokens','embed_credentials',
-                           'webhook_events','rate_limits']
+                           'checkout_intents','webhook_events','rate_limits']
   loop
     execute format('alter table public.%I enable row level security', t);
     execute format('alter table public.%I force row level security', t);

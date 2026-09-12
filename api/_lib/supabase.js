@@ -746,8 +746,7 @@ export async function rpc(fn, args = {}, options = {}) {
 
 /**
  * Authoritative "is this session still alive" check for money-touching calls
- * only (start checkout, mint an embed token, cancel, pause, switch, export,
- * delete). Verifies the JWT locally first — garbage never reaches the network —
+ * only (start checkout, cancel, pause, switch, export, delete). Verifies the JWT locally first — garbage never reaches the network —
  * then asks GET /auth/v1/user with the user's own bearer token and the
  * PUBLISHABLE key in `apikey`. Catches a session signed out or revoked while
  * its JWT is still inside its hour.

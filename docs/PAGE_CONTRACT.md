@@ -19,7 +19,7 @@ Rules that are not negotiable:
 - No inline `onclick`. `data-action` only.
 - No ad slot, no paywall prompt, no email capture and no affiliate link on
   `/breathing-exercises-anxiety`, `/breathing-exercises-for-panic-attacks`,
-  `/pro`, `/pro/thanks`, `/for-practitioners` or `/embed`.
+  `/pro` or `/pro/thanks`.
 - Never put "Wim Hof" in a title, H1, meta description or slug.
 - **No emoji. Anywhere. In any file.** Not in nav labels, not in card titles,
   not in a favicon data URI, not in a footer.
@@ -190,7 +190,6 @@ allowed.
                 <a href="/timer">Timer</a>
                 <a href="/guides">Guides</a>
                 <a href="/science">Science</a>
-                <a href="/for-practitioners">For practitioners</a>
                 <a href="/pro">Pro</a>
             </nav>
         </div>
@@ -267,7 +266,7 @@ role on the left, dates in tabular figures on the right.
 reviewed by anyone, it says Published and Updated and nothing else. Writing
 "Reviewed by …" for a review that did not happen is a fabricated credential.
 
-On a page with no author strip (a legal page, `/embed`), drop `.article-meta`
+On a page with no author strip (a legal page, `/pro`), drop `.article-meta`
 and keep the breadcrumb, `h1` and lead.
 
 ## 4. The timer section — exact snippet
@@ -573,7 +572,7 @@ sideways. Numeric columns get `class="num"` for tabular figures.
 
 Four link columns, an authorship byline naming a person, then the legal row.
 Drop the link to the page you are on. On the crisis-safe pages, remove the
-`/pro` and `/for-practitioners` links.
+`/pro` link.
 
 ```html
 <footer class="footer">
@@ -611,9 +610,6 @@ Drop the link to the page you are on. On the crisis-safe pages, remove the
             <p class="footer-heading">The site</p>
             <a href="/about">About</a>
             <a href="/pro">Pro</a>
-            <a href="/for-practitioners">For practitioners</a>
-            <a href="/embed">Embed the timer</a>
-            <a href="/handouts">Printable handouts</a>
         </nav>
     </div>
 
@@ -665,9 +661,7 @@ No matrix, no tiers, no ticks and crosses. `--clay` appears on the price and
 the button here and on the home page's `.plan-band`, and nowhere near the
 timer.
 
-`/for-practitioners` points at the same plan with a ruled list of what it
-means for a practitioner and one `data-plan="yearly"` button. The
-`.pricing-matrix` classes still exist in `css/styles.css` for any old page
+The `.pricing-matrix` classes still exist in `css/styles.css` for any old page
 that has not been converted; do not build new ones.
 
 Structured data on `/pro`: two `Offer`s (10.00 USD, `unitCode` `MON`; 100.00
@@ -693,7 +687,7 @@ the CSS prints then has a real accessible counterpart.
 Height is reserved in CSS (280px, or 90px for the leaderboard variant) so
 toggling measures CLS 0. `body.session-active .ad-slot { display: none }` hides
 them while someone is breathing, and
-`body[data-tier="pro"|"practitioner"|"studio"] .ad-slot { display: none }` keeps
+`body[data-tier="pro"] .ad-slot { display: none }` keeps
 a paying customer from ever seeing reserved ad space (`js/ads.js` also removes
 the nodes outright).
 
@@ -702,7 +696,7 @@ never between the Begin button and the circle. At most two in-content units per
 page. Add `<script type="module" src="/js/ads.js"></script>`.
 
 **Forbidden:** `/`, `/timer`, any technique landing page's timer viewport, `/pro`,
-`/pro/thanks`, `/for-practitioners`, `/embed`, `/breathing-exercises-anxiety`,
+`/pro/thanks`, `/breathing-exercises-anxiety`,
 `/breathing-exercises-for-panic-attacks`.
 
 Any monetisation ask that is not an ad slot (tip button, upgrade card, capture

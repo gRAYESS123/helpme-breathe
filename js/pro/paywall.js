@@ -58,10 +58,6 @@ const FEATURE_COPY = {
     name: 'Shareable pattern links',
     line: 'Send a pattern to someone as a link that opens the timer already set up.',
   },
-  'handout-branding': {
-    name: 'Branded handouts',
-    line: 'Printable handouts with your own name and logo are part of the plan, alongside client links and the white-label embed.',
-  },
 };
 
 const shownFeatures = new Set();

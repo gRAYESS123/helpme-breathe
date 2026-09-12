@@ -387,7 +387,7 @@ test('priceIdFor reads the server env and never a browser value', () => {
   assert.throws(() => priceIdFor({ plan: 'lifetime' }, ENV), /Unknown plan/);
   // One plan, two billing periods: anything else is an unknown plan, including
   // the second plan the design once reserved room for.
-  assert.throws(() => priceIdFor({ plan: 'practitioner_yearly', trial: false }, ENV), /Unknown plan/);
+  assert.throws(() => priceIdFor({ plan: 'retired_second_plan', trial: false }, ENV), /Unknown plan/);
   assert.throws(() => priceIdFor({ plan: 'monthly', trial: false }, { ...ENV, MOR_PRICE_MONTHLY: '' }), /Missing environment variable MOR_PRICE_MONTHLY/);
   assert.deepEqual(planForPriceId(ENV.MOR_PRICE_YEARLY_TRIAL, ENV), { plan: 'yearly', trial: true });
   assert.equal(isTrialPriceId(ENV.MOR_PRICE_MONTHLY_TRIAL, ENV), true);

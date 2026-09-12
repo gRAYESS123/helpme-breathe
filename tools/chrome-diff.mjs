@@ -31,9 +31,7 @@ const SKIP_PATHS = ['docs/private', 'tools/render/out'];
 
 /* Pages that legitimately carry no site chrome. Each one says why. */
 const EXEMPT = new Map([
-  ['embed/v1/frame.html', 'the embedded widget: zero third-party requests, no site chrome'],
   ['render.html', 'headless capture surface — a header would appear in every clip'],
-  ['s/index.html', 'client session link; a verified licence strips the chrome'],
 ]);
 
 /**
@@ -60,16 +58,16 @@ function exemptFrom(file, blockName) {
  * decision written down somewhere, not a licence to drift.
  *
  *   - AGENT_BRIEF hard rule 5: the two crisis-safe pages carry zero
- *     monetisation surfaces, so /pro and /for-practitioners come off.
+ *     monetisation surfaces, so /pro comes off.
  *   - /legal/medical-disclaimer carries five suicide helplines; the same
  *     omission was kept there as a judgement call (see OWNER_REVIEW_FLAGS).
  *   - On /about the byline's "what that means" link would be a self-link, so
  *     it points at the medical disclaimer instead.
  */
 const ALLOWED_DIFFS = new Map([
-  ['breathing-exercises-anxiety.html', { extra: [], gone: ['/pro|Pro', '/for-practitioners|For practitioners'] }],
-  ['breathing-exercises-for-panic-attacks.html', { extra: [], gone: ['/pro|Pro', '/for-practitioners|For practitioners'] }],
-  ['legal/medical-disclaimer.html', { extra: [], gone: ['/pro|Pro', '/for-practitioners|For practitioners'] }],
+  ['breathing-exercises-anxiety.html', { extra: [], gone: ['/pro|Pro'] }],
+  ['breathing-exercises-for-panic-attacks.html', { extra: [], gone: ['/pro|Pro'] }],
+  ['legal/medical-disclaimer.html', { extra: [], gone: ['/pro|Pro'] }],
   [
     'about.html',
     {

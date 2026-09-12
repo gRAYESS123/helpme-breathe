@@ -3,7 +3,7 @@
  *
  * api/_lib/ratelimit.js is in-memory and per-instance; its own header says it
  * "is not a security control". The endpoints that gate money (trial
- * eligibility, checkout, embed-token minting, billing changes) use this one
+ * eligibility, checkout, billing changes) use this one
  * instead: a fixed-window counter in public.rate_limits, bumped atomically by
  * the `bump_rate_limit(p_bucket, p_window_seconds, p_limit)` function from
  * supabase/migrations/0001_accounts_billing.sql (design §3.2), which returns

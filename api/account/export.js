@@ -5,10 +5,10 @@
  *   Authorization: Bearer <supabase access token>   (assertLiveUser — money-adjacent)
  *
  * Returns `Content-Disposition: attachment` JSON containing: the `profiles`
- * row, every `subscriptions` row (provider ids included), every `embed_tokens`
- * and `embed_credentials` row, and a note that the merchant of record holds its
- * own copy as a separate controller. No hashes, no peppers, no other user's
- * data — every query is keyed on the verified JWT `sub`.
+ * row, every `subscriptions` row (provider ids included), and a note that the
+ * merchant of record holds its own copy as a separate controller. Those two
+ * tables are everything an account owns. No hashes, no peppers, no other
+ * user's data — every query is keyed on the verified JWT `sub`.
  *
  * `createExportHandler(deps)` is exported for the test suite.
  */
@@ -41,8 +41,6 @@ const SUBSCRIPTION_FIELDS = [
   'next_billed_at', 'cancel_at', 'canceled_at', 'paused_at', 'resume_at', 'past_due_since', 'access_until',
   'display_amount', 'display_currency', 'display_tax_inclusive', 'dispute_open', 'live', 'created_at', 'updated_at',
 ];
-const EMBED_TOKEN_FIELDS = ['id', 'token_id', 'domains', 'label', 'created_at', 'revoked_at', 'last_seen_at', 'hit_count', 'verify_count_30d'];
-const EMBED_CREDENTIAL_FIELDS = ['jti', 'token_id', 'issued_at', 'expires_at', 'superseded_at', 'revoked_at', 'last_seen_at', 'hit_count'];
 
 function pick(row, fields) {
   const out = {};
@@ -75,12 +73,10 @@ export function createExportHandler(deps) {
       }
       const sub = identity.sub;
 
-      const [profile, subscriptions, embedTokens] = await Promise.all([
+      const [profile, subscriptions] = await Promise.all([
         store.profileFor(sub),
         store.subscriptionsFor(sub),
-        store.embedTokensFor(sub),
       ]);
-      const credentials = await store.embedCredentialsFor(embedTokens.map((row) => row.token_id));
 
       const body = {
         ok: true,
@@ -91,8 +87,6 @@ export function createExportHandler(deps) {
         },
         profile: profile ? pick(profile, PROFILE_FIELDS) : null,
         subscriptions: subscriptions.map((row) => pick(row, SUBSCRIPTION_FIELDS)),
-        embed_tokens: embedTokens.map((row) => pick(row, EMBED_TOKEN_FIELDS)),
-        embed_credentials: credentials.map((row) => pick(row, EMBED_CREDENTIAL_FIELDS)),
         note: CONTROLLER_NOTE,
       };
 

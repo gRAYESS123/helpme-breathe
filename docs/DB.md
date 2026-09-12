@@ -16,12 +16,13 @@ device before sign-in; **one plan**, `monthly` ($10) or `yearly` ($100),
 everything included; **D3** a 3-day card-required trial, one per person,
 locked by a MAC'd device cookie and a peppered email hash.
 
-> **2026-09-12.** The `plan` enums used to carry a third value,
-> `practitioner_yearly`, so that offering a separate practitioner plan would be
-> a config change rather than a migration. The owner closed that option
-> permanently. The value is gone from both check constraints in
-> `supabase/migrations/0001_accounts_billing.sql`, which is an edit rather than
-> a `0002` because `0001` has not been run anywhere yet.
+> **2026-09-12.** The `plan` enums used to carry a third value, for a separate
+> professional plan, so that offering one would be a config change rather than a
+> migration. The owner closed that option permanently, along with the whole
+> layer built on top of it and its two credential tables. The value is gone from
+> both check constraints, and the tables from the schema, in
+> `supabase/migrations/0001_accounts_billing.sql` — an edit rather than a `0002`
+> because `0001` has not been run anywhere yet.
 
 ---
 
@@ -30,9 +31,7 @@ locked by a MAC'd device cookie and a peppered email hash.
 ```
 auth.users ─────┬──< profiles            (cascade)     one row per account
  (Supabase)     ├──< subscriptions       (SET NULL)    one row per MoR subscription; detaches on delete
-                ├──< checkout_intents    (cascade)     one row per checkout attempt; the reservation
-                └──< embed_tokens        (cascade)     credential groups
-                        └──< embed_credentials (cascade)  one row per issued jti
+                └──< checkout_intents    (cascade)     one row per checkout attempt; the reservation
 
 devices         no FK — outlives the account (device half of the trial lock, D1 counter)
 trial_claims    no FK — outlives the account (email half of the trial lock)
@@ -40,7 +39,7 @@ webhook_events  no FK — idempotency + retry ledger + forensic trail
 rate_limits     no FK — fixed-window counters for the money endpoints
 ```
 
-Nine tables. Every timestamp is `timestamptz`. Every primary key that is not a
+Seven tables. Every timestamp is `timestamptz`. Every primary key that is not a
 natural key is a `uuid` from `gen_random_uuid()` (pgcrypto).
 
 ### The three deliberate non-cascades
@@ -51,9 +50,8 @@ natural key is a `uuid` from `gen_random_uuid()` (pgcrypto).
 | `trial_claims` | none (`user_id` is a bare uuid) | Same: the email hash must survive the account, or one trial per person is unenforceable. |
 | `subscriptions` | `user_id ... on delete set null` | Draft 1 cascaded it, which meant a deleted account with a still-live merchant-of-record subscription orphaned every later webhook. Now the row **detaches** (`user_id = null`, `detached_at` set) and is kept, so reconciliation still works (§11.5). |
 
-Everything else (`profiles`, `checkout_intents`, `embed_tokens`,
-`embed_credentials`) cascades from the account, because none of it has meaning
-without one.
+Everything else (`profiles`, `checkout_intents`) cascades from the account,
+because neither has meaning without one.
 
 ---
 
@@ -96,7 +94,7 @@ the SQL editor.
 
 Legend for the **Written by** column: task numbers are the build plan in §15
 (`3` = entitlement-core, which also owns `api/cron/retention.js`; `4` = trial-guard;
-`5` = mor-adapters, which also owns `api/cron/reconcile.js`; `8` = embed-credentials;
+`5` = mor-adapters, which also owns `api/cron/reconcile.js`;
 `12` = cleanup-integrate). The design's §3.4 says the crons are "task 13"; its §15
 ownership table has no task 13, and that table wins.
 
@@ -236,7 +234,7 @@ anonymous data — we hold the pepper — which is why it has a 24-month ceiling
 
 ### 3.5 `public.checkout_intents` — the reservation; the security pivot
 
-Commercial terms are decided **here, server-side**, by `POST
+Price, plan and trial are decided **here, server-side**, by `POST
 /api/trial/eligibility`, and the browser only ever carries the opaque
 `reservation_id` (as `custom_data.rid` on the provider transaction). Nothing
 that comes back through the browser is trusted: at first webhook contact the
@@ -263,44 +261,7 @@ whether a trial was granted, which price — is read from here (§5.4, §6.3).
 **Indexes:** `checkout_intents_user_idx (user_id, created_at desc)`,
 `checkout_intents_txn_idx (provider, provider_transaction_id)`.
 
-### 3.6 `public.embed_tokens` — a subscriber's credential groups
-
-A subscriber manages a **credential group** on `/account`. Each issued token
-is its own row in `embed_credentials` with its own `jti`, so rotation can
-expire the old one after an overlap and revocation can kill every `jti` in
-the group at once (§9.3). Cascades from the account.
-
-| Column | Type | Null | Default | Meaning | Written by |
-|---|---|---|---|---|---|
-| `id` | `uuid` PK | no | `gen_random_uuid()` | Local row id. | 8 |
-| `user_id` | `uuid` → `auth.users(id)` cascade | no | — | The subscriber. | 8 |
-| `token_id` | `text` unique | no | — | The group id (`et_…`), shown on `/account` and carried as `gid` in the credential payload. | 8 |
-| `domains` | `text[]` | no | `'{}'` | Hostnames the white-label frame may be embedded on. Checked at frame-document time against `Referer` (§9.2). | 8 |
-| `label` | `text` | yes | — | The subscriber's own name for it ("Clinic homepage"). | 8 |
-| `created_at` | `timestamptz` | no | `now()` | | 8 |
-| `revoked_at` | `timestamptz` | yes | — | Set by `DELETE /api/embed/token`. Invalidates **every** `jti` in the group immediately. | 8 |
-| `last_seen_at` | `timestamptz` | yes | — | Last verified render. | 8 |
-| `hit_count` | `bigint` | no | `0` | Verified renders, sampled 1-in-10 to keep the write cheap (§9.4). | 8 |
-| `verify_count_30d` | `bigint` | no | `0` | Rolling 30-day count, so the owner can see one subscriber serving outsized volume — the fair-use signal (§9.5). Maintained by task 8; the roll-off is task 8's to define. | 8 |
-
-**Indexes:** `embed_tokens_user_idx (user_id)`.
-
-### 3.7 `public.embed_credentials` — one row per issued embed credential
-
-| Column | Type | Null | Default | Meaning | Written by |
-|---|---|---|---|---|---|
-| `jti` | `text` PK | no | — | The credential id (`ec_…`) carried in the `typ: 'emb'` token payload. | 8 |
-| `token_id` | `text` → `embed_tokens(token_id)` cascade | no | — | The group. | 8 |
-| `issued_at` | `timestamptz` | no | `now()` | | 8 |
-| `expires_at` | `timestamptz` | no | — | Token `exp` (30 days from issue). | 8 |
-| `superseded_at` | `timestamptz` | yes | — | Set on rotation (`GET /api/embed/token?rotate=1`). The credential hard-expires **48 hours** after this, long enough for a cached snippet to keep working while the subscriber updates it. | 8 |
-| `revoked_at` | `timestamptz` | yes | — | Per-credential revocation, in addition to the group-level `embed_tokens.revoked_at`. | 8 |
-| `last_seen_at` | `timestamptz` | yes | — | | 8 |
-| `hit_count` | `bigint` | no | `0` | Sampled verified renders for this `jti`; `/account` shows it so a subscriber can see what is out there. | 8 |
-
-**Indexes:** `embed_credentials_group_idx (token_id)`.
-
-### 3.8 `public.webhook_events` — idempotency, replay defence, retry ledger, forensic trail
+### 3.6 `public.webhook_events` — idempotency, replay defence, retry ledger, forensic trail
 
 `status` is a **state machine**, not a flag: `received` → `processed` |
 `ignored` | `failed`. A `failed` row is re-claimable (a provider retry or a
@@ -325,7 +286,7 @@ returning status` — zero rows back means already processed.
 **Indexes:** `webhook_events_received_idx (received_at desc)`,
 `webhook_events_failed_idx (status, received_at desc) where status <> 'processed'`.
 
-### 3.9 `public.rate_limits` — fixed-window counters
+### 3.7 `public.rate_limits` — fixed-window counters
 
 `api/_lib/ratelimit.js` is in-memory and per-instance; its own header says it
 "is not a security control". The design puts `POST /api/trial/eligibility`
@@ -381,7 +342,7 @@ code path that creates a profile.
 ### 4.3 `public.touch_updated_at()` — triggers `*_touch`
 
 `before update` on `profiles`, `subscriptions` and `trial_claims` — the three
-tables that carry `updated_at`. Sets `new.updated_at = now()`. The other six
+tables that carry `updated_at`. Sets `new.updated_at = now()`. The other four
 tables have no `updated_at` and no touch trigger.
 
 ---
@@ -401,7 +362,6 @@ Every rule, the exact statement, and the reason. The job is owned by task 3
 | 6 | `delete from public.trial_claims where claimed_at < now() - interval '24 months'` | **A real ceiling, not "indefinitely."** The hash is pseudonymised personal data (we hold the pepper). 24 months is longer than anyone's patience for trial-hopping and short enough to defend (§11.4). |
 | 7 | `delete from public.devices where coalesce(trial_consumed_at, last_seen_at) < now() - interval '24 months'` | Same ceiling for the device half, measured from last activity. |
 | 8 | `delete from public.rate_limits where window_start < now() - interval '2 days'` | Windows are seconds to hours long; two days is generous. |
-| 9 | `delete from public.embed_credentials where expires_at < now() - interval '30 days'` | An expired credential is dead weight after a month; the row is dropped. Groups (`embed_tokens`) are never auto-deleted. |
 
 **Stated retention, as the privacy policy will phrase it (§11.4):** account
 data while the account exists plus 30 days; invoices at the merchant of
@@ -452,9 +412,6 @@ where status in ('active','trialing') and access_until > now() group by 1;
 select date_trunc('month', canceled_at) as m, count(*) from public.subscriptions
 where canceled_at is not null group by 1 order by 1 desc limit 6;
 
--- one subscriber serving outsized embed volume (the fair-use signal)
-select token_id, verify_count_30d from public.embed_tokens order by 2 desc limit 10;
-
 -- anything the webhook pipeline has not finished with
 select provider, event_id, event_type, status, attempts, error, received_at
 from public.webhook_events where status <> 'processed' order by received_at desc;
@@ -483,8 +440,7 @@ leaves billing running is the worst possible outcome:
    provider ids kept. (The FK's `on delete set null` would null `user_id`
    anyway; the explicit step is what stamps `detached_at`, so the row is not
    mistaken for an orphan.)
-4. Delete the `auth.users` row → cascades `profiles`, `checkout_intents`,
-   `embed_tokens` and, through it, `embed_credentials`.
+4. Delete the `auth.users` row → cascades `profiles` and `checkout_intents`.
 5. Null `trial_claims.user_id` and `devices.trial_user_id`; keep the hashes
    until the 24-month ceiling, so the person cannot take a second trial by
    deleting and re-creating the account.
@@ -510,6 +466,8 @@ migration.
   store.
 - **No licence keys, activations, seats or domain counts.** The one-plan model
   has none.
+- **No credential tables.** There is nothing to issue: one plan, used by the
+  person who bought it, on this site.
 - **No raw email in the trial ledger.** Only the peppered HMAC.
 - **No analytics.** GA4 events are client-side and consent-gated; nothing
   here is exported to it.

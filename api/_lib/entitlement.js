@@ -214,22 +214,6 @@ export function winningRow(rows) {
 }
 
 /**
- * Whether a plan carries commercial rights — the `com` claim (§7.2).
- *
- * There is one plan and it includes everything, so every known plan is
- * commercial and every live pro entitlement carries `com: 1`. (The design once
- * allowed a second, practitioner-only plan that would have narrowed this; the
- * owner closed that option on 2026-09-12 and the switch is gone.)
- *
- * @param {string|null} plan
- * @returns {boolean}
- */
-export function commercialFor(plan) {
-  if (!plan) return false;
-  return PLANS.includes(String(plan));
-}
-
-/**
  * The effective entitlement for one user — §6.5 columns 3 and 4 as data.
  *
  * Reads `access_until` exactly as stored; never recomputes it. A row with no
@@ -239,7 +223,7 @@ export function commercialFor(plan) {
  * @param {object[]|null|undefined} rows every `subscriptions` row for the user
  * @param {number|string|Date} [now]
  * @returns {{
- *   tier:'pro'|'free', status:string, plan:string|null, commercial:boolean,
+ *   tier:'pro'|'free', status:string, plan:string|null,
  *   trial_ends_at:string|null, current_period_end:string|null, cancel_at:string|null,
  *   access_until:string|null, access_until_ms:number|null,
  *   next_charge:{amount:string|null, currency:string|null, tax_inclusive:boolean|null, at:string|null}|null,
@@ -264,7 +248,6 @@ export function entitlementFor(rows, now) {
     tier,
     status,
     plan,
-    commercial: live && commercialFor(plan),
     trial_ends_at: toIso(trialEndsMs),
     current_period_end: toIso(periodEndMs),
     cancel_at: toIso(cancelAtMs),
@@ -339,10 +322,10 @@ function uiTextFor(status, live, dates) {
  *   exp = iat + 14 days                            for a free token (grants nothing)
  *
  * @param {{
- *   sub:string, tier:'pro'|'free', status?:string, plan?:string|null, commercial?:boolean,
+ *   sub:string, tier:'pro'|'free', status?:string, plan?:string|null,
  *   accessUntilMs?:number|null, periodEndMs?:number|null, kid:string, now?:number
  * }} input
- * @returns {{v:3, typ:'ent', sub:string, tier:string, st:string, plan:string|null, com:0|1, pe:number, iat:number, exp:number, kid:string}}
+ * @returns {{v:3, typ:'ent', sub:string, tier:string, st:string, plan:string|null, pe:number, iat:number, exp:number, kid:string}}
  */
 export function buildEntitlementPayload(input) {
   if (!input || typeof input.sub !== 'string' || !input.sub) {
@@ -368,7 +351,6 @@ export function buildEntitlementPayload(input) {
     tier,
     st: typeof input.status === 'string' && input.status ? input.status : 'none',
     plan: input.plan && PLANS.includes(String(input.plan)) ? String(input.plan) : null,
-    com: input.commercial ? 1 : 0,
     pe: pe == null ? 0 : Math.floor(pe / 1000),
     iat,
     exp,
@@ -390,7 +372,6 @@ export async function signEntitlement(input) {
     tier: entitlement.tier,
     status: entitlement.status,
     plan: entitlement.plan,
-    commercial: entitlement.commercial,
     accessUntilMs: entitlement.access_until_ms,
     periodEndMs: toMs(entitlement.trial_ends_at) ?? toMs(entitlement.current_period_end),
     kid,
@@ -403,14 +384,15 @@ export async function signEntitlement(input) {
 /**
  * Verify a v3 entitlement token. No grace past `exp` — the 14 days IS the grace.
  *
+ * `typ: 'ent'` is the only token type there is.
+ *
  * @param {string} token
  * @param {string} secret
- * @param {{now?:number, expectedKid?:string, typ?:'ent'|'emb'}} [options]
+ * @param {{now?:number, expectedKid?:string}} [options]
  * @returns {Promise<{ok:boolean, payload:object|null, reason:string}>}
  *   reason adds `bad_type` to verifyToken()'s list.
  */
 export async function verifyEntitlementToken(token, secret, options = {}) {
-  const typ = options.typ || 'ent';
   const result = await verifyToken(token, secret, {
     now: options.now,
     expectedKid: options.expectedKid,
@@ -418,7 +400,7 @@ export async function verifyEntitlementToken(token, secret, options = {}) {
   });
   if (!result.ok) return result;
   const payload = result.payload;
-  if (payload.v !== 3 || payload.typ !== typ || typeof payload.sub !== 'string' || !payload.sub) {
+  if (payload.v !== 3 || payload.typ !== 'ent' || typeof payload.sub !== 'string' || !payload.sub) {
     return { ok: false, payload, reason: 'bad_type' };
   }
   return result;
@@ -511,14 +493,6 @@ export function createStore(db) {
     async profileFor(userId) {
       const rows = asArray(await db(`profiles?id=eq.${uuid(userId)}&select=*&limit=1`));
       return rows[0] || null;
-    },
-    async embedTokensFor(userId) {
-      return asArray(await db(`embed_tokens?user_id=eq.${uuid(userId)}&select=*&order=created_at.asc`));
-    },
-    async embedCredentialsFor(tokenIds) {
-      const ids = (tokenIds || []).map((id) => String(id)).filter((id) => /^[A-Za-z0-9_-]+$/.test(id));
-      if (ids.length === 0) return [];
-      return asArray(await db(`embed_credentials?token_id=in.(${ids.join(',')})&select=*&order=issued_at.asc`));
     },
     /** §11.5 step 3: detach, never cascade. Provider ids are kept. */
     async detachSubscriptions(userId, nowIso) {

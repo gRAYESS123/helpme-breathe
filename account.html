@@ -6,7 +6,7 @@
     <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
     <title>Your account — Help Me Breathe</title>
-    <meta name="description" content="Your Help Me Breathe account: the plan you are on, billing, embed credentials, a copy of your data, and how to delete the account.">
+    <meta name="description" content="Your Help Me Breathe account: the plan you are on, billing, a copy of your data, and how to delete the account.">
 
     <meta name="robots" content="noindex, nofollow">
     <meta name="referrer" content="no-referrer">
@@ -75,7 +75,6 @@
                 <a href="/timer">Timer</a>
                 <a href="/guides">Guides</a>
                 <a href="/science">Science</a>
-                <a href="/for-practitioners">For practitioners</a>
                 <a href="/pro">Pro</a>
             </nav>
         </div>
@@ -90,7 +89,7 @@
                 </ol>
             </nav>
             <h1>Your account</h1>
-            <p class="lead">Your plan, what is charged and when, your embed credentials, and everything we hold about you.</p>
+            <p class="lead">Your plan, what is charged and when, and everything we hold about you.</p>
         </header>
 
         <main id="main">
@@ -187,52 +186,11 @@
                 </div>
             </section>
 
-            <section class="account-section" data-role="embed-section" hidden>
-                <h2>Embed credentials</h2>
-                <p>A credential lets the timer run on your own site without our attribution, on the domains you name.
-                Each credential lasts 30 days and renews when you rotate it.</p>
-
-                <p class="auth-note" data-role="embed-locked" hidden>Embed credentials become available when you subscribe.</p>
-
-                <div data-role="embed-body" hidden>
-                    <p class="account-loading" data-role="embed-loading">Loading your credentials…</p>
-                    <ul class="cred-list" data-role="cred-list"></ul>
-                    <p data-role="cred-empty" hidden>You have no credentials yet. Make one below.</p>
-
-                    <h3>New credential</h3>
-                    <div class="cred-form">
-                        <div>
-                            <label class="auth-label" for="cred-domains">Domains, one per line</label>
-                            <textarea id="cred-domains" rows="3" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
-                        </div>
-                        <div>
-                            <label class="auth-label" for="cred-label">Label, so you know which site this is</label>
-                            <input class="auth-input" id="cred-label" type="text" maxlength="60" autocomplete="off">
-                        </div>
-                        <div class="btn-row">
-                            <button type="button" class="btn btn--primary" data-role="cred-create">Create credential</button>
-                        </div>
-                    </div>
-
-                    <div class="snippet-box" data-role="snippet-box" hidden>
-                        <label class="auth-label" for="cred-snippet">Paste this into your page</label>
-                        <textarea id="cred-snippet" readonly></textarea>
-                        <div class="btn-row">
-                            <button type="button" class="btn" data-role="copy-snippet">Copy snippet</button>
-                        </div>
-                        <p class="auth-note">This is the only time we show it in full. Rotate the credential if you lose it.</p>
-                    </div>
-
-                    <p class="account-ok" data-role="embed-ok" aria-live="polite"></p>
-                    <p class="account-error" data-role="embed-error" aria-live="polite"></p>
-                </div>
-            </section>
-
             <section class="account-section" data-role="data-section" hidden>
                 <h2>Your data</h2>
-                <p>Export gives you a JSON file with your profile, every subscription record, and every embed
-                credential. Payments are handled by a merchant of record, which keeps its own copy of your payment
-                records as a separate data controller.</p>
+                <p>Export gives you a JSON file with your profile and every subscription record. Payments are handled by a
+                merchant of record, which keeps its own copy of your payment records as a separate data
+                controller.</p>
 
                 <div class="account-actions">
                     <button type="button" class="btn" data-role="export">Export my data</button>
@@ -295,9 +253,7 @@
                 <nav class="footer-nav" aria-label="About and products">
                     <p class="footer-heading">The site</p>
                     <a href="/about">About</a>
-                    <a href="/for-practitioners">For practitioners</a>
-                    <a href="/embed">Embed the timer</a>
-                    <a href="/handouts">Printable handouts</a>
+                    <a href="/pro">Pro</a>
                 </nav>
             </div>
 
@@ -430,15 +386,6 @@
             }
         }
 
-        function count(n) {
-            const value = Number(n) || 0;
-            try {
-                return new Intl.NumberFormat().format(value);
-            } catch {
-                return String(value);
-            }
-        }
-
         function planName(plan) {
             const def = PLANS[String(plan || '')];
             return def && def.label ? def.label.toLowerCase() : 'plan';
@@ -460,18 +407,8 @@
             cross_origin: 'That request was blocked. Reload the page and try again.',
             bad_request: 'We could not read that request. Reload the page and try again.',
             not_configured: 'That plan is not available right now. Email contact@helpmebreath.com.',
-            domains_required: 'Add at least one domain.',
-            too_many_domains: 'Ten domains at most for one credential.',
-            invalid_domain: 'One of those lines does not look like a domain name.',
-            wildcard_not_allowed: 'Wildcards are not allowed. Write each domain in full.',
-            own_site_not_allowed: 'A credential cannot be bound to helpmebreath.com.',
-            subscription_required: 'Embed credentials need a live subscription.',
-            commercial_plan_required: 'This plan does not include embed credentials.',
             ledger_unavailable: 'We could not read that just now. Try again in a minute.',
             auth_unavailable: 'Sign-in is briefly unavailable. Try again in a minute.',
-            not_found: 'We could not find that credential.',
-            revoked: 'That credential group has already been revoked.',
-            token_id_required: 'That credential is missing its id. Reload the page.',
             entitlement_unavailable: 'We could not read your plan just now. Try again in a minute.',
             rate_limited: 'Too many requests, wait a minute.',
         };
@@ -507,7 +444,7 @@
         }
 
         function clearMessages() {
-            for (const role of ['plan-ok', 'plan-error', 'account-error', 'embed-ok', 'embed-error', 'data-ok', 'data-error', 'delete-error']) {
+            for (const role of ['plan-ok', 'plan-error', 'account-error', 'data-ok', 'data-error', 'delete-error']) {
                 setText(role, '');
             }
         }
@@ -561,7 +498,6 @@
                     tier: info.tier,
                     status: info.status,
                     plan: info.plan,
-                    commercial: info.commercial,
                     trial_ends_at: trialing ? info.periodEnd : null,
                     current_period_end: trialing ? null : info.periodEnd,
                     cancel_at: null,
@@ -697,7 +633,7 @@
             if (status === 'none') {
                 setStatus('No subscription', 'You have an account, and no subscription on it yet.', '');
                 planBody('Everything in the plan is one subscription: the pattern builder, saved presets, streaks and'
-                    + ' export, soundscapes, night mode, printable handouts, commercial use and the white-label embed.');
+                    + ' export, soundscapes, night mode, no ads and offline use.');
                 showPlanLine(true);
                 subscribeButtons(me && me.trial && me.trial.available === true);
                 planNote('One free trial per person. Cancel any time from this page.');
@@ -970,238 +906,6 @@
             await reload(result.body && result.body.message);
         }
 
-        /* -------------------------------------------------- embed section --- */
-
-        function credState(cred) {
-            if (cred.revoked_at) return 'Revoked';
-            if (cred.superseded_at) {
-                const overlap = fmtDate(cred.overlap_ends_at);
-                return overlap ? `Superseded, works until ${overlap}` : 'Superseded';
-            }
-            return cred.live ? 'Live' : 'Expired';
-        }
-
-        function credRow(cred) {
-            const tr = document.createElement('tr');
-            const cells = [
-                { text: fmtDate(cred.issued_at) || 'unknown' },
-                { text: fmtDate(cred.expires_at) || 'unknown' },
-                { text: count(cred.hit_count), num: true },
-                { text: credState(cred) },
-            ];
-            for (const cell of cells) {
-                const td = document.createElement('td');
-                td.textContent = cell.text;
-                if (cell.num) td.className = 'num';
-                if (!cred.live) td.classList.add('is-dim');
-                tr.appendChild(td);
-            }
-            return tr;
-        }
-
-        function credGroup(group) {
-            const li = document.createElement('li');
-            li.className = 'cred-group';
-            li.setAttribute('data-revoked', group.revoked_at ? 'true' : 'false');
-
-            const head = document.createElement('div');
-            head.className = 'cred-head';
-            const name = document.createElement('span');
-            name.className = 'cred-label';
-            name.textContent = group.label || 'Untitled credential';
-            const id = document.createElement('span');
-            id.className = 'cred-id';
-            id.textContent = group.token_id;
-            head.append(name, id);
-
-            const domains = document.createElement('p');
-            domains.className = 'cred-domains';
-            domains.textContent = (group.domains || []).join(', ') || 'No domains on this credential.';
-
-            const meta = document.createElement('p');
-            meta.className = 'cred-domains';
-            const created = fmtDate(group.created_at);
-            const parts = [];
-            if (created) parts.push(`Created ${created}`);
-            parts.push(`verified ${count(group.verify_count_30d)} times in the last 30 days`);
-            if (group.revoked_at) parts.push(`revoked ${fmtDate(group.revoked_at)}`);
-            meta.textContent = `${parts.join(', ')}.`;
-
-            li.append(head, domains, meta);
-
-            const creds = Array.isArray(group.credentials) ? group.credentials : [];
-            if (creds.length) {
-                const table = document.createElement('table');
-                table.className = 'cred-table';
-                const caption = document.createElement('caption');
-                caption.className = 'sr-only-inline';
-                caption.textContent = `Credentials issued for ${group.label || group.token_id}`;
-                const thead = document.createElement('thead');
-                const headRow = document.createElement('tr');
-                for (const [text, num] of [['Issued', false], ['Expires', false], ['Hits', true], ['State', false]]) {
-                    const th = document.createElement('th');
-                    th.scope = 'col';
-                    th.textContent = text;
-                    if (num) th.className = 'num';
-                    headRow.appendChild(th);
-                }
-                thead.appendChild(headRow);
-                const tbody = document.createElement('tbody');
-                for (const cred of creds) tbody.appendChild(credRow(cred));
-                table.append(caption, thead, tbody);
-                li.appendChild(table);
-            }
-
-            if (!group.revoked_at) {
-                const row = document.createElement('div');
-                row.className = 'btn-row';
-                const rotate = button('Rotate', 'btn');
-                twoStep(rotate, 'Confirm rotate', () => doRotate(group.token_id, rotate));
-                const revoke = button('Revoke', 'btn btn--danger');
-                twoStep(revoke, 'Confirm revoke', () => doRevoke(group.token_id, revoke));
-                row.append(rotate, revoke);
-                li.appendChild(row);
-            }
-
-            return li;
-        }
-
-        function renderCredentials(groups) {
-            const list = el('cred-list');
-            clear(list);
-            for (const group of groups) list.appendChild(credGroup(group));
-            show(el('cred-empty'), groups.length === 0);
-        }
-
-        async function loadCredentials() {
-            show(el('embed-loading'), true);
-            const result = await apiFetch('/api/embed/token');
-            show(el('embed-loading'), false);
-            if (bounced(result)) return;
-            if (!result.ok) {
-                say('embed-error', failureMessage(result, 'We could not load your credentials. Try again in a minute.'));
-                return;
-            }
-            renderCredentials(Array.isArray(result.body.groups) ? result.body.groups : []);
-        }
-
-        function showSnippet(body) {
-            const box = el('snippet-box');
-            const field = document.getElementById('cred-snippet');
-            field.value = body.snippet || body.iframe_snippet || '';
-            show(box, !!field.value);
-        }
-
-        async function doCreateCredential(trigger) {
-            if (busy) return;
-            const domainsField = document.getElementById('cred-domains');
-            const labelField = document.getElementById('cred-label');
-            const domains = String(domainsField.value || '')
-                .split(/[\n,]+/)
-                .map((line) => line.trim())
-                .filter(Boolean);
-            clearMessages();
-            if (!domains.length) {
-                say('embed-error', 'Add at least one domain, one per line.');
-                domainsField.focus();
-                return;
-            }
-            busy = true;
-            trigger.disabled = true;
-            const result = await apiFetch('/api/embed/token', {
-                method: 'POST',
-                body: { domains, label: String(labelField.value || '').trim() },
-            });
-            busy = false;
-            trigger.disabled = false;
-            if (bounced(result)) return;
-            if (!result.ok) {
-                say('embed-error', failureMessage(result, 'We could not create that credential. Try again in a minute.'));
-                return;
-            }
-            track(EVENTS.EMBED_TOKEN_CREATED || 'embed_token_created', {
-                domain_count: domains.length,
-                action: 'create',
-            });
-            domainsField.value = '';
-            labelField.value = '';
-            showSnippet(result.body);
-            say('embed-ok', 'Credential created. Paste the snippet below into your page.');
-            await loadCredentials();
-        }
-
-        async function doRotate(tokenId, trigger) {
-            if (busy) return;
-            busy = true;
-            clearMessages();
-            trigger.disabled = true;
-            const result = await apiFetch(`/api/embed/token?rotate=1&token_id=${encodeURIComponent(tokenId)}`);
-            busy = false;
-            trigger.disabled = false;
-            if (bounced(result)) return;
-            if (!result.ok) {
-                say('embed-error', failureMessage(result, 'We could not rotate that credential. Try again in a minute.'));
-                return;
-            }
-            track(EVENTS.EMBED_TOKEN_CREATED || 'embed_token_created', {
-                domain_count: Array.isArray(result.body.domains) ? result.body.domains.length : 0,
-                action: 'rotate',
-            });
-            showSnippet(result.body);
-            const overlap = fmtDate(result.body.overlap_ends_at);
-            say('embed-ok', overlap
-                ? `Rotated. The old snippet keeps working until ${overlap}, so update your page before then.`
-                : 'Rotated. Update your page with the new snippet below.');
-            await loadCredentials();
-        }
-
-        async function doRevoke(tokenId, trigger) {
-            if (busy) return;
-            busy = true;
-            clearMessages();
-            trigger.disabled = true;
-            const result = await apiFetch('/api/embed/token', { method: 'DELETE', body: { token_id: tokenId } });
-            busy = false;
-            trigger.disabled = false;
-            if (bounced(result)) return;
-            if (!result.ok) {
-                say('embed-error', failureMessage(result, 'We could not revoke that credential. Try again in a minute.'));
-                return;
-            }
-            show(el('snippet-box'), false);
-            say('embed-ok', 'Revoked. Every snippet from that credential stops working now.');
-            await loadCredentials();
-        }
-
-        function copySnippet(trigger) {
-            const field = document.getElementById('cred-snippet');
-            if (!field.value) return;
-            const done = () => {
-                say('embed-ok', 'Snippet copied.');
-                track(EVENTS.EMBED_SNIPPET_COPIED || 'embed_snippet_copied', { placement: 'account' });
-            };
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(field.value).then(done).catch(() => {
-                    field.focus();
-                    field.select();
-                    say('embed-error', 'We could not copy it for you. The snippet is selected, so copy it yourself.');
-                });
-                return;
-            }
-            field.focus();
-            field.select();
-            say('embed-error', 'This browser will not let us copy for you. The snippet is selected, so copy it yourself.');
-            if (trigger) trigger.blur();
-        }
-
-        function renderEmbed() {
-            const pro = entitlement().tier === 'pro';
-            show(el('embed-locked'), !pro);
-            show(el('embed-body'), pro);
-            show(el('embed-section'), true);
-            if (pro) loadCredentials();
-        }
-
         /* --------------------------------------------------- data section --- */
 
         async function doExport(trigger) {
@@ -1272,7 +976,6 @@
         function render() {
             renderAccount();
             renderPlan();
-            renderEmbed();
             renderData();
             show(el('plan-section'), true);
             show(el('loading'), false);
@@ -1306,8 +1009,6 @@
             twoStep(el('cancel-confirm'), 'Confirm: cancel my subscription', () => doCancel('period_end', el('cancel-confirm')));
             twoStep(el('cancel-now'), 'Confirm: end it now', () => doCancel('now', el('cancel-now')));
 
-            el('cred-create').addEventListener('click', (event) => doCreateCredential(event.currentTarget));
-            el('copy-snippet').addEventListener('click', (event) => copySnippet(event.currentTarget));
 
             const ack = el('delete-ack');
             const del = el('delete');

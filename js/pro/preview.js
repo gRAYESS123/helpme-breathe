@@ -31,7 +31,7 @@
  * while the preview is showing (§8.3): the first thing a person sees on a
  * timer page is never an ad next to a sign-in prompt.
  *
- * Crisis pages, the embed frame and /s/ carry `data-open-timer`, so
+ * The two crisis pages carry `data-open-timer`, so
  * requireTimer() never fails there and this module never renders.
  */
 

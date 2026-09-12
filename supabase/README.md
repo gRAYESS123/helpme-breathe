@@ -11,7 +11,7 @@ only about applying it.
 ```
 supabase/
   migrations/
-    0001_accounts_billing.sql   nine tables, one RPC function, RLS on everything, zero policies
+    0001_accounts_billing.sql   seven tables, one RPC function, RLS on everything, zero policies
   README.md                     this file
 ```
 
@@ -39,7 +39,7 @@ supabase/
 
 Run each of these in the SQL editor after the migration.
 
-**All nine tables exist, with RLS enabled and forced:**
+**All seven tables exist, with RLS enabled and forced:**
 
 ```sql
 select relname as table_name, relrowsecurity as rls_enabled, relforcerowsecurity as rls_forced
@@ -48,9 +48,9 @@ where relnamespace = 'public'::regnamespace and relkind = 'r'
 order by relname;
 ```
 
-Expected: nine rows — `checkout_intents`, `devices`, `embed_credentials`,
-`embed_tokens`, `profiles`, `rate_limits`, `subscriptions`, `trial_claims`,
-`webhook_events` — every one with `rls_enabled = true` and `rls_forced = true`.
+Expected: seven rows — `checkout_intents`, `devices`, `profiles`,
+`rate_limits`, `subscriptions`, `trial_claims`, `webhook_events` — every one
+with `rls_enabled = true` and `rls_forced = true`.
 
 **Zero policies:**
 
@@ -130,7 +130,7 @@ this repo) against a stub `auth.users` table and stub `anon`, `authenticated`
 and `service_role` (`bypassrls`) roles. Observed:
 
 - runs clean, and runs clean a second time (idempotent);
-- all nine tables have RLS enabled **and** forced, `pg_policies` is empty, and
+- all seven tables have RLS enabled **and** forced, `pg_policies` is empty, and
   `anon` / `authenticated` hold no table privilege;
 - `bump_rate_limit` answers `true, true, false` for limit 2, is executable by
   `service_role`, and is refused for `anon` ("permission denied for function");
@@ -146,7 +146,7 @@ and `service_role` (`bypassrls`) roles. Observed:
 - the `updated_at` triggers fire, the `plan` / `status` check constraints
   reject bad values, the webhook claim statement from the design's §6.1
   re-claims a `received` row and returns zero rows for a `processed` one;
-- all nine retention statements and the rollback script below parse and run.
+- all eight retention statements and the rollback script below parse and run.
 
 Two things that harness could not prove and step 6 must: that `create extension
 pgcrypto` succeeds in your project (PGlite has no pgcrypto, so that one line was
@@ -160,11 +160,13 @@ documentation states.
 staging project, not on a preview. Until it has, a correction to the schema is
 an edit to this file, not a second migration. That is how the `plan` check
 constraints on `subscriptions` and `checkout_intents` came to read
-`('monthly','yearly')`: the design once carried a third value,
-`practitioner_yearly`, so that offering a separate practitioner plan would be a
-config change. The owner closed that option on 2026-09-12 — one plan,
-everything included, billed monthly or yearly — and the value was removed from
-`0001` rather than dropped by a `0002`.
+`('monthly','yearly')`: the design once carried a third value for a separate
+professional plan, so that offering one would be a config change. The owner
+closed that option on 2026-09-12 — one plan, everything included, billed
+monthly or yearly — and the value was removed from `0001` rather than dropped
+by a `0002`. The same decision retired two more tables that belonged to the
+removed layer, and they came out of `0001` the same way — nine tables became
+seven.
 
 Once you have run `0001` against the real project, this stops being true: from
 that moment every schema change is a new numbered file, per the section below.
@@ -174,7 +176,7 @@ that moment every schema change is a new numbered file, per the section below.
 - Name it `NNNN_short_description.sql`, numbered after the last one. Apply in
   order, by hand, the same way.
 - Keep it idempotent (`if not exists`, `create or replace`, `drop ... if exists`).
-- Every new table gets the same treatment as the nine here: `enable row level
+- Every new table gets the same treatment as the seven here: `enable row level
   security`, `force row level security`, `revoke all ... from anon,
   authenticated`, and **no policy**. Every new function in `public` gets
   `revoke execute ... from public` and an explicit grant to `service_role`.
@@ -194,8 +196,7 @@ drop trigger if exists on_auth_user_created on auth.users;
 drop function if exists public.handle_new_user();
 drop function if exists public.touch_updated_at() cascade;
 drop function if exists public.bump_rate_limit(text, integer, integer);
-drop table if exists public.embed_credentials, public.embed_tokens,
-                     public.checkout_intents, public.webhook_events,
+drop table if exists public.checkout_intents, public.webhook_events,
                      public.rate_limits, public.trial_claims, public.devices,
                      public.subscriptions, public.profiles;
 ```

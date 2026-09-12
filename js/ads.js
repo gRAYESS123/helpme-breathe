@@ -10,7 +10,7 @@
  *   - defers until first interaction or 3s idle so it cannot hurt LCP
  *
  * Ad slots are allowed on content and comparison pages only, below the fold.
- * They are forbidden on the timer viewport, /pro, /for-practitioners, /embed,
+ * They are forbidden on the timer viewport, /pro,
  * /pro/thanks and the crisis-safe pages (see docs/AGENT_BRIEF.md rule 6).
  *
  * Markup: <div class="ad-slot" data-ad-slot="in-content-1" aria-hidden="true"></div>

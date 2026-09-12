@@ -375,60 +375,6 @@
     "footer": "Cancel any time · 14-day refund"
   },
   {
-    "file": "images/og/for-practitioners.jpg",
-    "layout": "og",
-    "size": [
-      1200,
-      630
-    ],
-    "theme": "box",
-    "kicker": "For practitioners",
-    "title_lines": [
-      "Tools for Therapists",
-      "and Coaches"
-    ],
-    "sub_lines": [
-      "White-label embeds, client links",
-      "and a commercial licence"
-    ]
-  },
-  {
-    "file": "images/og/embed.jpg",
-    "layout": "og",
-    "size": [
-      1200,
-      630
-    ],
-    "theme": "478",
-    "kicker": "Free widget",
-    "title_lines": [
-      "Embed a Breathing",
-      "Timer on Your Site"
-    ],
-    "sub_lines": [
-      "One line of HTML and zero",
-      "third-party requests"
-    ]
-  },
-  {
-    "file": "images/og/handouts.jpg",
-    "layout": "og",
-    "size": [
-      1200,
-      630
-    ],
-    "theme": "box",
-    "kicker": "Printable",
-    "title_lines": [
-      "Breathing Handouts",
-      "for Clients"
-    ],
-    "sub_lines": [
-      "Print-ready cards for each",
-      "of the seven patterns"
-    ]
-  },
-  {
     "file": "images/og/medical-disclaimer.jpg",
     "layout": "og",
     "size": [
@@ -478,60 +424,6 @@
     "sub_lines": [
       "Plain terms and an unconditional",
       "14-day refund"
-    ]
-  },
-  {
-    "file": "images/og/dpa.jpg",
-    "layout": "og",
-    "size": [
-      1200,
-      630
-    ],
-    "theme": "neutral",
-    "kicker": "For practitioners",
-    "title_lines": [
-      "Data Processing",
-      "Addendum"
-    ],
-    "sub_lines": [
-      "The paperwork a clinic asks for,",
-      "in plain language"
-    ]
-  },
-  {
-    "file": "images/og/privacy-attestation.jpg",
-    "layout": "og",
-    "size": [
-      1200,
-      630
-    ],
-    "theme": "neutral",
-    "kicker": "For practitioners",
-    "title_lines": [
-      "Privacy",
-      "Attestation"
-    ],
-    "sub_lines": [
-      "What the timer collects",
-      "when your client uses it"
-    ]
-  },
-  {
-    "file": "images/og/security-overview.jpg",
-    "layout": "og",
-    "size": [
-      1200,
-      630
-    ],
-    "theme": "neutral",
-    "kicker": "For practitioners",
-    "title_lines": [
-      "Security",
-      "Overview"
-    ],
-    "sub_lines": [
-      "No accounts, no database,",
-      "nothing to breach"
     ]
   },
   {

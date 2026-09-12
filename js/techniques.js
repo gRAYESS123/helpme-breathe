@@ -3,7 +3,7 @@
  *
  * Pure data + pure functions. No DOM, no storage, no network, no side effects,
  * so this module is safe to import from the app, from a technique landing page
- * and from the sandboxed embed frame.
+
  *
  * Contract (see docs/MODULE_API.md):
  *   TECHNIQUES          map of key -> technique object
@@ -26,7 +26,7 @@
  * field stays so that nothing reading it breaks. `rim` and `fill` are the
  * technique's day accent pair; the site itself uses the CSS tokens
  * (--rim-<key> / --fill-<key>) and only surfaces that cannot read the
- * stylesheet — the render harness, a white-label embed — should read these.
+ * stylesheet, such as the render harness, should read these.
  *
  * `sources` is intentionally empty here. Page agents own citations: a claim is
  * only allowed on a page where the author opened and quoted the source.

@@ -11,8 +11,7 @@
  *   3. DETACH, do not cascade, the subscription rows: user_id = null,
  *      detached_at = now(), provider ids kept — so later webhooks for a
  *      still-live subscription still reconcile instead of becoming orphans.
- *   4. Delete the auth.users row (cascading profiles, embed_tokens,
- *      embed_credentials, checkout_intents).
+ *   4. Delete the auth.users row (cascading profiles and checkout_intents).
  *   5. Null trial_claims.user_id and devices.trial_user_id; keep the hashes
  *      until the 24-month ceiling, or deleting an account would reset the
  *      free-trial limit.
@@ -150,7 +149,7 @@ export function createDeleteHandler(deps) {
       const nowIso = toIso(now());
       const detached = await store.detachSubscriptions(sub, nowIso);
 
-      // 4. Delete the auth.users row (cascades profiles, embed_*, checkout_intents).
+      // 4. Delete the auth.users row (cascades profiles and checkout_intents).
       await deleteAuthUser(sub);
 
       // 5. Keep the trial ledger, drop the link.

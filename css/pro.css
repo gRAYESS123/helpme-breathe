@@ -386,7 +386,7 @@
 /* This card renders inside [data-slot="post-session"], which lives in
    .breathing-section. BRAND.md sections 1 and 8 keep --clay off the timer
    screen, so the on-timer offer speaks in the neutral voice: ink price, green
-   button. --clay stays on /pro, /for-practitioners and the pricing matrix. */
+   button. --clay stays on /pro. */
 .paywall-card .paywall-price {
     font-family: var(--display);
     font-size: 1.375rem;

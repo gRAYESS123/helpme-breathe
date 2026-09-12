@@ -7,7 +7,7 @@
  * (vercel.com/docs/cron-jobs/manage-cron-jobs, "Securing cron jobs"); the
  * request is refused without it, so the endpoint is not publicly callable.
  *
- * The nine statements of §3.4, in order, as PostgREST calls. The first one is
+ * The eight statements of §3.4, in order, as PostgREST calls. The first one is
  * the one that matters most and the one draft 1 got wrong: payloads are
  * nulled ONLY on `processed` rows, so a `failed` event keeps its evidence for
  * as long as the problem does. Every statement is idempotent — Vercel cron
@@ -100,12 +100,6 @@ export function retentionSteps(nowMs) {
       method: 'DELETE',
       path: `rate_limits?window_start=lt.${iso(2 * DAY_MS)}&select=bucket`,
       sql: "delete from public.rate_limits where window_start < now() - interval '2 days'",
-    },
-    {
-      name: 'embed_credentials_deleted',
-      method: 'DELETE',
-      path: `embed_credentials?expires_at=lt.${iso(30 * DAY_MS)}&select=jti`,
-      sql: "delete from public.embed_credentials where expires_at < now() - interval '30 days'",
     },
   ];
 }

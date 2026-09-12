@@ -781,8 +781,8 @@ export function createBreathingApp(rootEl, options = {}) {
     }
     hideSafetyAck();
 
-    // The one gate on Start (design section 8.1). Crisis pages, the embed
-    // frame and /s/ carry data-open-timer and pass straight through; a
+    // The one gate on Start (design section 8.1). The two crisis pages carry
+    // data-open-timer and pass straight through; a
     // subscriber passes; a device inside its free sessions passes. Otherwise
     // the engine enters the preview state instead of running: js/pro/preview.js
     // animates one demonstration cycle and renders the account card.

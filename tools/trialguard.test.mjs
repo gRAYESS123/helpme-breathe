@@ -459,8 +459,8 @@ test('priceIdFor chooses server-side from (plan, trial) and prefers the adapter'
   // price var is blank is not sellable on this deployment.
   assert.equal(planAvailable('yearly', { ...ENV, MOR_PRICE_YEARLY: '' }), false);
   // One plan, two billing periods. There is no third value to configure.
-  assert.equal(planAvailable('practitioner_yearly', ENV), false);
-  assert.equal(planAvailable('practitioner_yearly', { ...ENV, MOR_PRICE_PRACTITIONER: 'TESTFIXTURE_pract' }), false);
+  assert.equal(planAvailable('retired_second_plan', ENV), false);
+  assert.equal(planAvailable('retired_second_plan', { ...ENV, MOR_PRICE_RETIRED: 'TESTFIXTURE_retired' }), false);
   assert.deepEqual(PLANS, ['monthly', 'yearly']);
 });
 
@@ -726,15 +726,15 @@ test('eligibility: yearly plan uses the yearly prices; unknown or unconfigured p
 
   // The retired second plan is now simply an unknown plan: refused, and no
   // env var can bring it back.
-  const pract = await run({ plan: 'practitioner_yearly' });
-  assert.equal(pract.result.status, 400);
-  assert.equal(pract.result.body.error, 'bad_plan');
-  const practConfigured = await run({
-    plan: 'practitioner_yearly',
-    env: { ...ENV, MOR_PRICE_PRACTITIONER: 'TESTFIXTURE_price_practitioner' },
+  const retired = await run({ plan: 'retired_second_plan' });
+  assert.equal(retired.result.status, 400);
+  assert.equal(retired.result.body.error, 'bad_plan');
+  const retiredConfigured = await run({
+    plan: 'retired_second_plan',
+    env: { ...ENV, MOR_PRICE_RETIRED: 'TESTFIXTURE_price_retired' },
   });
-  assert.equal(practConfigured.result.status, 400, 'no env var revives a plan that no longer exists');
-  assert.equal(practConfigured.result.body.error, 'bad_plan');
+  assert.equal(retiredConfigured.result.status, 400, 'no env var revives a plan that no longer exists');
+  assert.equal(retiredConfigured.result.body.error, 'bad_plan');
 });
 
 test('eligibility: a plan with no trial price never offers a trial and writes no reservation', async () => {
@@ -1118,7 +1118,7 @@ test('POST /api/trial/eligibility: 400 on a bad body or plan; a GET is 405', asy
 
   // 2026-09-12: there is one plan. The retired second plan value is refused
   // like any other unknown plan — there is no env var left that accepts it.
-  const retiredPlan = await handler.POST(postEligibility({ plan: 'practitioner_yearly' }));
+  const retiredPlan = await handler.POST(postEligibility({ plan: 'retired_second_plan' }));
   assert.equal(retiredPlan.status, 400);
   const retiredBody = await retiredPlan.json();
   assert.equal(retiredBody.error, 'bad_plan');

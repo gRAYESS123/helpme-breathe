@@ -36,7 +36,7 @@ colour of the page.
 | `--track` | `#DFD8C7` | Progress trough, input wells, the featured pricing column. |
 | `--green` | `#0F5136` | Primary: the Begin button, links, the focus ring, the active nav item. |
 | `--chalk` | `#FFFFFF` | Ink on primary. |
-| `--clay` | `#8A4B24` | **Commerce accent.** Paid surfaces only — price figures, the Practitioner flag, checkout buttons. Never on the timer screen. |
+| `--clay` | `#8A4B24` | **Commerce accent.** Paid surfaces only — price figures and checkout buttons on `/pro`. Never on the timer screen. |
 | `--ok` | `#1B6B45` | Success. |
 | `--warn` | `#7E5406` | Caution: the contraindication rule. |
 | `--bad` | `#A32721` | Danger: the crisis block border, form errors. |
@@ -207,14 +207,11 @@ Nothing lighter than 400, anywhere. Micro type floor is **11px**
       'Helvetica Neue', Arial, sans-serif;
 ```
 
-Loading (preconnect + non-blocking, on every page except the embed widget):
+Loading (preconnect + non-blocking, on every page):
 
 ```
 https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap
 ```
-
-**The embed widget loads no webfont at all.** Hard rule 14: zero third-party
-requests from inside that iframe. It uses the fallback stacks.
 
 Measured on the shipped timer at a 1240px viewport: phase word 40px Newsreader,
 `h1` 36px Newsreader, timer digits 28px IBM Plex Sans. The phase word is the
@@ -356,11 +353,11 @@ the one cue a person actually needs.
 | Contraindication callout | 3px `--warn` left rule on leaf. |
 | Crisis block | a full 1px `--bad` border on leaf. Carries **Embrace 1564** (Lebanon) alongside 988, 116 123 and findahelpline.com. |
 | Article header | breadcrumb eyebrow → `h1` → lead → a hairline-ruled strip with the author's name and role on the left and Published / Reviewed dates in tabular figures on the right. **The site has no medical reviewer. Never invent one.** |
-| Pricing | a full feature matrix with the **Practitioner** column featured: flagged "Most practitioners", tinted with `--track`, and the only filled primary button. Pro gets a secondary button. Directly under the table, a small line saying the price is in US dollars, invoiced, sold by our merchant of record who collects any VAT or sales tax, and that there is a 14-day unconditional refund. |
+| Pricing | one plan card on `/pro`: the interval toggle, the price, the honest trial statement, one filled primary button, the fine print, and one list of what is included. No matrix, no columns, no ticks and crosses. Directly under the card, a small line saying the price is in US dollars, sold by our merchant of record who collects any VAT or sales tax, and that there is a 14-day unconditional refund. |
 | Cookie banner | a leaf card. **Decline is listed first and weighted exactly the same as Accept.** |
 | Ad slot | 1px dashed `--edge` on paper, label in `--graphite` (never `--edge` for text), reserved height so CLS stays 0. |
 | Footer | 1px `--ink` top rule, four link columns, an authorship byline naming a person, then the legal row. |
-| Site header | on **every** page: leaf ground, hairline bottom rule, the lockup linking to `/`, nav Timer · Guides · Science · For practitioners · Pro. **The Pro link is not accent-coloured.** At 640px and below the nav collapses behind a menu button; at 420px and below the wordmark drops and the lockup is the ring alone. |
+| Site header | on **every** page: leaf ground, hairline bottom rule, the lockup linking to `/`, nav Timer · Guides · Science · Pro. **The Pro link is not accent-coloured.** At 640px and below the nav collapses behind a menu button; at 420px and below the wordmark drops and the lockup is the ring alone. |
 
 ---
 
@@ -554,4 +551,4 @@ turns out badly.
    the build on `var(--clay)` under any selector scoped to `.breathing-section`,
    `[data-slot="post-session"]`, `.post-session-card` or `.paywall-card`. The
    on-timer offer speaks in the neutral voice: `--ink` price, `--green` button.
-   `--clay` stays on `/pro`, `/for-practitioners` and the pricing matrix.
+   `--clay` stays on `/pro`.
