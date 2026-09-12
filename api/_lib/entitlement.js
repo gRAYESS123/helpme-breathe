@@ -2,7 +2,9 @@
  * api/_lib/entitlement.js — subscription rows -> tier, and the signed v3 token.
  *
  * Specification: docs/private/ACCOUNTS_BILLING_DESIGN.md §6.5 (the mapping),
- * §7.1 (GET /api/me) and §7.2 (token v3). Owner decisions D1/D2/D3 apply.
+ * §7.1 (GET /api/me) and §7.2 (token v3). Owner decisions D1 and D3 apply.
+ * There is one plan — monthly or yearly billing of the same thing — so no
+ * plan-shaped branch survives in here beyond the enum itself.
  *
  * Two pure functions carry the whole rule set:
  *
@@ -32,8 +34,8 @@ import { kidFor, signToken, verifyToken } from './crypto.js';
 export const TIER_PRO = 'pro';
 export const TIER_FREE = 'free';
 
-/** `subscriptions.plan` values (§3.2). `practitioner_yearly` exists so D2 is a config change. */
-export const PLANS = Object.freeze(['monthly', 'yearly', 'practitioner_yearly']);
+/** `subscriptions.plan` values (§3.2). One plan, billed monthly or yearly. */
+export const PLANS = Object.freeze(['monthly', 'yearly']);
 
 /** `subscriptions.status` values: the provider's five plus the local `expired`. */
 export const STATUSES = Object.freeze(['trialing', 'active', 'past_due', 'paused', 'canceled', 'expired']);
@@ -214,20 +216,17 @@ export function winningRow(rows) {
 /**
  * Whether a plan carries commercial rights — the `com` claim (§7.2).
  *
- * Under D2 = `one` (the owner's decision: no separate practitioner plan) every
- * pro entitlement is commercial. Under D2 = `two` only `practitioner_yearly`
- * is. D2 is inferred from whether a practitioner price is configured
- * (`MOR_PRICE_PRACTITIONER`, "Empty under D2 = one" — §10.2), so switching is
- * an env change and not a code change.
+ * There is one plan and it includes everything, so every known plan is
+ * commercial and every live pro entitlement carries `com: 1`. (The design once
+ * allowed a second, practitioner-only plan that would have narrowed this; the
+ * owner closed that option on 2026-09-12 and the switch is gone.)
  *
  * @param {string|null} plan
- * @param {{practitionerPlanOffered?:boolean}} [options]
  * @returns {boolean}
  */
-export function commercialFor(plan, options = {}) {
+export function commercialFor(plan) {
   if (!plan) return false;
-  if (plan === 'practitioner_yearly') return true;
-  return options.practitionerPlanOffered ? false : PLANS.includes(String(plan));
+  return PLANS.includes(String(plan));
 }
 
 /**
@@ -239,7 +238,6 @@ export function commercialFor(plan, options = {}) {
  *
  * @param {object[]|null|undefined} rows every `subscriptions` row for the user
  * @param {number|string|Date} [now]
- * @param {{practitionerPlanOffered?:boolean}} [options]
  * @returns {{
  *   tier:'pro'|'free', status:string, plan:string|null, commercial:boolean,
  *   trial_ends_at:string|null, current_period_end:string|null, cancel_at:string|null,
@@ -249,7 +247,7 @@ export function commercialFor(plan, options = {}) {
  *   ever_paid:boolean, had_trial:boolean, dispute_open:boolean, ui:string, row:object|null
  * }}
  */
-export function entitlementFor(rows, now, options = {}) {
+export function entitlementFor(rows, now) {
   const at = nowMs(now);
   const row = winningRow(rows);
   const status = statusOf(row);
@@ -266,7 +264,7 @@ export function entitlementFor(rows, now, options = {}) {
     tier,
     status,
     plan,
-    commercial: live && commercialFor(plan, options),
+    commercial: live && commercialFor(plan),
     trial_ends_at: toIso(trialEndsMs),
     current_period_end: toIso(periodEndMs),
     cancel_at: toIso(cancelAtMs),

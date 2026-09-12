@@ -1,8 +1,7 @@
 /**
  * js/pro/paywall.js — the only place an upgrade offer is allowed to appear.
  *
- * One plan, two intervals (docs/private/ACCOUNTS_BILLING_DESIGN.md D2). Two
- * entry points, both deliberately quiet:
+ * One plan, two intervals. Two entry points, both deliberately quiet:
  *
  *   1. The offer card. It renders in the completing instance's
  *      `[data-slot="post-session"]` on the THIRD completed session, once ever

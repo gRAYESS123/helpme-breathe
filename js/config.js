@@ -16,7 +16,7 @@
  *
  *   SUPABASE             url + publishable key, read by js/auth.js only
  *   CHECKOUT             client-side token + sandbox flag, read by js/checkout.js only
- *   PLANS                D2 — the one plan and its intervals
+ *   PLANS                the one plan and its two intervals
  *   TIMER_FREE_SESSIONS  D1 — read in exactly one place, js/entitlements.js#requireTimer
  *   MOR_LEGAL            the merchant-of-record sentence, one place, every page
  *
@@ -75,18 +75,16 @@ export const CHECKOUT = Object.freeze({
 });
 
 /**
- * D2 — PLANS. `mode: 'one'` is the owner's decision of 2026-09-11: monthly and
- * yearly only, everything included, no practitioner tier. `'two'` would add
- * `practitioner_yearly`; that value is shipped here so switching later is a
- * config change and not a migration (design §0.2). The D2 flag is branched on
- * in this file and nowhere else: everything downstream reads `PLANS.available`.
+ * PLANS. One plan, everything included, for individuals and for people who
+ * teach breathing alike; two billing intervals. Owner decisions of 2026-09-11
+ * and 2026-09-12: there is no practitioner or therapist plan and there will
+ * not be one, so nothing here is a switch. Everything downstream reads
+ * `PLANS.available`.
  *
  * Prices are US-dollar list prices for copy. What a person is actually charged
  * comes from the provider's own price preview and receipt (design §5.6), never
  * from these numbers.
  */
-const PLAN_MODE = 'one';
-
 const PLAN_DEFINITIONS = Object.freeze({
   monthly: Object.freeze({
     key: 'monthly',
@@ -106,24 +104,11 @@ const PLAN_DEFINITIONS = Object.freeze({
     per: 'a year',
     commercial: true,
   }),
-  practitioner_yearly: Object.freeze({
-    key: 'practitioner_yearly',
-    label: 'Practitioner plan',
-    price: 149,
-    currency: 'USD',
-    interval: 'year',
-    per: 'a year',
-    commercial: true,
-  }),
 });
 
 export const PLANS = Object.freeze({
-  /** 'one' | 'two' — D2. */
-  mode: PLAN_MODE,
   /** The plan keys a button may carry in `data-plan`, in display order. */
-  available: Object.freeze(
-    PLAN_MODE === 'two' ? ['monthly', 'yearly', 'practitioner_yearly'] : ['monthly', 'yearly'],
-  ),
+  available: Object.freeze(['monthly', 'yearly']),
   /** The interval a bare checkout button (no `data-plan`) opens. */
   default: 'monthly',
   /** Trial length in days, for copy only. Whether a trial applies is decided by the server. */
@@ -132,7 +117,6 @@ export const PLANS = Object.freeze({
   refundDays: 14,
   monthly: PLAN_DEFINITIONS.monthly,
   yearly: PLAN_DEFINITIONS.yearly,
-  practitioner_yearly: PLAN_DEFINITIONS.practitioner_yearly,
 });
 
 /**

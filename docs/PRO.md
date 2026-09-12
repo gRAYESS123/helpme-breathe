@@ -203,8 +203,9 @@ Five exports, nothing secret:
 | `MOR_LEGAL` | The merchant-of-record sentence. One place, every page. Replace "a merchant of record" with the provider's legal name in the same commit that turns checkout on. |
 
 `PLANS` and `TIMER_FREE_SESSIONS` are owner decisions, not configuration to be
-tuned per page: `PLANS.mode` is branched on in `js/config.js` and nowhere else,
-and `TIMER_FREE_SESSIONS` is read in `requireTimer()` and nowhere else.
+tuned per page: there is one plan with two intervals and no switch for a second
+(owner decision 2026-09-12: no practitioner or therapist plan, ever), and
+`TIMER_FREE_SESSIONS` is read in `requireTimer()` and nowhere else.
 
 Website approval for helpmebreath.com must have passed at the provider or the
 overlay refuses to open; sandbox works meanwhile.

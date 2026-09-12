@@ -154,6 +154,21 @@ skipped; `gen_random_uuid()` is core Postgres since 13 either way), and that
 the `postgres` role in the SQL editor carries `bypassrls` as Supabase's own
 documentation states.
 
+## Why `0001` still gets edited in place
+
+**2026-09-12: `0001` has not been run anywhere** — not on production, not on a
+staging project, not on a preview. Until it has, a correction to the schema is
+an edit to this file, not a second migration. That is how the `plan` check
+constraints on `subscriptions` and `checkout_intents` came to read
+`('monthly','yearly')`: the design once carried a third value,
+`practitioner_yearly`, so that offering a separate practitioner plan would be a
+config change. The owner closed that option on 2026-09-12 — one plan,
+everything included, billed monthly or yearly — and the value was removed from
+`0001` rather than dropped by a `0002`.
+
+Once you have run `0001` against the real project, this stops being true: from
+that moment every schema change is a new numbered file, per the section below.
+
 ## Adding a later migration
 
 - Name it `NNNN_short_description.sql`, numbered after the last one. Apply in

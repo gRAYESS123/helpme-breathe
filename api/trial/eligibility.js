@@ -7,7 +7,7 @@
  *
  * Request
  *   Authorization: Bearer <supabase access token>
- *   { "plan": "monthly" | "yearly" | "practitioner_yearly", "device_mirror": "<uuid>.<mac>" }
+ *   { "plan": "monthly" | "yearly", "device_mirror": "<uuid>.<mac>" }
  *
  *   That is the whole body. No signals, no consent flag, no device id, and no
  *   client-supplied price. `device_mirror` is honoured only when its MAC
@@ -71,7 +71,6 @@ const METHODS = 'POST, OPTIONS';
 export const REQUIRED_ENV = Object.freeze(['TRIAL_PEPPER', 'DEVICE_PEPPER', 'MOR_API_KEY', 'MOR_PRICE_MONTHLY', 'MOR_PRICE_YEARLY']);
 export const TRIAL_ENV = Object.freeze(['MOR_PRICE_MONTHLY_TRIAL', 'MOR_PRICE_YEARLY_TRIAL']);
 export const OPTIONAL_ENV = Object.freeze([
-  'MOR_PRICE_PRACTITIONER',
   'MOR_API_BASE',
   'MOR_SANDBOX',
   'SITE_ORIGIN',

@@ -44,7 +44,7 @@ create table if not exists public.subscriptions (
   provider_customer_id      text,
   provider_price_id         text,
   plan                      text not null check (plan in
-                              ('monthly','yearly','practitioner_yearly')),
+                              ('monthly','yearly')),
   status                    text not null check (status in
                               ('trialing','active','past_due','paused','canceled','expired')),
   had_trial                 boolean not null default false,
@@ -131,7 +131,7 @@ create table if not exists public.checkout_intents (
   user_id         uuid not null references auth.users(id) on delete cascade,
   email_hash      bytea,
   device_id       uuid,
-  plan            text not null check (plan in ('monthly','yearly','practitioner_yearly')),
+  plan            text not null check (plan in ('monthly','yearly')),
   trial_granted   boolean not null default false,
   price_id        text not null,
   provider        text not null,

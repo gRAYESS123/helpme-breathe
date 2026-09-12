@@ -18,7 +18,6 @@ process.env.LICENSE_SECRET = 'TESTFIXTURE-license-secret-not-real';
 process.env.SUPABASE_URL = 'https://testfixture.supabase.co';
 process.env.SUPABASE_SECRET_KEY = 'TESTFIXTURE-supabase-secret-not-real';
 process.env.SITE_ORIGIN = 'https://helpmebreath.com';
-delete process.env.MOR_PRICE_PRACTITIONER;
 
 // Lives in tools/; HMB_REPO_ROOT lets it run from anywhere else.
 const REPO = process.env.HMB_REPO_ROOT
@@ -252,14 +251,16 @@ test('decideVerdict: every failure mode is the free widget, never a throw', asyn
   }
 });
 
-test('decideVerdict: under D2 = two a consumer plan is not commercial; the practitioner plan is', async () => {
+test('decideVerdict: every plan we sell carries the com claim; a row with no live access does not', async () => {
   const wl = await credential();
-  const consumer = seededLedger({ subscription: { plan: 'monthly' } });
-  const no = await frame.decideVerdict(frameRequest(wl), { now: NOW, fetchImpl: consumer.fetchImpl, sample: 1, ip: '203.0.113.60', practitionerPlanOffered: true });
-  assert.deepEqual(no, { whitelabel: false, reason: 'not_commercial' });
-  const practitioner = seededLedger({ subscription: { plan: 'practitioner_yearly' } });
-  const yes = await frame.decideVerdict(frameRequest(wl), { now: NOW, fetchImpl: practitioner.fetchImpl, sample: 1, ip: '203.0.113.61', practitionerPlanOffered: true });
-  assert.deepEqual(yes, { whitelabel: true, reason: 'ok' });
+  for (const plan of ['monthly', 'yearly']) {
+    const live = seededLedger({ subscription: { plan } });
+    const out = await frame.decideVerdict(frameRequest(wl), { now: NOW, fetchImpl: live.fetchImpl, sample: 1, ip: '203.0.113.60' });
+    assert.deepEqual(out, { whitelabel: true, reason: 'ok' }, plan);
+  }
+  const lapsed = seededLedger({ subscription: { plan: 'monthly', status: 'canceled', access_until: new Date(NOW - DAY).toISOString() } });
+  const gone = await frame.decideVerdict(frameRequest(wl), { now: NOW, fetchImpl: lapsed.fetchImpl, sample: 1, ip: '203.0.113.61' });
+  assert.deepEqual(gone, { whitelabel: false, reason: 'lapsed' });
   // Two rows: the entitlement takes the one with the later access_until (section 13).
   const churned = seededLedger({ subscription: { status: 'canceled', access_until: new Date(NOW - DAY).toISOString() } });
   churned.tables.subscriptions.push({ user_id: USER, status: 'active', plan: 'monthly', access_until: new Date(NOW + 10 * DAY).toISOString() });
@@ -376,7 +377,6 @@ function tokenDeps(ledger, overrides = {}) {
     assertLiveUser: async (jwt) => (jwt === 'TESTFIXTURE-live-jwt' ? { ok: true, sub: USER } : { ok: false, reason: 'bad_signature' }),
     rest: (method, path, options = {}) => entitlement.rest(method, path, { ...options, fetchImpl: ledger.fetchImpl }),
     limit: async () => ({ allowed: true, reason: 'ok' }),
-    practitionerPlanOffered: () => false,
     now: () => NOW,
     secret: () => SECRET,
     newId: (prefix) => `${prefix}testfixture${String((n += 1)).padStart(6, '0')}`,
@@ -519,20 +519,23 @@ test('GET lists groups with their credentials and live flags', async () => {
   assert.equal(body.groups[0].credentials[0].live, false);
 });
 
-test('the limiter fails closed and D2 = two gates on the practitioner plan', async () => {
+test('the limiter fails closed; a lapsed subscriber may not mint, a live one on either plan may', async () => {
   const ledger = seededLedger();
   const limited = await token.handle(tokenRequest('POST', { domains: ['a.example'] }), tokenDeps(ledger, { limit: async () => ({ allowed: false, reason: 'limited' }) }));
   assert.equal(limited.status, 429);
   const down = await token.handle(tokenRequest('POST', { domains: ['a.example'] }), tokenDeps(ledger, { limit: async () => ({ allowed: false, reason: 'limiter_unavailable' }) }));
   assert.equal(down.status, 503);
 
-  const consumer = await token.handle(tokenRequest('POST', { domains: ['a.example'] }), tokenDeps(ledger, { practitionerPlanOffered: () => true }));
-  assert.equal(consumer.status, 403);
-  assert.equal((await consumer.json()).reason, 'commercial_plan_required');
+  const lapsed = seededLedger({ subscription: { plan: 'monthly', status: 'canceled', access_until: new Date(NOW - DAY).toISOString() } });
+  const refused = await token.handle(tokenRequest('POST', { domains: ['a.example'] }), tokenDeps(lapsed));
+  assert.equal(refused.status, 403);
+  assert.equal((await refused.json()).reason, 'subscription_required');
 
-  const practitioner = seededLedger({ subscription: { plan: 'practitioner_yearly' } });
-  const okRes = await token.handle(tokenRequest('POST', { domains: ['a.example'] }), tokenDeps(practitioner, { practitionerPlanOffered: () => true }));
-  assert.equal(okRes.status, 200);
+  for (const plan of ['monthly', 'yearly']) {
+    const live = seededLedger({ subscription: { plan } });
+    const okRes = await token.handle(tokenRequest('POST', { domains: ['a.example'] }), tokenDeps(live));
+    assert.equal(okRes.status, 200, plan);
+  }
 });
 
 /* ------------------------------------------------- POST /api/entitlement */

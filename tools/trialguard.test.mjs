@@ -59,7 +59,6 @@ const ENV = Object.freeze({
   MOR_PRICE_MONTHLY: 'TESTFIXTURE_price_monthly',
   MOR_PRICE_YEARLY_TRIAL: 'TESTFIXTURE_price_yearly_trial',
   MOR_PRICE_YEARLY: 'TESTFIXTURE_price_yearly',
-  MOR_PRICE_PRACTITIONER: '',
 });
 
 const NOW = Date.parse('2026-09-11T12:00:00.000Z');
@@ -450,14 +449,19 @@ test('priceIdFor chooses server-side from (plan, trial) and prefers the adapter'
   assert.equal(priceIdFor({ plan: 'monthly', trial: true }, ENV), 'TESTFIXTURE_price_monthly_trial');
   assert.equal(priceIdFor({ plan: 'monthly', trial: false }, ENV), 'TESTFIXTURE_price_monthly');
   assert.equal(priceIdFor({ plan: 'yearly', trial: true }, ENV), 'TESTFIXTURE_price_yearly_trial');
-  assert.equal(priceIdFor({ plan: 'practitioner_yearly', trial: true }, ENV), '', 'no trial price exists for the practitioner plan');
-  assert.equal(priceIdFor({ plan: 'practitioner_yearly', trial: false }, ENV), '', 'D2 = one: not configured');
+  assert.equal(priceIdFor({ plan: 'yearly', trial: false }, ENV), 'TESTFIXTURE_price_yearly');
   assert.equal(priceIdFor({ plan: 'nope', trial: false }, ENV), '');
   const adapter = { priceIdFor: ({ plan, trial }) => `adapter_${plan}_${trial ? 'trial' : 'paid'}` };
   assert.equal(priceIdFor({ plan: 'monthly', trial: true }, ENV, adapter), 'adapter_monthly_trial');
+  assert.equal(planAvailable('monthly', ENV), true);
+  assert.equal(planAvailable('yearly', ENV), true);
+  // Sellable means "known plan AND a paid price in env" — a known plan whose
+  // price var is blank is not sellable on this deployment.
+  assert.equal(planAvailable('yearly', { ...ENV, MOR_PRICE_YEARLY: '' }), false);
+  // One plan, two billing periods. There is no third value to configure.
   assert.equal(planAvailable('practitioner_yearly', ENV), false);
-  assert.equal(planAvailable('practitioner_yearly', { ...ENV, MOR_PRICE_PRACTITIONER: 'TESTFIXTURE_pract' }), true);
-  assert.deepEqual(PLANS, ['monthly', 'yearly', 'practitioner_yearly']);
+  assert.equal(planAvailable('practitioner_yearly', { ...ENV, MOR_PRICE_PRACTITIONER: 'TESTFIXTURE_pract' }), false);
+  assert.deepEqual(PLANS, ['monthly', 'yearly']);
 });
 
 // --------------------------------------------------------- runEligibility --
@@ -718,28 +722,39 @@ test('eligibility: yearly plan uses the yearly prices; unknown or unconfigured p
   const bad = await run({ plan: 'lifetime' });
   assert.equal(bad.result.status, 400);
   assert.equal(bad.result.body.error, 'bad_plan');
+  assert.deepEqual(bad.result.body.plans, ['monthly', 'yearly'], 'the refusal names the plans we sell');
+
+  // The retired second plan is now simply an unknown plan: refused, and no
+  // env var can bring it back.
   const pract = await run({ plan: 'practitioner_yearly' });
-  assert.equal(pract.result.status, 400, 'D2 = one: practitioner price not configured');
+  assert.equal(pract.result.status, 400);
+  assert.equal(pract.result.body.error, 'bad_plan');
+  const practConfigured = await run({
+    plan: 'practitioner_yearly',
+    env: { ...ENV, MOR_PRICE_PRACTITIONER: 'TESTFIXTURE_price_practitioner' },
+  });
+  assert.equal(practConfigured.result.status, 400, 'no env var revives a plan that no longer exists');
+  assert.equal(practConfigured.result.body.error, 'bad_plan');
 });
 
 test('eligibility: a plan with no trial price never offers a trial and writes no reservation', async () => {
-  // D2 = two: the practitioner plan is sold, but it has no trial price at all.
-  const env = { ...ENV, MOR_PRICE_PRACTITIONER: 'TESTFIXTURE_price_practitioner' };
-  const { result, ledger, provider } = await run({ plan: 'practitioner_yearly', env });
-  assert.equal(result.status, 200, 'never a 503 after the ladder has run');
+  // A monthly plan whose trial price env var is missing: still sellable at the
+  // full price, never a trial, and the ladder is skipped entirely.
+  const { result, ledger, provider } = await run({ env: { ...ENV, MOR_PRICE_MONTHLY_TRIAL: '' } });
+  assert.equal(result.status, 200, 'never a 503: the buyer can still subscribe at full price');
   assert.equal(result.body.trial, false);
   assert.deepEqual(result.body.reasons, [REASONS.TRIAL_DISABLED]);
   assert.equal(ledger.state.claims.size, 0, 'no reservation for a trial that cannot be sold');
   assert.ok(!ledger.state.calls.includes('findClaim'), 'the ladder is not run');
-  assert.equal(provider.calls.find((c) => c[0] === 'createCheckoutSession')[1].priceId, 'TESTFIXTURE_price_practitioner');
+  assert.equal(provider.calls.find((c) => c[0] === 'createCheckoutSession')[1].priceId, 'TESTFIXTURE_price_monthly');
   assert.equal(ledger.state.intents[0].trial_granted, false);
 
-  // The same holds for a monthly plan whose trial price env var is missing.
-  const noTrialPrice = await run({ env: { ...ENV, MOR_PRICE_MONTHLY_TRIAL: '' } });
-  assert.equal(noTrialPrice.result.status, 200);
-  assert.equal(noTrialPrice.result.body.trial, false);
-  assert.deepEqual(noTrialPrice.result.body.reasons, [REASONS.TRIAL_DISABLED]);
-  assert.equal(noTrialPrice.ledger.state.claims.size, 0);
+  // Same for yearly.
+  const yearly = await run({ plan: 'yearly', env: { ...ENV, MOR_PRICE_YEARLY_TRIAL: '' } });
+  assert.equal(yearly.result.status, 200);
+  assert.equal(yearly.result.body.trial, false);
+  assert.equal(yearly.ledger.state.claims.size, 0);
+  assert.equal(yearly.provider.calls.find((c) => c[0] === 'createCheckoutSession')[1].priceId, 'TESTFIXTURE_price_yearly');
 });
 
 test('eligibility: a refused caller does not also consume the network bucket; an intent failure on a no-trial answer alerts once', async () => {
@@ -1100,6 +1115,15 @@ test('POST /api/trial/eligibility: 400 on a bad body or plan; a GET is 405', asy
   const badPlan = await handler.POST(postEligibility({ plan: 'lifetime' }));
   assert.equal(badPlan.status, 400);
   assert.equal((await badPlan.json()).error, 'bad_plan');
+
+  // 2026-09-12: there is one plan. The retired second plan value is refused
+  // like any other unknown plan — there is no env var left that accepts it.
+  const retiredPlan = await handler.POST(postEligibility({ plan: 'practitioner_yearly' }));
+  assert.equal(retiredPlan.status, 400);
+  const retiredBody = await retiredPlan.json();
+  assert.equal(retiredBody.error, 'bad_plan');
+  assert.deepEqual(retiredBody.plans, ['monthly', 'yearly']);
+
   const noPlan = await handler.POST(postEligibility({ device_mirror: 'x' }));
   assert.equal(noPlan.status, 400);
   const get = await handler.GET(new Request(`${ORIGIN}/api/trial/eligibility`, { headers: { origin: ORIGIN, 'x-forwarded-host': 'helpmebreath.com' } }));

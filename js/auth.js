@@ -68,7 +68,7 @@ const METHOD_KEY = 'hmb.signin.method';
 const IDB_NAME = 'hmb';
 const IDB_STORE = 'kv';
 
-const INTENT_RE = /^(none|subscribe:(monthly|yearly|practitioner_yearly))$/;
+const INTENT_RE = /^(none|subscribe:(monthly|yearly))$/;
 const DEVICE_MIRROR_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.[A-Za-z0-9_-]{16,128}$/i;
 const OTP_TYPES = new Set(['email', 'magiclink', 'signup', 'recovery', 'invite', 'email_change']);
 const METHODS = new Set(['magic_link', 'otp_code', 'google']);
@@ -317,7 +317,7 @@ export function validateNext(value) {
 }
 
 /**
- * `intent` must match `^(none|subscribe:(monthly|yearly|practitioner_yearly))$`.
+ * `intent` must match `^(none|subscribe:(monthly|yearly))$`.
  * @param {unknown} value
  * @returns {string} the intent, or 'none'
  */

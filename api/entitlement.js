@@ -12,7 +12,7 @@
  * question is whether the credential is genuine and still live: signed by us,
  * not expired, not revoked, not past its rotation overlap, and issued by a
  * subscriber whose access has not lapsed and whose plan carries the `com`
- * claim (§7.2 — every plan under D2 = one). This endpoint answers exactly
+ * claim (§7.2 — every plan does; there is one plan). This endpoint answers exactly
  * that, from the signature and the ledger in Postgres, through the same
  * api/_lib/entitlement.js#entitlementFor() that api/me.js uses.
  *
@@ -56,7 +56,7 @@
 
 import { b64urlEncode, verifyToken } from './_lib/crypto.js';
 import { entitlementFor } from './_lib/entitlement.js';
-import { hasEnv, readEnv, requireEnv } from './_lib/env.js';
+import { readEnv, requireEnv } from './_lib/env.js';
 import { createLimiter, rateLimitHeaders } from './_lib/ratelimit.js';
 import {
   clientIp,
@@ -169,19 +169,19 @@ export const OWNER_COLUMNS = 'access_until,status,plan,last_event_at,updated_at,
  * The issuing subscriber's standing, through the same function api/me.js uses
  * (api/_lib/entitlement.js#entitlementFor), so the frame, the /s/ link and
  * the account page can never disagree about who is a subscriber and who holds
- * the `com` claim. Under D2 = one every pro entitlement is commercial; under
- * D2 = two (MOR_PRICE_PRACTITIONER set) only the practitioner plan is, and a
- * credential minted before a downgrade stops white-labelling at the next load.
+ * the `com` claim. There is one plan and it includes commercial use, so every
+ * live pro entitlement is commercial; a credential minted before the
+ * subscription lapses stops white-labelling at the next load.
+ *
+ * `not_commercial` stays in the vocabulary as the "pro but no `com`" branch —
+ * unreachable while one plan is the whole offer, and the caller's fallback.
  *
  * @param {object[]|null|undefined} rows every `subscriptions` row for the user
  * @param {number} now
- * @param {{practitionerPlanOffered?:boolean}} [options]
  * @returns {{ok:boolean, reason:'ok'|'lapsed'|'not_commercial', plan:string|null}}
  */
-export function ownerStanding(rows, now, options = {}) {
-  const practitionerPlanOffered =
-    typeof options.practitionerPlanOffered === 'boolean' ? options.practitionerPlanOffered : hasEnv('MOR_PRICE_PRACTITIONER');
-  const ent = entitlementFor(Array.isArray(rows) ? rows : [], now, { practitionerPlanOffered });
+export function ownerStanding(rows, now) {
+  const ent = entitlementFor(Array.isArray(rows) ? rows : [], now);
   if (ent.tier !== 'pro') return { ok: false, reason: 'lapsed', plan: ent.plan };
   if (!ent.commercial) return { ok: false, reason: 'not_commercial', plan: ent.plan };
   return { ok: true, reason: 'ok', plan: ent.plan };
@@ -253,7 +253,7 @@ export async function verifyEmbedCredential(token, secret, options = {}) {
  * "attribution stays"; nothing here ever grants on a blank.
  *
  * @param {object} payload a payload from verifyEmbedCredential()
- * @param {{now?:number, fetchImpl?:typeof fetch, timeoutMs?:number, practitionerPlanOffered?:boolean}} [options]
+ * @param {{now?:number, fetchImpl?:typeof fetch, timeoutMs?:number}} [options]
  * @returns {Promise<{ok:boolean, reason:string, credential?:object, group?:object, domains?:string[]}>}
  *   reason: ok | unavailable | unknown | mismatch | revoked | superseded | expired | lapsed | not_commercial
  */
@@ -306,7 +306,7 @@ export async function credentialStatus(payload, options = {}) {
   const expires = credential.expires_at ? Date.parse(credential.expires_at) : NaN;
   if (!Number.isFinite(expires) || now >= expires) return { ok: false, reason: 'expired' };
 
-  const owner = ownerStanding(subs.data, now, { practitionerPlanOffered: options.practitionerPlanOffered });
+  const owner = ownerStanding(subs.data, now);
   if (!owner.ok) return { ok: false, reason: owner.reason };
 
   return {

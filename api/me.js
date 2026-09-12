@@ -54,7 +54,7 @@ import {
   toIso,
   verifyEntitlementToken,
 } from './_lib/entitlement.js';
-import { hasEnv, requireEnv } from './_lib/env.js';
+import { requireEnv } from './_lib/env.js';
 import { createLimiter, rateLimitHeaders } from './_lib/ratelimit.js';
 import { clientIp, errorResponse, json, methodNotAllowed, preflight } from './_lib/respond.js';
 
@@ -98,7 +98,7 @@ function trialHint(rows, entitlement, trialEnabled) {
  *   verifyAccessToken:(jwt:string)=>Promise<{ok:boolean, sub?:string, email?:string, reason?:string}>,
  *   store:{subscriptionsFor:(id:string)=>Promise<object[]>, profileFor:(id:string)=>Promise<object|null>},
  *   resolveDevice?:(request:Request, options:{mirror:string, now:number})=>Promise<{cookieValue:string, deviceId?:string, freeSessionsUsed?:number}|null>,
- *   secret:string, kid?:string, trialEnabled?:boolean, practitionerPlanOffered?:boolean,
+ *   secret:string, kid?:string, trialEnabled?:boolean,
  *   now?:()=>number, limiter?:{check:Function}
  * }} deps
  * @returns {{GET:(request:Request)=>Promise<Response>, OPTIONS:(request:Request)=>Promise<Response>}}
@@ -110,7 +110,6 @@ export function createMeHandler(deps) {
     resolveDevice = null,
     secret,
     trialEnabled = false,
-    practitionerPlanOffered = false,
     now = () => Date.now(),
   } = deps;
   const rate = deps.limiter || limiter;
@@ -167,7 +166,7 @@ export function createMeHandler(deps) {
         return failOpen(request, sub, identity, at, kid, cookies, deviceId, freeSessionsUsed);
       }
 
-      const entitlement = entitlementFor(rows, at, { practitionerPlanOffered });
+      const entitlement = entitlementFor(rows, at);
       const signed = await signEntitlement({ sub, entitlement, secret, kid, now: at });
       cookies.unshift(entitlementCookie(signed.token));
 
@@ -334,7 +333,6 @@ async function defaultDeps() {
       resolveDevice,
       secret: env.LICENSE_SECRET,
       trialEnabled,
-      practitionerPlanOffered: hasEnv('MOR_PRICE_PRACTITIONER'),
     };
   })();
   depsPromise.catch(() => {

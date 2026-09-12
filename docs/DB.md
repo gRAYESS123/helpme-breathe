@@ -12,11 +12,16 @@ numbers below refer to it. Where this page and that document disagree, the
 design document wins and this page has a bug.
 
 Owner decisions this schema is built for: **D1** three free timer sessions per
-device before sign-in; **D2** one plan, `monthly` ($10) or `yearly` ($100),
+device before sign-in; **one plan**, `monthly` ($10) or `yearly` ($100),
 everything included; **D3** a 3-day card-required trial, one per person,
-locked by a MAC'd device cookie and a peppered email hash. The
-`practitioner_yearly` plan value ships in the enums so that a later D2 change
-is a config change, not a migration.
+locked by a MAC'd device cookie and a peppered email hash.
+
+> **2026-09-12.** The `plan` enums used to carry a third value,
+> `practitioner_yearly`, so that offering a separate practitioner plan would be
+> a config change rather than a migration. The owner closed that option
+> permanently. The value is gone from both check constraints in
+> `supabase/migrations/0001_accounts_billing.sql`, which is an edit rather than
+> a `0002` because `0001` has not been run anywhere yet.
 
 ---
 
@@ -131,7 +136,7 @@ row that produced it (§6.5).
 | `provider_subscription_id` | `text` | no | — | The provider's subscription id (`sub_…`). With `provider`, the join key forever once resolved (§6.3). | 5 |
 | `provider_customer_id` | `text` | yes | — | The provider's customer id (`ctm_…`). Second-choice join for a webhook with no usable reservation id. | 5 |
 | `provider_price_id` | `text` | yes | — | The provider price the subscription is on (`pri_…`). Checked against the reservation at `sub.created` — a trial price with no `trial_granted` reservation is cancelled immediately (§6.3). | 5 |
-| `plan` | `text` check | no | — | `monthly`, `yearly` or `practitioner_yearly`. Under D2 = one, only the first two occur. | 5 |
+| `plan` | `text` check | no | — | `monthly` or `yearly` — two billing periods for the one plan. | 5 |
 | `status` | `text` check | no | — | `trialing`, `active`, `past_due`, `paused`, `canceled` (the provider's five) plus the local `expired`, set only by the retention job. | 5, 3 |
 | `had_trial` | `boolean` | no | `false` | This subscription began with a trial. Set from the reservation row, never from `custom_data`. | 5 |
 | `ever_paid` | `boolean` | no | `false` | A non-zero `transaction.completed` has been seen. **Gates the past-due grace:** a decline at trial conversion (`ever_paid = false`) ends access at `trial_ends_at`, not seven days later (§6.5). | 5 |
@@ -244,7 +249,7 @@ whether a trial was granted, which price — is read from here (§5.4, §6.3).
 | `user_id` | `uuid` → `auth.users(id)` cascade | no | — | From the verified JWT `sub`. | 4 |
 | `email_hash` | `bytea` | yes | — | The same HMAC as `trial_claims.email_hash`, so the webhook can update the ledger without the email. | 4 |
 | `device_id` | `uuid` | yes | — | The verified device. The webhook burns `devices.trial_consumed_at` from **this**, never from `custom_data`. | 4 |
-| `plan` | `text` check | no | — | `monthly`, `yearly` or `practitioner_yearly`. | 4 |
+| `plan` | `text` check | no | — | `monthly` or `yearly`. | 4 |
 | `trial_granted` | `boolean` | no | `false` | The ladder's verdict. A subscription arriving on a trial price with no matching `trial_granted = true` row is cancelled at the provider immediately (§6.3). | 4 |
 | `price_id` | `text` | no | — | Chosen server-side from `(plan, trial)`. Never client-supplied. | 4 |
 | `provider` | `text` | no | — | Adapter id. | 4 |
@@ -276,7 +281,7 @@ the group at once (§9.3). Cascades from the account.
 | `revoked_at` | `timestamptz` | yes | — | Set by `DELETE /api/embed/token`. Invalidates **every** `jti` in the group immediately. | 8 |
 | `last_seen_at` | `timestamptz` | yes | — | Last verified render. | 8 |
 | `hit_count` | `bigint` | no | `0` | Verified renders, sampled 1-in-10 to keep the write cheap (§9.4). | 8 |
-| `verify_count_30d` | `bigint` | no | `0` | Rolling 30-day count, so the owner can see one subscriber serving outsized volume — the data behind the D2 pricing question (§9.5). Maintained by task 8; the roll-off is task 8's to define. | 8 |
+| `verify_count_30d` | `bigint` | no | `0` | Rolling 30-day count, so the owner can see one subscriber serving outsized volume — the fair-use signal (§9.5). Maintained by task 8; the roll-off is task 8's to define. | 8 |
 
 **Indexes:** `embed_tokens_user_idx (user_id)`.
 
@@ -447,7 +452,7 @@ where status in ('active','trialing') and access_until > now() group by 1;
 select date_trunc('month', canceled_at) as m, count(*) from public.subscriptions
 where canceled_at is not null group by 1 order by 1 desc limit 6;
 
--- one subscriber serving outsized embed volume (the D2 signal)
+-- one subscriber serving outsized embed volume (the fair-use signal)
 select token_id, verify_count_30d from public.embed_tokens order by 2 desc limit 10;
 
 -- anything the webhook pipeline has not finished with

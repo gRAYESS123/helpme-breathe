@@ -284,19 +284,20 @@ import { SUPABASE, CHECKOUT, PLANS, TIMER_FREE_SESSIONS, MOR_LEGAL } from '/js/c
 |---|---|---|
 | `SUPABASE` | `{ url, publishableKey }` | `js/auth.js` only. |
 | `CHECKOUT` | `{ clientToken, sandbox, previewPriceIds: { monthly, yearly } }` | `js/checkout.js` only. Empty `clientToken` means checkout is closed and every button renders a calm "Checkout is not open yet" card. `previewPriceIds` are used by `/pro` **only** to show a localised total; they never open a checkout. |
-| `PLANS` | `{ mode, available, default, trialDays, refundDays, monthly, yearly, practitioner_yearly }` | The whole site, for copy. |
+| `PLANS` | `{ available, default, trialDays, refundDays, monthly, yearly }` | The whole site, for copy. |
 | `TIMER_FREE_SESSIONS` | `3` | `js/entitlements.js#requireTimer()` **and nowhere else**. |
 | `MOR_LEGAL` | one sentence | Every page that mentions who takes the money. |
 
-`PLANS.mode` is `'one'`: `available` is `['monthly', 'yearly']`, `default` is
-`'monthly'`, `trialDays` is `3`, `refundDays` is `14`. Each plan definition is
+`available` is `['monthly', 'yearly']`, `default` is `'monthly'`, `trialDays`
+is `3`, `refundDays` is `14`. Each plan definition is
 `{ key, label, price, currency, interval, per, commercial }` — US list prices,
 for copy only. What a person is actually charged comes from the provider's own
 price preview and receipt.
 
-`practitioner_yearly` is defined but **not offered**: it exists so that a second
-plan would be a config change rather than a migration. The mode flag is branched
-on in this file and nowhere else; everything downstream reads `PLANS.available`.
+There is no second plan and no switch for one. Owner decision 2026-09-12: no
+practitioner or therapist plan, now or later; the `practitioner_yearly` value
+that once shipped as a latent option was removed the same day. Everything
+downstream reads `PLANS.available`.
 
 There is no `mode: 'link' | 'paddle' | 'waitlist'`, no hosted payment link, no
 price id for opening a checkout, and no waitlist. The browser never chooses a

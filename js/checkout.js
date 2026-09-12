@@ -6,7 +6,7 @@
  *   <button type="button" data-action="checkout" data-plan="monthly">Subscribe</button>
  *
  * and this module handles the click. `data-plan` is one of `PLANS.available`
- * from js/config.js ('monthly' or 'yearly' under D2 = 'one'). Rebuilt
+ * from js/config.js ('monthly' or 'yearly'). Rebuilt
  * 2026-09-11 against docs/private/ACCOUNTS_BILLING_DESIGN.md §4.4 and §5.5.
  *
  * The price is never client-chosen. `subscribe(plan)`:
@@ -344,7 +344,7 @@ function renderNoTrialNote(plan, trigger, target, reasons) {
  */
 export function openSignIn(options = {}) {
   const next = safeNext(options.next || currentPath());
-  const intent = /^(none|subscribe:(monthly|yearly|practitioner_yearly))$/.test(String(options.intent || ''))
+  const intent = /^(none|subscribe:(monthly|yearly))$/.test(String(options.intent || ''))
     ? String(options.intent)
     : 'none';
   const params = new URLSearchParams({ next, intent });
@@ -358,7 +358,7 @@ export function openSignIn(options = {}) {
 /**
  * Start a subscription for one interval of the plan.
  *
- * @param {'monthly'|'yearly'|'practitioner_yearly'} plan
+ * @param {'monthly'|'yearly'} plan
  * @param {{trigger?:Element, container?:Element, placement?:string}} [options]
  * @returns {Promise<{ok:boolean, mode:string, plan:string, trial?:boolean, reservationId?:string, error?:string}>}
  */

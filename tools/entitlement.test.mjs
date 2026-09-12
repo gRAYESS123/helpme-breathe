@@ -266,12 +266,13 @@ test('entitlementFor: maximum access_until across rows wins, with that row\'s st
   assert.equal(entitlementFor([unwritten], NOW).tier, 'free', 'a missing access_until grants nothing');
 });
 
-test('commercial claim: D2=one makes every pro entitlement commercial; D2=two only the practitioner plan', () => {
+test('commercial claim: one plan, so every live pro entitlement is commercial', () => {
   assert.equal(commercialFor('monthly'), true);
-  assert.equal(commercialFor('yearly', { practitionerPlanOffered: false }), true);
-  assert.equal(commercialFor('monthly', { practitionerPlanOffered: true }), false);
-  assert.equal(commercialFor('practitioner_yearly', { practitionerPlanOffered: true }), true);
+  assert.equal(commercialFor('yearly'), true);
   assert.equal(commercialFor(null), false);
+  assert.equal(commercialFor('practitioner_yearly'), false, 'a plan we do not sell carries nothing');
+  // No switch survives: a stray options object cannot narrow the claim.
+  assert.equal(commercialFor('monthly', { practitionerPlanOffered: true }), true);
   const lapsed = stored({ status: 'canceled', cancel_at: iso(NOW - DAY), canceled_at: iso(NOW - DAY) });
   assert.equal(entitlementFor([lapsed], NOW).commercial, false, 'no commercial rights without access');
 });

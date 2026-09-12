@@ -88,17 +88,16 @@ export function getProvider(name) {
 // --------------------------------------------------------------------------
 
 /** The plan enum, exactly as the subscriptions.plan CHECK constraint spells it. */
-export const PLANS = Object.freeze(['monthly', 'yearly', 'practitioner_yearly']);
+export const PLANS = Object.freeze(['monthly', 'yearly']);
 
 /**
  * Which env var holds the provider price id (Paddle `pri_…`) or product path
- * (FastSpring) for each (plan, trial) pair. `null` means "this plan has no
- * trial price" — the practitioner plan never trials.
+ * (FastSpring) for each (plan, trial) pair. `null` would mean "this plan has
+ * no trial price"; both plans carry one today.
  */
 export const PRICE_ENV = Object.freeze({
   monthly: Object.freeze({ trial: 'MOR_PRICE_MONTHLY_TRIAL', paid: 'MOR_PRICE_MONTHLY' }),
   yearly: Object.freeze({ trial: 'MOR_PRICE_YEARLY_TRIAL', paid: 'MOR_PRICE_YEARLY' }),
-  practitioner_yearly: Object.freeze({ trial: null, paid: 'MOR_PRICE_PRACTITIONER' }),
 });
 
 /**
@@ -298,7 +297,6 @@ export const PROVIDER_ENV_OPTIONAL = Object.freeze([
   'MOR_PRICE_MONTHLY',
   'MOR_PRICE_YEARLY_TRIAL',
   'MOR_PRICE_YEARLY',
-  'MOR_PRICE_PRACTITIONER',
   'SITE_ORIGIN',
 ]);
 

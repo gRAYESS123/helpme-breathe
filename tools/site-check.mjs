@@ -1680,7 +1680,7 @@ function checkVercelJson() {
  *     be present on the two crisis pages.
  *  2. No provider is named in api/ or js/ outside the seam (the adapters, the
  *     env registry, js/config.js and js/checkout.js), so one env var can swap
- *     the payment rail.
+ *     the payment rail. And no trace of a second plan: one plan, no switch.
  *  3. The "no account / free forever" promises that were true before accounts
  *     existed must not come back. A short allowlist covers the sentences that
  *     are still true (the first three sessions, the widget, the client links).
@@ -1696,6 +1696,8 @@ const OPEN_TIMER_ALLOWED = new Set([
 const OPEN_TIMER_REQUIRED = ['breathing-exercises-anxiety.html', 'breathing-exercises-for-panic-attacks.html'];
 const PROVIDER_SEAM = ['api/_lib/providers/', 'api/_lib/env.js', 'js/config.js', 'js/checkout.js'];
 const PROVIDER_RE = /\b(paddle|fastspring)\b/gi;
+/** Owner decision 2026-09-12: one plan, no practitioner or therapist plan, no switch for one. */
+const SECOND_PLAN_RE = /practitioner_yearly|MOR_PRICE_PRACTITIONER|practitionerPlanOffered|PLAN_MODE/g;
 const COPY_TRUTH_HARD = [
   { re: /free forever/gi, label: 'free forever' },
   { re: /always free/gi, label: 'always free' },
@@ -1750,6 +1752,16 @@ function checkAccountsModel() {
     let m;
     while ((m = PROVIDER_RE.exec(code)) !== null) {
       ERR(file, lineOf(m.index), 'provider-outside-seam', `"${m[0]}" named outside the provider seam; go through api/_lib/providers/ or js/config.js`);
+    }
+  }
+  for (const file of [...allFiles].filter((f) => /^(api|js)\/.*\.js$/.test(f)).sort()) {
+    const raw = readText(file);
+    if (raw == null) continue;
+    const lineOf = makeLineLookup(raw);
+    SECOND_PLAN_RE.lastIndex = 0;
+    let m;
+    while ((m = SECOND_PLAN_RE.exec(raw)) !== null) {
+      ERR(file, lineOf(m.index), 'second-plan', `"${m[0]}": there is one plan and no switch for a second (owner decision 2026-09-12)`);
     }
   }
 

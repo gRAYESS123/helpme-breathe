@@ -53,7 +53,6 @@ const ENV = Object.freeze({
   MOR_PRICE_MONTHLY: 'pri_TESTFIXTURE_monthly',
   MOR_PRICE_YEARLY_TRIAL: 'pri_TESTFIXTURE_yearly_trial',
   MOR_PRICE_YEARLY: 'pri_TESTFIXTURE_yearly',
-  MOR_PRICE_PRACTITIONER: '',
 });
 
 const USER = 'b0a2c1de-0000-4000-8000-000000000001';
@@ -385,9 +384,11 @@ test('both adapters implement contract v3', () => {
 test('priceIdFor reads the server env and never a browser value', () => {
   assert.equal(priceIdFor({ plan: 'monthly', trial: true }, ENV), ENV.MOR_PRICE_MONTHLY_TRIAL);
   assert.equal(priceIdFor({ plan: 'yearly', trial: false }, ENV), ENV.MOR_PRICE_YEARLY);
-  assert.throws(() => priceIdFor({ plan: 'practitioner_yearly', trial: true }, ENV), /no trial price/);
-  assert.throws(() => priceIdFor({ plan: 'practitioner_yearly', trial: false }, ENV), /MOR_PRICE_PRACTITIONER/);
   assert.throws(() => priceIdFor({ plan: 'lifetime' }, ENV), /Unknown plan/);
+  // One plan, two billing periods: anything else is an unknown plan, including
+  // the second plan the design once reserved room for.
+  assert.throws(() => priceIdFor({ plan: 'practitioner_yearly', trial: false }, ENV), /Unknown plan/);
+  assert.throws(() => priceIdFor({ plan: 'monthly', trial: false }, { ...ENV, MOR_PRICE_MONTHLY: '' }), /Missing environment variable MOR_PRICE_MONTHLY/);
   assert.deepEqual(planForPriceId(ENV.MOR_PRICE_YEARLY_TRIAL, ENV), { plan: 'yearly', trial: true });
   assert.equal(isTrialPriceId(ENV.MOR_PRICE_MONTHLY_TRIAL, ENV), true);
   assert.equal(isTrialPriceId(ENV.MOR_PRICE_MONTHLY, ENV), false);

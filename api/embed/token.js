@@ -28,10 +28,10 @@
  * Any subscriber whose access has not lapsed AND whose plan carries the `com`
  * claim, decided by api/entitlement.js#ownerStanding() — a thin wrapper over
  * the same api/_lib/entitlement.js#entitlementFor() that api/me.js and the
- * frame use. Under owner decision D2 (one plan, everything included) that is
- * every subscriber, because commercialFor() answers true for every plan while
- * MOR_PRICE_PRACTITIONER is empty. If D2 ever becomes `two`, setting that env
- * var makes only `practitioner_yearly` eligible — no code moves.
+ * frame use. One plan includes everything, so that is every subscriber:
+ * commercialFor() answers true for every plan we sell. (The design once held
+ * a second, practitioner-only plan that would have narrowed this; the owner
+ * closed that option on 2026-09-12.)
  *
  * Credentials expire 30 days after issue (§9.3's example: iat + 30 d) and the
  * frame additionally checks the row's `expires_at`, the group's `revoked_at`
@@ -44,7 +44,7 @@
 import { bearerToken } from '../_lib/authz.js';
 import { kidFor, signToken } from '../_lib/crypto.js';
 import { dblimitCheck } from '../_lib/dblimit.js';
-import { hasEnv, readEnv, requireEnv } from '../_lib/env.js';
+import { readEnv, requireEnv } from '../_lib/env.js';
 import {
   errorResponse,
   json,
@@ -234,7 +234,6 @@ function defaultDeps() {
     assertLiveUser,
     rest,
     limit: (bucket, windowSeconds, limit) => dblimitCheck(bucket, windowSeconds, limit),
-    practitionerPlanOffered: () => hasEnv('MOR_PRICE_PRACTITIONER'),
     now: () => Date.now(),
     secret: () => requireEnv(['LICENSE_SECRET']).LICENSE_SECRET,
     newId: randomId,
@@ -250,7 +249,6 @@ function defaultDeps() {
  *   assertLiveUser:(jwt:string)=>Promise<{ok:boolean, sub?:string|null, reason?:string}>,
  *   rest:Function,
  *   limit:(bucket:string, windowSeconds:number, limit:number)=>Promise<{allowed:boolean, reason:string}>,
- *   practitionerPlanOffered:()=>boolean,
  *   now:()=>number, secret:()=>string, newId:(prefix:string)=>string
  * }} deps
  * @returns {Promise<Response>}
@@ -354,7 +352,7 @@ export async function handle(request, deps) {
       timeoutMs: 8000,
     });
     if (!subs.ok) return respond(503, { ok: false, reason: 'ledger_unavailable' });
-    const owner = ownerStanding(subs.data, now, { practitionerPlanOffered: deps.practitionerPlanOffered() });
+    const owner = ownerStanding(subs.data, now);
     if (owner.reason === 'lapsed') return respond(403, { ok: false, reason: 'subscription_required' });
     if (!owner.ok) return respond(403, { ok: false, reason: 'commercial_plan_required' });
 

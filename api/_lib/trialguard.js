@@ -56,14 +56,13 @@ export const DEVICE_COOKIE_MAX_AGE = 63072000;
 /** How long a granted trial is held for while the buyer is in the overlay. */
 export const RESERVATION_MINUTES = 30;
 
-/** The plans the server accepts. D2 = `one` ships without a practitioner price. */
-export const PLANS = Object.freeze(['monthly', 'yearly', 'practitioner_yearly']);
+/** The plans the server accepts: one plan, billed monthly or yearly. */
+export const PLANS = Object.freeze(['monthly', 'yearly']);
 
 /** Which env var holds the provider price id for each (plan, trial) pair. */
 export const PRICE_ENV = Object.freeze({
   monthly: Object.freeze({ trial: 'MOR_PRICE_MONTHLY_TRIAL', paid: 'MOR_PRICE_MONTHLY' }),
   yearly: Object.freeze({ trial: 'MOR_PRICE_YEARLY_TRIAL', paid: 'MOR_PRICE_YEARLY' }),
-  practitioner_yearly: Object.freeze({ trial: '', paid: 'MOR_PRICE_PRACTITIONER' }),
 });
 
 /** Machine-readable reasons a trial is refused (§5.4). The list is closed. */
@@ -519,8 +518,8 @@ export function priceIdFor(choice, env, provider) {
 }
 
 /**
- * Is this plan sellable given the configured prices? `practitioner_yearly`
- * exists only when MOR_PRICE_PRACTITIONER is set (D2 = `two`).
+ * Is this plan sellable given the configured prices? A known plan with no
+ * paid price id in env is not sellable on this deployment.
  * @param {string} plan
  * @param {Record<string,string>} env
  * @param {object} [provider]
@@ -733,9 +732,9 @@ export async function runEligibility(input) {
     return { status: 503, body: { ok: false, error: 'not_configured' }, cookieValue: null };
   }
 
-  // A plan with no trial price configured (practitioner_yearly under D2, or a
-  // missing MOR_PRICE_*_TRIAL) never offers a trial. Decided before the
-  // ladder so no reservation is ever written for a trial that cannot be sold.
+  // A plan with no trial price configured (a missing MOR_PRICE_*_TRIAL) never
+  // offers a trial. Decided before the ladder so no reservation is ever
+  // written for a trial that cannot be sold.
   const trialOffered = trialEnabled === true && priceIdFor({ plan, trial: true }, env, provider) !== '';
 
   const reasons = [];

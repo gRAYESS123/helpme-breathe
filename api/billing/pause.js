@@ -95,7 +95,7 @@ export function createPauseHandler(deps) {
       const at = now();
       const resumeAt = resumeAtFor(row, months, at);
       const effectiveFrom = 'next_billing_period';
-      const unit = row.plan === 'yearly' || row.plan === 'practitioner_yearly' ? 'year' : 'month';
+      const unit = row.plan === 'yearly' ? 'year' : 'month';
       let result;
       try {
         result = await provider.pauseSubscription(

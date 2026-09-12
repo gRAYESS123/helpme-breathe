@@ -516,10 +516,9 @@ export function isPro() {
 }
 
 /**
- * The commercial-rights claim. Under D2 = 'one' the server sets `com: 1` on
- * every pro token, so this equals isPro(); under 'two' it is true only on the
- * practitioner plan. Still exported because js/pro/* and /for-practitioners
- * call it.
+ * The commercial-rights claim. There is one plan and it includes commercial
+ * use, so the server sets `com: 1` on every pro token and this equals isPro().
+ * Still exported because js/pro/* and /for-practitioners call it.
  */
 export function isPractitioner() {
   return isPro() && Number(state.payload && state.payload.com) === 1;

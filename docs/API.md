@@ -273,9 +273,14 @@ with `transactionId` and the price was fixed on the server.
 | 502 | `{ ok: false, error: "checkout_unavailable" }` | The provider could not create a transaction. |
 | 503 | `{ ok: false, reason: "auth_unavailable" }` / configuration missing | Never a value, only a variable name. |
 
-Every 2xx sets `__Host-hmb_did`. The plan enum is `monthly`, `yearly`,
-`practitioner_yearly` — the third exists so that offering a second plan is a
-config change and not a migration; it is not sold today.
+Every 2xx sets `__Host-hmb_did`. The plan enum is `monthly` and `yearly` —
+two billing periods for the one plan. Anything else is `400 bad_plan`.
+
+> **2026-09-12.** The enum used to carry a third value, `practitioner_yearly`,
+> so that offering a separate practitioner plan would be a config change rather
+> than a migration. The owner closed that option permanently: one plan,
+> everything included. The value, its `MOR_PRICE_PRACTITIONER` price variable
+> and the flag that narrowed the `com` claim are gone from the server.
 
 ---
 
@@ -408,7 +413,9 @@ Full detail, including the snippets and the `/s/` link, is in
 Live bearer JWT on every method. Who may mint: any subscriber whose access has
 not lapsed and whose plan carries the `com` claim, decided by
 `ownerStanding()` — a thin wrapper over the same `entitlementFor()` that
-`/api/me` uses.
+`/api/me` uses. One plan includes commercial use, so that is every live
+subscriber; the `commercial_plan_required` branch remains as the fallback if
+`ownerStanding()` ever answers pro-but-not-commercial.
 
 | Call | Body / query | Answers |
 |---|---|---|
@@ -668,7 +675,6 @@ one-to-one. **Required** means "counted in `/api/health`'s `missing`".
 | `MOR_PRICE_MONTHLY` | yes | The monthly price, no trial. |
 | `MOR_PRICE_YEARLY_TRIAL` | unless `TRIAL_ENABLED=false` | The yearly price carrying the trial. |
 | `MOR_PRICE_YEARLY` | yes | The yearly price, no trial. |
-| `MOR_PRICE_PRACTITIONER` | no | **Leave empty.** Only set if the owner ever decides on a separate practitioner plan. Setting it also narrows the `com` claim to that plan alone. |
 | `MOR_STOREFRONT` | FastSpring only | The popup storefront URL. |
 | `MOR_API_USERNAME` | no | FastSpring only, and only if you prefer two variables to the `username:password` form of `MOR_API_KEY`. |
 | `MOR_API_PASSWORD` | no | The other half of the pair above. |
@@ -785,8 +791,8 @@ verification never re-serialises — key order would change the bytes.
 | `sub` | The Supabase user id (`emb`: the issuing subscriber's). |
 | `tier` | `pro` or `free`. |
 | `st` | `trialing` \| `active` \| `past_due` \| `paused` \| `canceled` \| `none`. |
-| `plan` | `monthly`, `yearly`, `practitioner_yearly`, or `null`. |
-| `com` | `1` when the plan carries commercial rights. Under one plan, that is every pro token. |
+| `plan` | `monthly`, `yearly`, or `null`. |
+| `com` | `1` when the plan carries commercial rights. One plan includes everything, so that is every pro token; a free token is always `0`. |
 | `pe` | Trial end or period end, seconds. `0` when unknown. |
 | `iat`, `exp` | Seconds since epoch. |
 | `kid` | First 8 hex characters of `sha256(LICENSE_SECRET)`, so a rotation is detectable as `kid_mismatch` rather than a generic signature failure. |

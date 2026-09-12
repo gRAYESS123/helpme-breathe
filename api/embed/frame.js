@@ -136,7 +136,7 @@ export function decideEmbedding(headers, domains) {
  * are injectable for tests.
  *
  * @param {Request} request
- * @param {{now?:number, fetchImpl?:typeof fetch, sample?:number, ip?:string, practitionerPlanOffered?:boolean}} [options]
+ * @param {{now?:number, fetchImpl?:typeof fetch, sample?:number, ip?:string}} [options]
  * @returns {Promise<{whitelabel:boolean, reason:string}>} the full reason; renderFrame() coarsens it
  */
 export async function decideVerdict(request, options = {}) {
@@ -172,7 +172,6 @@ export async function decideVerdict(request, options = {}) {
   const status = await credentialStatus(verified.payload, {
     now,
     fetchImpl: options.fetchImpl,
-    practitionerPlanOffered: options.practitionerPlanOffered,
   });
   if (!status.ok) return { whitelabel: false, reason: status.reason };
 
