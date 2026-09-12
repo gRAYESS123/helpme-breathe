@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
+
+    <title>Your account — Help Me Breathe</title>
+    <meta name="description" content="Your Help Me Breathe account: the plan you are on, billing, embed credentials, a copy of your data, and how to delete the account.">
+
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <meta name="author" content="Georges Rayess">
+
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
+
+    <!-- PERFORMANCE -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="/css/styles.css" as="style">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/pro.css">
+    <link rel="stylesheet" href="/css/account.css">
+
+    <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
+
+    <!--
+      Google Consent Mode v2 — copy verbatim, do not reorder. The DENIED
+      defaults must be pushed before gtag('config', …). js/consent.js replays
+      the visitor's stored choice and owns the banner.
+    -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'wait_for_update': 500
+        });
+        gtag('js', new Date());
+        gtag('config', 'G-09WY9JD4YM', {
+            'anonymize_ip': true,
+            'cookie_expires': 63072000,
+            'page_location': window.location.origin + window.location.pathname
+        });
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
+</head>
+<body class="theme-478 article-page account-page" data-no-ads="true" data-no-asks="true">
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/for-practitioners">For practitioners</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <header class="article-header">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    <li>Your account</li>
+                </ol>
+            </nav>
+            <h1>Your account</h1>
+            <p class="lead">Your plan, what is charged and when, your embed credentials, and everything we hold about you.</p>
+        </header>
+
+        <main id="main">
+            <p class="account-loading" data-role="loading">Loading your account…</p>
+            <p class="account-error" data-role="page-error" aria-live="polite"></p>
+
+            <div class="account-banner" data-role="legacy-banner" hidden>
+                <p>Help Me Breathe now uses accounts. If you bought a licence key before today, email
+                <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> with your receipt and we'll
+                move you across at no cost.</p>
+                <div class="btn-row">
+                    <button type="button" class="btn btn--quiet" data-role="legacy-dismiss">Dismiss</button>
+                </div>
+            </div>
+
+            <div class="account-banner account-banner--warn" data-role="stale-banner" hidden>
+                <p>We could not load the latest details; what you see may be a few hours old.</p>
+            </div>
+
+            <section class="account-section" data-role="account-section" hidden>
+                <h2>Your account</h2>
+                <dl class="account-dl">
+                    <dt>Email</dt>
+                    <dd data-role="field-email"></dd>
+                    <dt data-role="label-method" hidden>Signed in with</dt>
+                    <dd data-role="field-method" hidden></dd>
+                    <dt data-role="label-created" hidden>Member since</dt>
+                    <dd data-role="field-created" hidden></dd>
+                </dl>
+                <p class="auth-note">An account is for one person or one household.</p>
+                <div class="account-actions">
+                    <button type="button" class="btn btn--quiet" data-role="signout">Sign out</button>
+                </div>
+                <p class="account-error" data-role="account-error" aria-live="polite"></p>
+            </section>
+
+            <section class="account-section" data-role="plan-section" hidden>
+                <h2>Your plan</h2>
+
+                <div class="account-banner account-banner--bad" data-role="past-due-banner" hidden>
+                    <p data-role="past-due-text"></p>
+                </div>
+
+                <p class="status-line" data-role="status-line">
+                    <span class="status-word" data-role="status-word"></span>
+                    <span data-role="status-detail"></span>
+                </p>
+
+                <p data-role="plan-body" hidden></p>
+                <p data-role="plan-line" hidden></p>
+
+                <div class="account-actions" data-role="plan-actions"></div>
+                <div data-checkout-slot data-role="checkout-slot"></div>
+
+                <p class="auth-note" data-role="plan-note" hidden></p>
+                <p class="auth-note" data-role="two-subs-note" hidden>If you believe you have two subscriptions, email
+                <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and we'll refund one.</p>
+
+                <p class="account-ok" data-role="plan-ok" aria-live="polite"></p>
+                <p class="account-error" data-role="plan-error" aria-live="polite"></p>
+
+                <div class="cancel-screen" data-role="cancel-screen" role="group" aria-labelledby="cancel-heading" hidden>
+                    <h3 id="cancel-heading">Cancel your subscription</h3>
+                    <ul class="cancel-options">
+                        <li class="cancel-option" data-role="option-pause" hidden>
+                            <h3>Pause instead</h3>
+                            <p>Nothing is charged while paused. Access carries on to the end of the period you have already paid for.</p>
+                            <div class="btn-row">
+                                <button type="button" class="btn" data-role="pause-1">Pause 1 month</button>
+                                <button type="button" class="btn" data-role="pause-3">Pause 3 months</button>
+                            </div>
+                        </li>
+                        <li class="cancel-option" data-role="option-switch" hidden>
+                            <h3>Switch to yearly</h3>
+                            <p data-role="switch-copy"></p>
+                            <div class="btn-row">
+                                <button type="button" class="btn" data-role="switch-yearly">Switch to yearly</button>
+                            </div>
+                        </li>
+                        <li class="cancel-option cancel-option--final">
+                            <h3>Cancel my subscription</h3>
+                            <p class="cancel-effect" data-role="cancel-effect"></p>
+                            <div class="btn-row">
+                                <button type="button" class="btn btn--danger" data-role="cancel-confirm">Cancel my subscription</button>
+                            </div>
+                            <div class="btn-row">
+                                <button type="button" class="btn btn--quiet" data-role="cancel-now" hidden>End it now instead</button>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn--quiet" data-role="cancel-close">Close this</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="account-section" data-role="embed-section" hidden>
+                <h2>Embed credentials</h2>
+                <p>A credential lets the timer run on your own site without our attribution, on the domains you name.
+                Each credential lasts 30 days and renews when you rotate it.</p>
+
+                <p class="auth-note" data-role="embed-locked" hidden>Embed credentials become available when you subscribe.</p>
+
+                <div data-role="embed-body" hidden>
+                    <p class="account-loading" data-role="embed-loading">Loading your credentials…</p>
+                    <ul class="cred-list" data-role="cred-list"></ul>
+                    <p data-role="cred-empty" hidden>You have no credentials yet. Make one below.</p>
+
+                    <h3>New credential</h3>
+                    <div class="cred-form">
+                        <div>
+                            <label class="auth-label" for="cred-domains">Domains, one per line</label>
+                            <textarea id="cred-domains" rows="3" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+                        </div>
+                        <div>
+                            <label class="auth-label" for="cred-label">Label, so you know which site this is</label>
+                            <input class="auth-input" id="cred-label" type="text" maxlength="60" autocomplete="off">
+                        </div>
+                        <div class="btn-row">
+                            <button type="button" class="btn btn--primary" data-role="cred-create">Create credential</button>
+                        </div>
+                    </div>
+
+                    <div class="snippet-box" data-role="snippet-box" hidden>
+                        <label class="auth-label" for="cred-snippet">Paste this into your page</label>
+                        <textarea id="cred-snippet" readonly></textarea>
+                        <div class="btn-row">
+                            <button type="button" class="btn" data-role="copy-snippet">Copy snippet</button>
+                        </div>
+                        <p class="auth-note">This is the only time we show it in full. Rotate the credential if you lose it.</p>
+                    </div>
+
+                    <p class="account-ok" data-role="embed-ok" aria-live="polite"></p>
+                    <p class="account-error" data-role="embed-error" aria-live="polite"></p>
+                </div>
+            </section>
+
+            <section class="account-section" data-role="data-section" hidden>
+                <h2>Your data</h2>
+                <p>Export gives you a JSON file with your profile, every subscription record, and every embed
+                credential. Payments are handled by a merchant of record, which keeps its own copy of your payment
+                records as a separate data controller.</p>
+
+                <div class="account-actions">
+                    <button type="button" class="btn" data-role="export">Export my data</button>
+                </div>
+                <p class="account-ok" data-role="data-ok" aria-live="polite"></p>
+                <p class="account-error" data-role="data-error" aria-live="polite"></p>
+
+                <div class="danger-zone">
+                    <h3>Delete my account</h3>
+                    <p>This cannot be undone. Any live subscription is cancelled first, and the account is removed.
+                    If a payment dispute is open, or a payment is outstanding, we will ask you to sort that out first.</p>
+                    <div class="check-row">
+                        <input type="checkbox" id="delete-ack" data-role="delete-ack">
+                        <label for="delete-ack">I understand this deletes my account and cancels any subscription. The merchant of record keeps its own copy of the payment record as a separate controller.</label>
+                    </div>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn--danger" data-role="delete" disabled>Delete my account</button>
+                    </div>
+                    <p class="account-error" data-role="delete-error" aria-live="polite"></p>
+                </div>
+            </section>
+
+            <div class="account-footer-actions" data-role="footer-actions" hidden>
+                <a class="btn btn--quiet" href="/timer">Open a timer</a>
+                <a class="btn btn--quiet" href="mailto:contact@helpmebreath.com">Email us about your account</a>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/for-practitioners">For practitioners</a>
+                    <a href="/embed">Embed the timer</a>
+                    <a href="/handouts">Printable handouts</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician: <a href="/about">what that means for what you read here</a>.</p>
+
+            <div class="legal-links">
+                <a href="/legal/privacy-policy">Privacy Policy</a>
+                <a href="/legal/terms-of-service">Terms of Service</a>
+                <a href="/legal/refund-policy">Refund Policy</a>
+                <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
+                <a href="mailto:contact@helpmebreath.com">Contact</a>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="/js/consent.js"></script>
+    <script type="module" src="/js/app.js"></script>
+    <script type="module">
+        /*
+         * /account — the signed-in account page.
+         *
+         * Design: docs/private/ACCOUNTS_BILLING_DESIGN.md §4.2, §4.3, §5.7,
+         * §5.8, §5.9, §7.4, §9.3, §11.1, §11.5, §12, §13.
+         *
+         * Every network call goes through apiFetch() from js/auth.js, which
+         * adds the Supabase bearer and the device-mirror header. Nothing here
+         * reads a cookie, names a price the server did not send, or puts an
+         * identifier in a query string — with the single documented exception
+         * of `token_id` on the rotate GET (§9.3).
+         *
+         * Every failure ends as one sentence in an .account-error region.
+         * There is no alert(), no confirm() and no stack trace on screen.
+         */
+
+        import {
+            ready,
+            signedIn,
+            user,
+            signOut,
+            apiFetch,
+            fetchMe,
+            signInUrl,
+            lastSignInMethod,
+        } from '/js/auth.js';
+        import {
+            refresh,
+            getLicenseInfo,
+            hadLegacyLicence,
+            dismissLegacyNotice,
+            onChange,
+        } from '/js/entitlements.js';
+        import { subscribe } from '/js/checkout.js';
+        import { track, EVENTS } from '/js/analytics.js';
+        import { PLANS } from '/js/config.js';
+
+        const NEXT = '/account';
+        const CANCEL_TRACKED_KEY = 'hmb.account.canceled-seen';
+        const TWO_STEP_MS = 6000;
+
+        /** The current /api/me answer, or a cache-shaped stand-in. */
+        let me = null;
+        let booted = false;
+        let busy = false;
+        let lastSignature = '';
+
+        /* ----------------------------------------------------------- dom --- */
+
+        const el = (role) => document.querySelector(`[data-role="${role}"]`);
+
+        function show(node, visible) {
+            if (node) node.hidden = !visible;
+        }
+
+        function setText(role, text) {
+            const node = el(role);
+            if (node) node.textContent = text == null ? '' : String(text);
+        }
+
+        function clear(node) {
+            while (node && node.firstChild) node.removeChild(node.firstChild);
+        }
+
+        function button(label, classes, role) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = classes;
+            b.textContent = label;
+            if (role) b.setAttribute('data-role', role);
+            return b;
+        }
+
+        /* -------------------------------------------------------- formats --- */
+
+        /** The one date formatter on this page: 12 September 2026. */
+        function fmtDate(iso) {
+            if (!iso) return '';
+            const ms = typeof iso === 'number' ? iso : Date.parse(iso);
+            if (!Number.isFinite(ms)) return '';
+            try {
+                return new Intl.DateTimeFormat('en-GB', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                }).format(new Date(ms));
+            } catch {
+                return new Date(ms).toDateString();
+            }
+        }
+
+        /** Server messages carry ISO datetimes; nobody should have to read one. */
+        function humanDates(text) {
+            return String(text || '').replace(
+                /\d{4}-\d{2}-\d{2}(?:T[\d:.]+(?:Z|[+-]\d{2}:?\d{2})?)?/g,
+                (match) => fmtDate(match) || match,
+            );
+        }
+
+        /** The amount the provider says it will take, in its own currency. */
+        function money(charge) {
+            if (!charge || charge.amount == null || !charge.currency) return '';
+            const amount = Number(charge.amount);
+            if (!Number.isFinite(amount)) return '';
+            try {
+                return new Intl.NumberFormat(undefined, {
+                    style: 'currency',
+                    currency: String(charge.currency),
+                }).format(amount);
+            } catch {
+                return `${charge.amount} ${charge.currency}`;
+            }
+        }
+
+        function count(n) {
+            const value = Number(n) || 0;
+            try {
+                return new Intl.NumberFormat().format(value);
+            } catch {
+                return String(value);
+            }
+        }
+
+        function planName(plan) {
+            const def = PLANS[String(plan || '')];
+            return def && def.label ? def.label.toLowerCase() : 'plan';
+        }
+
+        const PLAN_LINE =
+            `$${PLANS.monthly.price} a month or $${PLANS.yearly.price} a year — everything included. ` +
+            `${PLANS.refundDays} days, unconditional refund.`;
+
+        /* --------------------------------------------------------- errors --- */
+
+        const CODE_SENTENCES = {
+            no_subscription: 'There is no subscription to change.',
+            not_active: 'Only an active subscription can be paused.',
+            cancel_scheduled: 'This subscription is already set to end, so it cannot be paused.',
+            already_on_plan: 'You are already on the yearly plan.',
+            unsupported_switch: 'That change is not available on this subscription.',
+            not_eligible: 'That change is not available on this subscription.',
+            cross_origin: 'That request was blocked. Reload the page and try again.',
+            bad_request: 'We could not read that request. Reload the page and try again.',
+            not_configured: 'That plan is not available right now. Email contact@helpmebreath.com.',
+            domains_required: 'Add at least one domain.',
+            too_many_domains: 'Ten domains at most for one credential.',
+            invalid_domain: 'One of those lines does not look like a domain name.',
+            wildcard_not_allowed: 'Wildcards are not allowed. Write each domain in full.',
+            own_site_not_allowed: 'A credential cannot be bound to helpmebreath.com.',
+            subscription_required: 'Embed credentials need a live subscription.',
+            commercial_plan_required: 'This plan does not include embed credentials.',
+            ledger_unavailable: 'We could not read that just now. Try again in a minute.',
+            auth_unavailable: 'Sign-in is briefly unavailable. Try again in a minute.',
+            not_found: 'We could not find that credential.',
+            revoked: 'That credential group has already been revoked.',
+            token_id_required: 'That credential is missing its id. Reload the page.',
+            entitlement_unavailable: 'We could not read your plan just now. Try again in a minute.',
+            rate_limited: 'Too many requests, wait a minute.',
+        };
+
+        /** One plain sentence for any failed apiFetch result. Never a stack trace. */
+        function failureMessage(result, fallback) {
+            if (!result) return fallback;
+            if (result.status === 0) return 'We could not reach the server. Check your connection and try again.';
+            const body = (result && result.body) || {};
+            const code = String(body.error || body.reason || '');
+            if (result.status === 429 || code === 'rate_limited') return 'Too many requests, wait a minute.';
+            if (result.status === 502) {
+                return 'The payment provider did not answer. Try again in a minute, or cancel from your emailed receipt.';
+            }
+            if (body.message) return humanDates(body.message);
+            if (code === 'not_eligible' && body.reason && CODE_SENTENCES[body.reason]) return CODE_SENTENCES[body.reason];
+            if (CODE_SENTENCES[code]) return CODE_SENTENCES[code];
+            if (result.status === 503) return 'That is briefly unavailable. Try again in a minute.';
+            return fallback;
+        }
+
+        /** True when the call was refused for want of a session: we leave for /signin. */
+        function bounced(result) {
+            if (result && result.status === 401) {
+                location.replace(signInUrl({ next: NEXT }));
+                return true;
+            }
+            return false;
+        }
+
+        function say(role, text) {
+            setText(role, text ? humanDates(text) : '');
+        }
+
+        function clearMessages() {
+            for (const role of ['plan-ok', 'plan-error', 'account-error', 'embed-ok', 'embed-error', 'data-ok', 'data-error', 'delete-error']) {
+                setText(role, '');
+            }
+        }
+
+        /* ------------------------------------------------------ two-step --- */
+
+        /**
+         * A confirm() we can style and that never blocks the page: the button
+         * says what it will do, then says "Confirm …" for six seconds.
+         */
+        function twoStep(btn, confirmLabel, run) {
+            const original = btn.textContent;
+            let armed = false;
+            let timer = 0;
+            const disarm = () => {
+                armed = false;
+                window.clearTimeout(timer);
+                btn.textContent = original;
+                btn.removeAttribute('data-armed');
+            };
+            btn.addEventListener('click', () => {
+                if (btn.disabled) return;
+                if (!armed) {
+                    armed = true;
+                    btn.textContent = confirmLabel;
+                    btn.setAttribute('data-armed', 'true');
+                    timer = window.setTimeout(disarm, TWO_STEP_MS);
+                    return;
+                }
+                disarm();
+                run();
+            });
+            return disarm;
+        }
+
+        /* ----------------------------------------------------------- me ----- */
+
+        /** What js/entitlements.js already knows, shaped like an /api/me body. */
+        function cachedMe() {
+            const info = getLicenseInfo();
+            const account = user() || {};
+            const trialing = info.status === 'trialing';
+            return {
+                ok: true,
+                user: {
+                    id: account.id || '',
+                    email: account.email || (info.account && info.account.email) || '',
+                    created_at: account.created_at || null,
+                },
+                entitlement: {
+                    tier: info.tier,
+                    status: info.status,
+                    plan: info.plan,
+                    commercial: info.commercial,
+                    trial_ends_at: trialing ? info.periodEnd : null,
+                    current_period_end: trialing ? null : info.periodEnd,
+                    cancel_at: null,
+                    access_until: info.accessUntil,
+                    next_charge: info.nextCharge,
+                    provider: null,
+                    ui: 'stale',
+                },
+                trial: { available: info.trialAvailable === true, reason: info.trialReason || 'unavailable' },
+            };
+        }
+
+        function entitlement() {
+            return (me && me.entitlement) || {};
+        }
+
+        function statusOf() {
+            const value = entitlement().status;
+            return typeof value === 'string' && value ? value : 'none';
+        }
+
+        /** GET /api/me, and keep the entitlement token fresh at the same time. */
+        async function loadMe() {
+            const [answer] = await Promise.all([fetchMe(), refresh({ force: true })]);
+            if (!answer || answer.ok === false) {
+                if (answer && answer.reason === 'unauthenticated') {
+                    location.replace(signInUrl({ next: NEXT }));
+                    return false;
+                }
+                me = cachedMe();
+                show(el('stale-banner'), true);
+                return true;
+            }
+            me = answer;
+            show(el('stale-banner'), answer.stale === true || entitlement().ui === 'stale');
+            return true;
+        }
+
+        async function reload(message) {
+            const alive = await loadMe();
+            if (!alive) return;
+            render();
+            if (message) say('plan-ok', message);
+        }
+
+        /* ------------------------------------------------- account section --- */
+
+        const METHOD_WORDS = {
+            magic_link: 'a link emailed to you',
+            otp_code: 'a 6-digit code',
+            google: 'Google',
+        };
+
+        function renderAccount() {
+            const account = (me && me.user) || {};
+            setText('field-email', account.email || 'not known');
+
+            const method = METHOD_WORDS[lastSignInMethod()] || '';
+            show(el('label-method'), !!method);
+            show(el('field-method'), !!method);
+            setText('field-method', method);
+
+            const created = fmtDate(account.created_at);
+            show(el('label-created'), !!created);
+            show(el('field-created'), !!created);
+            setText('field-created', created);
+
+            show(el('account-section'), true);
+        }
+
+        /* ---------------------------------------------------- plan section --- */
+
+        function setStatus(word, detail, tone) {
+            const line = el('status-line');
+            if (tone) line.setAttribute('data-tone', tone);
+            else line.removeAttribute('data-tone');
+            setText('status-word', word);
+            setText('status-detail', detail);
+        }
+
+        function planBody(text) {
+            const node = el('plan-body');
+            setText('plan-body', text || '');
+            show(node, !!text);
+        }
+
+        function planNote(text) {
+            const node = el('plan-note');
+            setText('plan-note', text || '');
+            show(node, !!text);
+        }
+
+        function showPlanLine(visible) {
+            setText('plan-line', PLAN_LINE);
+            show(el('plan-line'), visible);
+        }
+
+        function subscribeButtons(withTrial) {
+            const actions = el('plan-actions');
+            const slot = el('checkout-slot');
+            const monthly = button(
+                withTrial ? 'Start the free trial — monthly' : 'Subscribe — monthly',
+                'btn btn--commerce',
+            );
+            const yearly = button(withTrial ? 'Yearly, two months free' : 'Yearly', 'btn');
+            monthly.addEventListener('click', () => {
+                subscribe('monthly', { trigger: monthly, container: slot });
+            });
+            yearly.addEventListener('click', () => {
+                subscribe('yearly', { trigger: yearly, container: slot });
+            });
+            actions.append(monthly, yearly);
+        }
+
+        function manageButton(label, target) {
+            const btn = button(label, 'btn');
+            btn.addEventListener('click', () => openPortal(target, btn));
+            return btn;
+        }
+
+        function renderPlan() {
+            const ent = entitlement();
+            const status = statusOf();
+            const actions = el('plan-actions');
+            clear(actions);
+            show(el('past-due-banner'), false);
+            show(el('cancel-screen'), false);
+            show(el('two-subs-note'), status === 'active' || status === 'trialing');
+
+            const charge = money(ent.next_charge);
+            const label = planName(ent.plan);
+
+            if (status === 'none') {
+                setStatus('No subscription', 'You have an account, and no subscription on it yet.', '');
+                planBody('Everything in the plan is one subscription: the pattern builder, saved presets, streaks and'
+                    + ' export, soundscapes, night mode, printable handouts, commercial use and the white-label embed.');
+                showPlanLine(true);
+                subscribeButtons(me && me.trial && me.trial.available === true);
+                planNote('One free trial per person. Cancel any time from this page.');
+                return;
+            }
+
+            if (status === 'trialing') {
+                const ends = fmtDate(ent.trial_ends_at);
+                const amount = charge || 'the price shown to you at checkout';
+                setStatus(
+                    'Trial',
+                    `Your free trial ends on ${ends || 'its last day'}. On that day the card you gave is charged `
+                    + `${amount} for the ${label} unless you cancel first.`,
+                    'ok',
+                );
+                planBody('');
+                showPlanLine(false);
+                actions.append(manageButton('Manage billing', 'overview'), cancelButton());
+                planNote('Cancelling during the trial takes two clicks and your card is never charged.');
+                return;
+            }
+
+            if (status === 'active') {
+                const renews = fmtDate(ent.current_period_end);
+                const amount = charge ? ` for ${charge}` : ' for the price shown to you at checkout';
+                let detail = `The ${label}.`;
+                if (renews) detail += ` Renews on ${renews}${amount}.`;
+                setStatus('Active', detail, 'ok');
+                showPlanLine(false);
+
+                if (ent.cancel_at) {
+                    const until = fmtDate(ent.access_until) || fmtDate(ent.cancel_at);
+                    planBody(`Cancels on ${fmtDate(ent.cancel_at)}; you keep access until ${until}.`);
+                    const keep = button('Keep my subscription', 'btn btn--quiet');
+                    keep.addEventListener('click', () => openPortal('overview', keep));
+                    actions.append(manageButton('Manage billing', 'overview'), keep);
+                    planNote('A scheduled cancellation is removed in the billing portal, which opens in a new tab.');
+                    return;
+                }
+
+                planBody('');
+                actions.append(manageButton('Manage billing', 'overview'), pauseButton());
+                if (ent.plan === 'monthly') actions.append(switchButton());
+                actions.append(cancelButton());
+                planNote('Cancel any time from this page. Access carries on to the end of the period you have paid for.');
+                return;
+            }
+
+            if (status === 'past_due') {
+                const until = fmtDate(ent.access_until);
+                setStatus('Payment failed', until ? `Access ends on ${until} unless the card is updated.` : 'Update your card to keep access.', 'bad');
+                planBody('');
+                showPlanLine(false);
+                say('past-due-text', 'Your last payment did not go through. Update your card and access carries on as before.');
+                show(el('past-due-banner'), true);
+                actions.append(manageButton('Update your card', 'update_payment_method'), cancelButton());
+                planNote('Nothing else is charged until the card works again.');
+                track(EVENTS.SUBSCRIPTION_PAST_DUE || 'subscription_past_due', { plan: ent.plan || 'unknown' });
+                return;
+            }
+
+            if (status === 'paused') {
+                const until = fmtDate(ent.access_until);
+                setStatus(
+                    'Paused',
+                    `Paused. Nothing is charged while paused.${until ? ` Access continues until ${until}.` : ''}`,
+                    'warn',
+                );
+                planBody('');
+                showPlanLine(false);
+                actions.append(manageButton('Manage billing', 'overview'), cancelButton());
+                planNote('Resume whenever you want from the billing portal.');
+                return;
+            }
+
+            if (status === 'canceled') {
+                const until = ent.access_until || ent.cancel_at;
+                const when = fmtDate(until);
+                const ended = !until || Date.parse(until) <= Date.now();
+                setStatus(
+                    'Cancelled',
+                    when ? `Your subscription ${ended ? 'ended' : 'ends'} on ${when}.` : 'Your subscription has ended.',
+                    'warn',
+                );
+                planBody('You can subscribe again whenever you like. Nothing you saved was deleted.');
+                showPlanLine(true);
+                subscribeButtons(false);
+                planNote('One free trial per person. This account has had its trial, so this is a straight subscription.');
+                trackCancelledOnce(ent);
+                return;
+            }
+
+            setStatus('Plan', 'We could not read the status of this subscription.', 'warn');
+            planBody('');
+            showPlanLine(false);
+            actions.append(manageButton('Manage billing', 'overview'));
+            planNote('');
+        }
+
+        function trackCancelledOnce(ent) {
+            let seen = null;
+            try {
+                seen = window.localStorage.getItem(CANCEL_TRACKED_KEY);
+            } catch {
+                seen = null;
+            }
+            if (seen) return;
+            try {
+                window.localStorage.setItem(CANCEL_TRACKED_KEY, '1');
+            } catch {
+                /* a browser that refuses storage simply sends the event again */
+            }
+            track(EVENTS.SUBSCRIPTION_CANCELED || 'subscription_canceled', {
+                plan: ent.plan || 'unknown',
+                when: ent.trial_ends_at && !ent.current_period_end ? 'trial' : 'active',
+            });
+        }
+
+        /* -------------------------------------------------- plan actions --- */
+
+        function pauseButton() {
+            const btn = button('Pause', 'btn');
+            btn.addEventListener('click', () => {
+                const actions = el('plan-actions');
+                const one = button('Pause 1 month', 'btn');
+                const three = button('Pause 3 months', 'btn');
+                const back = button('Not now', 'btn btn--quiet');
+                one.addEventListener('click', () => doPause(1, one));
+                three.addEventListener('click', () => doPause(3, three));
+                back.addEventListener('click', () => renderPlan());
+                actions.replaceChild(three, btn);
+                actions.insertBefore(one, three);
+                actions.insertBefore(back, three.nextSibling);
+                one.focus();
+            });
+            return btn;
+        }
+
+        function switchButton() {
+            const btn = button('Switch to yearly', 'btn');
+            twoStep(btn, `Confirm: $${PLANS.yearly.price} a year`, () => doSwitch(btn));
+            return btn;
+        }
+
+        function cancelButton() {
+            const btn = button('Cancel', 'btn btn--quiet');
+            btn.addEventListener('click', () => openCancelScreen());
+            return btn;
+        }
+
+        /* ------------------------------------------------- manage billing --- */
+
+        /**
+         * §5.7: portal links are minted on click, never on load, and never
+         * cached. A blocked pop-up falls back to this tab.
+         */
+        async function openPortal(target, trigger) {
+            if (busy) return;
+            busy = true;
+            clearMessages();
+            if (trigger) trigger.disabled = true;
+            track(EVENTS.MANAGE_BILLING_CLICK || 'manage_billing_click', { target });
+            const result = await apiFetch('/api/billing/portal', { method: 'POST', body: {} });
+            busy = false;
+            if (trigger) trigger.disabled = false;
+            if (bounced(result)) return;
+
+            const body = (result && result.body) || {};
+            if (result.status === 404 || body.error === 'no_subscription') {
+                if (trigger) trigger.hidden = true;
+                say('plan-error', 'There is no subscription to manage on this account.');
+                return;
+            }
+            if (!result.ok) {
+                say('plan-error', failureMessage(result, 'We could not open the billing portal. Try again in a minute.'));
+                return;
+            }
+
+            const url = body[target] || body.overview;
+            if (!url) {
+                say('plan-error', 'The billing portal did not send us a link. Try again in a minute.');
+                return;
+            }
+            const opened = window.open(url, '_blank', 'noopener');
+            if (!opened) location.assign(url);
+        }
+
+        /* --------------------------------------------------- cancel screen --- */
+
+        function openCancelScreen() {
+            const ent = entitlement();
+            const status = statusOf();
+            const screen = el('cancel-screen');
+
+            show(el('option-pause'), status === 'active' && !ent.cancel_at);
+            show(el('option-switch'), status === 'active' && ent.plan === 'monthly' && !ent.cancel_at);
+            setText('switch-copy', `$${PLANS.yearly.price} a year, two months free.`);
+
+            let effect = 'Your subscription ends and nothing further is charged.';
+            if (status === 'trialing') {
+                effect = 'You keep the remaining trial days and are never charged.';
+            } else if (status === 'active') {
+                const until = fmtDate(ent.current_period_end) || fmtDate(ent.access_until);
+                effect = until
+                    ? `You keep access until ${until}. Nothing further is charged.`
+                    : 'You keep access to the end of the period you have paid for. Nothing further is charged.';
+            } else if (status === 'paused') {
+                effect = 'Your subscription ends now; nothing was being charged.';
+            } else if (status === 'past_due') {
+                effect = 'Your subscription ends and nothing further is charged. The outstanding payment still stands.';
+            }
+            setText('cancel-effect', effect);
+
+            show(el('cancel-now'), status === 'active' || status === 'trialing');
+            show(screen, true);
+            track(EVENTS.CANCEL_SCREEN_VIEW || 'cancel_screen_view', { status_at_cancel: status });
+            const heading = document.getElementById('cancel-heading');
+            if (heading && heading.scrollIntoView) heading.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        async function doPause(months, trigger) {
+            if (busy) return;
+            busy = true;
+            clearMessages();
+            if (trigger) trigger.disabled = true;
+            const result = await apiFetch('/api/billing/pause', { method: 'POST', body: { months } });
+            busy = false;
+            if (trigger) trigger.disabled = false;
+            if (bounced(result)) return;
+            if (!result.ok) {
+                say('plan-error', failureMessage(result, 'We could not pause the subscription. Try again in a minute.'));
+                return;
+            }
+            track(EVENTS.RETENTION_OFFER_TAKEN || 'retention_offer_taken', { offer: months === 3 ? 'pause_3' : 'pause_1' });
+            await reload(result.body && result.body.message);
+        }
+
+        async function doSwitch(trigger) {
+            if (busy) return;
+            busy = true;
+            clearMessages();
+            if (trigger) trigger.disabled = true;
+            const result = await apiFetch('/api/billing/switch', { method: 'POST', body: { plan: 'yearly' } });
+            busy = false;
+            if (trigger) trigger.disabled = false;
+            if (bounced(result)) return;
+            if (!result.ok) {
+                say('plan-error', failureMessage(result, 'We could not switch the plan. Try again in a minute.'));
+                return;
+            }
+            track(EVENTS.RETENTION_OFFER_TAKEN || 'retention_offer_taken', { offer: 'annual' });
+            await reload(result.body && result.body.message);
+        }
+
+        async function doCancel(when, trigger) {
+            if (busy) return;
+            const status = statusOf();
+            busy = true;
+            clearMessages();
+            if (trigger) trigger.disabled = true;
+            const result = await apiFetch('/api/billing/cancel', { method: 'POST', body: { when } });
+            busy = false;
+            if (trigger) trigger.disabled = false;
+            if (bounced(result)) return;
+            if (!result.ok) {
+                say('plan-error', failureMessage(result, 'We could not cancel the subscription. Try again in a minute, or cancel from your emailed receipt.'));
+                return;
+            }
+            track(EVENTS.CANCEL_CONFIRM || 'cancel_confirm', { status_at_cancel: status });
+            await reload(result.body && result.body.message);
+        }
+
+        /* -------------------------------------------------- embed section --- */
+
+        function credState(cred) {
+            if (cred.revoked_at) return 'Revoked';
+            if (cred.superseded_at) {
+                const overlap = fmtDate(cred.overlap_ends_at);
+                return overlap ? `Superseded, works until ${overlap}` : 'Superseded';
+            }
+            return cred.live ? 'Live' : 'Expired';
+        }
+
+        function credRow(cred) {
+            const tr = document.createElement('tr');
+            const cells = [
+                { text: fmtDate(cred.issued_at) || 'unknown' },
+                { text: fmtDate(cred.expires_at) || 'unknown' },
+                { text: count(cred.hit_count), num: true },
+                { text: credState(cred) },
+            ];
+            for (const cell of cells) {
+                const td = document.createElement('td');
+                td.textContent = cell.text;
+                if (cell.num) td.className = 'num';
+                if (!cred.live) td.classList.add('is-dim');
+                tr.appendChild(td);
+            }
+            return tr;
+        }
+
+        function credGroup(group) {
+            const li = document.createElement('li');
+            li.className = 'cred-group';
+            li.setAttribute('data-revoked', group.revoked_at ? 'true' : 'false');
+
+            const head = document.createElement('div');
+            head.className = 'cred-head';
+            const name = document.createElement('span');
+            name.className = 'cred-label';
+            name.textContent = group.label || 'Untitled credential';
+            const id = document.createElement('span');
+            id.className = 'cred-id';
+            id.textContent = group.token_id;
+            head.append(name, id);
+
+            const domains = document.createElement('p');
+            domains.className = 'cred-domains';
+            domains.textContent = (group.domains || []).join(', ') || 'No domains on this credential.';
+
+            const meta = document.createElement('p');
+            meta.className = 'cred-domains';
+            const created = fmtDate(group.created_at);
+            const parts = [];
+            if (created) parts.push(`Created ${created}`);
+            parts.push(`verified ${count(group.verify_count_30d)} times in the last 30 days`);
+            if (group.revoked_at) parts.push(`revoked ${fmtDate(group.revoked_at)}`);
+            meta.textContent = `${parts.join(', ')}.`;
+
+            li.append(head, domains, meta);
+
+            const creds = Array.isArray(group.credentials) ? group.credentials : [];
+            if (creds.length) {
+                const table = document.createElement('table');
+                table.className = 'cred-table';
+                const caption = document.createElement('caption');
+                caption.className = 'sr-only-inline';
+                caption.textContent = `Credentials issued for ${group.label || group.token_id}`;
+                const thead = document.createElement('thead');
+                const headRow = document.createElement('tr');
+                for (const [text, num] of [['Issued', false], ['Expires', false], ['Hits', true], ['State', false]]) {
+                    const th = document.createElement('th');
+                    th.scope = 'col';
+                    th.textContent = text;
+                    if (num) th.className = 'num';
+                    headRow.appendChild(th);
+                }
+                thead.appendChild(headRow);
+                const tbody = document.createElement('tbody');
+                for (const cred of creds) tbody.appendChild(credRow(cred));
+                table.append(caption, thead, tbody);
+                li.appendChild(table);
+            }
+
+            if (!group.revoked_at) {
+                const row = document.createElement('div');
+                row.className = 'btn-row';
+                const rotate = button('Rotate', 'btn');
+                twoStep(rotate, 'Confirm rotate', () => doRotate(group.token_id, rotate));
+                const revoke = button('Revoke', 'btn btn--danger');
+                twoStep(revoke, 'Confirm revoke', () => doRevoke(group.token_id, revoke));
+                row.append(rotate, revoke);
+                li.appendChild(row);
+            }
+
+            return li;
+        }
+
+        function renderCredentials(groups) {
+            const list = el('cred-list');
+            clear(list);
+            for (const group of groups) list.appendChild(credGroup(group));
+            show(el('cred-empty'), groups.length === 0);
+        }
+
+        async function loadCredentials() {
+            show(el('embed-loading'), true);
+            const result = await apiFetch('/api/embed/token');
+            show(el('embed-loading'), false);
+            if (bounced(result)) return;
+            if (!result.ok) {
+                say('embed-error', failureMessage(result, 'We could not load your credentials. Try again in a minute.'));
+                return;
+            }
+            renderCredentials(Array.isArray(result.body.groups) ? result.body.groups : []);
+        }
+
+        function showSnippet(body) {
+            const box = el('snippet-box');
+            const field = document.getElementById('cred-snippet');
+            field.value = body.snippet || body.iframe_snippet || '';
+            show(box, !!field.value);
+        }
+
+        async function doCreateCredential(trigger) {
+            if (busy) return;
+            const domainsField = document.getElementById('cred-domains');
+            const labelField = document.getElementById('cred-label');
+            const domains = String(domainsField.value || '')
+                .split(/[\n,]+/)
+                .map((line) => line.trim())
+                .filter(Boolean);
+            clearMessages();
+            if (!domains.length) {
+                say('embed-error', 'Add at least one domain, one per line.');
+                domainsField.focus();
+                return;
+            }
+            busy = true;
+            trigger.disabled = true;
+            const result = await apiFetch('/api/embed/token', {
+                method: 'POST',
+                body: { domains, label: String(labelField.value || '').trim() },
+            });
+            busy = false;
+            trigger.disabled = false;
+            if (bounced(result)) return;
+            if (!result.ok) {
+                say('embed-error', failureMessage(result, 'We could not create that credential. Try again in a minute.'));
+                return;
+            }
+            track(EVENTS.EMBED_TOKEN_CREATED || 'embed_token_created', {
+                domain_count: domains.length,
+                action: 'create',
+            });
+            domainsField.value = '';
+            labelField.value = '';
+            showSnippet(result.body);
+            say('embed-ok', 'Credential created. Paste the snippet below into your page.');
+            await loadCredentials();
+        }
+
+        async function doRotate(tokenId, trigger) {
+            if (busy) return;
+            busy = true;
+            clearMessages();
+            trigger.disabled = true;
+            const result = await apiFetch(`/api/embed/token?rotate=1&token_id=${encodeURIComponent(tokenId)}`);
+            busy = false;
+            trigger.disabled = false;
+            if (bounced(result)) return;
+            if (!result.ok) {
+                say('embed-error', failureMessage(result, 'We could not rotate that credential. Try again in a minute.'));
+                return;
+            }
+            track(EVENTS.EMBED_TOKEN_CREATED || 'embed_token_created', {
+                domain_count: Array.isArray(result.body.domains) ? result.body.domains.length : 0,
+                action: 'rotate',
+            });
+            showSnippet(result.body);
+            const overlap = fmtDate(result.body.overlap_ends_at);
+            say('embed-ok', overlap
+                ? `Rotated. The old snippet keeps working until ${overlap}, so update your page before then.`
+                : 'Rotated. Update your page with the new snippet below.');
+            await loadCredentials();
+        }
+
+        async function doRevoke(tokenId, trigger) {
+            if (busy) return;
+            busy = true;
+            clearMessages();
+            trigger.disabled = true;
+            const result = await apiFetch('/api/embed/token', { method: 'DELETE', body: { token_id: tokenId } });
+            busy = false;
+            trigger.disabled = false;
+            if (bounced(result)) return;
+            if (!result.ok) {
+                say('embed-error', failureMessage(result, 'We could not revoke that credential. Try again in a minute.'));
+                return;
+            }
+            show(el('snippet-box'), false);
+            say('embed-ok', 'Revoked. Every snippet from that credential stops working now.');
+            await loadCredentials();
+        }
+
+        function copySnippet(trigger) {
+            const field = document.getElementById('cred-snippet');
+            if (!field.value) return;
+            const done = () => {
+                say('embed-ok', 'Snippet copied.');
+                track(EVENTS.EMBED_SNIPPET_COPIED || 'embed_snippet_copied', { placement: 'account' });
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(field.value).then(done).catch(() => {
+                    field.focus();
+                    field.select();
+                    say('embed-error', 'We could not copy it for you. The snippet is selected, so copy it yourself.');
+                });
+                return;
+            }
+            field.focus();
+            field.select();
+            say('embed-error', 'This browser will not let us copy for you. The snippet is selected, so copy it yourself.');
+            if (trigger) trigger.blur();
+        }
+
+        function renderEmbed() {
+            const pro = entitlement().tier === 'pro';
+            show(el('embed-locked'), !pro);
+            show(el('embed-body'), pro);
+            show(el('embed-section'), true);
+            if (pro) loadCredentials();
+        }
+
+        /* --------------------------------------------------- data section --- */
+
+        async function doExport(trigger) {
+            if (busy) return;
+            busy = true;
+            clearMessages();
+            trigger.disabled = true;
+            const result = await apiFetch('/api/account/export', { raw: true });
+            busy = false;
+            trigger.disabled = false;
+            if (bounced(result)) return;
+            if (!result.ok || !result.response) {
+                say('data-error', result && result.status === 429
+                    ? 'Too many requests, wait a minute.'
+                    : failureMessage(result, 'We could not build your export. Try again in a minute.'));
+                return;
+            }
+            let url = '';
+            try {
+                const blob = await result.response.blob();
+                url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'help-me-breathe-export.json';
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            } catch {
+                say('data-error', 'We could not save the file. Try again in a minute.');
+                return;
+            } finally {
+                if (url) window.setTimeout(() => URL.revokeObjectURL(url), 30000);
+            }
+            track(EVENTS.ACCOUNT_EXPORT || 'account_export', {});
+            say('data-ok', 'Your export is downloading as help-me-breathe-export.json.');
+        }
+
+        async function doDelete(trigger) {
+            if (busy) return;
+            const hadSubscription = statusOf() !== 'none';
+            busy = true;
+            clearMessages();
+            trigger.disabled = true;
+            track(EVENTS.ACCOUNT_DELETE_REQUEST || 'account_delete_request', { had_subscription: hadSubscription });
+            const result = await apiFetch('/api/account/delete', { method: 'POST', body: {} });
+            busy = false;
+            trigger.disabled = false;
+            if (bounced(result)) return;
+            if (!result.ok) {
+                say('delete-error', failureMessage(result, 'We could not delete the account. Try again in a minute, or email contact@helpmebreath.com.'));
+                return;
+            }
+            try {
+                await signOut();
+            } catch {
+                /* the account is gone either way; do not block the redirect */
+            }
+            location.assign('/?deleted=1');
+        }
+
+        function renderData() {
+            show(el('data-section'), true);
+            show(el('footer-actions'), true);
+        }
+
+        /* --------------------------------------------------------- render --- */
+
+        function render() {
+            renderAccount();
+            renderPlan();
+            renderEmbed();
+            renderData();
+            show(el('plan-section'), true);
+            show(el('loading'), false);
+        }
+
+        /* ----------------------------------------------------------- wire --- */
+
+        function wire() {
+            el('signout').addEventListener('click', async () => {
+                clearMessages();
+                try {
+                    await signOut();
+                } catch {
+                    /* the local session is cleared regardless */
+                }
+                location.assign('/');
+            });
+
+            el('legacy-dismiss').addEventListener('click', () => {
+                dismissLegacyNotice();
+                show(el('legacy-banner'), false);
+            });
+
+            el('cancel-close').addEventListener('click', () => {
+                show(el('cancel-screen'), false);
+            });
+            el('pause-1').addEventListener('click', (event) => doPause(1, event.currentTarget));
+            el('pause-3').addEventListener('click', (event) => doPause(3, event.currentTarget));
+            el('switch-yearly').addEventListener('click', (event) => doSwitch(event.currentTarget));
+
+            twoStep(el('cancel-confirm'), 'Confirm: cancel my subscription', () => doCancel('period_end', el('cancel-confirm')));
+            twoStep(el('cancel-now'), 'Confirm: end it now', () => doCancel('now', el('cancel-now')));
+
+            el('cred-create').addEventListener('click', (event) => doCreateCredential(event.currentTarget));
+            el('copy-snippet').addEventListener('click', (event) => copySnippet(event.currentTarget));
+
+            const ack = el('delete-ack');
+            const del = el('delete');
+            ack.addEventListener('change', () => {
+                del.disabled = !ack.checked;
+            });
+            del.addEventListener('click', (event) => {
+                if (!ack.checked) return;
+                doDelete(event.currentTarget);
+            });
+
+            el('export').addEventListener('click', (event) => doExport(event.currentTarget));
+        }
+
+        /* ----------------------------------------------------------- boot --- */
+
+        async function boot() {
+            wire();
+            try {
+                await ready();
+            } catch {
+                /* a failed initial session read is the same as signed out */
+            }
+            if (!signedIn()) {
+                location.replace(signInUrl({ next: NEXT }));
+                return;
+            }
+
+            show(el('legacy-banner'), hadLegacyLicence());
+
+            let alive = false;
+            try {
+                alive = await loadMe();
+            } catch {
+                me = cachedMe();
+                show(el('stale-banner'), true);
+                alive = true;
+            }
+            if (!alive) return;
+
+            render();
+            booted = true;
+            lastSignature = `${entitlement().tier}|${statusOf()}`;
+
+            // Another tab, or a background refresh, changed the entitlement.
+            onChange((tier, info) => {
+                const signature = `${tier}|${info && info.status}`;
+                if (signature === lastSignature) return;
+                lastSignature = signature;
+                if (!booted || busy) return;
+                reload();
+            });
+        }
+
+        boot().catch(() => {
+            show(el('loading'), false);
+            say('page-error', 'We could not load your account. Reload the page, or email contact@helpmebreath.com.');
+        });
+    </script>
+</body>
+</html>

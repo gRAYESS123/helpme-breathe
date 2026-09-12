@@ -1,47 +1,89 @@
 # Help Me Breathe — the API
 
-Four serverless functions. No database, no accounts, no npm dependencies, no
-bundler. Everything runs on Vercel's Node runtime using Web-standard handlers, so
+Accounts, one subscription plan, and the embed credential that removes the
+attribution line. Everything runs on Vercel's Node runtime using Web-standard
+handlers, with **zero npm runtime dependencies**: `fetch` and WebCrypto only, so
 the same files port to Cloudflare Pages Functions with a two-line adapter.
 
-| Route | Method | What it does |
-|---|---|---|
-| `/api/license` | `POST` | Turns a licence key into a signed entitlement token. |
-| `/api/entitlement` | `POST` | Refreshes a token, re-checking the merchant of record only when it is nearly stale. |
-| `/api/subscribe` | `POST` | Double opt-in email signup, proxied so the mailing key never reaches a browser. |
-| `/api/health` | `GET` | Which environment variables are set. Booleans and names only. |
+Identity is Supabase (email link, 6-digit code, or Google — no passwords). State
+is Postgres, reached over PostgREST with the secret key. The schema is
+documented in **[`docs/DB.md`](DB.md)** and created by the migrations in
+`supabase/` — this file does not repeat either.
+
+The old licence-key model is gone: there is no `/api/license`, no key, no
+activation count, no SKU, no `MOR_PRODUCT_*` variable and no waitlist mode.
+
+| Route | Method | Auth | What it does |
+|---|---|---|---|
+| `/api/me` | `GET` | Bearer JWT | The one endpoint the signed-in front end calls: user, entitlement, trial hint, free-session count, signed token, cookies. |
+| `/api/session/count` | `GET`, `POST` | none (POST same-origin) | The free-session counter for a device. |
+| `/api/trial/eligibility` | `POST` | Bearer JWT (live) | Decides trial-or-not, reserves it, and creates the checkout transaction. |
+| `/api/billing/portal` | `POST` | Bearer JWT (live) | Mints customer-portal links. |
+| `/api/billing/cancel` | `POST` | Bearer JWT (live) | Cancels at period end, or immediately. |
+| `/api/billing/pause` | `POST` | Bearer JWT (live) | Pauses an active subscription for 1 or 3 months. |
+| `/api/billing/switch` | `POST` | Bearer JWT (live) | Switches monthly → yearly, prorated. |
+| `/api/account/signout` | `POST` | none | Clears the entitlement cookie. |
+| `/api/account/export` | `GET` | Bearer JWT (live) | Data portability: a JSON attachment of everything we hold. |
+| `/api/account/delete` | `POST` | Bearer JWT (live) | Cancels at the provider first, then deletes the account. |
+| `/api/embed/token` | `GET`, `POST`, `DELETE` | Bearer JWT (live) | Mint, list, rotate and revoke embed credentials. |
+| `/api/embed/frame` | `GET` | none (credential in `?wl=`) | The white-label embed document, verdict decided at render time. |
+| `/api/entitlement` | `POST` | none | Is this embed credential live? Used by `/s/`. |
+| `/api/webhooks/mor` | `POST` | webhook signature | Every merchant-of-record event. |
+| `/api/cron/reconcile` | `GET` | `CRON_SECRET` | Hourly: re-drive failed events, rewrite flagged subscriptions. |
+| `/api/cron/retention` | `GET` | `CRON_SECRET` | Weekly: the nine retention statements. |
+| `/api/subscribe` | `POST` | none (same-origin) | Double opt-in email signup. Unchanged. |
+| `/api/health` | `GET` | none | Which environment variables are set. Booleans and names only. |
 
 ## Files
 
 ```
 api/
-  license.js                  POST /api/license
-  entitlement.js              POST /api/entitlement
+  me.js                       GET  /api/me
+  entitlement.js              POST /api/entitlement  (embed credential verifier)
   subscribe.js                POST /api/subscribe
   health.js                   GET  /api/health
+  account/
+    signout.js  export.js  delete.js
+  billing/
+    portal.js  cancel.js  pause.js  switch.js
+  trial/
+    eligibility.js
+  session/
+    count.js
+  embed/
+    token.js                  mint / list / rotate / revoke
+    frame.js                  the white-label frame document
+  webhooks/
+    mor.js                    one endpoint for every merchant of record
+  cron/
+    reconcile.js  retention.js
   _lib/
+    authz.js                  requireUser / requireLiveUser / bearerToken
     crypto.js                 base64url, SHA-256, HMAC-SHA256, signToken / verifyToken
-    env.js                    requireEnv, isProduction, describeConfig
+    supabase.js               verifyAccessToken, db() (PostgREST), assertLiveUser
+    entitlement.js            accessUntilFor, entitlementFor, the v3 token, the cookies
+    trialguard.js             the device cookie, the trial ledger, runEligibility
+    env.js                    KNOWN_VARS, requireEnv, isProduction, describeConfig
     respond.js                json(), CORS, body reading, error mapping
     ratelimit.js              in-memory per-IP counters
+    dblimit.js                per-user counters in Postgres
     providers/
-      index.js                the merchant-of-record seam: SKUs, tiers, caps, domains
-      paddle.js               Paddle Billing adapter (primary)
-      fastspring.js           FastSpring adapter (fallback)
+      index.js                the merchant-of-record seam: adapter contract, plans, prices
+      paddle.js               primary adapter
+      fastspring.js           fallback adapter
     email/
-      index.js                the email seam
-      brevo.js                Brevo double opt-in adapter (default)
-      mailerlite.js           MailerLite adapter
+      index.js  brevo.js  mailerlite.js
 tools/
-  keygen.mjs                  prints a LICENSE_SECRET, writes nothing
-  api.test.mjs                node --test suite, no network
+  keygen.mjs                  prints a 64-character secret, writes nothing
+  api.test.mjs  webhook.test.mjs  trialguard.test.mjs
+  supabase.test.mjs  entitlement.test.mjs  embed.test.mjs
+  site-check.mjs              the whole-site linter
 ```
 
 Vercel deploys every file under `api/` as a function **except** the ones it
 ignores. From the Vercel docs on adding utility files to `/api`: *"To avoid
 turning these files into functions, Vercel ignores files with the following
-characters: Files that start with an underscore, `_` … If your file uses any of
-the above, it will not be turned into a function."* That is why every shared
+characters: Files that start with an underscore, `_`."* That is why every shared
 module lives under `api/_lib/`.
 
 `package.json` already has `"type": "module"`, which the Node runtime requires
@@ -53,181 +95,491 @@ for `.js` files that use ESM.
 export const config = { runtime: 'nodejs', maxDuration: 15 };
 
 export async function POST(request) {
-  return json(200, { ok: true }, { request });
+  return json(200, { ok: true }, { request, methods: 'POST, OPTIONS' });
 }
 export async function OPTIONS(request) { … }
 ```
 
 `runtime` is optional — Vercel defaults to `nodejs` — but it is written out so a
-reader does not have to know the default. `maxDuration` is set because each of
-these endpoints makes one or two outbound calls and should give up rather than
-hang.
+reader does not have to know the default. `maxDuration` is set per endpoint
+because each makes one or two outbound calls and should give up rather than hang.
 
 ---
 
-## `POST /api/license`
+## Authentication
 
-Exchanges a licence key for a token. This is the only endpoint that increments
-the activation counter.
+Four kinds, and nothing else.
 
-**Request**
+| Kind | How | Used by |
+|---|---|---|
+| **Bearer JWT** | `Authorization: Bearer <Supabase access token>`, verified locally against the JWKS (`verifyAccessToken`). | `GET /api/me` — the hot path, called on every page load of a signed-in visitor. |
+| **Bearer JWT (live)** | The same, plus a round trip to Supabase's `/auth/v1/user` (`assertLiveUser` / `requireLiveUser`), so a session signed out or revoked inside its hour is refused. | Every money-touching call: trial eligibility, portal, cancel, pause, switch, export, delete, embed token. |
+| **Same-origin** | The `Origin` header must match the site, or an entry in `ALLOWED_ORIGINS` (`resolveSameOrigin`). | `POST /api/session/count`, `POST /api/subscribe`, and every billing and trial POST **in addition to** the JWT. |
+| **`CRON_SECRET`** | `Authorization: Bearer <CRON_SECRET>`, compared with `timingSafeEqual`. Vercel sends it on every cron invocation. | The two cron endpoints. |
+| **Webhook signature** | Verified by the adapter over the **raw request body** (`verifyWebhook(rawBody, headers, MOR_WEBHOOK_SECRET)`). | `POST /api/webhooks/mor`. |
 
-```json
-{ "key": "txn_01hqwertyuiopasdfghjklzxcv", "domains": ["clinic.example"] }
-```
+The user id always comes from the verified token's `sub`. **No handler ever
+takes a user id, an email or a price from a request body.**
+`stripClientAssertedIdentity()` removes and logs any identity- or price-shaped
+key that turns up in one.
 
-`domains` is optional and only means something for Practitioner and Studio,
-which get white-label embeds. For Pro it is ignored rather than rejected.
-Hostnames are normalised: scheme, port, path and case are stripped.
+Every JWT failure answers the same way — `401 { ok: false, reason:
+'unauthenticated' }` — so the client has one code path. When Supabase itself did
+not answer, the status is `503` with `reason: 'auth_unavailable'` and a
+`Retry-After`, because that is our fault and not the caller's.
+
+CORS is same-origin everywhere except `POST /api/entitlement` and
+`GET /api/embed/frame`, which answer `Access-Control-Allow-Origin: *` without
+credentials. Every API response is `no-store`.
+
+### Cookies
+
+| Cookie | Set by | Attributes | What it is |
+|---|---|---|---|
+| `__Host-hmb_ent` | `GET /api/me` | `Path=/; Secure; SameSite=Lax; Max-Age=1209600` | The signed v3 entitlement token, 14 days. Readable by script on purpose: it is the repair path when Safari sweeps `localStorage`. Cleared by `POST /api/account/signout`. |
+| `__Host-hmb_did` | `GET /api/me`, `POST /api/session/count`, `POST /api/trial/eligibility` | `Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=63072000` | `<uuid>.<mac>` — the device anchor for the free-session count and the trial lock, 2 years. Never cleared by sign-out: it is a device, not a session. |
+
+The `__Host-hmb_did` value is mirrored back in the response body so the browser
+can re-supply it as `X-HMB-Device-Mirror` (on `GET /api/me`) or as
+`device_mirror` in a JSON body (on the two POSTs) after storage is swept. A MAC
+that does not verify is discarded. **No fingerprinting, anywhere.**
+
+---
+
+## `GET /api/me`
+
+The one endpoint the signed-in front end calls.
+
+**Request** — `Authorization: Bearer <access token>`, optionally
+`X-HMB-Device-Mirror: <uuid>.<mac>`. The mirror is read from the header only: a
+GET has no body, and an identifier must never travel in a query string where it
+would land in request logs and `Referer` headers. A `?device_mirror=` parameter
+is deliberately ignored.
 
 **Response — 200**
 
 ```json
 {
   "ok": true,
-  "token": "eyJ2IjoxLCJ0aWVy….q0Xk…",
-  "tier": "practitioner",
-  "activations": 3,
-  "max": 25,
-  "domains": ["clinic.example"],
-  "exp": 1789000000
+  "user": { "id": "…uuid…", "email": "person@example.com", "created_at": "2026-09-01T…" },
+  "entitlement": {
+    "tier": "pro", "status": "active", "plan": "yearly", "commercial": true,
+    "trial_ends_at": null, "current_period_end": "2027-09-11T…",
+    "cancel_at": null, "access_until": "2027-09-13T…",
+    "next_charge": { "amount": "100.00", "currency": "USD", "tax_inclusive": true, "at": "2027-09-11T…" },
+    "provider": "…", "ui": "active"
+  },
+  "trial": { "available": false, "reason": "already_subscribed" },
+  "free_sessions_used": 3,
+  "token": "eyJ2IjozL…",
+  "token_exp": 1789000000,
+  "device_id": "…uuid….…mac…"
 }
 ```
 
-**Response — failure**
+Both cookies are set on every call. A signed-in user with no subscription gets a
+**200** with `tier: "free"` and a free token, so the client has one code path.
 
-```json
-{ "ok": false, "code": "activation_limit", "error": "This licence is already active on 25 devices…" }
-```
-
-`error` is a finished sentence meant to be shown to the buyer as-is. `code` is
-for the client to branch on.
-
-| Status | `code` | When |
+| Status | Body | When |
 |---|---|---|
-| 400 | `missing_key`, `bad_key`, `bad_domains`, `bad_request` | The request never reaches the provider. |
-| 409 | `activation_limit` | The provider's counter is already at the cap. |
-| 409 | `domain_limit` | More domains than the tier allows. |
-| 422 | `unrecognised_key`, `not_found`, `not_paid`, `canceled`, `refunded`, `test_mode`, `unknown_product`, `subscription_inactive`, `pack_only` | The key is real input but does not grant a licence. |
-| 429 | `rate_limited` | More than 10 attempts a minute from one client IP. |
-| 502 | `provider_unavailable`, `provider_error` | The merchant of record did not answer. |
-| 503 | — | A required environment variable is missing. |
+| 200 | as above | Normal. |
+| 200 | `+ "stale": true` | The entitlement read failed **and** the caller's own `__Host-hmb_ent` verified for the same user. It is handed straight back. A paying subscriber is never locked out by our outage. |
+| 401 | `{ ok: false, reason: "unauthenticated" }` | Missing or invalid JWT. |
+| 429 | `{ ok: false, reason: "rate_limited" }` | More than 120 calls a minute from one IP. |
+| 503 | `{ ok: false, reason: "entitlement_unavailable" }` | The read failed and there was no usable cached token. The client keeps its `localStorage` copy. |
 
-### The Protocol Pack is not a licence
+Rules this handler keeps: the entitlement is read from Postgres only — the
+provider is never called; `next_charge` comes from `subscriptions.display_*`,
+never a constant; `assertLiveUser` is **not** used here, because it runs on every
+page load and the JWT's own hour is the boundary. The device half never blocks
+the entitlement half: if the device layer is unavailable the entitlement still
+answers and only the cookie and counter are omitted.
 
-`MOR_PRODUCT_PACK` maps to the internal SKU `pack`, and `pack` is not an app
-tier — the pack is a print-ready PDF, and it is included free with Pro. A pack
-key therefore gets a 422 with `code: "pack_only"` and a sentence pointing at the
-download link in the receipt, rather than a token that unlocks nothing. **If the
-owner would rather the pack unlock something in the app, that is a one-line
-change in `api/license.js` plus a new tier — flag it before launch.**
+The `trial` object here is a cheap hint for the account page. `POST
+/api/trial/eligibility` is the authority.
 
 ---
 
-## `POST /api/entitlement`
+## `GET` / `POST /api/session/count`
 
-Refreshes a token. Two paths:
+The free-session counter. No account needed.
 
-- **Cheap path.** The token verifies and is not yet inside its recheck window.
-  The same token comes straight back. One HMAC, no outbound call. This is what
-  the embed frame calls on every load.
-- **Recheck path.** The token is inside its recheck window, or already expired.
-  The merchant of record is asked again, so a cancelled subscription or a
-  refunded order stops working within a week — with no revocation list and no
-  database.
-
-**The recheck window is `min(7 days, half the token's own lifetime)`** — 7 days
-for a 30-day lifetime token, 3.5 days for a 7-day subscription token. The second
-half of that expression matters: subscription tokens live exactly 7 days, so a
-flat "recheck inside the last 7 days" rule would mark every practitioner token
-stale the moment it was signed, and the embed frame — which holds the token and
-never the key — would never get a usable answer.
-
-**Request**
-
-```json
-{ "token": "eyJ2IjoxLCJ0aWVy….q0Xk…", "key": "txn_01hq…" }
+```
+GET  /api/session/count                      read the count for this device
+POST /api/session/count { device_mirror? }   count one completed session
 ```
 
-`key` is optional. It exists because the token payload carries `sub`, which is a
-one-way hash of the licence key, and a hash cannot be turned back into a key — so
-a genuine recheck needs the key itself. When `key` is supplied it must hash to
-the token's `sub`, otherwise the answer is `key_mismatch`; that check is what
-stops anyone pairing a Pro key with a Studio token.
+Both answer `{ ok: true, device_id, free_sessions_used }` and set
+`__Host-hmb_did`, minting a MAC'd id when the browser has none. That is how a
+signed-out visitor who has never called `/api/me` gets a device anchor at all.
 
-When `key` is absent and a recheck is due, the answer depends on whether the
-token is still inside its own lifetime:
+The counter is **soft**: it never denies anything by itself,
+`js/entitlements.js#requireTimer()` reads it, and clearing cookies resets it.
+What it must not allow is a third-party page planting a device id on a
+stranger's browser, so:
 
-- **Not yet expired** → `{ ok: true, …, "refreshed": false, "stale": true }`.
-  An unexpired token *is* valid — that is what the signature and `exp` mean — so
-  the honest answer is yes, with a flag saying the provider could not be asked.
-  This is the normal answer for an embed frame on a third-party site.
-- **Already expired** → `{ ok: false, reason: "refresh_required" }`, and the
-  client falls back to its own 14-day offline grace.
+- **POST is same-origin only**, and the mirror is read from a JSON body, which a
+  cross-site form post cannot send;
+- **GET reads only the cookie** — never a query parameter, never a mirror;
+- **GET never writes.** No row is inserted and nothing is bumped, so a crawler
+  without a cookie cannot fill the `devices` table. The row is created by the
+  first POST.
 
-**A refresh never increments the activation counter.**
+On a ledger outage the answer is 200 `{ ok: false, free_sessions_used: null }`
+with a MAC'd cookie, and the client falls back to its local count. More than 30
+beacons a minute from one IP gets a 429; a cross-origin POST gets
+`403 { ok: false, error: "cross_origin" }`.
 
-**Response — 200, valid**
+---
+
+## `POST /api/trial/eligibility`
+
+Decides, reserves, and creates the transaction. This is the **only** place the
+`TRIAL_ENABLED` flag is read, and the only place a checkout transaction is
+created.
+
+**Request** — `Authorization: Bearer <access token>` (live), same-origin.
 
 ```json
-{ "ok": true, "token": "…", "tier": "studio", "exp": 1789000000, "act": 3, "dom": ["a.example"], "refreshed": true }
+{ "plan": "monthly", "device_mirror": "<uuid>.<mac>" }
 ```
 
-`refreshed` is `true` only when the merchant of record was actually asked and a
-new token was minted. `stale: true` (present only when true) means the token is
-past its recheck point but could not be re-verified, because no `key` was sent or
-because the provider was unreachable. Either way `ok: true` means "use it".
+That is the whole body. No signals, no consent flag, no device id and **no
+client-supplied price**. `device_mirror` is honoured only when its MAC verifies;
+anything else is discarded and counted as one soft signal.
 
-**Response — 200, not valid**
+**Response — 200**
 
 ```json
-{ "ok": false, "reason": "bad_signature" }
+{
+  "ok": true,
+  "device_id": "…", "reservation_id": "…uuid…",
+  "trial": true, "plan": "monthly",
+  "checkout": { "provider": "…", "transaction_id": "txn_…" },
+  "price_preview": { "amount": "10.00", "currency": "USD", "tax_inclusive": true, "formatted": "$10.00" },
+  "reasons": []
+}
 ```
 
-A well-formed request always gets a 200; the verdict is in `ok`. Only a missing
-or malformed body (400) or a flood (429) gets a non-200. `reason` is one of
-`missing_token`, `malformed`, `bad_signature`, `bad_payload`, `bad_version`,
-`kid_mismatch`, `refresh_required`, `key_mismatch`, `pack_only`,
-`provider_unavailable`, or any provider reason from the table above.
+There is no `price_id` in the response, by design: the browser opens the overlay
+with `transactionId` and the price was fixed on the server.
 
-Note what is *not* in that list: a plain `expired`. The token is verified with
-`allowExpired`, because an expired token is still a question worth answering —
-an expired token with a `key` gets a real recheck and usually a brand-new token,
-and an expired token without one gets `refresh_required` plus `graceEnds`. The
-clock alone never decides.
+| Status | Body | When |
+|---|---|---|
+| 200 | `trial: false, reasons: ["ledger_unavailable"]` | A trial-ledger or rate-limiter outage. **Not** an error: the buyer can still subscribe at the full price. |
+| 400 | `{ ok: false, error: "bad_plan", plans: [...] }` or `"bad_request"` | |
+| 401 | `{ ok: false, reason: "unauthenticated" }` | JWT missing, invalid, or the session was revoked. |
+| 403 | `{ ok: false, error: "cross_origin" }` | Not called from the site itself. |
+| 502 | `{ ok: false, error: "checkout_unavailable" }` | The provider could not create a transaction. |
+| 503 | `{ ok: false, reason: "auth_unavailable" }` / configuration missing | Never a value, only a variable name. |
 
-More than 120 refreshes a minute from one client IP gets a 429. The limit is
-deliberately generous: an office behind one NAT address, or a busy practitioner
-site with several embeds on a page, shares a bucket, and a 429 here would put the
-attribution line back on a paying customer's widget.
+Every 2xx sets `__Host-hmb_did`. The plan enum is `monthly`, `yearly`,
+`practitioner_yearly` — the third exists so that offering a second plan is a
+config change and not a migration; it is not sold today.
 
-A provider outage while the token is still valid answers `ok: true` with
-`stale: true`. Once the token has expired, an outage inside the offline grace
-window answers `provider_unavailable` **with** `tier` and `graceEnds`. Either
-way the customer keeps working rather than being logged out because a third
-party had a bad afternoon. A *hard* rejection — refunded, cancelled, subscription
-inactive — is different: it answers `ok: false` with that reason even while the
-token is technically still valid, because that is the whole point of rechecking.
+---
 
-### CORS on this endpoint is `*`, deliberately
+## The billing endpoints
 
-`/api/entitlement` sends `Access-Control-Allow-Origin: *` because the embed frame
-and the client session link are rendered inside third-party sites. What that
-exposes is exactly one thing: whether a token the caller **already holds** is
-valid, and what tier and domains it claims. It exposes no secret, no key, no
-email and no order data. It never sends
-`Access-Control-Allow-Credentials`, so no browser attaches a cookie to it. A
-caller without a token learns nothing; a caller with one already knows its
-contents, because the payload half of a token is plain base64url JSON that
-anyone can read. The signature is what they cannot forge.
+All four are `POST`, all four need a **live** bearer JWT and a same-origin
+`Origin`, and all four name their `effective_from` explicitly in every branch
+rather than letting the provider's default decide. None of them names a payment
+company: `MOR_PROVIDER` picks the adapter.
 
-Every other endpoint is same-origin only: the `Origin` header is echoed back
-only when its host matches the request host, or matches an entry in
-`ALLOWED_ORIGINS`.
+Shared errors: `401` unauthenticated, `403 cross_origin`, `400 bad_request`,
+`404 no_subscription`, `429 rate_limited` (per user, counted in Postgres),
+`502 provider_unavailable`.
+
+### `POST /api/billing/portal`
+
+No body. Answers
+`{ ok, overview, cancel, update_payment_method, expires_in }`. Links are minted
+per request and never stored — portal sessions are temporary and must not be
+cached. `/account` fetches them on click, not on load. Limit: 30 an hour per
+user.
+
+### `POST /api/billing/cancel`
+
+```json
+{ "when": "period_end" }   // default: keeps what was paid for, or the rest of the trial
+{ "when": "now" }          // the secondary "end it now" link, never the default
+```
+
+Answers `{ ok, effective_from, status, cancel_at, access_until, message }`.
+
+| Status | `when` | `effective_from` |
+|---|---|---|
+| `trialing` | `period_end` | `next_billing_period` |
+| `active`, `past_due` | `period_end` | `next_billing_period` |
+| `paused` | `period_end` | `immediately` |
+| any | `now` | `immediately` |
+
+Paused is the one status where "end of period" means immediately: nothing is
+charged while paused and the paid period has already run out, so there is
+nothing left to keep — and the provider documents immediate cancellation as its
+own behaviour for paused subscriptions. Never worse than the provider's own
+portal: both default to the end of the period. Limit: 10 an hour per user.
+
+### `POST /api/billing/pause`
+
+```json
+{ "months": 1 }   // or 3
+```
+
+Answers `{ ok, effective_from: "next_billing_period", resume_at, access_until,
+message }`. Only an `active` subscription can pause: a trial has nothing to
+pause, a past-due one has a card to fix first, and a paused one already is.
+Extra errors: `409 { error: "not_active" | "cancel_scheduled" }`.
+`access_until` stays as stored until the provider's pause webhook writes the new
+value.
+
+### `POST /api/billing/switch`
+
+```json
+{ "plan": "yearly" }
+```
+
+Answers `{ ok, plan: "yearly", next_billed_at, message }`. Monthly → yearly
+only, and only from an `active` monthly subscription with no cancellation
+scheduled. The switch is prorated. The price id comes from the adapter's
+`priceIdFor({ plan: 'yearly', trial: false })`, i.e. from `MOR_PRICE_YEARLY` —
+never from the request. Extra errors:
+`409 { error: "not_eligible", reason }`, `503` when the price is not configured.
+
+---
+
+## The account endpoints
+
+### `POST /api/account/signout`
+
+Clears `__Host-hmb_ent` and answers `200 { ok: true }`. That is its only job. No
+bearer token is needed: the cookie belongs to the caller's own browser and
+clearing it grants nothing to anyone. `__Host-hmb_did` is deliberately **not**
+cleared. `js/auth.js` calls this after clearing the Supabase session and the
+`hmb.ent` / `hmb.ent.snapshot` keys.
+
+### `GET /api/account/export`
+
+Live bearer JWT. Returns `Content-Disposition: attachment` JSON containing the
+`profiles` row, every `subscriptions` row (provider ids included), every
+`embed_tokens` and `embed_credentials` row, and a note that the merchant of
+record holds its own copy as a separate controller. Field allowlists keep hashes
+and secrets out of it, and every query is keyed on the verified `sub`. Limit: 10
+a minute per IP.
+
+### `POST /api/account/delete`
+
+Live bearer JWT. Deletion that does not fight the subscription, in this order
+and no other:
+
+1. **Refuse** while a payment dispute is open or a `past_due` balance stands.
+2. **Cancel every live subscription at the merchant of record first, and verify
+   the cancellation came back**, before touching Supabase. A cancel that does not
+   verify aborts the whole request with nothing changed.
+3. **Detach, do not cascade,** the subscription rows: `user_id = null`,
+   `detached_at = now()`, provider ids kept — so a later webhook for a still-live
+   subscription reconciles instead of becoming an orphan.
+4. Delete the `auth.users` row, cascading `profiles`, `embed_tokens`,
+   `embed_credentials` and `checkout_intents`.
+5. Null `trial_claims.user_id` and `devices.trial_user_id`, keeping the hashes
+   until the 24-month ceiling — otherwise deleting an account would reset the
+   free-trial limit.
+
+Cancellation uses `effective_from: 'next_billing_period'`. A row whose
+`cancel_at` is already set is not cancelled a second time.
+
+| Status | Body |
+|---|---|
+| 200 | `{ ok: true, deleted: true, subscriptions_cancelled, note }` |
+| 409 | `{ ok: false, reason: "dispute_open" \| "past_due", message }` |
+| 502 | `{ ok: false, reason: "cancel_failed", message }` — **nothing was changed** |
+
+Limit: 5 a minute per IP.
+
+---
+
+## The embed endpoints
+
+Full detail, including the snippets and the `/s/` link, is in
+[`docs/EMBED.md`](EMBED.md). The contract in brief:
+
+### `/api/embed/token` — `GET`, `POST`, `DELETE`
+
+Live bearer JWT on every method. Who may mint: any subscriber whose access has
+not lapsed and whose plan carries the `com` claim, decided by
+`ownerStanding()` — a thin wrapper over the same `entitlementFor()` that
+`/api/me` uses.
+
+| Call | Body / query | Answers |
+|---|---|---|
+| `POST` | `{ domains: ["clinic.example"], label? }` | `{ ok, action: "create", token_id, jti, expires_at, token, domains, label, snippet, iframe_snippet }` |
+| `GET` | — | `{ ok, frame_path, groups: [{ token_id, label, domains, created_at, revoked_at, last_seen_at, hit_count, verify_count_30d, credentials: [...] }] }` |
+| `GET` | `?rotate=1&token_id=et_…` | `{ ok, action: "rotate", token_id, jti, expires_at, token, domains, superseded, overlap_ends_at, snippet, iframe_snippet }` |
+| `DELETE` | `{ token_id }` | `{ ok, token_id, revoked_at, credentials_revoked }` |
+
+A **group** (`token_id`, the `gid` claim) is what the subscriber sees on
+`/account`; each issued credential is its own row with its own `jti`. Rotating
+issues a fresh `jti` and stamps `superseded_at` on the live ones, which keep
+verifying for **48 hours**. Revoking stamps `revoked_at` on the group **and**
+each credential. Credentials expire 30 days after issue; at most 10 domains per
+group; wildcards and our own hostname are refused. Errors: `400` with a reason
+(`domains_required`, `too_many_domains`, `invalid_domain`,
+`wildcard_not_allowed`, `own_site_not_allowed`), `403 not_entitled`,
+`404 not_found`, `409 revoked`, `429`, `503 ledger_unavailable`. Limit: 30 calls
+an hour per subscriber, counted in Postgres.
+
+### `GET /api/embed/frame`
+
+The embed document, with the white-label verdict decided at **render time** and
+inlined as `window.__HMB_EMBED`. The embedding origin is observable on exactly
+one request — the fetch of the frame document itself — so the domain check
+happens here, from `Sec-Fetch-Dest`, `Sec-Fetch-Site` and `Referer`, and the
+runtime never re-asks.
+
+**Every failure is the free widget.** No referer, wrong host, missing fetch
+metadata, expired, revoked, rotated past its overlap, owner lapsed, malformed
+`wl`, ledger down, rate limited — each renders the ordinary attributed widget. A
+clinic's visitor never sees an error page because of a billing state they know
+nothing about.
+
+It answers at its own path rather than through a rewrite because Vercel gives
+the filesystem precedence over rewrites, and `embed/v1/frame.html` exists as a
+static file. `vercel.json` must therefore carry
+`"functions": { "api/embed/frame.js": { "includeFiles": "embed/v1/frame.html" } }`
+so the template ships inside the bundle; without it every request falls back to
+the static document, which is the free widget — safe, but never white-labelled.
+Limit: 120/min per IP, and exceeding it serves the free widget, never a 429 page.
+
+### `POST /api/entitlement`
+
+Is this embed credential live? Called by `/s/?c=…` and by nothing else — the
+frame does **not** call it.
+
+```json
+{ "token": "<the wl value>" }
+```
+```json
+{ "ok": true, "typ": "emb", "tier": "pro", "whitelabel": true, "gid": "et_…", "exp": 1789000000 }
+{ "ok": false, "reason": "expired" }
+```
+
+There is no `host` parameter and no `dom` comparison: `/s/` is served from our
+own origin, so the request is same-origin and `Origin`/`Referer` always say
+helpmebreath.com. A `host` in the body is ignored.
+
+Only v3 credentials with `typ: 'emb'` are accepted. The account entitlement
+token (`typ: 'ent'`) is a 14-day bearer credential for the signed-in browser and
+has no business inside a shareable link, so it is refused with `wrong_type`; a
+retired v1 licence token is refused the same way.
+
+A well-formed request always gets a **200** with the verdict in `ok`. Only a
+missing or malformed body (400) or a flood (429, at 120/min per IP) gets a
+non-200. `reason` is one of `missing`, `malformed`, `bad_signature`,
+`bad_payload`, `bad_version`, `kid_mismatch`, `wrong_type`, `expired`,
+`unavailable`, `unknown`, `mismatch`, `revoked`, `superseded`, `lapsed`,
+`not_commercial`. A verified render is counted, sampled 1-in-10.
+
+CORS is `*` with no credentials, deliberately: the answer exposes nothing the
+caller does not already hold — the payload half of a token is plain base64url
+JSON — and it never sets a cookie.
+
+---
+
+## `POST /api/webhooks/mor`
+
+One endpoint for every merchant of record. `MOR_PROVIDER` picks the adapter;
+nothing in this file names a provider. The body is read **once, as text**, and
+that exact string is what the adapter hashes — never `readJsonBody()`, never
+`JSON.parse`-then-`stringify`.
+
+| Status | When |
+|---|---|
+| `200 ok` | Every event in the delivery was processed or ignored. |
+| `400 bad request` | Unreadable body, or the adapter parsed no event. |
+| `401 invalid signature` | `verifyWebhook` said no. |
+| `500 retry` / `503 retry` | At least one event failed, or the store was unreachable. The provider retries. |
+| `503 not configured` | A required variable is unset. |
+
+### The state machine
+
+`webhook_events.status` moves `received → processed | ignored | failed`.
+
+- **Claim.** The `(provider, event_id)` row is claimed before the event is
+  applied. A `failed` or `received` row is **re-claimable**; a `processed` or
+  `ignored` row is a permanent no-op. So a manual re-POST of a failed event is
+  re-processed, not skipped.
+- **Failure keeps evidence.** An event whose processing throws is answered with
+  a non-2xx so the provider retries, and its row is marked `failed` with the
+  payload **kept**. The retention cron nulls payloads only on `processed` rows.
+- **The environment gate.** An event whose `live` flag disagrees with
+  `MOR_SANDBOX` is recorded as `ignored` and never touches a subscription. A
+  missing flag is `live_flag_unknown` and is also ignored. Anything but the
+  literal `true` in `MOR_SANDBOX` means live, which is the strict reading: a
+  forgotten variable on a live deployment must not accept sandbox events.
+- **Ordering is enforced by the write.** `last_event_at < occurred_at` is a
+  filter on the `UPDATE`; zero rows affected sets `needs_reconcile = true` for
+  the hourly cron. Terminal cancellation is a separate statement guarded on
+  `status <> 'canceled'`, so a stale update can never resurrect a subscription.
+- **`custom_data` is a hint, never a fact.** The only field read from it is
+  `rid`, an opaque uuid; every fact comes from the `checkout_intents` row it
+  names. A `custom_data.user_id`, if one ever appears, is ignored and logged.
+- **`access_until` has one writer.** This handler, through
+  `api/_lib/entitlement.js#accessUntilFor()`, so the formula lives once.
+
+Normalised event types: `sub.created`, `sub.trialing`, `sub.activated`,
+`sub.updated`, `sub.past_due`, `sub.paused`, `sub.resumed`, `sub.canceled`,
+`txn.completed`, `txn.failed`, `txn.refunded`, `txn.chargeback`, `ignore`.
+Subscription statuses: `trialing`, `active`, `past_due`, `paused`, `canceled`,
+plus our local `expired`.
+
+The full specification — the handler, the signature, `applyEvent`, the
+`access_until` table and the trial lifecycle — is in the private design
+document; `docs/DB.md` documents the tables.
+
+---
+
+## The two cron jobs
+
+Both are `GET`, both refuse a request without `Authorization: Bearer
+<CRON_SECRET>`, and both are declared in `vercel.json`.
+
+### `/api/cron/reconcile` — hourly, `17 * * * *`
+
+"Reconciliation, not hope." Three passes, each capped and each logged:
+
+1. **Re-drive** `webhook_events` rows with `status = 'failed'` and
+   `attempts < 10`, oldest first, capped at 50: re-parse the kept payload
+   through the adapter, re-claim (`attempts += 1`), apply. The live-flag gate
+   applies here too. This runs first so that a re-driven event which turns out
+   to be older than the row is repaired by the next pass in the same run.
+2. **Rewrite** every `subscriptions` row with `needs_reconcile = true`, or whose
+   `access_until` is in the past while `status in ('trialing','active')` — a
+   renewal webhook that never arrived. `provider.getSubscription()` is
+   authoritative; the flag is then cleared. Capped at 50.
+3. **Alert** on anything still failed after 10 attempts, and on any subscription
+   with `user_id is null and detached_at is null` — a true orphan. Vercel
+   surfaces these in the function logs.
+
+Answers `{ ok, ran_at, results }` with `200`, or `500` when a step failed.
+
+### `/api/cron/retention` — weekly, `0 4 * * 1`
+
+Nine idempotent statements, in order: null webhook payloads older than 30 days
+**on `processed` rows only**; delete processed events older than 180 days; expire
+stale trial reservations; delete checkout intents 7 days past expiry; mark
+subscriptions `expired` 7 days past `access_until`; delete trial claims and
+devices older than 24 months; prune the rate-limit table. A step that fails is
+logged and the remaining steps still run; the response is `500` when any failed,
+so the invocation shows red in the Vercel log.
+
+Answers `{ ok, ran_at, results }`.
 
 ---
 
 ## `POST /api/subscribe`
+
+Unchanged by the accounts work. Double opt-in email signup, proxied so the
+mailing key never reaches a browser.
 
 **Request**
 
@@ -236,36 +588,26 @@ only when its host matches the request host, or matches an entry in
 ```
 
 `consent` must be literally `true`. `technique` and `source` are optional short
-slugs used as tags. The email is lower-cased and validated server-side: shape,
+slugs used as tags. The address is lower-cased and validated server-side: shape,
 length (254 total, 64 in the local part), no doubled dots, no leading or
 trailing dot.
 
-**Response — 200**
-
-```json
-{ "ok": true, "message": "Check your inbox to confirm" }
-```
+**Response — 200** `{ "ok": true, "message": "Check your inbox to confirm" }`
 
 The answer is identical whether the address is new or already on the list.
 Telling a stranger which addresses are subscribed would be a leak, and the
 person at the form needs the same instruction either way.
 
-**Response — failure**
-
-```json
-{ "ok": false, "error": "That does not look like an email address.", "field": "email" }
-```
-
-400 for validation, 429 for more than 5 requests a minute from one client IP,
-502 when the mailing service is unreachable, 503 when it is not configured
-(either a required variable is unset in production, or the list/template ids are
-present but unusable).
+**Failure** `{ "ok": false, "error": "…", "field": "email" }` — 400 for
+validation, 429 for more than 5 a minute from one IP (and 3 an hour to the same
+address, keyed on a hash), 502 when the mailing service is unreachable, 503 when
+it is not configured.
 
 Both adapters create the contact **unconfirmed** and let the provider send the
-confirmation email. Brevo uses `POST /v3/contacts/doubleOptinConfirmation`,
-which is itself the double opt-in flow. MailerLite uses `POST /api/subscribers`
-with `status: "unconfirmed"` — turn double opt-in on for the group in the
-MailerLite dashboard, because that switch, not this code, sends the email.
+confirmation email. Brevo uses `POST /v3/contacts/doubleOptinConfirmation`.
+MailerLite uses `POST /api/subscribers` with `status: "unconfirmed"` — turn
+double opt-in on for the group in the dashboard, because that switch, not this
+code, sends the email.
 
 Only a 12-character hash prefix of the address is ever logged.
 
@@ -279,301 +621,293 @@ Only a 12-character hash prefix of the address is ever logged.
   "provider": "paddle",
   "email": "brevo",
   "env": "production",
-  "time": "2026-09-09T10:00:00.000Z",
-  "configured": { "license_secret": true, "mor_api_key": false, "…": false },
+  "time": "2026-09-12T10:00:00.000Z",
+  "configured": { "license_secret": true, "supabase_url": true, "mor_api_key": false, "…": false },
   "missing": ["MOR_API_KEY"]
 }
 ```
 
-Booleans and variable names only. No value from the environment appears here —
-not truncated, not hashed, not hinted at. The `kid` is deliberately omitted even
-though it is technically public, because there is no reason to publish anything
-derived from `LICENSE_SECRET` on an unauthenticated endpoint.
+`configured` has one lowercased key for **every** name in `KNOWN_VARS`, set or
+not. `missing` lists only what a *working* deployment needs: sign-in, the
+entitlement token, the trial ledger, checkout, webhooks and the two cron jobs —
+see the **Required** column below.
 
-`ok` is `false` when a variable a working deployment needs is unset. The
-endpoint still answers 200: it is a report, not a probe that should take the
-site down.
+Booleans and variable names only. No value from the environment appears here —
+not truncated, not hashed, not hinted at. The names are already public in
+`.env.example`, so listing which ones are unset costs nothing and saves the
+owner from guessing after a deploy. The `kid` is deliberately omitted even
+though it is technically public.
+
+`ok` is `false` when something in `missing` is unset. The endpoint still answers
+**200**: it is a report, not a probe that should take the site down.
 
 ---
 
 ## Environment variables
 
-Every variable, with a one-line comment each, is in `.env.example`. The short
-version:
+The full list, matching `KNOWN_VARS` in `api/_lib/env.js` and `.env.example`
+one-to-one. **Required** means "counted in `/api/health`'s `missing`".
 
 | Variable | Required | Notes |
 |---|---|---|
-| `LICENSE_SECRET` | yes | 64 characters from `node tools/keygen.mjs`. |
-| `MOR_PROVIDER` | no | `paddle` (default) or `fastspring`. |
-| `MOR_API_KEY` | yes | Paddle: `pdl_live_apikey_…`. FastSpring: `username:password`. |
-| `MOR_API_BASE` | no | Overrides the API base URL. Leave empty in production. |
-| `MOR_WEBHOOK_SECRET` | no | Reserved for the auto-activation webhook flow. |
-| `MOR_PRODUCT_LIFETIME` | yes | Pro lifetime. Several ids may be comma separated. |
-| `MOR_PRODUCT_MONTHLY` | no | Pro monthly, if it is ever offered. |
-| `MOR_PRODUCT_PRACTITIONER` | for that tier | Practitioner $99/yr. |
-| `MOR_PRODUCT_STUDIO` | for that tier | Studio $199/yr. |
-| `MOR_PRODUCT_PACK` | no | Protocol Pack. Refused as a licence, see above. |
-| `MOR_API_USERNAME` / `MOR_API_PASSWORD` | no | FastSpring alternative to the `user:pass` form. |
+| `LICENSE_SECRET` | yes | 64 characters from `node tools/keygen.mjs`. Signs every entitlement token and every embed credential. Rotating it signs every subscriber out of offline use until their next page load. |
+| `SUPABASE_URL` | yes | `https://<ref>.supabase.co`. The same value goes into `js/config.js` (public). |
+| `SUPABASE_PUBLISHABLE_KEY` | yes | The publishable (anon) key. Public by design; the server copy is used only to call the auth API. |
+| `SUPABASE_SECRET_KEY` | yes | The secret (service role) key. Server only. Bypasses row level security. Never in the repo, never in a response. |
+| `TRIAL_PEPPER` | yes | 64 characters. HMAC key for the one-way email hash in the trial ledger. Rotating it resets every email trial lock. |
+| `DEVICE_PEPPER` | yes | 64 characters. HMAC key for the device cookie. Rotating it resets every free-session count and device trial signal. |
+| `TRIAL_ENABLED` | no | `true` offers the 3-day card-required trial; `false` sells a straight subscription. Read only by `api/trial/eligibility.js`. Anything but the literal `true` is off. |
+| `SITE_ORIGIN` | yes | The site's own origin, used to build callback URLs, embed snippets and the same-origin check. |
+| `MOR_PROVIDER` | no | `paddle` (default) or `fastspring`. One variable switches the whole payment rail. |
+| `MOR_API_KEY` | yes | Paddle: an API key beginning `pdl_live_apikey_` (or `pdl_sdbx_apikey_`). FastSpring: `username:password`. |
+| `MOR_API_BASE` | no | Overrides the provider's API base URL. Leave empty in production. |
+| `MOR_WEBHOOK_SECRET` | yes | The signing secret of the webhook notification destination. One per environment: delete the sandbox destination at go-live. |
+| `MOR_CLIENT_TOKEN` | yes | The client-side checkout token (`test_…` or `live_…`). Public by design; the same value goes into `js/config.js`. |
+| `MOR_SANDBOX` | no | Literally `true` on every sandbox deployment, `false` at go-live. Also gates the webhook live-flag check. |
+| `MOR_PRICE_MONTHLY_TRIAL` | unless `TRIAL_ENABLED=false` | The monthly price carrying the 3-day trial period. |
+| `MOR_PRICE_MONTHLY` | yes | The monthly price, no trial. |
+| `MOR_PRICE_YEARLY_TRIAL` | unless `TRIAL_ENABLED=false` | The yearly price carrying the trial. |
+| `MOR_PRICE_YEARLY` | yes | The yearly price, no trial. |
+| `MOR_PRICE_PRACTITIONER` | no | **Leave empty.** Only set if the owner ever decides on a separate practitioner plan. Setting it also narrows the `com` claim to that plan alone. |
+| `MOR_STOREFRONT` | FastSpring only | The popup storefront URL. |
+| `MOR_API_USERNAME` | no | FastSpring only, and only if you prefer two variables to the `username:password` form of `MOR_API_KEY`. |
+| `MOR_API_PASSWORD` | no | The other half of the pair above. |
+| `CRON_SECRET` | yes | 64 characters. The bearer token Vercel's two cron jobs must present. |
+| `ALERT_EMAIL` | yes | Where orphaned webhooks, forged trials and stuck events are reported. |
 | `EMAIL_PROVIDER` | no | `brevo` (default) or `mailerlite`. |
-| `EMAIL_API_KEY` | yes | Never leaves the server. |
-| `EMAIL_LIST_ID` | yes | Brevo list id (numeric) or MailerLite group id. |
+| `EMAIL_API_KEY` | yes | The mailing service key. `/api/subscribe` is the only thing that ever sees it. |
+| `EMAIL_LIST_ID` | Brevo only | Brevo list id (comma separated for several) or MailerLite group id. |
 | `EMAIL_DOI_TEMPLATE_ID` | Brevo only | Numeric id of the double opt-in template. |
-| `EMAIL_DOI_REDIRECT_URL` | Brevo only | Where a confirmed subscriber lands. |
+| `EMAIL_DOI_REDIRECT_URL` | Brevo only | Where a confirmed email subscriber lands: `https://helpmebreath.com/pro/thanks?confirmed=1` (the page then shows an email-confirmed message, not a purchase). |
 | `EMAIL_API_BASE` | no | Test hook. Leave empty in production. |
-| `ALLOWED_ORIGINS` | no | Extra origins for the same-origin endpoints. |
+| `ALLOWED_ORIGINS` | no | Extra origins allowed to call the same-origin endpoints, comma separated. Normally empty: the API and the site share an origin. |
 
 Missing variables behave differently by environment. `VERCEL_ENV=production`
-throws `MissingEnvError`, which becomes a 503 and a log line naming the
-variable. Preview and development get `DEV_DEFAULTS` where one exists and an
-obvious `dev-missing-<NAME>` placeholder otherwise, so a local request fails at
-the provider with a 401 instead of silently pretending to work. **A preview
-deployment is not production**, which is what lets you point a preview at the
-Paddle sandbox.
+throws `MissingEnvError`, which becomes a 503 and a log line naming the variable
+and never a value. Preview and development get `DEV_DEFAULTS` where one exists
+and an obvious `dev-missing-<NAME>` placeholder otherwise, so a local request
+fails at the provider with a 401 instead of silently pretending to work. **A
+preview deployment is not production**, which is what lets you point a preview at
+the sandbox.
 
-Each product variable may hold several ids separated by commas or spaces. That
-matters for Paddle, where a transaction exposes both a price id (`pri_…`) and a
-product id (`pro_…`), and where the $14 founding price is a second price id
-against the same product. Put both in; the highest-ranked match wins if an order
-contains several products.
+Three public values are duplicated in `js/config.js` on purpose, because the
+browser needs them: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` and
+`MOR_CLIENT_TOKEN`. Nothing else is.
 
 ---
 
-## Swapping the merchant of record
+## The provider adapter contract
 
-One file, one variable.
+Swapping the merchant of record is a one-file change: write a new adapter next
+to `paddle.js` / `fastspring.js`, add it to `listProviders()`, and set
+`MOR_PROVIDER`. Nothing outside `api/_lib/providers/` names a payment company —
+and `tools/site-check.mjs` fails the build if anything does.
 
-1. Write `api/_lib/providers/<name>.js` exporting an adapter:
+**Adapter contract v3.** `ADAPTER_METHODS` in `api/_lib/providers/index.js` is
+the enforced list; `assertAdapter(adapter)` throws if one is missing.
 
-   ```js
-   export const myProvider = {
-     id: 'myprovider',
-     keyHint: 'Your licence key is on your receipt.',
-     looksLikeKey(key) { … },
-     async lookup(key, ctx) { … },              // -> { ok, record } | { ok: false, reason }
-     async recordActivation(record, input, ctx) { … },
-   };
-   ```
+```js
+{
+  id: 'paddle',
+  // checkout
+  priceIdFor({ plan, trial }, env),                 // -> string
+  async ensureCustomer(email, ctx),                 // -> { id, existed }   (409-tolerant)
+  async createCheckoutSession({ priceId, customerId, customData }, ctx),
+                                                    // -> { transactionId, status?, checkoutUrl? }
+  async pricePreview({ priceId, countryCode, customerIp }, ctx),
+                                                    // -> { amount, currency, taxInclusive, formatted }
+  // webhooks
+  async verifyWebhook(rawBody, headers, secret),    // -> { ok, reason? }
+  parseEvents(rawBody, ctx?),                       // -> NormalizedEvent[]
+  // management
+  async getSubscription(subscriptionId, ctx),       // -> NormalizedEvent-shaped state
+  async cancelSubscription(subscriptionId, { effectiveFrom }, ctx),
+  async pauseSubscription(subscriptionId, { resumeAt, effectiveFrom }, ctx),
+  async changePlan(subscriptionId, priceId, { prorate }, ctx),
+  async createPortalSession(customerId, subscriptionIds, ctx),
+}
+```
 
-2. Add it to `listProviders()` in `api/_lib/providers/index.js`.
-3. Set `MOR_PROVIDER=<name>` and redeploy.
-
-Nothing outside `api/_lib/providers/` names a payment company. `lookup()` must
-return a `record` of `{ provider, orderId, sku, tier, live, status,
-subscriptionStatus, activations, maxActivations, maxDomains, domains, ref }`;
-`ref` is for whatever provider-internal ids `recordActivation` needs to write
-back. `ctx` is `{ env, fetchImpl, isProd, sub }` — always call through
+`ctx` is `{ env, fetchImpl?, isProd?, sub? }` — always call through
 `ctx.fetchImpl` when it is present, which is how the test suite runs offline.
-`ctx.sub` is the 12-character hash of the licence key and is the **only**
-identifier an adapter may log: for both Paddle and FastSpring the order id *is*
-the licence key the buyer pastes, so `record.orderId` must never appear in a log
-line.
 
-The email seam works the same way: `api/_lib/email/index.js`, adapter with
+**Every adapter produces exactly one event shape** (`normalizeEvent()` fills
+every field, `null` when unknown, so consumers never guard against `undefined`):
+
+```
+id, type, providerEventType, occurredAt, live, reservationId,
+providerSubscriptionId, providerCustomerId, providerPriceId, providerTransactionId,
+customerEmail, status, plan, hadTrial,
+trialStartsAt, trialEndsAt, currentPeriodStart, currentPeriodEnd, nextBilledAt,
+canceledAt, pausedAt, scheduledChange: { action, effectiveAt, resumeAt } | null,
+amount, currency, taxInclusive, totalIsZero, customDataUserIdSeen, payload
+```
+
+`payload` is the provider's own delivery for that event, exactly as parsed, so
+`webhook_events.payload` can be fed back through `parseEvents()` to re-drive a
+failed row.
+
+The plan↔price mapping is **ours, not the provider's**, so it is shared:
+`PRICE_ENV` maps each `(plan, trial)` pair to an env var, `priceIdFor()` reads
+it, and `planForPriceId()` / `isTrialPriceId()` resolve a provider id back to a
+plan. The browser never sees a price id and never chooses one.
+
+Errors: every provider call that fails throws a `ProviderError` carrying
+`status`, `code` and `reason` (`provider_unavailable`, `provider_error`,
+`not_found`, `conflict`, `bad_request`, `unauthorized`, `rate_limited`), which
+the endpoints turn into a calm 502 or 503. **Adapters never log a customer
+email, a transaction id or a subscription id**, and a test enforces it.
+
+The email seam works the same way: `api/_lib/email/index.js`, an adapter with
 `id`, `requiredEnv` and `subscribe(contact, ctx)`, then `EMAIL_PROVIDER`.
 
-### Paddle specifics
-
-- Base URLs: live `https://api.paddle.com`, sandbox `https://sandbox-api.paddle.com`.
-  The adapter picks one from the shape of `MOR_API_KEY` (`pdl_sdbx_…` means
-  sandbox), and **refuses a sandbox key on a production deployment before making
-  any network call**.
-- The licence key a buyer pastes is the **transaction id** from the receipt,
-  matching `^txn_[a-z\d]{26}$`.
-- Verification is `GET /transactions/{id}?include=customer,adjustments`. The
-  order must be `billed`, `paid` or `completed`; `canceled` and `draft`/`ready`
-  are refused. Any adjustment whose `action` is `refund`, `chargeback` or
-  `chargeback_warning` and whose `status` is not `rejected` or `reversed` revokes
-  the licence. A partial `credit` does not.
-- For renewing SKUs the subscription is checked too. `active`, `trialing` and
-  `past_due` are honoured (`past_due` is Paddle retrying a card); `canceled` and
-  `paused` are refused.
-- **The activation counter lives on the customer, not the transaction.** Paddle
-  is explicit that *"`billed` and `completed` transactions are considered records
-  for tax and legal purposes, so they can't be changed"*, so `PATCH
-  /transactions/{id}` is not available. `PATCH /customers/{id}` accepts
-  `custom_data`, so the ledger is:
-
-  ```json
-  { "hmb_activations": { "txn_01h…": { "n": 2, "max": 6, "doms": ["clinic.example"],
-                                       "first": "…", "last": "…" } } }
-  ```
-
-  One entry per purchase, so a customer who buys twice keeps two counters. The
-  adapter reads the customer's existing `custom_data`, merges, and writes it
-  back, so anything else the owner keeps there survives.
-- **Required API key permissions:** `transaction.read`, `customer.read`,
-  `customer.write`, `subscription.read`. Without `customer.write` the counter
-  cannot be incremented and the cap silently stops biting — the adapter logs a
-  loud warning when the write fails, and the token is still issued so a paying
-  customer is never stranded by a permissions mistake.
-- **To free an activation slot**, edit `hmb_activations` on the customer in the
-  Paddle dashboard: lower `n`, or delete the entry for that transaction.
-
-### FastSpring specifics
-
-- Base URL `https://api.fastspring.com`. Authentication is HTTP Basic with the
-  API username and password created in the dashboard; put them in `MOR_API_KEY`
-  as `username:password`, or use `MOR_API_USERNAME` / `MOR_API_PASSWORD`.
-- The licence key is the **order id** from the receipt.
-- Verification is `GET /orders/{id}`: `live` must be true in production,
-  `completed` must be true, and the product path must match one of the
-  `MOR_PRODUCT_*` variables. Subscription products are checked with `GET
-  /subscriptions/{id}`, where `active` must be true.
-- The ledger lives in the order's tags, written with `POST /orders`
-  (*"Updates order tags and attributes."*). Tag values are strings, so it is
-  JSON-in-a-string under the tag `hmb_act`. Every tag already on the order is
-  written back alongside it, because the docs do not say whether a tag update
-  merges into the existing map or replaces it.
-- **Known limit, unverified against a live account:** the documented response
-  schema for `GET /orders/{id}` does not list a `tags` field — only the update
-  endpoint documents tags. If a real order does not echo its tags back, the
-  adapter reads an activation count of zero every time and the device cap stops
-  biting on FastSpring. Licences are still issued and nobody is stranded. Confirm
-  this against one real order before FastSpring ever becomes the primary rail.
-- **Known limit:** FastSpring's documented order schema does not expose a refund
-  flag, so a refunded one-off order cannot be detected from the order alone. The
-  revocation path is a manual tag: set `hmb_revoked` to any non-empty value on
-  the order in the FastSpring dashboard and the adapter refuses the key from the
-  next call onwards. Three undocumented fields (`refunded`, `returned`,
-  `status === "refunded"`) are also checked defensively in case a future API
-  version starts sending them. Subscription refunds are covered, because the
-  subscription goes inactive.
-- **To free an activation slot**, edit the `hmb_act` tag on the order.
-
 ---
 
-## The licence token
+## The entitlement token (v3)
 
 ```
 base64url(JSON payload) + "." + base64url(HMAC-SHA256 over the first segment)
 ```
 
 The signature covers the **encoded** first segment, not the raw JSON, so
-verification never re-serialises JSON — key order would change the bytes.
+verification never re-serialises — key order would change the bytes.
 
 ```json
-{ "v": 1, "tier": "practitioner", "sub": "a1b2c3d4e5f6",
-  "iat": 1788000000, "exp": 1788604800, "kid": "9f2a1c04",
-  "act": 3, "dom": ["clinic.example"] }
+{ "v": 3, "typ": "ent", "sub": "…uuid…", "tier": "pro", "st": "active",
+  "plan": "yearly", "com": 1, "pe": 1789000000,
+  "iat": 1788000000, "exp": 1789209600, "kid": "9f2a1c04" }
 ```
 
 | Field | Meaning |
 |---|---|
-| `v` | Format version. Always `1`. Anything else is refused. |
-| `tier` | `pro`, `practitioner` or `studio`. |
-| `sub` | First 12 hex characters of `sha256(licence key)`. The only key derivative that may be logged. |
+| `v` | Always `3`. |
+| `typ` | `ent` for an account token, `emb` for an embed credential. The two are never interchangeable. |
+| `sub` | The Supabase user id (`emb`: the issuing subscriber's). |
+| `tier` | `pro` or `free`. |
+| `st` | `trialing` \| `active` \| `past_due` \| `paused` \| `canceled` \| `none`. |
+| `plan` | `monthly`, `yearly`, `practitioner_yearly`, or `null`. |
+| `com` | `1` when the plan carries commercial rights. Under one plan, that is every pro token. |
+| `pe` | Trial end or period end, seconds. `0` when unknown. |
 | `iat`, `exp` | Seconds since epoch. |
 | `kid` | First 8 hex characters of `sha256(LICENSE_SECRET)`, so a rotation is detectable as `kid_mismatch` rather than a generic signature failure. |
-| `act` | Activation count at the moment of issue. |
-| `dom` | Optional. Allowed hostnames for white-label embeds. Absent means "any". |
 
-**Lifetimes.** A lifetime purchase gets 30 days; anything that renews gets 7.
-That is the whole revocation mechanism: a cancelled subscriber's last token runs
-out within a week, so there is no revocation list to keep and nothing to clean up.
+**Lifetime.** `exp = min(iat + 14 days, access_until + 24h)` for a pro token;
+`iat + 14 days` for a free one, which grants nothing. Those 14 days **are** the
+offline grace: there is no grace past `exp`, and the `access_until + 24h` cap
+means a cancelled subscriber cannot stay offline into extra days.
 
-**Offline grace.** The client keeps working for 14 days past `exp` when refreshes
-fail, then falls back to free. `refreshWindow()` in `api/entitlement.js` is the
-single source of truth for that arithmetic and is covered by the test suite.
+An embed credential (`typ: 'emb'`) carries `{ v:3, typ:'emb', sub, gid, jti,
+dom[], iat, exp, kid }` and lives 30 days. Its ledger row is checked on every
+render, so a cancelled subscription stops white-labelling at the next page load
+regardless of `exp`.
 
-### How the client uses it
+**Entitlement, in one sentence:** a user's effective entitlement is the maximum
+`access_until` across all their subscription rows, together with the status of
+the row that produced that maximum. `access_until` is read exactly as stored and
+never recomputed at read time.
 
-`js/entitlements.js` owns the client side and is the only module that knows tiers
-exist. It stores the token at `localStorage['hmb.license']`, decodes the payload
-without verifying the signature (a read-only convenience — `requirePro()` is the
-only gate), and re-evaluates on a `storage` event so activating in one tab lights
-up the others.
+`accessUntilFor(row)` is the only writer's formula:
 
-```
-activate(key)  -> POST /api/license      { key }            -> store { token }
-refresh()      -> POST /api/entitlement  { token, key? }    -> replace { token }
-```
+| Status | `access_until` |
+|---|---|
+| `trialing` | `trial_ends_at` |
+| `active` | `current_period_end + 48h` (covers renewal-webhook lag) |
+| `past_due`, ever paid | `least(past_due_since, current_period_end) + 7 days` |
+| `past_due`, never paid | `coalesce(trial_ends_at, now())` — no grace; a declined card must not turn 3 trial days into 10 |
+| `paused` | `coalesce(current_period_end, now())` — a pause stops the next charge, it does not take away paid days |
+| `canceled` | `coalesce(cancel_at, canceled_at)` |
+| `expired` | unchanged |
 
-**Integration note for the Pro agent:** for the recheck path to work, the client
-needs to keep the licence key alongside the token — for example at
-`localStorage['hmb.licensekey']` — and pass it as `key` on refresh. Without it a
-token still works right up to its `exp` (the answer is `ok: true, stale: true`),
-but it can never be renewed, so the customer eventually has to re-paste their key
-by hand, which burns another activation slot. Calling `/api/license` again
-instead of `/api/entitlement` is *not* the fallback: that increments the counter.
+### Rotating `LICENSE_SECRET`
+
+Generate a new one with `node tools/keygen.mjs`, replace the variable, redeploy.
+Every existing token and every embed credential fails with `kid_mismatch`.
+Subscribers get a fresh token on their next `GET /api/me` — one page load, no
+action from them — but an **offline** subscriber drops to free until they are
+online again, and every issued embed credential stops white-labelling until its
+group is rotated from `/account`. Only rotate if you believe the secret leaked.
+There is no dual-secret grace period; adding one would keep the old secret
+around, which defeats the purpose.
 
 ---
 
 ## Security model, and what it does not do
 
-**What the signature buys.** A token cannot be forged without `LICENSE_SECRET`,
-and the secret only exists in the deployment's environment. Editing the payload
-in `localStorage` breaks the signature. Copying someone else's token works, but
-so does copying their licence key, which is the same problem one step earlier.
+**Authorization is by hand, on purpose.** Every `db()` call uses
+`SUPABASE_SECRET_KEY` and bypasses row level security, which means every handler
+is doing its own authorization: derive the user id from
+`verifyAccessToken().sub`, never from a request body. RLS is still on in the
+database as the second lock — see `docs/DB.md`.
 
-**What it does not buy.** Client-side enforcement is bypassable **by design**.
-Every paid feature ships in the same static JavaScript as the free ones, so a
-determined person can open devtools and turn a flag on. That is a deliberate
-trade for a site with no accounts, no server rendering and no database. The
-business defence is that Pro costs $19 once, the Practitioner tier's value is the
-commercial-use licence and the white-label domain list — things a bypass does not
-grant — and the people who would bypass it were never going to pay. **Do not
-build DRM on top of this.** Nothing here should be treated as protecting a
-secret; it protects a purchase record.
+**The JWT verifier trusts the header for two things only:** `kid` (which key to
+look up) and `alg` (which must *agree* with the key found, or the token is
+rejected). The algorithm is derived from the matched JWK, never from the header.
+HS256 anywhere — header or JWK — is refused outright, because it would mean the
+project still uses symmetric signing keys and a verifier holding the secret
+could mint tokens. After the signature: `exp` (30 s skew), `nbf`, `iat`, `iss`,
+`aud`, `role`, `session_id`, `sub` shape, `is_anonymous`, and
+`exp - iat <= 7200` so a forged lifetime cannot outlive the hour Supabase
+issues.
 
-**Activation counting is coarse.** An "activation" is one successful
-`/api/license` call. There is no device identifier in the contract, so a person
-who clears their browser storage and re-activates burns another slot. Six slots
-for a lifetime Pro licence is generous enough that this is a support email, not
-a wall — and the fix is one edit in the provider dashboard.
+**Client-side enforcement is bypassable by design.** Every paid feature ships in
+the same static JavaScript as the free ones, so a determined person can open
+devtools and turn a flag on. The signature stops forgery, not inspection. What
+actually protects the business is that the plan is $10 a month, and that the
+things a bypass does not grant — a working embed credential, a client link that
+white-labels, an account that survives a cache clear — are server-side. **Do not
+build DRM on top of this.**
 
-**The ledger is racy.** Two simultaneous activations read the same counter and
-both write `n + 1`, so one increment is lost. There is no compare-and-swap
-without a database, and losing an increment errs toward the customer.
+**Rate limiting is two-tier.** Per-IP counters live in an in-memory `Map` inside
+a warm function instance: Vercel may run several and recycle them at any moment,
+so the real limit is "a few times the configured number". It stops a careless
+script; it is not a security control. Per-user limits that matter — minting
+credentials, cancelling, pausing — are counted in Postgres instead.
 
-**Rate limiting is best effort.** The counters live in an in-memory `Map` inside
-a warm function instance. Vercel may run several instances and recycle them at
-any moment, so the real limit is "a few times the configured number". It stops a
-careless script; it is not a security control.
+**The free-session counter is soft and says so.** It never denies anything by
+itself, clearing cookies resets it, and that is accepted: the alternative is
+fingerprinting, which rule 8 forbids.
 
-**Secrets never leave the server.** `EMAIL_API_KEY` and `MOR_API_KEY` are used
-only in outbound request headers. Nothing logs a full licence key, a full email
-address or any environment value: keys are logged as `sub`, addresses as a
-12-character hash prefix, and `/api/health` returns booleans. This matters more
-than it looks, because on both rails the *order id* is the licence key — so
-`record.orderId` is as sensitive as the key itself and never reaches a log line.
-Provider adapters get `ctx.sub` for exactly this reason, and a test enforces it.
+**Secrets never leave the server.** `EMAIL_API_KEY`, `MOR_API_KEY` and
+`SUPABASE_SECRET_KEY` are used only in outbound request headers. Nothing logs a
+token, a key, an email address, a provider customer id or any environment value:
+addresses are logged as a 12-character hash prefix and `/api/health` returns
+booleans.
 
 **Everything is `no-store`.** No API response should ever sit in a CDN or a
-browser cache.
-
-### Rotating `LICENSE_SECRET`
-
-Generate a new one with `node tools/keygen.mjs`, replace the variable, redeploy.
-Every existing token immediately fails with `kid_mismatch`, so every customer
-re-activates from the key in their receipt — one click each, and one more
-activation slot each. Only rotate if you believe the secret leaked. There is no
-dual-secret grace period; adding one would mean keeping the old secret around,
-which defeats the purpose of rotating.
+browser cache; `vercel.json` sets `Cache-Control: no-store` and
+`X-Robots-Tag: noindex` on `/api/*`.
 
 ---
 
 ## Local development and testing
 
 ```bash
-node --test tools/api.test.mjs      # 74 tests, no network, no env needed
-node --check api/license.js         # and every other file under api/
-node tools/keygen.mjs               # prints a secret, writes nothing
-npm test                            # runs everything under tools/
+node --test tools/api.test.mjs        # the endpoints, the token, CORS, env
+node --test tools/supabase.test.mjs   # the JWT verifier and the PostgREST helper
+node --test tools/webhook.test.mjs    # the state machine and both adapters
+node --test tools/trialguard.test.mjs # the device cookie, the ledger, eligibility
+node --test tools/entitlement.test.mjs
+node --test tools/embed.test.mjs
+node --check api/me.js                # and every other file under api/
+node tools/keygen.mjs                 # prints a secret, writes nothing
+node tools/site-check.mjs             # the whole-site linter
+npm test                              # runs everything under tools/
 ```
 
-The suite covers the token round trip, expiry, tampering (payload and
-signature), `kid` mismatch after rotation, the grace-window arithmetic, the rate
-limiter, CORS behaviour on both policies, `requireEnv` in production versus
-development, product-id mapping for both providers with a mocked `fetch`
-(including refunds, chargebacks, cancelled subscriptions, sandbox keys in
-production and ledger writes), and every branch of subscribe validation. One
-test exists purely to hold a hard rule in place: it captures `console.warn`
-while both adapters fail a ledger write and asserts that no order id — which on
-both rails *is* the licence key — ever appears in the output.
+No test touches the network and none needs an environment variable. Every
+endpoint exports a `create…Handler(deps)` factory for exactly this reason, and
+provider adapters take `fetchImpl` on their context. `MOR_API_BASE` and
+`EMAIL_API_BASE` point the adapters at a stub host.
 
-Provider adapters take `fetchImpl` on their context, which is how the tests run
-offline. `MOR_API_BASE` and `EMAIL_API_BASE` point the adapters at a stub host.
+`tools/site-check.mjs` also enforces four rules that belong to this model:
+`data-open-timer` may appear only on the two crisis pages, `embed/v1/frame.html`
+and `s/index.html` (and must appear on the two crisis pages); no payment company
+may be named outside `api/_lib/providers/`, `api/_lib/env.js`, `js/config.js`
+and `js/checkout.js`; "free forever", "always free", "no sign-up" and unqualified
+"no account" are refused as copy; and `isAccessibleForFree: false` may not appear
+in structured data, because only the interactive timer is gated and never the
+prose.
 
 To exercise the real thing, run `vercel dev` with a `.env` holding sandbox
-credentials. A sandbox Paddle key works on preview and development but is
-refused on production, so there is no way to accidentally ship one.
+credentials. A sandbox provider key is refused on a production deployment before
+any network call is made, so there is no way to accidentally ship one.

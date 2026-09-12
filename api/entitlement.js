@@ -1,79 +1,62 @@
 /**
- * POST /api/entitlement — silent token refresh.
+ * POST /api/entitlement — is this embed credential live?
  *
- * Request  { token: string, key?: string, host?: string }
- * Response { ok: true, token, tier, exp, act, dom?, refreshed, stale? }
- *          { ok: false, reason, tier?, exp? }
+ * Request  { token: string }
+ * Response { ok: true,  typ: 'emb', tier: 'pro', whitelabel: true, exp, gid }
+ *          { ok: false, reason }
  *
- * Two paths:
+ * WHAT THIS ENDPOINT IS FOR NOW (docs/private/ACCOUNTS_BILLING_DESIGN.md §9.2)
  *
- *   CHEAP PATH (the common one). The token verifies and is not yet inside its
- *   recheck window. Nothing is asked of the merchant of record; the same token is
- *   handed straight back. This is what the embed frame calls on every load to
- *   decide whether to drop the attribution line, and it costs one HMAC.
+ * The client session link at /s/?c=… carries a subscriber's embed credential in
+ * its `wl` field. That page is hosted on helpmebreath.com itself, so the only
+ * question is whether the credential is genuine and still live: signed by us,
+ * not expired, not revoked, not past its rotation overlap, and issued by a
+ * subscriber whose access has not lapsed and whose plan carries the `com`
+ * claim (§7.2 — every plan under D2 = one). This endpoint answers exactly
+ * that, from the signature and the ledger in Postgres, through the same
+ * api/_lib/entitlement.js#entitlementFor() that api/me.js uses.
  *
- *   RECHECK PATH. The token is inside its recheck window, or already expired.
- *   Now the provider is asked again, so a cancelled subscription or a refunded
- *   order stops working within a week without any revocation list and without a
- *   database.
+ * WHAT IT NO LONGER CLAIMS
  *
- * THE RECHECK WINDOW IS NEVER THE WHOLE TOKEN LIFETIME
+ * Earlier revisions said this endpoint checked the embedding domain. It could
+ * not: the embed frame is served from our own origin, so its POST here was
+ * same-origin and `Origin`/`Referer` always said helpmebreath.com. The domain
+ * check now happens where the embedding origin is actually observable — on the
+ * frame *document* request, in api/embed/frame.js — and the frame never calls
+ * this endpoint at all. There is no `host` parameter, no `dom` comparison, and
+ * a `host` in the body is ignored.
  *
- * Subscription tokens live seven days (docs/AGENT_BRIEF.md §7). A flat "recheck
- * inside the last seven days" rule would therefore mark every practitioner token
- * stale the second it was minted, and the embed frame — which has only the token
- * and never the key — would never get a usable answer. So the window is
- * `min(7 days, half the token's own lifetime)`: 7 days for a 30-day lifetime
- * token, 3.5 days for a 7-day subscription token.
+ * WHAT IT ACCEPTS
  *
- * WHY `key` IS OPTIONAL AND WHAT HAPPENS WITHOUT IT
+ * Only v3 credentials with `typ: 'emb'` (§7.2, §9.3). The account entitlement
+ * token (`typ: 'ent'`) is a 14-day bearer credential for the signed-in browser
+ * and has no business inside a shareable link, so it is refused here with
+ * `wrong_type`. A retired v1 licence token is refused the same way whether or
+ * not api/_lib/crypto.js still accepts its version: it is not an embed
+ * credential, which is the clean deletion §11.1 asks for.
  *
- * The token payload is fixed by docs/AGENT_BRIEF.md §7 and carries `sub`, a
- * one-way hash of the licence key. A hash cannot be turned back into a key, so a
- * recheck genuinely needs the key itself. The client therefore sends it along
- * when it has it (see the integration note in docs/API.md).
+ * A well-formed request always gets a 200 with the verdict in `ok`. Only a
+ * missing or malformed body (400) or a flood (429) gets a non-200, so the /s/
+ * page has one code path: `ok && whitelabel` removes the attribution, anything
+ * else leaves the free, attributed page exactly as it was.
  *
- * When it does not, the answer depends on whether the token is still inside its
- * own lifetime. An unexpired token is valid — that is what the signature and
- * `exp` mean — so the honest answer is `ok: true` with `stale: true`, and the
- * caller keeps working until `exp`. Only an EXPIRED token with no key gets
- * `ok: false, reason: 'refresh_required'`, at which point the client leans on its
- * own 14-day offline grace. A refresh never increments the activation counter —
- * it is not an activation.
+ * CORS is `*` with no credentials, as before: the answer exposes nothing the
+ * caller does not already hold (the payload half of a token is plain base64url
+ * JSON) and never sets a cookie.
  *
- * `host` IS CHECKED, AND WHAT THAT IS AND IS NOT WORTH
+ * SHARED HELPERS
  *
- * The embed frame sends the hostname of the page it is embedded in. When the
- * token carries a `dom` claim and the caller names a host that the claim does
- * not cover, the answer is `ok: false, reason: 'domain_mismatch'` — so a lifted
- * token pasted into someone else's site gets a no from the server as well as
- * from the widget.
- *
- * Be honest about the limit. The frame is served from our own origin, so the
- * request's `Origin` and `Referer` headers say helpmebreath.com and cannot tell
- * us anything about the embedding page; `host` is supplied by the frame, and
- * someone hosting their own copy of the frame could supply whatever they like.
- * The binding that actually matters is therefore the one done at mint time: a
- * token gets a `dom` claim at activation, and embed/v1/frame.html refuses to
- * white-label a token with no claim at all. This check is defence in depth on
- * top of that, not the boundary itself. A request that names no host is not
- * refused, because js/entitlements.js refreshes from helpmebreath.com itself.
- *
- * CORS: this endpoint answers `Access-Control-Allow-Origin: *` because the embed
- * frame and the client session link are rendered inside third-party sites. See
- * the note at the top of api/_lib/respond.js for what that does and does not
- * expose. Credentials are never allowed, so no cookie is ever attached.
+ * api/embed/frame.js and api/embed/token.js import the credential verifier and
+ * the ledger reader from this file. The ledger reader is a never-throwing
+ * wrapper around api/_lib/supabase.js#db() — the one PostgREST client in the
+ * repo — because the frame is an unauthenticated hot path that must degrade to
+ * "cannot verify" rather than to a stack trace. Everything here is `fetch` +
+ * WebCrypto over api/_lib/crypto.js.
  */
 
-import { buildPayload, kidFor, signToken, subFor, verifyToken } from './_lib/crypto.js';
-import { isProduction, providerName, readEnv, requireEnv } from './_lib/env.js';
-import {
-  SKU_TIER,
-  SKU_TOKEN_DAYS,
-  getProvider,
-  limitsForTier,
-  messageForReason,
-} from './_lib/providers/index.js';
+import { b64urlEncode, verifyToken } from './_lib/crypto.js';
+import { entitlementFor } from './_lib/entitlement.js';
+import { hasEnv, readEnv, requireEnv } from './_lib/env.js';
 import { createLimiter, rateLimitHeaders } from './_lib/ratelimit.js';
 import {
   clientIp,
@@ -83,75 +66,299 @@ import {
   preflight,
   readJsonBody,
 } from './_lib/respond.js';
+import { db } from './_lib/supabase.js';
 
 export const config = { runtime: 'nodejs', maxDuration: 15 };
 
 const METHODS = 'POST, OPTIONS';
 
-/**
- * The longest a token may go unchecked once it is near expiry. Capped again at
- * half the token's own lifetime, so a 7-day subscription token is not born stale.
- */
-export const RECHECK_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+/** A rotated credential keeps working this long after its successor is issued (§9.3). */
+export const ROTATION_OVERLAP_MS = 48 * 60 * 60 * 1000;
 
-/** The client keeps working this long past `exp` when refreshes fail (AGENT_BRIEF §7). */
-export const OFFLINE_GRACE_MS = 14 * 24 * 60 * 60 * 1000;
+/** Shape of the two ids a credential carries. Short, URL-safe, ours. */
+export const GROUP_ID_RE = /^et_[A-Za-z0-9_-]{8,64}$/;
+export const CREDENTIAL_ID_RE = /^ec_[A-Za-z0-9_-]{8,64}$/;
 
-/** Optional variables the adapters read when present. */
-const OPTIONAL_ENV = [
-  'MOR_PRODUCT_LIFETIME',
-  'MOR_PRODUCT_MONTHLY',
-  'MOR_PRODUCT_PRACTITIONER',
-  'MOR_PRODUCT_STUDIO',
-  'MOR_PRODUCT_PACK',
-  'MOR_API_BASE',
-  'MOR_API_USERNAME',
-  'MOR_API_PASSWORD',
-];
+/** A Supabase user id. */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** A `wl` value as it arrives in a query string or a /s/ payload. */
+export const WL_RE = /^[A-Za-z0-9._~-]{8,4096}$/;
 
 /**
- * Refreshes are cheap and frequent; the limit only exists to stop a runaway loop.
- * It is deliberately generous because a whole office behind one NAT address, or a
- * busy practitioner site with several embeds, shares a bucket — and a 429 here
- * would put the attribution line back on a paying customer's widget.
+ * Generous on purpose: an office behind one NAT address shares a bucket, and a
+ * 429 here would put the attribution line back on a paying subscriber's page.
  */
 const limiter = createLimiter({ name: 'entitlement', limit: 120, windowMs: 60 * 1000 });
 
+/* ------------------------------------------------------------ the ledger --- */
+
 /**
- * Where a token sits relative to its expiry and the offline grace window.
- *
- * `recheckWindowMs` is `min(RECHECK_WINDOW_MS, lifetime / 2)`, where lifetime is
- * the token's own `exp - iat`. Without the second half of that expression a
- * 7-day subscription token would be inside its recheck window from the moment it
- * was signed, and the embed frame (token only, never the key) could never get a
- * usable answer.
- *
- * @param {object} payload a verified token payload
- * @param {number} [now] milliseconds since epoch
- * @returns {{expMs:number, msToExpiry:number, lifetimeMs:number, recheckWindowMs:number,
- *            expired:boolean, needsRecheck:boolean, withinGrace:boolean, graceEndsMs:number}}
+ * The Postgres connection, or null when the deployment has no Supabase yet.
+ * Read per call, never cached, so a redeploy with new env values takes effect.
+ * @returns {{url:string, key:string}|null}
  */
-export function refreshWindow(payload, now = Date.now()) {
-  const expSeconds = Number(payload && payload.exp);
-  const iatSeconds = Number(payload && payload.iat);
-  const expMs = Number.isFinite(expSeconds) ? expSeconds * 1000 : 0;
-  const lifetimeMs =
-    Number.isFinite(iatSeconds) && expSeconds > iatSeconds ? (expSeconds - iatSeconds) * 1000 : 0;
-  const recheckWindowMs =
-    lifetimeMs > 0 ? Math.min(RECHECK_WINDOW_MS, Math.floor(lifetimeMs / 2)) : RECHECK_WINDOW_MS;
-  const msToExpiry = expMs - now;
-  const graceEndsMs = expMs + OFFLINE_GRACE_MS;
+export function ledgerConfig() {
+  const url = readEnv('SUPABASE_URL').replace(/\/+$/, '');
+  const key = readEnv('SUPABASE_SECRET_KEY');
+  if (!url || !key || !/^https:\/\//.test(url)) return null;
+  return { url, key };
+}
+
+/**
+ * One PostgREST call with the secret key, through api/_lib/supabase.js#db().
+ * Never throws: an unconfigured ledger, a network error, a timeout or a
+ * non-2xx comes back as `{ ok: false }` so every caller degrades to "cannot
+ * verify" rather than to a stack trace. The frame's rendering path must never
+ * surface a database error to a clinic's visitor (§9.2).
+ *
+ * @param {'GET'|'POST'|'PATCH'|'DELETE'} method
+ * @param {string} path e.g. 'embed_credentials' or 'rpc/bump_rate_limit'
+ * @param {{query?:Record<string,string>, body?:unknown, prefer?:string, timeoutMs?:number, fetchImpl?:typeof fetch}} [options]
+ * @returns {Promise<{ok:boolean, status:number, data:any, reason?:string}>}
+ */
+export async function rest(method, path, options = {}) {
+  const cfg = ledgerConfig();
+  if (!cfg) return { ok: false, status: 0, data: null, reason: 'ledger_unconfigured' };
+
+  const timeoutMs = Number.isFinite(options.timeoutMs) ? options.timeoutMs : 2500;
+  try {
+    const data = await db(path, {
+      method,
+      query: options.query,
+      body: options.body,
+      prefer: options.prefer,
+      timeoutMs,
+      ctx: { url: cfg.url, secretKey: cfg.key, fetchImpl: options.fetchImpl },
+    });
+    return { ok: true, status: 200, data: data === undefined ? null : data };
+  } catch (error) {
+    const status = error && Number.isFinite(error.status) ? error.status : 0;
+    // SupabaseError messages name the path and status, never a key or a row.
+    console.warn('[entitlement] ledger call failed', {
+      method,
+      path,
+      status,
+      reason: error && error.reason ? error.reason : 'error',
+    });
+    return { ok: false, status, data: null, reason: status ? 'ledger_error' : 'ledger_unavailable' };
+  }
+}
+
+/**
+ * Does the subscriber still have access? The maximum `access_until` across
+ * their subscription rows is the one column the entitlement layer reads (§3.1,
+ * §6.5). No row, or every row in the past, means lapsed.
+ *
+ * @param {Array<{access_until?:string|null}>|null|undefined} rows
+ * @param {number} [now]
+ * @returns {boolean}
+ */
+export function ownerLive(rows, now = Date.now()) {
+  if (!Array.isArray(rows)) return false;
+  return rows.some((row) => {
+    const until = row && row.access_until ? Date.parse(row.access_until) : NaN;
+    return Number.isFinite(until) && until > now;
+  });
+}
+
+/** The columns the owner check needs. `select=*` would drag display_* along for nothing. */
+export const OWNER_COLUMNS = 'access_until,status,plan,last_event_at,updated_at,created_at';
+
+/**
+ * The issuing subscriber's standing, through the same function api/me.js uses
+ * (api/_lib/entitlement.js#entitlementFor), so the frame, the /s/ link and
+ * the account page can never disagree about who is a subscriber and who holds
+ * the `com` claim. Under D2 = one every pro entitlement is commercial; under
+ * D2 = two (MOR_PRICE_PRACTITIONER set) only the practitioner plan is, and a
+ * credential minted before a downgrade stops white-labelling at the next load.
+ *
+ * @param {object[]|null|undefined} rows every `subscriptions` row for the user
+ * @param {number} now
+ * @param {{practitionerPlanOffered?:boolean}} [options]
+ * @returns {{ok:boolean, reason:'ok'|'lapsed'|'not_commercial', plan:string|null}}
+ */
+export function ownerStanding(rows, now, options = {}) {
+  const practitionerPlanOffered =
+    typeof options.practitionerPlanOffered === 'boolean' ? options.practitionerPlanOffered : hasEnv('MOR_PRICE_PRACTITIONER');
+  const ent = entitlementFor(Array.isArray(rows) ? rows : [], now, { practitionerPlanOffered });
+  if (ent.tier !== 'pro') return { ok: false, reason: 'lapsed', plan: ent.plan };
+  if (!ent.commercial) return { ok: false, reason: 'not_commercial', plan: ent.plan };
+  return { ok: true, reason: 'ok', plan: ent.plan };
+}
+
+/** Lowercase, trimmed, no trailing dot, no wildcard prefix; empties dropped. */
+export function normalizeDomainList(list) {
+  if (!Array.isArray(list)) return [];
+  const out = [];
+  for (const entry of list) {
+    if (typeof entry !== 'string') continue;
+    const host = entry.trim().toLowerCase().replace(/^\*\./, '').replace(/\.$/, '');
+    if (host && !out.includes(host)) out.push(host);
+  }
+  return out;
+}
+
+/* ------------------------------------------------------- the credential --- */
+
+/**
+ * Verify an embed credential's signature and shape.
+ *
+ * Payload (§9.3): { v:3, typ:'emb', sub, gid, jti, dom[], iat, exp, kid }.
+ *
+ * api/_lib/crypto.js#verifyToken accepts `v === 1 || v === 3` (the
+ * entitlement-core task's edit) and checks shape -> signature -> version ->
+ * kid -> expiry. It is called with `allowExpired` so that an expired credential
+ * is reported as `expired` here only after its signature and type have been
+ * checked — a forged token never learns which clock it failed on.
+ *
+ * @param {string} token
+ * @param {string} secret LICENSE_SECRET
+ * @param {{now?:number}} [options]
+ * @returns {Promise<{ok:boolean, payload:object|null, reason:string}>}
+ *   reason: ok | missing | malformed | bad_signature | bad_payload | bad_version |
+ *           kid_mismatch | wrong_type | expired
+ */
+export async function verifyEmbedCredential(token, secret, options = {}) {
+  const now = Number.isFinite(options.now) ? options.now : Date.now();
+  const verified = await verifyToken(token, secret, { now, allowExpired: true });
+  if (!verified.ok) return { ok: false, payload: null, reason: verified.reason };
+
+  const payload = verified.payload;
+  if (!payload || payload.v !== 3 || payload.typ !== 'emb') {
+    return { ok: false, payload: null, reason: 'wrong_type' };
+  }
+  if (
+    typeof payload.sub !== 'string' || !UUID_RE.test(payload.sub) ||
+    typeof payload.gid !== 'string' || !GROUP_ID_RE.test(payload.gid) ||
+    typeof payload.jti !== 'string' || !CREDENTIAL_ID_RE.test(payload.jti) ||
+    !Array.isArray(payload.dom) || payload.dom.length > 20 ||
+    !Number.isFinite(Number(payload.iat)) || !Number.isFinite(Number(payload.exp))
+  ) {
+    return { ok: false, payload: null, reason: 'bad_payload' };
+  }
+  if (now >= Number(payload.exp) * 1000) {
+    return { ok: false, payload, reason: 'expired' };
+  }
+  return { ok: true, payload, reason: 'ok' };
+}
+
+/**
+ * Check a signature-verified credential against the ledger: the `jti` row, its
+ * group, and the issuing subscriber's access. Three reads, in parallel — the
+ * payload is signed, so `gid` and `sub` can be looked up directly and
+ * cross-checked afterwards rather than chained.
+ *
+ * Any ledger failure answers `unavailable`. The frame and /s/ treat that as
+ * "attribution stays"; nothing here ever grants on a blank.
+ *
+ * @param {object} payload a payload from verifyEmbedCredential()
+ * @param {{now?:number, fetchImpl?:typeof fetch, timeoutMs?:number, practitionerPlanOffered?:boolean}} [options]
+ * @returns {Promise<{ok:boolean, reason:string, credential?:object, group?:object, domains?:string[]}>}
+ *   reason: ok | unavailable | unknown | mismatch | revoked | superseded | expired | lapsed | not_commercial
+ */
+export async function credentialStatus(payload, options = {}) {
+  const now = Number.isFinite(options.now) ? options.now : Date.now();
+  const io = { fetchImpl: options.fetchImpl, timeoutMs: options.timeoutMs };
+
+  const [cred, group, subs] = await Promise.all([
+    rest('GET', 'embed_credentials', {
+      ...io,
+      query: {
+        jti: `eq.${payload.jti}`,
+        select: 'jti,token_id,issued_at,expires_at,superseded_at,revoked_at,hit_count',
+        limit: '1',
+      },
+    }),
+    rest('GET', 'embed_tokens', {
+      ...io,
+      query: {
+        token_id: `eq.${payload.gid}`,
+        select: 'token_id,user_id,domains,revoked_at,hit_count,verify_count_30d',
+        limit: '1',
+      },
+    }),
+    rest('GET', 'subscriptions', {
+      ...io,
+      query: {
+        user_id: `eq.${payload.sub}`,
+        select: OWNER_COLUMNS,
+        order: 'created_at.asc',
+        limit: '50',
+      },
+    }),
+  ]);
+
+  if (!cred.ok || !group.ok || !subs.ok) return { ok: false, reason: 'unavailable' };
+
+  const credential = Array.isArray(cred.data) ? cred.data[0] : null;
+  const groupRow = Array.isArray(group.data) ? group.data[0] : null;
+  if (!credential || !groupRow) return { ok: false, reason: 'unknown' };
+  if (credential.token_id !== payload.gid || groupRow.user_id !== payload.sub) {
+    return { ok: false, reason: 'mismatch' };
+  }
+  if (groupRow.revoked_at || credential.revoked_at) return { ok: false, reason: 'revoked' };
+
+  const superseded = credential.superseded_at ? Date.parse(credential.superseded_at) : NaN;
+  if (Number.isFinite(superseded) && now >= superseded + ROTATION_OVERLAP_MS) {
+    return { ok: false, reason: 'superseded' };
+  }
+  const expires = credential.expires_at ? Date.parse(credential.expires_at) : NaN;
+  if (!Number.isFinite(expires) || now >= expires) return { ok: false, reason: 'expired' };
+
+  const owner = ownerStanding(subs.data, now, { practitionerPlanOffered: options.practitionerPlanOffered });
+  if (!owner.ok) return { ok: false, reason: owner.reason };
+
   return {
-    expMs,
-    msToExpiry,
-    lifetimeMs,
-    recheckWindowMs,
-    expired: msToExpiry <= 0,
-    needsRecheck: msToExpiry <= recheckWindowMs,
-    withinGrace: msToExpiry <= 0 && now < graceEndsMs,
-    graceEndsMs,
+    ok: true,
+    reason: 'ok',
+    credential,
+    group: groupRow,
+    domains: normalizeDomainList(groupRow.domains),
   };
 }
+
+/**
+ * Count a verified render, sampled 1-in-10 so the write stays cheap (§9.4).
+ * Best effort: a failure here changes nothing for the visitor.
+ *
+ * @param {{credential:object, group:object}} status from credentialStatus()
+ * @param {{now?:number, sample?:number, fetchImpl?:typeof fetch}} [options]
+ * @returns {Promise<boolean>} whether a write was attempted
+ */
+export async function recordHit(status, options = {}) {
+  const roll = Number.isFinite(options.sample) ? options.sample : Math.random();
+  if (roll >= 0.1) return false;
+  const now = Number.isFinite(options.now) ? options.now : Date.now();
+  const seen = new Date(now).toISOString();
+  const io = { fetchImpl: options.fetchImpl, timeoutMs: 1500, prefer: 'return=minimal' };
+  await Promise.all([
+    rest('PATCH', 'embed_credentials', {
+      ...io,
+      query: { jti: `eq.${status.credential.jti}` },
+      body: { hit_count: Number(status.credential.hit_count || 0) + 1, last_seen_at: seen },
+    }),
+    rest('PATCH', 'embed_tokens', {
+      ...io,
+      query: { token_id: `eq.${status.group.token_id}` },
+      body: {
+        hit_count: Number(status.group.hit_count || 0) + 1,
+        verify_count_30d: Number(status.group.verify_count_30d || 0) + 1,
+        last_seen_at: seen,
+      },
+    }),
+  ]);
+  return true;
+}
+
+/** A short random id for a group or a credential: 15 random bytes, base64url. */
+export function randomId(prefix) {
+  const bytes = new Uint8Array(15);
+  globalThis.crypto.getRandomValues(bytes);
+  return `${prefix}${b64urlEncode(bytes)}`;
+}
+
+/* ------------------------------------------------------------- handlers --- */
 
 /**
  * @param {Request} request
@@ -165,21 +372,6 @@ export async function OPTIONS(request) {
  * @param {Request} request
  * @returns {Promise<Response>}
  */
-/**
- * Does `host` fall under one of the hostnames on the licence? An entry covers
- * itself and its subdomains; a leading `*.` is tolerated and ignored.
- * @param {string} host
- * @param {string[]} claimed
- * @returns {boolean}
- */
-function hostAllowed(host, claimed) {
-  return claimed.some((entry) => {
-    const claim = String(entry).trim().toLowerCase().replace(/^\*\./, '');
-    if (!claim) return false;
-    return host === claim || host.endsWith(`.${claim}`);
-  });
-}
-
 export async function GET(request) {
   return methodNotAllowed(request, METHODS, { anyOrigin: true });
 }
@@ -203,149 +395,30 @@ export async function POST(request) {
     }
 
     const parsed = await readJsonBody(request, { maxBytes: 8192 });
-    if (!parsed.ok) {
-      return respond(400, { ok: false, reason: 'bad_request' });
-    }
+    if (!parsed.ok) return respond(400, { ok: false, reason: 'bad_request' });
 
     const token = typeof parsed.data.token === 'string' ? parsed.data.token.trim() : '';
-    const key = typeof parsed.data.key === 'string' ? parsed.data.key.trim() : '';
-    const host =
-      typeof parsed.data.host === 'string'
-        ? parsed.data.host.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/[/:].*$/, '')
-        : '';
     if (!token) return respond(400, { ok: false, reason: 'missing_token' });
+    if (!WL_RE.test(token)) return respond(200, { ok: false, reason: 'malformed' });
 
     const env = requireEnv(['LICENSE_SECRET']);
-    const secret = env.LICENSE_SECRET;
+    const verified = await verifyEmbedCredential(token, env.LICENSE_SECRET);
+    if (!verified.ok) return respond(200, { ok: false, reason: verified.reason });
 
-    // allowExpired: an expired token is still a question worth answering, and
-    // the answer depends on the provider, not on the clock alone.
-    const verified = await verifyToken(token, secret, { allowExpired: true });
-    if (!verified.ok || !verified.payload) {
-      return respond(200, { ok: false, reason: verified.reason });
-    }
+    const status = await credentialStatus(verified.payload);
+    if (!status.ok) return respond(200, { ok: false, reason: status.reason });
 
-    const payload = verified.payload;
-
-    // Domain binding, checked server-side as well as in the widget. Only when the
-    // caller names a host: a refresh from helpmebreath.com names none.
-    const claimed = Array.isArray(payload.dom) ? payload.dom.filter(Boolean) : [];
-    if (host && claimed.length && !hostAllowed(host, claimed)) {
-      return respond(200, { ok: false, reason: 'domain_mismatch' });
-    }
-
-    const window = refreshWindow(payload);
-
-    /** Hand the caller's own token back. `stale` says a recheck was wanted but could not run. */
-    const keepToken = (stale) =>
-      respond(200, {
-        ok: true,
-        token,
-        tier: payload.tier,
-        exp: payload.exp,
-        act: payload.act,
-        ...(payload.dom ? { dom: payload.dom } : {}),
-        refreshed: false,
-        ...(stale ? { stale: true } : {}),
-      });
-
-    if (!window.needsRecheck) {
-      // Cheap path: still comfortably valid, hand the same token back untouched.
-      return keepToken(false);
-    }
-
-    if (!key) {
-      // An unexpired token is valid — that is what the signature and `exp` mean.
-      // The embed frame only ever has the token, so answering `ok: false` here
-      // would silently kill every white-label embed. Say yes, and say it is stale.
-      if (!window.expired) return keepToken(true);
-
-      return respond(200, {
-        ok: false,
-        reason: 'refresh_required',
-        tier: payload.tier,
-        exp: payload.exp,
-        expired: true,
-        graceEnds: Math.floor(window.graceEndsMs / 1000),
-      });
-    }
-
-    // The key must be the one this token was minted for. Without this check the
-    // wide-open CORS policy would let anyone swap a Pro key onto a Studio token.
-    const sub = await subFor(key);
-    if (sub !== payload.sub) {
-      console.warn('[entitlement] key does not match token subject', { sub, tokenSub: payload.sub });
-      return respond(200, { ok: false, reason: 'key_mismatch' });
-    }
-
-    // A fresh env object for the adapter. LICENSE_SECRET stays out of it.
-    const providerEnv = requireEnv(['MOR_API_KEY']);
-    for (const name of OPTIONAL_ENV) {
-      const value = readEnv(name);
-      if (value) providerEnv[name] = value;
-    }
-
-    const provider = getProvider(providerName());
-    // `sub` rides along so the adapter can name the caller in a log line without
-    // ever handling the key itself (AGENT_BRIEF section 2 rule 9).
-    const lookup = await provider.lookup(key, { env: providerEnv, isProd: isProduction(), sub });
-
-    if (!lookup.ok) {
-      console.warn('[entitlement] recheck failed', { sub, provider: provider.id, reason: lookup.reason });
-
-      // A provider outage must never revoke a paying customer. While the token
-      // is still inside its own lifetime the answer is simply "keep what you
-      // have"; past expiry we say so explicitly and let the client's grace logic
-      // take over. A hard rejection (refunded, cancelled) falls through to the
-      // plain `ok: false` below, which is the point of rechecking at all.
-      const transient = lookup.reason === 'provider_unavailable' || lookup.reason === 'provider_error';
-      if (transient && !window.expired) return keepToken(true);
-      if (transient && window.withinGrace) {
-        return respond(200, {
-          ok: false,
-          reason: 'provider_unavailable',
-          tier: payload.tier,
-          exp: payload.exp,
-          graceEnds: Math.floor(window.graceEndsMs / 1000),
-        });
-      }
-      return respond(200, {
-        ok: false,
-        reason: lookup.reason,
-        message: messageForReason(lookup.reason, provider),
-      });
-    }
-
-    const record = lookup.record;
-    if (record.sku === 'pack') {
-      return respond(200, { ok: false, reason: 'pack_only' });
-    }
-
-    const tier = SKU_TIER[record.sku];
-    const limits = limitsForTier(tier);
-    const kid = await kidFor(secret);
-
-    // A refresh is not an activation: the counter is read, never incremented.
-    const fresh = buildPayload({
-      tier,
-      sub,
-      kid,
-      act: record.activations,
-      days: SKU_TOKEN_DAYS[record.sku],
-      domains: limits.domains > 0 ? record.domains : [],
-    });
-    const freshToken = await signToken(fresh, secret);
-
-    console.log('[entitlement] refreshed', { sub, tier, sku: record.sku, provider: provider.id });
+    // Awaited: a serverless instance may freeze the moment the response is
+    // returned, so a fire-and-forget write here would often never land.
+    await recordHit(status);
 
     return respond(200, {
       ok: true,
-      token: freshToken,
-      tier,
-      exp: fresh.exp,
-      act: fresh.act,
-      ...(fresh.dom ? { dom: fresh.dom } : {}),
-      refreshed: true,
+      typ: 'emb',
+      tier: 'pro',
+      whitelabel: true,
+      gid: verified.payload.gid,
+      exp: Number(verified.payload.exp),
     });
   } catch (error) {
     return errorResponse(error, request, { methods: METHODS, anyOrigin: true, label: 'entitlement' });

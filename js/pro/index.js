@@ -18,6 +18,7 @@
  */
 
 import { initPaywall } from './paywall.js';
+import { initPreview } from './preview.js';
 import { initCapture } from './capture.js';
 import { initPatterns } from './patterns.js';
 import { initStreaks } from './streaks.js';
@@ -87,6 +88,9 @@ function initInstance(rootEl, instance) {
 if (typeof document !== 'undefined') {
   injectStyles();
   initPaywall();
+  // The timer's preview state (design section 8.2): one demonstration cycle
+  // and the account card when Start is refused by requireTimer().
+  initPreview();
   initCapture();
 
   document.addEventListener('hmb:ready', (event) => {

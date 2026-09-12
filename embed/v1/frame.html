@@ -16,6 +16,20 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="color-scheme" content="light dark">
 
+    <!--
+      THE WHITE-LABEL VERDICT LIVES HERE.
+
+      This file is a template as well as a page. api/embed/frame.js serves it
+      for white-label embeds and replaces the empty script below with
+      `window.__HMB_EMBED = { whitelabel: true|false, reason }`, decided on the
+      server from the document request's Sec-Fetch-Dest, Sec-Fetch-Site and
+      Referer headers plus the `wl` credential and the ledger. Served as a
+      static file (the free widget), the script stays empty, `__HMB_EMBED` is
+      undefined, and the module at the bottom keeps the attribution. The
+      runtime never asks the server a second time.
+    -->
+    <script data-hmb-verdict></script>
+
     <!-- The ring with a gap. Same-origin, and never an emoji data URI. A
          browser fetches at most one of these, and only when this document is
          opened directly rather than inside an iframe. -->
@@ -34,8 +48,8 @@
       shared engine modules. No web font — not even the site's Newsreader and
       IBM Plex Sans; frame.css uses the fallback stacks instead. No analytics,
       no ad library, no consent script, no remote image. The only cross-origin
-      request the frame can ever make is a practitioner's own logo, and only
-      after that practitioner's white-label key has been verified.
+      request the frame can ever make is a subscriber's own logo, and only
+      after that subscriber's white-label credential has been verified.
     -->
     <link rel="stylesheet" href="/embed/v1/frame.css">
 
@@ -136,12 +150,13 @@
         html.setAttribute('data-hmb-surface', theme);
 
         /*
-         * Class mode is a Practitioner feature. Render it immediately when a
-         * token is present (the common case is a valid one) and let the module
-         * downgrade to normal if verification fails, rather than making every
-         * legitimate class start in the wrong layout.
+         * Class mode belongs to a verified white-label credential. The verdict
+         * is already inlined above this script by api/embed/frame.js, so the
+         * layout is decided before first paint rather than corrected after.
          */
-        html.setAttribute('data-hmb-mode', mode === 'class' ? (wl ? 'class' : 'normal') : mode);
+        var verdict = window.__HMB_EMBED;
+        var whitelabel = !!(verdict && typeof verdict === 'object' && verdict.whitelabel === true);
+        html.setAttribute('data-hmb-mode', mode === 'class' ? (whitelabel ? 'class' : 'normal') : mode);
 
         /*
          * js/app.js resolves ?t= and ?d= ahead of every other source, which is
@@ -179,7 +194,12 @@
     </script>
 </head>
 
-<body class="theme-478">
+<!--
+  data-open-timer: the account gate in js/entitlements.js#requireTimer() stands
+  aside on exactly four surfaces — the two crisis pages, this frame and /s/.
+  A subscriber's visitors run the widget with no account (design §0.1, §8.1).
+-->
+<body class="theme-478" data-open-timer="true">
 
 <div class="hmb-shell">
 
@@ -315,9 +335,10 @@
 
     <!--
       Attribution is in the markup, not added by script, so it is present even
-      if JavaScript never runs. It is removed only after /api/entitlement
-      confirms a white-label key for this domain.
-      The link is rel="nofollow noopener" and there is no configuration,
+      if JavaScript never runs. It is removed only when the server inlined a
+      `whitelabel: true` verdict for this document request — a credential that
+      verified, on a domain it is bound to, from a subscriber whose access is
+      live. The link is rel="nofollow noopener" and there is no configuration,
       parameter or paid tier that makes it followed (AGENT_BRIEF hard rule 7).
     -->
     <p class="hmb-attrib" data-hmb-attrib>
@@ -474,7 +495,7 @@
 <script type="module">
 /*
  * Frame behaviour that the shared engine does not cover:
- *   - white-label verification (the only thing that can remove attribution)
+ *   - applying the server's white-label verdict (the only thing that can remove attribution)
  *   - practitioner branding
  *   - class mode's Start button
  *   - the hmb:resize / session postMessage protocol documented in docs/EMBED.md
@@ -498,13 +519,8 @@ const html = document.documentElement;
  * height and a session state — nothing private — so '*' is safe here.
  */
 let parentOrigin = '*';
-let referrerHost = '';
 try {
-    if (document.referrer) {
-        const ref = new URL(document.referrer);
-        parentOrigin = ref.origin;
-        referrerHost = ref.host.toLowerCase();
-    }
+    if (document.referrer) parentOrigin = new URL(document.referrer).origin;
 } catch { /* opaque or absent referrer */ }
 
 function post(message) {
@@ -580,7 +596,9 @@ document.addEventListener('hmb:phase', scheduleReport);
 /* ------------------------------------------------------------------- titling */
 
 const technique = getTechnique(cfg.technique || '') || getTechnique((root && root.getAttribute('data-technique')) || '');
-if (technique) document.title = `${technique.title} — Help Me Breathe`;
+// A white-labelled document does not carry our name in its title either;
+// readVerdict() is a hoisted declaration, defined with the verification below.
+if (technique) document.title = readVerdict().ok ? technique.title : `${technique.title} — Help Me Breathe`;
 
 /* ------------------------------------------------------- contraindications */
 
@@ -628,100 +646,22 @@ if (cfg.brand && brandRow && brandName) {
 
 /* -------------------------------------------------- white-label verification */
 
-/**
- * Ask the server whether this token belongs to a live subscription with the
- * white-label right, and whether it is allowed on the domain we are embedded in.
+/*
+ * There is no request here. The verdict was decided by api/embed/frame.js
+ * while serving this document — the only request on which the embedding
+ * page's origin is observable — and inlined as `window.__HMB_EMBED`. A static
+ * copy of this file has no verdict and is the free widget.
  *
- * Fail closed. Attribution stays unless the answer is an unambiguous yes:
- * a network error, a timeout, a non-2xx response, a free or pro tier, a MISSING
- * domain claim, or a domain claim that does not include the host page all keep it.
- *
- * A missing `dom` used to mean "no restriction", which made every practitioner
- * token an unbound bearer credential: the product tells practitioners to paste
- * `data-wl="your-licence-key"` into public page HTML, so anyone reading that page
- * could lift the token and strip attribution on any site. It now means "this
- * licence was never bound to a domain, so it cannot white-label anything". The
- * hostnames are collected at activation (js/entitlements.js activate(key, domains)
- * → /api/license) and written into the token.
- *
- * The verdict is cached in sessionStorage for the life of the tab so a page
- * with several embeds makes one request, not one per widget.
+ * Fail closed. Attribution stays unless the verdict is an unambiguous
+ * `whitelabel: true`: an absent object, a malformed one, or any `reason` other
+ * than success all keep it. Nothing the host page can do from outside the
+ * frame changes this, because the frame's own document is what carries it.
  */
-const DENIED = { ok: false };
-
-async function askServer(token) {
-    let response;
-    try {
-        const controller = new AbortController();
-        const timeout = window.setTimeout(() => controller.abort(), 4000);
-        response = await fetch('/api/entitlement', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token, host: referrerHost }),
-            signal: controller.signal,
-            credentials: 'omit',
-        });
-        window.clearTimeout(timeout);
-    } catch {
-        // Unreachable API, blocked request or timeout — attribution stays.
-        return DENIED;
-    }
-    if (!response.ok) return DENIED;
-
-    let body;
-    try { body = await response.json(); } catch { return DENIED; }
-    if (!body || typeof body !== 'object' || body.ok === false) return DENIED;
-
-    const payload = (body.payload && typeof body.payload === 'object') ? body.payload : body;
-    const tier = String(payload.tier || '').toLowerCase();
-    if (tier !== 'practitioner' && tier !== 'studio') return DENIED;
-
-    // `dom` is the allow-list of hostnames this licence was bound to. No list,
-    // no white-label: an unbound token is exactly the thing we refuse to honour.
-    const domains = Array.isArray(payload.dom) ? payload.dom.filter(Boolean) : [];
-    if (!domains.length || !referrerHost) return DENIED;
-
-    const allowed = domains.some((entry) => {
-        const claim = String(entry).trim().toLowerCase().replace(/^\*\./, '');
-        if (!claim) return false;
-        return referrerHost === claim || referrerHost.endsWith(`.${claim}`);
-    });
-    if (!allowed) return DENIED;
-
-    return { ok: true, tier };
-}
-
-async function verifyWhiteLabel(token) {
-    if (!token) return DENIED;
-
-    const cacheKey = `hmb.wl.${token.slice(-24)}`;
-
-    /*
-     * A yes is cached for the life of the tab. A no is cached for 60 seconds
-     * only: it still stops a page with six widgets making six requests, but it
-     * does not let one unlucky timeout keep a paying practitioner attributed
-     * until they close the tab.
-     */
-    const DENY_TTL_MS = 60 * 1000;
-    try {
-        const cached = window.sessionStorage.getItem(cacheKey);
-        if (cached) {
-            const parsed = JSON.parse(cached);
-            if (parsed && typeof parsed === 'object') {
-                if (parsed.ok) return parsed;
-                if (Date.now() - Number(parsed.at || 0) < DENY_TTL_MS) return DENIED;
-            }
-        }
-    } catch { /* private mode: verify again, that is all */ }
-
-    const verdict = await askServer(token);
-    try {
-        window.sessionStorage.setItem(
-            cacheKey,
-            JSON.stringify(verdict.ok ? verdict : { ok: false, at: Date.now() }),
-        );
-    } catch { /* fine */ }
-    return verdict;
+function readVerdict() {
+    const verdict = window.__HMB_EMBED;
+    if (!verdict || typeof verdict !== 'object') return { ok: false, reason: 'static' };
+    if (verdict.whitelabel !== true) return { ok: false, reason: String(verdict.reason || 'denied') };
+    return { ok: true, reason: 'ok' };
 }
 
 function applyWhiteLabel() {
@@ -754,18 +694,13 @@ function wireClassMode() {
 
 if (cfg.mode === 'class') wireClassMode();
 
-if (cfg.wl) {
-    verifyWhiteLabel(cfg.wl).then((verdict) => {
-        if (verdict && verdict.ok) {
-            applyWhiteLabel();
-            return;
-        }
-        // Not verified: free frame, attribution intact, and class mode reverts.
-        if (cfg.mode === 'class') html.setAttribute('data-hmb-mode', 'normal');
-        scheduleReport();
-    });
-} else if (cfg.mode === 'class') {
-    html.setAttribute('data-hmb-mode', 'normal');
+const verdict = readVerdict();
+if (verdict.ok) {
+    applyWhiteLabel();
+} else {
+    // Free frame: attribution intact, class mode reverts, logo never loads.
+    if (cfg.mode === 'class') html.setAttribute('data-hmb-mode', 'normal');
+    scheduleReport();
 }
 </script>
 

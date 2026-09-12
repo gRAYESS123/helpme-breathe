@@ -1,84 +1,118 @@
 /**
  * js/entitlements.js — the ONLY module in the codebase that knows tiers exist.
  *
- * Every paid feature gate on the site calls `requirePro(feature)` from here.
- * Nothing else may read the licence token, and nothing else may decide what a
- * visitor is allowed to use. That is what makes swapping the merchant of record
- * a one-file change (js/config.js) instead of a rewrite.
+ * Every paid feature gate on the site calls `requirePro(feature)` from here and
+ * the timer's Start calls `requireTimer()`. Nothing else may read the
+ * entitlement token, and nothing else may decide what a visitor is allowed to
+ * use. Rebuilt 2026-09-11 for the one-plan, one-account model
+ * (docs/private/ACCOUNTS_BILLING_DESIGN.md §7.3); the licence-key model is gone.
  *
- * How validation works, in order:
+ * Preserved exactly, so no existing gate changes:
+ *   tier(), isPro(), requirePro(feature), onChange(cb), restore(), parseToken(),
+ *   getLicenseInfo(), and the `hmb:paywall` event.
  *
- *   1. Read the token from localStorage['hmb.license'].
- *   2. Decode the base64url payload in front of the '.' — locally, without
- *      verifying the signature. Local decoding is a convenience, never a
- *      security boundary: the real check is the HMAC verification the server
- *      does in /api/license and /api/entitlement.
- *   3. While `exp` has not passed, the payload's tier applies.
- *   4. Past `exp` but inside the 14-day offline grace window, the tier is KEPT
- *      (so a plane, a tunnel or a provider outage never locks a paying customer
- *      out of what they bought) and one silent refresh is attempted in the
- *      background: POST /api/entitlement { token, key? }. It never blocks, never
- *      throws, and a failure changes nothing. The same refresh runs inside the
- *      token's last week — or the second half of its life, whichever is
- *      shorter — so it renews before it can lapse at all.
- *   5. Past `exp` + 14 days, the tier falls back to free.
+ * Changed: isPractitioner() now returns the token's `com` (commercial) claim.
+ * Removed: activate(key) and deactivate() — both keep a one-release stub that
+ * logs a deprecation so a page still in a service-worker cache does not throw.
  *
- * The buyer's licence key is stored alongside the token at
- * localStorage['hmb.license.key']. The refresh endpoint can only re-check with
- * the merchant of record when it is handed the key, because the token carries
- * only a one-way hash of it — without the key a lifetime buyer would have to
- * paste it again every six weeks. It never leaves this module except in a
- * request body to /api/license or /api/entitlement.
+ * Added: signedIn(), account(), status(), refresh({ force }),
+ * requireAccount(feature), requireTimer(), readDeviceMirror(),
+ * recordFreeSession(), hadLegacyLicence(), dismissLegacyNotice().
  *
- * Token shape (the API agent owns the issuer):
- *   base64url(JSON payload) + '.' + base64url(HMAC-SHA256)
- *   payload = { v:1, tier, sub, iat, exp, kid, act, dom? }   // exp in seconds
+ * How the entitlement is read, offline-first (§7.3):
  *
- * Never log, track or transmit a full licence key.
+ *   1. localStorage['hmb.ent']
+ *   2. if absent, the `__Host-hmb_ent` cookie (the Safari-sweep repair path —
+ *      the one cookie read in js/, and it is read, never written)
+ *   3. decode the payload locally, WITHOUT verifying the signature. Local
+ *      decoding is a convenience, never a security boundary: the server
+ *      verifies the HMAC on every request that matters.
+ *   4. now < exp → the tier applies; otherwise free. There is no grace past
+ *      `exp` for a v3 token: the 14 days the server puts into `exp` IS the
+ *      offline grace, capped at access_until + 24h so a cancelled subscriber
+ *      cannot stay offline into extra days.
+ *   5. refresh when online and the token is older than 24 hours, or whenever
+ *      `hmb:auth` fires. Fire-and-forget; a failure changes nothing.
+ *
+ * Token v3 (design §7.2): base64url(JSON) + '.' + base64url(HMAC-SHA256),
+ *   { v:3, typ:'ent', sub, tier:'pro'|'free', st, plan, com:0|1, pe, iat, exp, kid }
+ *
+ * Supabase proves WHO (js/auth.js); this token proves WHAT they may do. The
+ * auth module is loaded lazily and defensively: it imports supabase-js from a
+ * CDN, and a blocked or offline CDN must never take the breathing timer down
+ * with it. Signed-in state falls back to the last /api/me snapshot until the
+ * auth module reports in.
+ *
+ * Storage keys: hmb.ent, hmb.ent.snapshot, hmb.did. The retired hmb.license and
+ * hmb.license.key are deleted on first load (§11.1 grandfather shim).
  */
 
-const STORAGE_KEY = 'hmb.license';
-const KEY_STORAGE_KEY = 'hmb.license.key';
-const GRACE_MS = 14 * 24 * 60 * 60 * 1000;
-/**
- * Renew silently once the token is inside its last week, before it can lapse —
- * but never earlier than halfway through its own life. `/api/entitlement`
- * rechecks on `min(7 days, half the token's lifetime)`, and a 7-day
- * subscription token is *always* inside its last week, so a flat 7-day rule
- * here would fire a refresh on every single page load for every subscriber and
- * get the cheap "same token back" answer every time. Matching the server's
- * arithmetic means the request only goes out when it can actually do something.
- */
-const RENEW_BEFORE_MS = 7 * 24 * 60 * 60 * 1000;
-const TIERS = ['free', 'pro', 'practitioner', 'studio'];
+import { TIMER_FREE_SESSIONS } from './config.js';
+import { completedSessionCount, getFlag, setFlag } from './storage.js';
+import { track, EVENTS } from './analytics.js';
 
-const LICENSE_ENDPOINT = '/api/license';
-const ENTITLEMENT_ENDPOINT = '/api/entitlement';
+const TOKEN_KEY = 'hmb.ent';
+const SNAPSHOT_KEY = 'hmb.ent.snapshot';
+const DEVICE_KEY = 'hmb.did';
+const LEGACY_KEYS = ['hmb.license', 'hmb.license.key'];
+/** Storage flag (hmb.legacy-license): a licence key was found and removed. */
+const LEGACY_FLAG = 'legacy-license';
 
-/** @type {{tier:string, exp:number, payload:object|null, token:string|null, grace:boolean}} */
-let state = { tier: 'free', exp: 0, payload: null, token: null, grace: false };
+const ENT_COOKIE = '__Host-hmb_ent';
+const ME_ENDPOINT = '/api/me';
+const COUNT_ENDPOINT = '/api/session/count';
+const AUTH_MODULE = './auth.js';
 
-/** @type {Set<Function>} */
-const listeners = new Set();
-
-/** One silent refresh per page load, at most. */
-let refreshAttempted = false;
+const REFRESH_AFTER_MS = 24 * 60 * 60 * 1000;
+const TIERS = ['free', 'pro'];
+const STATUSES = ['trialing', 'active', 'past_due', 'paused', 'canceled'];
+const TOKEN_VERSION = 3;
 
 const hasWindow = typeof window !== 'undefined';
 const hasDocument = typeof document !== 'undefined';
 
-function readToken() {
+/**
+ * @typedef {object} EntState
+ * @property {string} tier 'free' | 'pro'
+ * @property {number} exp token expiry, ms
+ * @property {object|null} payload decoded token payload
+ * @property {string|null} token the raw token
+ * @property {boolean} fresh now < exp
+ */
+
+/** @type {EntState} */
+let state = { tier: 'free', exp: 0, payload: null, token: null, fresh: false };
+
+/** The last /api/me answer minus the token, mirrored in localStorage. */
+let snapshot = null;
+
+/** @type {Set<Function>} */
+const listeners = new Set();
+
+/** The auth module once it has loaded, or null while it has not / could not. */
+let auth = null;
+let authLoader = null;
+
+/** One /api/me call in flight at a time. */
+let refreshInFlight = null;
+
+/** Last beacon timestamp, so two callers on one completion count once. */
+let lastBeaconAt = 0;
+
+/* ------------------------------------------------------------- storage io */
+
+function readItem(key) {
   try {
-    return window.localStorage.getItem(STORAGE_KEY);
+    return window.localStorage.getItem(key);
   } catch {
     return null;
   }
 }
 
-function writeToken(token) {
+function writeItem(key, value) {
   try {
-    if (token) window.localStorage.setItem(STORAGE_KEY, token);
-    else window.localStorage.removeItem(STORAGE_KEY);
+    if (value == null || value === '') window.localStorage.removeItem(key);
+    else window.localStorage.setItem(key, value);
     return true;
   } catch {
     return false;
@@ -86,35 +120,49 @@ function writeToken(token) {
 }
 
 /**
- * The buyer's own licence key, kept in their own browser.
- *
- * Tokens are short-lived on purpose (30 days for a lifetime licence, 7 for a
- * subscription) so a cancellation self-expires with no revocation list. The
- * refresh endpoint can only re-check with the merchant of record when it is
- * given the key itself, because the token carries a one-way hash of it. Without
- * this, a lifetime buyer would have to paste their key again every six weeks.
- *
- * It is written here, read here, sent only to /api/license and /api/entitlement,
- * and removed by deactivate(). It is never logged, never tracked, and never put
- * in a URL.
+ * The Safari-sweep repair path: `__Host-hmb_ent` is server-set and exempt from
+ * script-storage eviction. Read only, never written, never sent anywhere by
+ * this module (the browser attaches it to same-origin requests itself).
  */
-function readKey() {
+function readEntitlementCookie() {
+  if (!hasDocument) return null;
   try {
-    return window.localStorage.getItem(KEY_STORAGE_KEY);
+    const raw = document.cookie || '';
+    if (!raw) return null;
+    for (const part of raw.split(';')) {
+      const eq = part.indexOf('=');
+      if (eq <= 0) continue;
+      if (part.slice(0, eq).trim() !== ENT_COOKIE) continue;
+      const value = part.slice(eq + 1).trim();
+      return value ? decodeURIComponent(value) : null;
+    }
+  } catch {
+    /* an unreadable cookie jar is the same as no cookie */
+  }
+  return null;
+}
+
+function readToken() {
+  return readItem(TOKEN_KEY) || readEntitlementCookie();
+}
+
+function readSnapshot() {
+  const raw = readItem(SNAPSHOT_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : null;
   } catch {
     return null;
   }
 }
 
-function writeKey(key) {
-  try {
-    if (key) window.localStorage.setItem(KEY_STORAGE_KEY, key);
-    else window.localStorage.removeItem(KEY_STORAGE_KEY);
-    return true;
-  } catch {
-    return false;
-  }
+function writeSnapshot(value) {
+  snapshot = value && typeof value === 'object' ? value : null;
+  writeItem(SNAPSHOT_KEY, snapshot ? JSON.stringify(snapshot) : null);
 }
+
+/* ----------------------------------------------------------------- token */
 
 /** Decode base64url -> UTF-8 string. Returns null on anything malformed. */
 function decodeSegment(segment) {
@@ -132,7 +180,7 @@ function decodeSegment(segment) {
 /**
  * Parse a token into its payload without verifying the signature.
  * Read-only helper for this module's own UI. Never use it as a gate —
- * `requirePro()` is the only gate.
+ * `requirePro()` and `requireTimer()` are the only gates.
  * @param {string|null} token
  * @returns {object|null}
  */
@@ -150,37 +198,36 @@ export function parseToken(token) {
   }
 }
 
-/** `exp` is issued in seconds; accept milliseconds too rather than locking someone out. */
-function expiryMs(payload) {
-  const raw = Number(payload && payload.exp) || 0;
+/** Unix seconds (or, defensively, milliseconds) → milliseconds. */
+function toMs(value) {
+  const raw = Number(value) || 0;
   if (raw <= 0) return 0;
   return raw > 1e11 ? raw : raw * 1000;
 }
 
+/**
+ * @param {string|null} token
+ * @returns {EntState}
+ */
 function evaluate(token) {
   const payload = parseToken(token);
-  if (!payload) return { tier: 'free', exp: 0, payload: null, token: token || null, grace: false };
-
-  const claimed = TIERS.includes(payload.tier) ? payload.tier : 'free';
-  const expMs = expiryMs(payload);
-  const now = Date.now();
-  const fresh = expMs > 0 && now < expMs;
-  const inGrace = expMs > 0 && !fresh && now < expMs + GRACE_MS;
-
-  return {
-    tier: fresh || inGrace ? claimed : 'free',
-    exp: expMs,
-    payload,
-    token: token || null,
-    grace: inGrace,
-  };
+  const empty = { tier: 'free', exp: 0, payload: null, token: token || null, fresh: false };
+  if (!payload) return empty;
+  // Only an account entitlement counts. An embed credential ('emb') or a
+  // retired v1 licence token in this slot is decoded for display and ignored
+  // as a tier.
+  const isEnt = Number(payload.v) === TOKEN_VERSION && (payload.typ === 'ent' || payload.typ == null);
+  const claimed = isEnt && TIERS.includes(payload.tier) ? payload.tier : 'free';
+  const expMs = toMs(payload.exp);
+  const fresh = expMs > 0 && Date.now() < expMs;
+  return { tier: fresh ? claimed : 'free', exp: expMs, payload, token: token || null, fresh };
 }
 
+/* -------------------------------------------------------------- notify */
+
 /**
- * Stamp the current tier on <body> so CSS can respond to it — specifically so a
- * paid tier reserves no ad space at all (css/styles.css hides .ad-slot for
- * pro/practitioner/studio). This is a presentation hint, never a gate: the gate
- * is requirePro(), and the real check is the server's HMAC verification.
+ * Stamp the current tier on <body> so CSS can respond to it — specifically so
+ * a paid tier reserves no ad space at all. A presentation hint, never a gate.
  */
 function stampTier() {
   if (!hasDocument) return;
@@ -195,123 +242,323 @@ function notify() {
   stampTier();
   for (const cb of listeners) {
     try {
-      cb(state.tier, { exp: state.exp, payload: state.payload });
+      cb(state.tier, { exp: state.exp, payload: state.payload, status: status() });
     } catch {
       /* a broken listener must not break the app */
     }
   }
 }
 
+/** A short signature of what listeners care about, to notify only on change. */
+function signature() {
+  const acct = account();
+  return [state.tier, status(), state.exp, acct ? acct.id : ''].join('|');
+}
+
 function refreshFromStorage() {
-  const before = state.tier;
+  const before = signature();
   state = evaluate(readToken());
-  if (state.tier !== before) notify();
-  maybeSilentRefresh();
+  snapshot = readSnapshot();
+  if (signature() !== before) notify();
   return state.tier;
 }
 
-/* --------------------------------------------------------- silent refresh */
+/* ------------------------------------------------------------- migration */
 
 /**
- * Ask the server for a fresh token, in the background.
- *
- * It runs in two situations: inside the last week of the token's life (so it is
- * renewed before it can lapse) and past `exp` while the 14-day offline grace is
- * still holding the tier up. Fire-and-forget: it never blocks a caller, never
- * throws, and never shows an error. A cancelled subscription simply fails to
- * refresh and expires on its own when the grace window runs out — no revocation
- * list, no owner action.
+ * §11.1 grandfather shim, one release only: a licence key from the retired
+ * model is removed and a flag left behind so /account and /pro can show the
+ * one-time "email us with your receipt" notice.
  */
-function renewWindowMs(payload, expMs) {
-  const iat = Number(payload && payload.iat) || 0;
-  const iatMs = iat > 1e11 ? iat : iat * 1000;
-  const lifetime = iatMs > 0 && expMs > iatMs ? expMs - iatMs : 0;
-  if (!lifetime) return RENEW_BEFORE_MS;
-  return Math.min(RENEW_BEFORE_MS, Math.floor(lifetime / 2));
-}
-
-function maybeSilentRefresh() {
-  if (refreshAttempted) return;
-  if (!state.token) return;
-  const window_ = renewWindowMs(state.payload, state.exp);
-  const due = state.grace || (state.exp > 0 && Date.now() > state.exp - window_);
-  if (!due) return;
-  if (!hasWindow || typeof fetch !== 'function') return;
-  if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
-  refreshAttempted = true;
-
-  const token = state.token;
-  const key = readKey();
-  const run = () => {
-    Promise.resolve()
-      .then(() =>
-        fetch(ENTITLEMENT_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(key ? { token, key } : { token }),
-        }),
-      )
-      .then((response) => (response && response.ok ? response.json() : null))
-      .then((data) => {
-        if (!data || data.ok === false || typeof data.token !== 'string' || !data.token) return;
-        if (data.token === token) return;
-        writeToken(data.token);
-        const before = state.tier;
-        state = evaluate(data.token);
-        if (state.tier !== before) notify();
-      })
-      .catch(() => {
-        /* offline, blocked, provider down — the grace window covers it */
-      });
-  };
-
-  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(run, { timeout: 4000 });
-  else window.setTimeout(run, 1200);
-}
-
-if (hasWindow) {
-  refreshFromStorage();
-  stampTier();
-}
-
-/**
- * Turn whatever a form gave us into a list of bare hostnames. Accepts a comma,
- * space or newline separated string, or an array. A pasted URL is reduced to its
- * host, and a leading `www.` is kept as typed — the server normalises further and
- * is the authority on what is acceptable.
- * @param {string[]|string|undefined} input
- * @returns {string[]}
- */
-function normaliseDomainInput(input) {
-  if (input == null) return [];
-  const raw = Array.isArray(input) ? input : String(input).split(/[\s,]+/);
-  const out = [];
-  for (const item of raw) {
-    let value = String(item || '').trim().toLowerCase();
-    if (!value) continue;
-    value = value.replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/:\d+$/, '');
-    if (!value || out.includes(value)) continue;
-    out.push(value);
-    if (out.length >= 10) break;
+function migrateLegacyLicence() {
+  let found = false;
+  for (const key of LEGACY_KEYS) {
+    if (readItem(key) != null) found = true;
+    writeItem(key, null);
   }
-  return out;
+  if (found) setFlag(LEGACY_FLAG, true);
+}
+
+/** True when a retired licence key was found on this browser and not yet acknowledged. */
+export function hadLegacyLicence() {
+  return getFlag(LEGACY_FLAG) === true;
+}
+
+/** Called by the page that showed the one-time notice. */
+export function dismissLegacyNotice() {
+  setFlag(LEGACY_FLAG, null);
+}
+
+/* ------------------------------------------------------------- auth glue */
+
+function isOnline() {
+  return !(typeof navigator !== 'undefined' && navigator.onLine === false);
+}
+
+/**
+ * Load js/auth.js lazily. It is the only module that knows Supabase exists and
+ * it imports supabase-js from a CDN, so a static import here would make every
+ * timer page depend on that CDN answering. If it cannot load, this module
+ * behaves as "signed out until told otherwise" and the timer keeps working.
+ * @returns {Promise<object|null>}
+ */
+function loadAuth() {
+  if (auth) return Promise.resolve(auth);
+  if (authLoader) return authLoader;
+  if (!hasWindow) return Promise.resolve(null);
+  authLoader = import(AUTH_MODULE)
+    .then(async (mod) => {
+      if (!mod || typeof mod.signedIn !== 'function') return null;
+      try {
+        if (typeof mod.ready === 'function') await mod.ready();
+      } catch {
+        /* an initial session read that fails is the same as signed out */
+      }
+      // The auth module may change the answer to signedIn(); tell gates.
+      const before = signature();
+      auth = mod;
+      wireAuth(mod);
+      if (signature() !== before) notify();
+      if (signedIn()) maybeRefresh();
+      return mod;
+    })
+    .catch(() => null);
+  return authLoader;
+}
+
+function wireAuth(mod) {
+  try {
+    if (typeof mod.onAuthChange === 'function') mod.onAuthChange(() => onAuthEvent());
+  } catch {
+    /* a module without the hook still answers signedIn(); hmb:auth covers the rest */
+  }
+}
+
+/**
+ * Sign-in or sign-out happened in this tab. `storage` events only fire in
+ * OTHER tabs, so re-read explicitly, then ask the server for the current
+ * entitlement. Nothing is cleared here on our own initiative: js/auth.js
+ * removes hmb.ent and hmb.ent.snapshot on sign-out, and a transient auth event
+ * must never cost a subscriber their offline token.
+ */
+function onAuthEvent() {
+  refreshFromStorage();
+  if (signedIn()) refresh({ force: true });
+}
+
+function maybeRefresh() {
+  if (!isOnline()) return;
+  if (!signedIn()) return;
+  const iat = toMs(state.payload && state.payload.iat);
+  const due = !state.token || !iat || Date.now() > iat + REFRESH_AFTER_MS || !state.fresh;
+  if (due) refresh();
+}
+
+/* --------------------------------------------------------- device mirror */
+
+/**
+ * The localStorage mirror of the `__Host-hmb_did` device cookie. The cookie is
+ * HttpOnly, so script cannot read it; the server hands the MAC'd value back in
+ * JSON so it can be re-supplied after Safari sweeps script storage. Copying
+ * someone else's only ever costs you a trial; inventing one gains nothing.
+ * @returns {string}
+ */
+export function readDeviceMirror() {
+  const value = readItem(DEVICE_KEY);
+  return typeof value === 'string' && /^[0-9a-f-]{36}\.[A-Za-z0-9_-]{20,}$/i.test(value) ? value : '';
+}
+
+function writeDeviceMirror(value) {
+  if (typeof value === 'string' && value && value.length <= 200) writeItem(DEVICE_KEY, value);
+}
+
+/* ---------------------------------------------------------------- refresh */
+
+/**
+ * GET /api/me: store the token, mirror the device id, remember the snapshot,
+ * notify listeners. Fire-and-forget safe: never throws, resolves to the parsed
+ * body on success and null on anything else. A failure changes nothing — the
+ * cached token is the fallback, by design (§5.3, "fail open").
+ *
+ * @param {{force?:boolean}} [options] `force` ignores the 24-hour rule.
+ * @returns {Promise<object|null>}
+ */
+export async function refresh(options = {}) {
+  const force = !!(options && options.force);
+  if (!hasWindow || typeof fetch !== 'function') return null;
+  if (!isOnline()) return null;
+  if (refreshInFlight) return refreshInFlight;
+
+  refreshInFlight = (async () => {
+    try {
+      const mod = await loadAuth();
+      if (!mod || !mod.signedIn()) return null;
+      if (!force) {
+        const iat = toMs(state.payload && state.payload.iat);
+        if (state.token && state.fresh && iat && Date.now() < iat + REFRESH_AFTER_MS) return null;
+      }
+      const bearer = await mod.accessToken();
+      if (!bearer) return null;
+
+      const headers = { Authorization: `Bearer ${bearer}`, Accept: 'application/json' };
+      const mirror = readDeviceMirror();
+      if (mirror) headers['X-HMB-Device-Mirror'] = mirror;
+
+      const response = await fetch(ME_ENDPOINT, {
+        method: 'GET',
+        headers,
+        credentials: 'same-origin',
+        cache: 'no-store',
+      });
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+      if (!response.ok || !data || data.ok !== true) return null;
+
+      if (typeof data.token === 'string' && data.token) writeItem(TOKEN_KEY, data.token);
+      if (typeof data.device_id === 'string') writeDeviceMirror(data.device_id);
+      writeSnapshot({
+        at: Date.now(),
+        user: data.user && typeof data.user === 'object' ? data.user : null,
+        entitlement: data.entitlement && typeof data.entitlement === 'object' ? data.entitlement : null,
+        trial: data.trial && typeof data.trial === 'object' ? data.trial : null,
+        free_sessions_used: Number.isFinite(Number(data.free_sessions_used))
+          ? Number(data.free_sessions_used)
+          : null,
+        token_exp: Number(data.token_exp) || null,
+      });
+      refreshFromStorage();
+      return data;
+    } catch {
+      return null;
+    } finally {
+      refreshInFlight = null;
+    }
+  })();
+
+  return refreshInFlight;
+}
+
+/* ------------------------------------------------------ free-session count */
+
+/**
+ * The D1 counter. Server-authoritative when a figure has been received (from
+ * /api/me or the session beacon); the local history count otherwise. Soft on
+ * purpose: clearing storage resets it, and the alternative is a wall on a
+ * breathing timer.
+ */
+function freeSessionsUsed() {
+  const server = snapshot && Number(snapshot.free_sessions_used);
+  if (snapshot && Number.isFinite(server) && snapshot.free_sessions_used !== null) return server;
+  return completedSessionCount();
+}
+
+/**
+ * POST the free-session beacon for one completed session. Called from the
+ * `hmb:session-complete` listener below; exported so the engine may call it
+ * explicitly instead. Either way, one completion counts once.
+ * @returns {Promise<number|null>} the server's count, or null
+ */
+export async function recordFreeSession() {
+  const now = Date.now();
+  if (now - lastBeaconAt < 2000) return null;
+  lastBeaconAt = now;
+  if (!hasWindow || typeof fetch !== 'function' || !isOnline()) return null;
+  try {
+    const mirror = readDeviceMirror();
+    const response = await fetch(COUNT_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      credentials: 'same-origin',
+      cache: 'no-store',
+      body: JSON.stringify(mirror ? { device_mirror: mirror } : {}),
+    });
+    let data = null;
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
+    }
+    if (!response.ok || !data) return null;
+    if (typeof data.device_id === 'string') writeDeviceMirror(data.device_id);
+    const count = Number(data.free_sessions_used);
+    if (data.ok === true && Number.isFinite(count)) {
+      writeSnapshot({ ...(snapshot || {}), free_sessions_used: count });
+      return count;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function onSessionComplete(event) {
+  const detail = (event && event.detail) || {};
+  if (detail.completed !== true) return;
+  if (isPro()) return;
+  if (hasDocument && document.body && openTimerPage()) return;
+  recordFreeSession();
 }
 
 /* --------------------------------------------------------------- public API */
 
-/** 'free' | 'pro' | 'practitioner' | 'studio'. */
+/** 'free' | 'pro'. */
 export function tier() {
   return state.tier;
 }
 
-/** True for pro, practitioner and studio. */
+/** True for a live subscription (trialing, active, paused or past-due grace). */
 export function isPro() {
-  return state.tier === 'pro' || state.tier === 'practitioner' || state.tier === 'studio';
+  return state.tier === 'pro';
 }
 
-/** True for practitioner and studio. */
+/**
+ * The commercial-rights claim. Under D2 = 'one' the server sets `com: 1` on
+ * every pro token, so this equals isPro(); under 'two' it is true only on the
+ * practitioner plan. Still exported because js/pro/* and /for-practitioners
+ * call it.
+ */
 export function isPractitioner() {
-  return state.tier === 'practitioner' || state.tier === 'studio';
+  return isPro() && Number(state.payload && state.payload.com) === 1;
+}
+
+/** True when a Supabase session exists (or, before the auth module reports in, when the last /api/me had a user). */
+export function signedIn() {
+  if (auth) {
+    try {
+      return !!auth.signedIn();
+    } catch {
+      return false;
+    }
+  }
+  return !!(snapshot && snapshot.user && snapshot.user.id);
+}
+
+/** `{ id, email } | null`. Never a token. */
+export function account() {
+  if (auth) {
+    try {
+      const user = auth.user();
+      if (user && user.id) return { id: String(user.id), email: user.email ? String(user.email) : null };
+      return null;
+    } catch {
+      return null;
+    }
+  }
+  const user = snapshot && snapshot.user;
+  return user && user.id ? { id: String(user.id), email: user.email ? String(user.email) : null } : null;
+}
+
+/** 'trialing' | 'active' | 'past_due' | 'paused' | 'canceled' | 'none'. */
+export function status() {
+  const fromToken = state.fresh && state.payload ? state.payload.st : null;
+  if (STATUSES.includes(fromToken)) return fromToken;
+  const fromSnapshot = snapshot && snapshot.entitlement ? snapshot.entitlement.status : null;
+  if (STATUSES.includes(fromSnapshot)) return fromSnapshot;
+  return 'none';
 }
 
 /**
@@ -332,89 +579,102 @@ export function requirePro(featureName) {
 }
 
 /**
- * Exchange a licence key for a signed token and store it.
- *
- * `error` is a finished sentence from `/api/license`, meant to be shown to the
- * buyer as-is. `code` is the machine-readable reason beside it (`pack_only`,
- * `activation_limit`, `unrecognised_key`, …) so a page can add a friendlier
- * branch; it is absent when the failure never reached the server.
- *
- * `domains` binds a Practitioner or Studio licence to the hostnames the
- * white-label embed may drop its attribution on. The server writes them into the
- * token's `dom` claim, and embed/v1/frame.html refuses to white-label a token
- * that carries no `dom` at all — so a token without domains is an ordinary
- * attributed embed, never an unbound bearer credential. Ignored for Free and Pro,
- * which have no white-label right to bind.
- *
- * @param {string} key the licence key, or a provider transaction reference
- * @param {string[]|string} [domains] hostnames for the white-label embed
- * @returns {Promise<{ok:boolean, tier?:string, error?:string, code?:string}>}
+ * Gate on having an account at all. True when signed in; otherwise dispatches
+ * `hmb:signin` with `{ feature, next }` and returns false.
+ * @param {string} featureName
+ * @returns {boolean}
  */
-export async function activate(key, domains) {
-  const trimmed = String(key || '').trim();
-  if (!trimmed) return { ok: false, error: 'Enter your licence key.', code: 'missing_key' };
-  const hosts = normaliseDomainInput(domains);
-  if (typeof fetch !== 'function') {
-    return { ok: false, error: 'This browser cannot reach the licence server.', code: 'no_fetch' };
+export function requireAccount(featureName) {
+  if (signedIn()) return true;
+  if (hasDocument) {
+    const next = hasWindow ? `${location.pathname}${location.search}` : '/';
+    document.dispatchEvent(
+      new CustomEvent('hmb:signin', { detail: { feature: String(featureName || ''), next } }),
+    );
   }
-  try {
-    const response = await fetch(LICENSE_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(hosts.length ? { key: trimmed, domains: hosts } : { key: trimmed }),
-    });
-    let data = null;
-    try {
-      data = await response.json();
-    } catch {
-      data = null;
-    }
-    if (!response.ok || !data || data.ok === false || !data.token) {
-      const error =
-        (data && data.error) || 'That key could not be verified. Check it and try again.';
-      const code = data && typeof data.code === 'string' ? data.code : 'rejected';
-      return { ok: false, error, code };
-    }
-    writeToken(data.token);
-    writeKey(trimmed);
-    refreshAttempted = false;
-    refreshFromStorage();
-    if (!isPro()) {
-      return {
-        ok: false,
-        error: 'That key is no longer active. Email contact@helpmebreath.com and we will sort it out.',
-        code: 'inactive_token',
-      };
-    }
-    return { ok: true, tier: tier() };
-  } catch {
-    return {
-      ok: false,
-      error: 'Could not reach the licence server. Check your connection and try again.',
-      code: 'network',
-    };
-  }
+  return false;
 }
 
 /**
- * Re-read the stored token (after another tab activated, or on demand).
+ * `data-open-timer` is a safety feature, not a config knob: the two crisis
+ * pages, the embed frame and /s/ run the timer for anyone, forever.
+ */
+function openTimerPage() {
+  const value = document.body && document.body.dataset ? document.body.dataset.openTimer : undefined;
+  return value === 'true' || value === '';
+}
+
+/**
+ * The single gate js/app.js calls on Start (design §8.1). This is the ONE place
+ * TIMER_FREE_SESSIONS (D1) is read.
+ *
+ * When it returns false the engine enters preview mode and dispatches
+ * `hmb:preview` with `{ reason }`, where reason is `'signed_out'` when this
+ * gate dispatched `hmb:signin` and `'no_subscription'` when it dispatched
+ * `hmb:paywall` (feature `'timer'`). `context.technique` is only for analytics.
+ *
+ * @param {{technique?:string}} [context]
+ * @returns {boolean}
+ */
+export function requireTimer(context = {}) {
+  if (!hasDocument) return true;
+  if (openTimerPage()) return true; // crisis pages, embed, /s/
+  if (isPro()) return true;
+  const used = freeSessionsUsed(); // device counter, server-authoritative when online
+  if (used < TIMER_FREE_SESSIONS) return true; // D1
+  const reason = signedIn() ? 'no_subscription' : 'signed_out';
+  track(EVENTS.TIMER_GATE_BLOCK || 'timer_gate_block', {
+    technique: context && context.technique ? String(context.technique) : undefined,
+    reason,
+    free_sessions_used: used,
+  });
+  if (!signedIn()) return requireAccount('timer');
+  return requirePro('timer');
+}
+
+/**
+ * @deprecated Licence keys are retired. Kept for one release so a cached page
+ * does not throw. Asks the server for the current account entitlement instead.
+ * @returns {Promise<{ok:boolean, tier?:string, error?:string, code?:string}>}
+ */
+export async function activate() {
+  console.warn('[entitlements] activate() is deprecated: Help Me Breathe now uses accounts.');
+  await refresh({ force: true });
+  if (isPro()) return { ok: true, tier: tier() };
+  return {
+    ok: false,
+    error: 'Help Me Breathe now uses accounts. Sign in, and your subscription follows your email address.',
+    code: 'deprecated',
+  };
+}
+
+/**
+ * @deprecated Kept for one release. Signs the account out through js/auth.js
+ * when it is available and drops this browser to free.
+ */
+export function deactivate() {
+  console.warn('[entitlements] deactivate() is deprecated: use signOut() from js/auth.js.');
+  loadAuth()
+    .then((mod) => (mod && typeof mod.signOut === 'function' ? mod.signOut() : null))
+    .catch(() => null)
+    .finally(() => {
+      writeItem(TOKEN_KEY, null);
+      writeSnapshot(null);
+      refreshFromStorage();
+    });
+}
+
+/**
+ * Re-read the stored token (after another tab signed in, or on demand).
  * @returns {string} the tier after the re-read
  */
 export function restore() {
   return refreshFromStorage();
 }
 
-/** Remove the stored licence from this browser and drop to free. */
-export function deactivate() {
-  writeToken(null);
-  writeKey(null);
-  refreshAttempted = false;
-  refreshFromStorage();
-}
-
 /**
  * Subscribe to tier changes. Returns an unsubscribe function.
- * @param {(tier:string, info:{exp:number, payload:object|null}) => void} cb
+ * @param {(tier:string, info:{exp:number, payload:object|null, status:string}) => void} cb
  * @returns {() => void}
  */
 export function onChange(cb) {
@@ -424,22 +684,28 @@ export function onChange(cb) {
 }
 
 /**
- * Everything the UI is allowed to know about the stored licence. Safe to
- * render: it contains no licence key and no email address.
+ * Everything the UI is allowed to know. Safe to render: no token, no bearer
+ * credential. The pre-2026-09-11 fields are kept (some are always null now)
+ * so existing pages keep reading the same shape.
  *
  * @returns {{
  *   tier:string, isPro:boolean, isPractitioner:boolean, hasLicense:boolean,
  *   exp:number, expiresAt:string|null, inGrace:boolean, graceEndsAt:string|null,
  *   canRenewSilently:boolean, activations:number|null, reference:string|null,
- *   keyId:string|null, domains:string[]|null, issuedAt:string|null
+ *   keyId:string|null, domains:string[]|null, issuedAt:string|null,
+ *   status:string, plan:string|null, commercial:boolean, periodEnd:string|null,
+ *   account:{id:string,email:string|null}|null, signedIn:boolean,
+ *   trialAvailable:boolean|null, trialReason:string|null,
+ *   nextCharge:object|null, accessUntil:string|null, freeSessionsUsed:number
  * }}
  */
 export function getLicenseInfo() {
   const p = state.payload || {};
+  const ent = (snapshot && snapshot.entitlement) || {};
   const expDate = state.exp ? new Date(state.exp) : null;
-  const graceDate = state.exp ? new Date(state.exp + GRACE_MS) : null;
-  const issued = Number(p.iat) || 0;
-  const issuedMs = issued > 1e11 ? issued : issued * 1000;
+  const issuedMs = toMs(p.iat);
+  const periodMs = toMs(p.pe);
+  const plan = typeof p.plan === 'string' ? p.plan : typeof ent.plan === 'string' ? ent.plan : null;
   return {
     tier: state.tier,
     isPro: isPro(),
@@ -447,20 +713,57 @@ export function getLicenseInfo() {
     hasLicense: !!state.token,
     exp: state.exp,
     expiresAt: expDate ? expDate.toISOString() : null,
-    inGrace: state.grace,
-    graceEndsAt: graceDate ? graceDate.toISOString() : null,
-    canRenewSilently: !!readKey(),
-    activations: Number.isFinite(Number(p.act)) ? Number(p.act) : null,
+    inGrace: false,
+    graceEndsAt: null,
+    canRenewSilently: signedIn(),
+    activations: null,
     reference: typeof p.sub === 'string' ? p.sub : null,
     keyId: typeof p.kid === 'string' ? p.kid : null,
-    domains: Array.isArray(p.dom) ? p.dom.slice() : null,
+    domains: null,
     issuedAt: issuedMs ? new Date(issuedMs).toISOString() : null,
+    status: status(),
+    plan,
+    commercial: isPractitioner(),
+    periodEnd: periodMs ? new Date(periodMs).toISOString() : null,
+    account: account(),
+    signedIn: signedIn(),
+    trialAvailable:
+      snapshot && snapshot.trial && typeof snapshot.trial.available === 'boolean'
+        ? snapshot.trial.available
+        : null,
+    trialReason: snapshot && snapshot.trial && typeof snapshot.trial.reason === 'string' ? snapshot.trial.reason : null,
+    nextCharge: ent.next_charge && typeof ent.next_charge === 'object' ? { ...ent.next_charge } : null,
+    accessUntil: typeof ent.access_until === 'string' ? ent.access_until : null,
+    freeSessionsUsed: freeSessionsUsed(),
   };
 }
 
-// Another tab activating a licence should light this one up too.
+/* ------------------------------------------------------------------- boot */
+
 if (hasWindow) {
+  migrateLegacyLicence();
+  state = evaluate(readToken());
+  snapshot = readSnapshot();
+  stampTier();
+
+  // Another tab signing in or out should light this one up too.
   window.addEventListener('storage', (event) => {
-    if (event && event.key === STORAGE_KEY) refreshFromStorage();
+    if (!event) return;
+    if (event.key === TOKEN_KEY || event.key === SNAPSHOT_KEY || event.key === null) refreshFromStorage();
   });
+
+  if (hasDocument) {
+    document.addEventListener('hmb:auth', onAuthEvent);
+    document.addEventListener('hmb:session-complete', onSessionComplete);
+  }
+
+  // Load the auth module in the background; it decides whether a refresh is
+  // due. A page that never loads js/auth.js keeps the cached token, unchanged.
+  const boot = () => {
+    loadAuth();
+  };
+  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(boot, { timeout: 2500 });
+  else window.setTimeout(boot, 300);
+
+  window.addEventListener('online', () => maybeRefresh());
 }

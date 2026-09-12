@@ -1943,7 +1943,7 @@ body.session-active .night-hint { display: none; }
 /* One tap from the top of a crisis-safe page to the timer. It sits under the
    article header so the crisis block is still the first thing in the main
    content, and it is a control, so it is sans and it clears 44px. */
-.jump-to-timer { margin: 0 0 1.25rem; }
+.jump-to-timer { max-width: var(--measure); margin: 0 auto 1.25rem; }
 
 .jump-to-timer a {
     display: inline-flex;

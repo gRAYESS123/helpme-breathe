@@ -5,9 +5,12 @@
  * and hand-rolled base64, so the same file runs unchanged on Vercel's Node
  * runtime, on Cloudflare Pages Functions and in `node --test`.
  *
- * Token format (agreed in docs/AGENT_BRIEF.md §7):
+ * Token format (docs/AGENT_BRIEF.md §7, widened by docs/private/ACCOUNTS_BILLING_DESIGN.md §7.2):
  *   base64url(JSON payload) + "." + base64url(HMAC-SHA256 over that first segment)
- *   payload = { v:1, tier, sub, iat, exp, kid, act, dom? }
+ *   v1 payload = { v:1, tier, sub, iat, exp, kid, act, dom? }           (legacy licence token)
+ *   v3 payload = { v:3, typ:'ent'|'emb', sub, tier, st, plan, com, pe, iat, exp, kid, ... }
+ *   (v2 was never shipped.) `verifyToken()` accepts v === 1 || v === 3 and checks
+ *   nothing else about the shape; api/_lib/entitlement.js owns the v3 fields.
  *
  * The signature covers the *encoded* first segment, not the raw JSON, so
  * verification never has to re-serialise JSON (key order would change the bytes).
@@ -126,7 +129,13 @@ export function b64urlDecodeToString(value) {
   return TEXT_DECODER.decode(b64urlDecode(value));
 }
 
-function bytesToHex(bytes) {
+/**
+ * Lowercase hex for a byte array. Exported because webhook signature checks
+ * compare a hex HMAC against a provider-supplied hex string.
+ * @param {Uint8Array} bytes
+ * @returns {string}
+ */
+export function bytesToHex(bytes) {
   let out = '';
   for (let i = 0; i < bytes.length; i += 1) out += bytes[i].toString(16).padStart(2, '0');
   return out;
@@ -214,7 +223,7 @@ export async function signToken(payload, secret) {
 }
 
 /**
- * Verify a licence token.
+ * Verify a signed token (v1 licence token or v3 entitlement / embed credential).
  *
  * Checks run in this order so the failure reason is always the most specific
  * one available: shape -> signature -> version -> kid -> expiry.
@@ -263,7 +272,7 @@ export async function verifyToken(token, secret, options = {}) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return { ok: false, payload: null, reason: 'bad_payload' };
   }
-  if (payload.v !== 1) {
+  if (payload.v !== 1 && payload.v !== 3) {
     return { ok: false, payload, reason: 'bad_version' };
   }
 

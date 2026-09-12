@@ -31,6 +31,9 @@ function adsAllowedOnThisPage() {
   if (!body) return false;
   if (body.dataset.noAds === 'true') return false;
   if (body.classList.contains('session-active')) return false;
+  // The preview state (design section 8.3): the first thing a person sees on
+  // a timer page is never an ad beside a sign-in prompt.
+  if (body.classList.contains('timer-preview')) return false;
   if (isPro()) return false;
   return true;
 }
@@ -131,6 +134,8 @@ if (typeof document !== 'undefined') {
   // A session starting after ads loaded: CSS hides the slots, nothing to do here.
   document.addEventListener('hmb:session-complete', () => initAds());
   document.addEventListener('hmb:session-stop', () => initAds());
+  // The preview card took the slot: strip any ad already on the page.
+  document.addEventListener('hmb:preview', () => removeAds());
   // A licence activated mid-session strips the slots immediately, without a reload.
   onChange(() => {
     if (isPro()) removeAds();

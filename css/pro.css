@@ -89,7 +89,13 @@
     cursor: not-allowed;
 }
 
-.pro-btn-primary {
+
+.prose a.pro-btn { color: var(--ink); }
+
+/* `.prose a` (0,1,1) would otherwise out-rank these (0,1,0) selectors and paint
+   the label green on a green button: the invisible-CTA bug of 2026-09-10. */
+.pro-btn-primary,
+.prose a.pro-btn-primary {
     background: var(--green);
     border-color: var(--green);
     color: var(--chalk);

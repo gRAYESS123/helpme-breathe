@@ -142,7 +142,7 @@
         /* --- m: a short note to the client --- */
         var message = clean(payload.m, 280);
 
-        /* --- wl: the practitioner's licence token --- */
+        /* --- wl: the subscriber's embed credential (typ 'emb') --- */
         var token = clean(payload.wl, 4096);
         if (!/^[A-Za-z0-9._~-]{8,4096}$/.test(token)) token = '';
 
@@ -268,7 +268,12 @@
     </style>
 </head>
 
-<body class="theme-478 technique-page" data-no-ads="true" data-no-asks="true">
+<!--
+  data-open-timer: the account gate in js/entitlements.js#requireTimer() stands
+  aside on exactly four surfaces — the two crisis pages, the embed frame and
+  this page. A client follows a link and breathes; no account (design §0.1).
+-->
+<body class="theme-478 technique-page" data-no-ads="true" data-no-asks="true" data-open-timer="true">
     <a class="skip-link" href="#main">Skip to main content</a>
 
     <!--
@@ -432,9 +437,10 @@
         <footer class="session-footer">
             <!--
               Attribution is in the markup so it survives a JavaScript failure.
-              It is removed only after /api/entitlement confirms a live
-              white-label key. The link is never followed
-              (AGENT_BRIEF hard rule 7).
+              It is removed only after /api/entitlement confirms a live embed
+              credential: signed by us, unexpired, not revoked, not past its
+              rotation overlap, from a subscriber whose access is live. The
+              link is never followed (AGENT_BRIEF hard rule 7).
             -->
             <p class="session-attrib" data-session-attrib>
                 <a href="/?utm_source=session" rel="nofollow noopener">Powered by Help Me Breathe</a>
@@ -495,11 +501,13 @@
     /*
      * Co-branding for the client session link.
      *
-     * The white-label check below is deliberately NOT the same as the embed
-     * frame's (embed/v1/frame.html). A licence token's optional `dom` claim
-     * restricts the domains a practitioner may white-label an *embed* on; a
-     * client session link is hosted on helpmebreath.com itself, so there is no
-     * embedding host to match and only the tier matters. Both fail closed.
+     * The white-label check below is deliberately NOT the embed frame's. The
+     * frame's verdict is decided on its document request (api/embed/frame.js),
+     * where the embedding site is observable and the credential's domain list
+     * applies. This page is hosted on helpmebreath.com itself, so there is no
+     * embedding host to match: /api/entitlement only confirms the credential
+     * is live. Both fail closed — attribution stays unless the answer is an
+     * unambiguous yes.
      */
     import { getTechnique } from '/js/techniques.js';
 
@@ -547,8 +555,7 @@
     async function verifyPractitioner(token) {
         if (!token) return false;
 
-        // A separate namespace from the embed frame's `hmb.wl.` verdicts: that
-        // check also weighs the token's domain claim, this one only the tier.
+        // One verdict per credential per tab.
         const cacheKey = `hmb.wls.${token.slice(-24)}`;
 
         // A yes lasts for the tab; a no lasts 60 seconds, so one timeout does
@@ -576,14 +583,12 @@
             window.clearTimeout(timer);
             if (response.ok) {
                 const body = await response.json();
-                if (body && typeof body === 'object' && body.ok !== false) {
-                    const payload = (body.payload && typeof body.payload === 'object') ? body.payload : body;
-                    const tier = String(payload.tier || '').toLowerCase();
-                    ok = tier === 'practitioner' || tier === 'studio';
-                }
+                // The server says `ok: true, whitelabel: true` for a live embed
+                // credential and nothing else. Anything short of that is a no.
+                ok = !!(body && typeof body === 'object' && body.ok === true && body.whitelabel === true);
             }
         } catch {
-            // Unreachable API or timeout: stay on the free, attributed page.
+            // Unreachable API, timeout or ledger outage: stay on the free, attributed page.
             ok = false;
         }
 

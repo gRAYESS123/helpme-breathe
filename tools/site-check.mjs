@@ -1670,6 +1670,137 @@ function checkVercelJson() {
   }
 }
 
+/* ------------------------------------------- accounts model guardrails ---- */
+/**
+ * Four checks added with the accounts and billing build (2026-09-11 decision,
+ * docs/private/ACCOUNTS_BILLING_DESIGN.md section 15, task 12).
+ *
+ *  1. `data-open-timer` is a safety feature, not a config knob: it runs the
+ *     timer for anyone, forever. It belongs on exactly four surfaces and must
+ *     be present on the two crisis pages.
+ *  2. No provider is named in api/ or js/ outside the seam (the adapters, the
+ *     env registry, js/config.js and js/checkout.js), so one env var can swap
+ *     the payment rail.
+ *  3. The "no account / free forever" promises that were true before accounts
+ *     existed must not come back. A short allowlist covers the sentences that
+ *     are still true (the first three sessions, the widget, the client links).
+ *  4. Gated timer pages keep `isAccessibleForFree: true`; the prose is never
+ *     paywalled, so paywall structured data would be a false signal.
+ */
+const OPEN_TIMER_ALLOWED = new Set([
+  'breathing-exercises-anxiety.html',
+  'breathing-exercises-for-panic-attacks.html',
+  'embed/v1/frame.html',
+  's/index.html',
+]);
+const OPEN_TIMER_REQUIRED = ['breathing-exercises-anxiety.html', 'breathing-exercises-for-panic-attacks.html'];
+const PROVIDER_SEAM = ['api/_lib/providers/', 'api/_lib/env.js', 'js/config.js', 'js/checkout.js'];
+const PROVIDER_RE = /\b(paddle|fastspring)\b/gi;
+const COPY_TRUTH_HARD = [
+  { re: /free forever/gi, label: 'free forever' },
+  { re: /always free/gi, label: 'always free' },
+  { re: /no sign-?ups?\b(?!\s+form)/gi, label: 'no sign-up' },
+];
+const NO_ACCOUNT_RE = /\bno account\b/gi;
+/** Sentences that are still true after accounts exist. Tested against ~120 chars around the match. */
+const NO_ACCOUNT_ALLOW = [
+  /(first|three|3)\b[^.]{0,80}sessions?[^.]{0,60}no account/i,
+  /no account (is )?(needed|required) for the first/i,
+  /(visitors?|clients?|students?|people|they|widget|frame|embed|links?|session links?|it) (need|needs|require|requires) no account/i,
+  /(without|with) (an? )?account/i,
+  /no account manager/i,
+  /no account is (ever )?created for (them|clients|students|visitors)/i,
+  /about having no account/i,
+  /no account,? (no client record|no database)/i,
+];
+
+function checkAccountsModel() {
+  // 1. data-open-timer
+  for (const page of pages.values()) {
+    const body = page.tags.find((t) => !t.closing && t.name === 'body');
+    const has = !!(body && body.attrNode('data-open-timer'));
+    if (has && !OPEN_TIMER_ALLOWED.has(page.file)) {
+      ERR(
+        page.file,
+        body.line,
+        'open-timer-allowlist',
+        'data-open-timer runs the timer for anyone, forever; it is allowed only on the two crisis pages, embed/v1/frame.html and s/index.html',
+      );
+    }
+  }
+  for (const file of OPEN_TIMER_REQUIRED) {
+    const page = pages.get(file);
+    if (!page) continue;
+    const body = page.tags.find((t) => !t.closing && t.name === 'body');
+    if (!body || !body.attrNode('data-open-timer')) {
+      ERR(file, body ? body.line : null, 'open-timer-missing', 'a crisis page must carry data-open-timer="true" on <body> so the timer runs without an account');
+    }
+  }
+
+  // 2. provider names outside the seam
+  for (const file of [...allFiles].filter((f) => /^(api|js)\/.*\.js$/.test(f)).sort()) {
+    if (PROVIDER_SEAM.some((seam) => file.startsWith(seam))) continue;
+    const raw = readText(file);
+    if (raw == null) continue;
+    const lineOf = makeLineLookup(raw);
+    const code = raw
+      .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
+      .replace(/\/\/[^\n]*/g, (m) => ' '.repeat(m.length));
+    PROVIDER_RE.lastIndex = 0;
+    let m;
+    while ((m = PROVIDER_RE.exec(code)) !== null) {
+      ERR(file, lineOf(m.index), 'provider-outside-seam', `"${m[0]}" named outside the provider seam; go through api/_lib/providers/ or js/config.js`);
+    }
+  }
+
+  // 3. copy truth
+  for (const page of pages.values()) {
+    const spans = [];
+    for (const t of page.texts) spans.push({ text: t.text, index: t.index, where: 'text' });
+    for (const tag of page.tags) {
+      if (tag.closing || tag.name !== 'meta') continue;
+      const content = tag.attrNode('content');
+      if (content && content.hasValue) spans.push({ text: content.value, index: content.valueIndex, where: 'meta content' });
+    }
+    for (const raw of page.rawText) {
+      const type = (raw.attrs?.find((a) => a.name === 'type')?.decoded || '').toLowerCase();
+      if (raw.name === 'title') spans.push({ text: raw.text, index: raw.index, where: 'title' });
+      if (raw.name === 'script' && type === 'application/ld+json') spans.push({ text: raw.text, index: raw.index, where: 'JSON-LD' });
+    }
+    for (const span of spans) {
+      for (const { re, label } of COPY_TRUTH_HARD) {
+        re.lastIndex = 0;
+        let m;
+        while ((m = re.exec(span.text)) !== null) {
+          ERR(page.file, page.lineOf(span.index + m.index), 'copy-truth', `"${label}" is no longer true now that accounts exist (${span.where}): "${snippet(span.text, m.index)}"`);
+        }
+      }
+      NO_ACCOUNT_RE.lastIndex = 0;
+      let m;
+      while ((m = NO_ACCOUNT_RE.exec(span.text)) !== null) {
+        const around = span.text.slice(Math.max(0, m.index - 120), m.index + 60);
+        if (NO_ACCOUNT_ALLOW.some((re) => re.test(around))) continue;
+        ERR(page.file, page.lineOf(span.index + m.index), 'copy-truth', `"no account" claim needs qualifying (${span.where}): "${snippet(span.text, m.index)}"`);
+      }
+    }
+  }
+
+  // 4. paywall structured data
+  for (const page of pages.values()) {
+    for (const raw of page.rawText) {
+      const type = (raw.attrs?.find((a) => a.name === 'type')?.decoded || '').toLowerCase();
+      if (raw.name !== 'script' || type !== 'application/ld+json') continue;
+      const m = /"isAccessibleForFree"\s*:\s*false/.exec(raw.text);
+      if (m) {
+        ERR(page.file, page.lineOf(raw.index + m.index), 'paywall-markup', 'isAccessibleForFree:false marks the prose as paywalled; only the interactive timer is gated (design section 8.4)');
+      }
+      if (/"cssSelector"/.test(raw.text) && /"hasPart"/.test(raw.text)) {
+        ERR(page.file, page.lineOf(raw.index), 'paywall-markup', 'hasPart/cssSelector paywall markup is not allowed (design section 8.4)');
+      }
+    }
+  }
+}
+
 /* ------------------------------------------------------ orphan/extra pages */
 function checkOrphans() {
   // Indexable pages nothing on the site links to are dead ends for crawlers.
@@ -1734,6 +1865,11 @@ try {
   checkClayOnTimer();
 } catch (e) {
   ERR(null, null, 'internal-error', `--clay check failed: ${e.message}`);
+}
+try {
+  checkAccountsModel();
+} catch (e) {
+  ERR(null, null, 'internal-error', `accounts-model check failed: ${e.message}`);
 }
 try {
   checkOrphans();

@@ -6,7 +6,7 @@
     <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
     <title>Privacy Attestation — Help Me Breathe</title>
-    <meta name="description" content="A one-page signed attestation: no personal data leaves the browser. What the Help Me Breathe widget does, what it does not do, dated and signed by name.">
+    <meta name="description" content="A one-page signed attestation, dated and signed by name: there is no client record, and this is everything a Help Me Breathe subscription stores about you.">
 
     <link rel="canonical" href="https://helpmebreath.com/compliance/privacy-attestation">
 
@@ -15,7 +15,7 @@
 
     <!-- Open Graph -->
     <meta property="og:title" content="Privacy Attestation — Help Me Breathe">
-    <meta property="og:description" content="A one-page signed attestation: no personal data leaves the browser. What the Help Me Breathe widget does, what it does not do, dated and signed by name.">
+    <meta property="og:description" content="A one-page signed attestation, dated and signed by name: there is no client record, and this is everything a Help Me Breathe subscription stores about you.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpmebreath.com/compliance/privacy-attestation">
     <meta property="og:image" content="https://helpmebreath.com/images/og/privacy-attestation.jpg">
@@ -24,7 +24,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Privacy Attestation — Help Me Breathe">
-    <meta name="twitter:description" content="A one-page signed attestation: no personal data leaves the browser. What the Help Me Breathe widget does, what it does not do, dated and signed by name.">
+    <meta name="twitter:description" content="A one-page signed attestation, dated and signed by name: there is no client record, and this is everything a Help Me Breathe subscription stores about you.">
     <meta name="twitter:image" content="https://helpmebreath.com/images/og/privacy-attestation.jpg">
 
     <!-- Favicon: the ring with a gap. No emoji anywhere. -->
@@ -242,7 +242,7 @@
                 </ol>
             </nav>
             <h1>Privacy Attestation</h1>
-            <p class="lead">No personal data leaves the browser. One page, dated and signed, for the person who has to ask.</p>
+            <p class="lead">There is no client record. One page, dated and signed, for the person who has to ask.</p>
         </header>
 
         <main id="main">
@@ -252,16 +252,19 @@
                 <div class="doc-meta">
                     <dl>
                         <dt>Document</dt>
-                        <dd>Privacy attestation, version 1.0</dd>
+                        <dd>Privacy attestation, version 1.1</dd>
 
                         <dt>Statement date</dt>
-                        <dd><time datetime="2026-09-09">9 September 2026</time></dd>
+                        <dd><time datetime="2026-09-12">12 September 2026</time></dd>
+
+                        <dt>Supersedes</dt>
+                        <dd>Version 1.0 of 9 September 2026, which was written before subscriber accounts existed</dd>
 
                         <dt>Given by</dt>
                         <dd>Georges Rayess, an individual trading as Help Me Breathe, Lebanon</dd>
 
                         <dt>Scope</dt>
-                        <dd>The breathing timer at helpmebreath.com, the embedded widget, and co-branded client session links</dd>
+                        <dd>The breathing timer at helpmebreath.com, the embedded widget, co-branded client session links, and the account records held when you subscribe</dd>
 
                         <dt>Contact</dt>
                         <dd><a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a></dd>
@@ -271,13 +274,14 @@
                 <section class="doc-section">
                     <h2>The statement</h2>
                     <div class="doc-callout">
-                        <p>I attest that the Help Me Breathe breathing timer, the embedded widget and the co-branded client session links collect no personal data about the people who use them, and transmit none to me or to anyone else. There is no client account, no client record and no database in which such data could be held.</p>
+                        <p>I attest that the Help Me Breathe breathing timer, the embedded widget and the co-branded client session links collect no personal data about the people who use them, and transmit none to me or to anyone else. <strong>There is no client record.</strong> Nothing about a practitioner's clients, classes or students is stored by me, no account is ever created for them, and no part of the product asks them for a name, an email address or a health detail.</p>
+                        <p>When you subscribe, you have an account of your own. It is small, and the section below headed "What a subscription stores about you" lists every field in it. Nothing in it says what anybody practised, and nothing in it concerns the people you work with.</p>
                     </div>
                 </section>
 
                 <section class="doc-section">
                     <h2>What the widget does</h2>
-                    <p>It draws a circle that grows and shrinks on a fixed schedule, counts the phases of a breathing pattern, and optionally plays a tone and vibrates the device at each change. That is the whole product. Everything it does happens inside the browser of the person using it:</p>
+                    <p>It draws a circle that grows and shrinks on a fixed schedule, counts the phases of a breathing pattern, and optionally plays a tone and vibrates the device at each change. That is the whole of what it does. Everything it does happens inside the browser of the person using it:</p>
                     <ul>
                         <li>The breathing pattern is read from a JavaScript file that ships with the page. No pattern is fetched from a server during a session.</li>
                         <li>Cue tones are generated in the browser with the Web Audio API. No audio file is downloaded and no microphone is opened.</li>
@@ -293,7 +297,7 @@
                         <li>It does not ask for a name, an email address, a date of birth, a health condition or any other detail about the person using it.</li>
                         <li>It does not create an account, a profile or a client identifier for the person using it. A subscriber has an account of their own, described in the <a href="/legal/privacy-policy">privacy policy</a>; the people they work with do not, and nothing in the widget makes one.</li>
                         <li>It does not record what was practised, for how long, or when, anywhere other than that person's own browser.</li>
-                        <li>It sets no cookies of its own, and neither does a client session link. The two first-party cookies a subscription uses on the main site are listed in the <a href="/legal/privacy-policy">privacy policy</a>.</li>
+                        <li>It sets no cookies of its own, and neither does a client session link. The main site at helpmebreath.com sets two first-party cookies of its own, one for the device and one for the subscription, and both are listed with their purpose and their lifetime in the <a href="/legal/privacy-policy">privacy policy</a>. Neither is set inside the frame, and neither follows a visitor to any other site.</li>
                         <li>Inside the embedded widget there are zero third-party requests of any kind: no web fonts, no analytics, no advertising, no tag manager, no tracking pixel, no error-reporting service. The frame loads its own HTML, CSS and one script from helpmebreath.com, and nothing from anywhere else.</li>
                         <li>Inside a client session link there is no analytics, no advertising, no tag manager, no tracking pixel and no error-reporting service. It does make a third-party request, and it is named in the next section rather than left out of this list.</li>
                         <li>It does not use a camera, a microphone, location, a heart-rate sensor or any other device sensor.</li>
@@ -302,13 +306,30 @@
                 </section>
 
                 <section class="doc-section">
-                    <h2>Where data does move, stated plainly</h2>
-                    <p>An attestation is only worth reading if it also lists the exceptions. There are four, and none of them concerns what a person practised.</p>
+                    <h2>What a subscription stores about you</h2>
+                    <p>The timer, the widget and the client links are one half of the product. The other half is a subscription, and an attestation that described only the first half would be a half-truth. Checkout is not open yet. When it opens, and when you subscribe, this is the whole of what I hold, and I attest to this list being complete.</p>
                     <ul>
+                        <li><strong>Your account.</strong> Your email address, the sign-in identities you have used, which are an email link, a Google account, or both, and the date the account was created. There is no password, anywhere, so there is no password store to leak.</li>
+                        <li><strong>Your subscription.</strong> The plan, its status, its period dates, the payment provider's subscription and customer identifiers, and the amount and currency the provider charges you, taken from the provider rather than guessed at. <strong>No card number, expiry date or security code ever reaches me.</strong> A merchant of record takes the payment as the seller on record, and holds its own copy of the payment record as a separate controller.</li>
+                        <li><strong>The free-trial check.</strong> One free trial per person. To keep that rule I store a one-way hash of your email address, computed on my own server with a secret key, and a random identifier in a first-party cookie on your device, <code>__Host-hmb_did</code>, which lasts 2 years. The same identifier counts the free timer sessions on that device, and that is the whole of the small record behind it. <strong>There is no browser fingerprinting.</strong> Nothing reads your screen, your fonts, your time zone, your hardware or your canvas, and no device profile is built. I will not call that hash anonymous, because I hold the key and could confirm a match against an address I already had. It is personal data, and it is treated as such.</li>
+                        <li><strong>Each checkout you start.</strong> The plan, whether a trial was granted and why. It expires after 30 minutes and is deleted a week later.</li>
+                        <li><strong>Embed credentials.</strong> If you mint a white-label credential, I store its identifiers, the domains you registered, the dates it was issued and expires, and a count of how often it was used. The count is against your credential, and it records nothing about the visitor.</li>
+                        <li><strong>Messages from the payment provider.</strong> When the provider reports a payment, a renewal, a decline or a cancellation, that message is kept as a record so that a dispute can be checked against what actually happened.</li>
+                    </ul>
+                    <p>How long each of those is kept: account data for as long as the account exists, plus up to 30 days in the database provider's backups. The body of a provider message for 30 days, and the bare record that it arrived for 180 days. The trial hash and the device record for 24 months from their last activity, then deleted. That last number needs its reason said out loud: without it, deleting an account would reset the free-trial limit and the rule would mean nothing. Invoices are kept by the merchant of record under its own tax retention, not mine.</p>
+                    <p>Account records are held in Supabase, an authentication and database service acting as a processor on my instructions, in a data-centre region in the European Union (Frankfurt, Germany). Your browser talks to Supabase only to sign you in. Everything else about your account is read through this site's own server, and the tables accept no direct access from a browser at all.</p>
+                    <p>When you subscribe, your account page carries an export control, which hands you a file containing your own account record, your subscription records and your embed credentials, and a delete control, which cancels a live subscription at the provider first, confirms the cancellation, and only then removes the account. The <a href="/legal/privacy-policy">privacy policy</a> sets out step by step what deletion does, including the two things it cannot do. The payment record the merchant of record holds is its own, and erasing that means asking the seller named on your receipt.</p>
+                </section>
+
+                <section class="doc-section">
+                    <h2>Where data does move, stated plainly</h2>
+                    <p>An attestation is only worth reading if it also lists the exceptions. There are five, and none of them concerns what a person practised.</p>
+                    <ul>
+                        <li><strong>Counting free sessions on the main site.</strong> On helpmebreath.com the first few sessions on a device run without an account, so when a session finishes the page tells my server that a session finished, and the count is held against the random device identifier described above. That message carries nothing about the session itself and nothing that identifies the person. It happens on helpmebreath.com only. Neither the embedded widget nor a client session link sends it, and neither has an allowance to count.</li>
                         <li><strong>Serving the page.</strong> The page has to be fetched over the internet, so the hosting provider's servers see the requesting IP address, the browser's user agent string, the URL and the time, exactly as they would for any website. That is ordinary web serving. It is not analytics, and I do not build profiles from it.</li>
                         <li><strong>Web fonts on a client session link.</strong> The page at <code>/s/</code> asks Google Fonts for the site's typefaces, so that the link looks like the rest of the site. Google's font servers therefore see the reader's IP address and user agent, as they would for any site using a hosted font. No identifier is sent with it, nothing about the session is included, and the page works normally if the request is blocked. The embedded widget does not do this: it makes no third-party request at all. If a hosted font is a problem for your setting, use the embedded widget rather than a session link.</li>
                         <li><strong>Analytics on the main site only.</strong> The public pages of helpmebreath.com run Google Analytics 4. Google Consent Mode defaults are set to denied, so nothing is measured until a visitor chooses to accept in the cookie banner. Analytics never runs inside the embedded widget, and never inside a client session link.</li>
-                        <li><strong>The practitioner's own account.</strong> If you have an active subscription, the merchant of record holds the email address and billing details you gave it at checkout, and I hold your account record — your email address, your plan and its dates — and our correspondence. That is data about you, the practitioner — not about anyone you work with.</li>
+                        <li><strong>The practitioner's own account.</strong> If you have an active subscription, the merchant of record holds the email address and billing details you gave it at checkout, and I hold the account, subscription and trial records listed in the section above, plus our correspondence. That is data about you, the practitioner, and none of it is about anyone you work with.</li>
                     </ul>
                     <p>A co-branded client session link carries your name, your chosen pattern, your session length and your message encoded inside the link itself. That is why no server needs to remember it. There is no record on my side of which link was made, who received it, or whether it was opened.</p>
                 </section>
@@ -317,7 +338,8 @@
                     <h2>What this attestation is, and is not</h2>
                     <p>This is a self-attestation. It is my own statement about my own product, given in good faith and accurate on the date above. It is not a third-party audit, not a certification, and not a substitute for one. Nobody independent has verified it.</p>
                     <p>What you can do instead of taking it on trust: open your browser's network panel on any page of the site, or on a page where the widget is embedded, and watch what is requested. Inside the widget frame you will see the page and its own script, and nothing else. That check takes about a minute and is more convincing than this paragraph.</p>
-                    <p>If this ever stops being true — if a future version of the widget needs to send something — this page gets a new version number and a new date, and subscribers are emailed before the change ships.</p>
+                    <p>If this ever stops being true, if a future version of the widget needs to send something, this page gets a new version number and a new date, and subscribers are emailed before the change ships.</p>
+                    <p>That is what version 1.1 is. Version 1.0 was written before the site had accounts, and it said so. The decision to add subscriber accounts and a subscription was taken on 11 September 2026, which made one sentence of version 1.0 something I could no longer stand behind, so it has been replaced rather than left to age quietly. What did not change is the part practitioners actually ask about: there is still no client record, and the widget still makes no third-party request.</p>
                 </section>
 
                 <section class="doc-section">
@@ -329,7 +351,7 @@
                             <p class="sig-label">An individual trading as Help Me Breathe, Lebanon · <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a></p>
                             <span class="sig-rule" aria-hidden="true"></span>
                             <span class="sig-label">Signature</span>
-                            <p class="sig-label">Dated 9 September 2026</p>
+                            <p class="sig-label">Dated 12 September 2026</p>
                         </div>
 
                         <div class="doc-signature">
@@ -346,7 +368,7 @@
                     <button class="doc-btn" type="button" data-role="print">Print this document</button>
                 </div>
 
-                <p class="doc-foot">Help Me Breathe — Privacy attestation v1.0 · 9 September 2026 · helpmebreath.com/compliance/privacy-attestation · Companion documents: <a href="/compliance/dpa">Data Processing Addendum</a> and <a href="/compliance/security-overview">security overview</a>. See also the site <a href="/legal/privacy-policy">privacy policy</a>, which covers the public pages as well as the widget.</p>
+                <p class="doc-foot">Help Me Breathe — Privacy attestation v1.1 · 12 September 2026 · helpmebreath.com/compliance/privacy-attestation · Companion documents: <a href="/compliance/dpa">Data Processing Addendum</a> and <a href="/compliance/security-overview">security overview</a>. See also the site <a href="/legal/privacy-policy">privacy policy</a>, which covers the public pages as well as the widget.</p>
             </article>
         </main>
 

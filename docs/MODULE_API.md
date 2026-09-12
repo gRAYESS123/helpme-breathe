@@ -9,8 +9,10 @@ Rules that apply everywhere:
 - Load with `<script type="module" src="/js/app.js"></script>` — root-relative,
   so pages in subfolders work.
 - No inline `onclick`. Use `data-action` attributes; the engine delegates.
-- Nothing in `js/` reads or writes a cookie. Only `localStorage`, only under the
-  `hmb.` namespace, always inside `try/catch`.
+- Nothing in `js/` **writes** a cookie. `js/entitlements.js` *reads*
+  `__Host-hmb_ent` once, as the repair path when a browser sweeps script
+  storage, and that is the only cookie access in `js/`. Everything else is
+  `localStorage`, only under the `hmb.` namespace, always inside `try/catch`.
 
 Load order on a page with a timer:
 
@@ -23,7 +25,13 @@ Load order on a page with a timer:
 ```
 
 `js/app.js` imports `techniques.js`, `storage.js` and `analytics.js` itself, and
-`analytics.js` imports `consent.js`, so those tags are all you need.
+`analytics.js` imports `consent.js`, so those tags are all you need. `js/app.js`
+also imports `js/entitlements.js` for the Start gate, and `js/pro/index.js`
+imports `js/checkout.js`, so a timer page needs no extra tag for either.
+
+A page with checkout buttons and no timer loads `/js/checkout.js` directly. The
+three account pages — `/signin`, `/auth/callback`, `/account` — load
+`/js/auth.js` themselves; nothing else should import it directly.
 
 ---
 
@@ -171,8 +179,12 @@ import {
 | `setPersistence(enabled)` | `void` | `false` keeps everything in memory for the rest of the page's life. |
 
 Keys in use: `hmb.settings`, `hmb.history`, `hmb.consent` (owned by `consent.js`),
-`hmb.license` (owned by `entitlements.js`), `hmb.ack.<techniqueKey>`,
-`hmb.third-session-tracked`.
+`hmb.ent`, `hmb.ent.snapshot`, `hmb.did` (owned by `entitlements.js`),
+`sb-hmb-auth-token` (owned by Supabase, through `auth.js`),
+`hmb.ack.<techniqueKey>`, `hmb.third-session-tracked`.
+
+The retired `hmb.license` and `hmb.license.key` are **deleted** on first load by
+`js/entitlements.js`; nothing writes them any more.
 
 ```js
 // SessionRecord
@@ -226,46 +238,298 @@ track(EVENTS.PAYWALL_VIEW, { feature: 'patterns' });
 consent has not been granted; up to 20 events are queued and replayed once if the
 visitor later accepts.
 
-`EVENTS` is frozen and enumerates every allowed name:
+`EVENTS` is frozen and enumerates every allowed name. `track()` warns to the
+console for a name that is not in it.
+
+**Practice and the site**
 
 `session_start`, `session_complete`, `session_abandon`, `technique_select`,
 `settings_open`, `third_session_reached`, `paywall_view`, `paywall_click`,
-`checkout_open`, `activate_attempt`, `activate_success`, `activate_fail`,
-`restore_success`, `capture_shown`, `capture_submit`, `support_click`,
+`checkout_open`, `capture_shown`, `capture_submit`, `support_click`,
 `pwa_install`, `outbound_affiliate_click`, `embed_snippet_copied`.
 
-Never pass an email address, a licence key, or free-text user input as a param.
+**Accounts, trial and subscription**
+
+`signin_view`, `signin_start`, `signin_complete`, `signin_fail`,
+`signin_resume_checkout`, `signout`, `timer_preview_view`, `timer_gate_block`,
+`trial_eligibility_check`, `trial_start`, `subscribe_start`, `trial_convert`,
+`subscription_past_due`, `subscription_canceled`, `manage_billing_click`,
+`cancel_screen_view`, `retention_offer_taken`, `cancel_confirm`,
+`embed_token_created`, `account_export`, `account_delete_request`,
+`plan_interval_toggle`.
+
+The activation events of the retired licence model (`activate_attempt`,
+`activate_success`, `activate_fail`, `restore_success`) are **gone** and must not
+come back.
+
+Never pass an email address, a user id, a device id, a token, a provider customer
+id, or free-text user input as a param.
+
+---
+
+## `js/config.js`
+
+The one file the owner edits for public provider values. **Nothing in it is
+secret**: the Supabase publishable key and the checkout client-side token are
+public by design; an API key or a secret key belongs in a Vercel environment
+variable and never here.
+
+**Five exports, and only five.**
+
+```js
+import { SUPABASE, CHECKOUT, PLANS, TIMER_FREE_SESSIONS, MOR_LEGAL } from '/js/config.js';
+```
+
+| Export | Shape | Read by |
+|---|---|---|
+| `SUPABASE` | `{ url, publishableKey }` | `js/auth.js` only. |
+| `CHECKOUT` | `{ clientToken, sandbox, previewPriceIds: { monthly, yearly } }` | `js/checkout.js` only. Empty `clientToken` means checkout is closed and every button renders a calm "Checkout is not open yet" card. `previewPriceIds` are used by `/pro` **only** to show a localised total; they never open a checkout. |
+| `PLANS` | `{ mode, available, default, trialDays, refundDays, monthly, yearly, practitioner_yearly }` | The whole site, for copy. |
+| `TIMER_FREE_SESSIONS` | `3` | `js/entitlements.js#requireTimer()` **and nowhere else**. |
+| `MOR_LEGAL` | one sentence | Every page that mentions who takes the money. |
+
+`PLANS.mode` is `'one'`: `available` is `['monthly', 'yearly']`, `default` is
+`'monthly'`, `trialDays` is `3`, `refundDays` is `14`. Each plan definition is
+`{ key, label, price, currency, interval, per, commercial }` — US list prices,
+for copy only. What a person is actually charged comes from the provider's own
+price preview and receipt.
+
+`practitioner_yearly` is defined but **not offered**: it exists so that a second
+plan would be a config change rather than a migration. The mode flag is branched
+on in this file and nowhere else; everything downstream reads `PLANS.available`.
+
+There is no `mode: 'link' | 'paddle' | 'waitlist'`, no hosted payment link, no
+price id for opening a checkout, and no waitlist. The browser never chooses a
+price.
+
+---
+
+## `js/auth.js`
+
+The **only** module in the codebase that knows Supabase exists.
+
+```js
+import { signedIn, user, accessToken, signInWithEmail, signInWithCode,
+         verifyCode, signInWithGoogle, signOut, onAuthChange, ready } from '/js/auth.js';
+```
+
+| Function | Returns | Notes |
+|---|---|---|
+| `signedIn()` | `boolean` | Synchronous, from a cached copy of the session. |
+| `user()` | `{ id, email, … } \| null` | Never a token. |
+| `accessToken()` | `Promise<string>` | The one way out. Asynchronous because a refresh may be needed. |
+| `ready()` | `Promise<void>` | Resolves once the session has been restored. |
+| `signInWithEmail(email, { intent, next })` | `Promise` | Magic link. |
+| `signInWithCode(email, { intent, next })` | `Promise` | 6-digit code, the fallback when a link is mangled by a mail client. |
+| `verifyCode(email, code)` | `Promise` | |
+| `signInWithGoogle({ intent, next })` | `Promise` | |
+| `signOut()` | `Promise` | Clears the local session and the `hmb.ent*` keys, then `POST /api/account/signout`. |
+| `onAuthChange(cb)` | unsubscribe fn | |
+
+Plus the helpers the two auth pages and `js/entitlements.js` need: `configured()`,
+`callbackUrl()`, `signInUrl()`, `openSignIn()`, `validateNext()`,
+`validateIntent()`, `intentPlan()`, `parseAuthParams()`, `completeCallback()`,
+`describeAuthError()`, `lastSignInMethod()`, `isDeviceMirror()`,
+`storeDeviceMirror()`, `readDeviceMirror()`, `apiFetch()`, `fetchMe()`.
+
+**No passwords, anywhere.** Sign-in is a magic link, a 6-digit code, or Google.
+
+What it never does: talk to PostgREST (the browser reads product data only
+through `GET /api/me`), expose a token on `user()`, or read or write a cookie.
+The device mirror in `localStorage['hmb.did']` is a copy of a value the server
+already returned in a response body.
+
+**The supabase-js import is lazy and pinned** to an exact version
+(`@supabase/supabase-js@2.116.0` from jsDelivr) — never a range. It is loaded
+with a dynamic `import()` on purpose: `js/entitlements.js` reaches into this
+module, which puts it in the import graph of every timer page, and a static
+cross-origin import would make a blocked CDN, a content blocker or an offline
+PWA fail the whole graph — `requireTimer()` included. With a lazy import the
+library is fetched only when there is a session to keep alive, an auth parameter
+in the URL, or a sign-in to start.
+
+`flowType: 'pkce'` is **not** the JS default; without it tokens land in the URL
+fragment. Any CSP needs `cdn.jsdelivr.net` in `script-src` and the Supabase
+project URL in `connect-src`.
+
+Dispatches `hmb:auth` on `document` with `{ event, signedIn, user }` on every
+session change.
 
 ---
 
 ## `js/entitlements.js`
 
-> **Functional stub. The Pro agent replaces this file.** The API below is the
-> contract; do not change it. Today it decodes the token payload without
-> verifying the signature — real verification is server-side in `/api/entitlement`.
+The **only** module that knows tiers exist. Every paid feature gate calls
+`requirePro(feature)`; the timer's Start calls `requireTimer()`. Nothing else may
+read the entitlement token, and nothing else may decide what a visitor may use.
 
 ```js
-import { isPro, isPractitioner, tier, requirePro, activate, restore, deactivate, onChange, parseToken } from '/js/entitlements.js';
+import { tier, isPro, isPractitioner, requirePro, requireTimer, requireAccount,
+         signedIn, account, status, refresh, restore, onChange,
+         getLicenseInfo, parseToken, readDeviceMirror, recordFreeSession } from '/js/entitlements.js';
 ```
+
+### Preserved exactly, so no existing gate changed
 
 | Function | Returns | Notes |
 |---|---|---|
-| `tier()` | `'free' \| 'pro' \| 'practitioner' \| 'studio'` | |
-| `isPro()` | `boolean` | True for pro, practitioner and studio. |
-| `isPractitioner()` | `boolean` | True for practitioner and studio. |
-| `requirePro(featureName)` | `boolean` | When `false`, dispatches `hmb:paywall` with `{ feature }`. **The only gate any feature may use.** |
-| `activate(key)` | `Promise<{ok, tier?, error?}>` | POSTs `{ key }` to `/api/license`, stores the returned `{ token }`. |
-| `restore()` | `string` (tier) | Re-reads `localStorage['hmb.license']`. |
-| `deactivate()` | `void` | Removes the token, drops to free. |
-| `onChange(cb)` | unsubscribe fn | `cb(tier, { exp, payload })`. |
-| `parseToken(token)` | `object \| null` | Decodes the base64url payload **without verifying the signature**. Read-only helper for debugging and for the Pro agent's own UI; never use it as a gate — `requirePro()` is the only gate. |
+| `tier()` | `'free' \| 'pro'` | There are no other tiers. |
+| `isPro()` | `boolean` | True for a live subscription: trialing, active, paused, or inside the past-due grace. |
+| `isPractitioner()` | `boolean` | Now the token's `com` (commercial) claim. Under one plan that equals `isPro()`. Still exported because `js/pro/*` and `/for-practitioners` call it. |
+| `requirePro(feature)` | `boolean` | When `false`, dispatches `hmb:paywall` with `{ feature }`. **The only paid-feature gate.** |
+| `restore()` | `string` (tier) | Re-reads the stored token. |
+| `onChange(cb)` | unsubscribe fn | `cb(tier, { exp, payload, status })`. |
+| `getLicenseInfo()` | `object` | Everything the UI may render. Never a token. |
+| `parseToken(token)` | `object \| null` | Decodes the payload **without verifying the signature**. Debugging only, never a gate. |
 
-Token: `base64url(payloadJSON) + '.' + base64url(HMAC-SHA256)`, payload
-`{ v, tier, sub, iat, exp, kid, act, dom? }`. `exp` is in seconds. A tier stays
-valid until `exp + 14 days` (offline grace), then falls back to free. A `storage`
-event on `hmb.license` re-evaluates, so activating in one tab lights up the others.
+### Added
 
-Never log, track or transmit a full licence key.
+| Function | Returns | Notes |
+|---|---|---|
+| `signedIn()` | `boolean` | From `js/auth.js` when it has loaded; otherwise from the last `/api/me` snapshot, so an offline or CDN-blocked page still answers. |
+| `account()` | `{ id, email } \| null` | Never a token. |
+| `status()` | `'trialing' \| 'active' \| 'past_due' \| 'paused' \| 'canceled' \| 'none'` | |
+| `refresh({ force })` | `Promise<object \| null>` | `GET /api/me`: stores the token, mirrors the device id, remembers the snapshot, notifies listeners. Fire-and-forget safe — never throws, and a failure changes nothing. |
+| `requireAccount(feature)` | `boolean` | True when signed in; otherwise dispatches `hmb:signin` with `{ feature, next }`. |
+| `requireTimer({ technique })` | `boolean` | The single gate `js/app.js` calls on Start. See below. |
+| `readDeviceMirror()` | `string` | The `localStorage` mirror of the `__Host-hmb_did` cookie, or `''`. |
+| `recordFreeSession()` | `Promise<number \| null>` | POSTs the completed-session beacon. One completion counts once. |
+| `hadLegacyLicence()` / `dismissLegacyNotice()` | `boolean` / `void` | A retired licence key was found on this browser and removed. `/account` shows a one-time "email us with your receipt" banner and calls `dismissLegacyNotice()` when it is closed. |
+
+### Removed
+
+`activate(key)` and `deactivate()` are **retired**. Both keep a **deprecated
+stub for one release** so a page still sitting in a service-worker cache does not
+throw: `activate()` logs a deprecation, calls `refresh({ force: true })` and
+answers `{ ok: false, code: 'deprecated' }` with a sentence telling the person to
+sign in; `deactivate()` logs a deprecation and signs out through `js/auth.js`.
+**Do not call either from new code, and delete both at the next release.**
+
+### `requireTimer()` — the one gate on Start
+
+The only place `TIMER_FREE_SESSIONS` is read. In order:
+
+1. A page carrying `<body data-open-timer>` always passes — the two crisis
+   pages, the embed frame and `/s/`. It is a safety feature, not a config knob.
+2. `isPro()` passes.
+3. A device inside its free-session allowance passes
+   (`free_sessions_used < TIMER_FREE_SESSIONS`, server-authoritative when online
+   and the local count otherwise).
+4. Otherwise it fires `timer_gate_block`, then dispatches `hmb:signin` (signed
+   out) or `hmb:paywall` with feature `'timer'` (signed in, no subscription), and
+   returns `false`.
+
+### Events it dispatches on `document`
+
+| Event | Detail | Raised by |
+|---|---|---|
+| `hmb:paywall` | `{ feature }` | `requirePro()` — answered by `js/pro/paywall.js`. |
+| `hmb:signin` | `{ feature, next }` | `requireAccount()` — answered by `js/pro/paywall.js`. |
+| `hmb:preview` | `{ reason, root, instance, technique, phases }` | `js/app.js` when `requireTimer()` is false — answered by `js/pro/preview.js`. |
+| `hmb:auth` | `{ event, signedIn, user }` | `js/auth.js`; this module listens and refreshes. |
+
+### Storage keys and how the token is read
+
+`hmb.ent` (the token), `hmb.ent.snapshot` (the last `/api/me` answer minus the
+token), `hmb.did` (the device mirror). Offline-first:
+
+1. `localStorage['hmb.ent']`;
+2. if absent, the `__Host-hmb_ent` cookie — the repair path after a browser
+   sweeps script storage, and the one cookie read in `js/`;
+3. decode the payload locally **without** verifying the signature. Local
+   decoding is a convenience, never a security boundary: the server verifies the
+   HMAC on every request that matters;
+4. `now < exp` means the tier applies, otherwise free. **There is no grace past
+   `exp`** for a v3 token: the up-to-14 days the server puts in `exp` *is* the
+   offline grace, capped at `access_until + 24h`;
+5. refresh when online and the token is older than 24 hours, or whenever
+   `hmb:auth` fires.
+
+Token v3: `base64url(JSON) + '.' + base64url(HMAC-SHA256)` over
+`{ v:3, typ:'ent', sub, tier, st, plan, com, pe, iat, exp, kid }` — the full
+table is in [`docs/API.md`](API.md). Supabase proves *who*; this token proves
+*what they may do*.
+
+---
+
+## `js/checkout.js`
+
+The only module that opens a payment flow. Pages write a plain button and load
+nothing else:
+
+```html
+<button type="button" data-action="checkout" data-plan="monthly">Subscribe</button>
+```
+
+```js
+import { subscribe, planLabel } from '/js/checkout.js';
+subscribe('yearly');
+```
+
+| Export | Notes |
+|---|---|
+| `subscribe(plan, options?)` | `plan` is one of `PLANS.available`. Returns `Promise<{ ok, mode, plan, trial?, reservationId?, error? }>`. |
+| `checkout(sku, options?)` | Retired spelling, kept as an alias of `subscribe()` so existing callers keep working. |
+| `planLabel(plan)` / `skuLabel` | The human label, e.g. "Yearly plan". |
+| `openSignIn({ next, intent })` | Sends a signed-out visitor to `/signin`. |
+
+What a click does:
+
+1. **No checkout token configured** → a calm "Checkout is not open yet" card.
+   There is no waitlist and no founding offer any more.
+2. **No signed-in session** → `/signin?next=…&intent=subscribe:<plan>`.
+   `/auth/callback` calls `subscribe()` again once the session exists, on the
+   callback page, with no page load in between.
+3. `POST /api/trial/eligibility` with `{ plan, device_mirror }` and the Supabase
+   bearer token. **The server decides trial-or-not, picks the price, creates the
+   transaction** and answers with a transaction id.
+4. The overlay opens with `transactionId` — **never an items array, never a
+   price id** — so nothing in devtools can swap in the trial price.
+
+One delegated click handler is installed on `document`, so any page that loads
+this module (every timer page does, via `js/pro/index.js`) gets working buttons.
+A page that wires its own handler sets `window.__hmbCheckoutBound = true` and
+this module adds no second listener; repeat calls for the same plan inside 1.2
+seconds collapse into one checkout and one `checkout_open` event either way.
+
+Nothing else in `js/` knows a provider exists. This file is the seam on the
+client, `api/_lib/providers/` is the seam on the server, and `js/config.js`
+holds the public values.
+
+---
+
+## `js/pro/preview.js`
+
+The timer's preview state — what a visitor past the free-session allowance sees.
+Imported and initialised by `js/pro/index.js`; no page loads it directly.
+
+```js
+import { initPreview, runDemonstration, renderPreviewCard } from '/js/pro/preview.js';
+```
+
+A timer page past the allowance is **not a wall**. The page stays fully
+readable — description, contraindications, the science, the FAQ — and the
+breathing section still shows the circle. When `js/app.js`'s `start()` finds
+`requireTimer()` false it enters preview mode instead of running and dispatches
+`hmb:preview` with `{ reason, root, instance, technique, phases }`, where
+`reason` is `'signed_out'` or `'no_subscription'`.
+
+This module answers by doing two things:
+
+1. **One continuous demonstration cycle** at the technique's real pace — inhale,
+   hold, exhale — with the phase word, the count and the ring changing exactly as
+   they would in a session. It does not run a timed session, count breaths,
+   record history, play audio or vibrate.
+2. **One card** into the instance's `[data-slot="post-session"]`: "Create an
+   account to keep going", the plan line, and either a sign-in link or the two
+   checkout buttons for a signed-in visitor without a subscription.
+
+It also stamps `body.timer-preview`, which is how `js/ads.js` knows to refuse a
+slot: the first thing a person sees on a timer page is never an ad next to a
+sign-in prompt.
+
+On a page carrying `data-open-timer` (the crisis pages, the embed frame, `/s/`)
+`requireTimer()` never fails, so this module never renders.
 
 ---
 
@@ -275,12 +539,19 @@ Never log, track or transmit a full licence key.
 import { initAds, removeAds } from '/js/ads.js';
 ```
 
-Self-initialises. It refuses to do anything when `isPro()`, when
-`<body data-no-ads="true">`, when `body.session-active` is present, or when the
-page has no `.ad-slot[data-ad-slot]`. It waits for a consent decision, then for
-first interaction or 3s idle, then injects the AdSense loader
-(`ca-pub-7348129075274196`) and fills each slot. When advertising storage was
-declined it sets `requestNonPersonalizedAds = 1`.
+Self-initialises. It **refuses** to do anything when any of these is true:
+
+- `isPro()`;
+- `<body data-no-ads="true">`;
+- `body.session-active` is present;
+- `body.timer-preview` is present — the preview state, so an ad never sits
+  beside a sign-in prompt;
+- the page has no `.ad-slot[data-ad-slot]`.
+
+Otherwise it waits for a consent decision, then for first interaction or 3s
+idle, then injects the AdSense loader (`ca-pub-7348129075274196`) and fills each
+slot. When advertising storage was declined it sets
+`requestNonPersonalizedAds = 1`.
 
 ---
 
@@ -404,8 +675,11 @@ Plus one page-level action, delegated from `document`: `support` (fires
 | `hmb:session-pause` | Paused. |
 | `hmb:session-complete` | Ran to the full duration. |
 | `hmb:session-stop` | Stopped early. |
+| `hmb:preview` | Start was pressed and `requireTimer()` said no. Adds `{ reason, phases }`. |
 | `hmb:consent` | From `consent.js`. |
 | `hmb:paywall` | From `entitlements.js`, `{ feature }`. |
+| `hmb:signin` | From `entitlements.js`, `{ feature, next }`. |
+| `hmb:auth` | From `auth.js`, `{ event, signedIn, user }`. |
 
 Every engine event carries at least:
 
@@ -424,6 +698,14 @@ document.addEventListener('hmb:session-complete', (e) => {
 
 ### Behaviour worth knowing
 
+- **The gate on Start.** `start()` calls `requireTimer({ technique })` from
+  `js/entitlements.js` once, after the safety acknowledgement and before
+  anything begins. When it returns `false` the engine calls `enterPreview()`:
+  it removes the circle's `active` class, dispatches `hmb:preview` with
+  `{ reason: 'signed_out' | 'no_subscription', phases }` on top of the usual
+  detail, and **returns without starting**. Nothing is timed, counted, recorded,
+  spoken or vibrated in preview mode. `js/pro/preview.js` answers the event.
+  A page carrying `data-open-timer` passes straight through.
 - **`body.session-active`** is added while any instance has a session, and stays
   on through a pause so an ad or an ask cannot appear mid-practice. It is removed
   on stop and on complete.
@@ -458,10 +740,44 @@ document.addEventListener('hmb:session-complete', (e) => {
 
 ## `js/pro/index.js`
 
-A one-line placeholder that exports `PRO_MODULE_READY = false`. The Pro agent
-replaces it with the real entry module (patterns, streaks, paywall, capture,
-night mode, soundscapes). Every app page already loads it, so shipping the real
-module needs no HTML change.
+The Pro entry module. Exports `PRO_MODULE_READY = true`. It injects `css/pro.css`
+once, wires the paywall and the email capture (both document-level, both quiet by
+default), adds the per-instance tools — "Custom pattern", "Your practice",
+"Night mode" — to every `[data-breathing-app]` as it announces `hmb:ready`, and
+imports `js/checkout.js` for its delegated `[data-action="checkout"]` handler.
+`js/pro/soundscapes.js` is loaded with a dynamic import inside `try/catch`, so a
+missing or blocked audio module can never break a page.
+
+---
+
+## `sw.js` — the service worker
+
+Not a module, but part of the contract. HTML navigations are network-first with
+the cache as an offline fallback, then `/offline.html`; same-origin assets are
+stale-while-revalidate; `/api/*` and cross-origin requests are **never**
+intercepted and never cached.
+
+**Never cached, by path** (`NEVER_CACHE`):
+
+```
+/account          /account.html
+/signin           /signin.html
+/auth/callback    /auth/callback.html
+/embed/v1/frame   /embed/v1/frame.html
+```
+
+The account and auth pages hold a signed-in person's state and must always come
+from the network; the embed frame is never cached because the white-label verdict
+is decided per request by `api/embed/frame.js` and inlined into the document.
+
+Two further rules: a navigation carrying **any** query string is not written to
+the cache, because `/pro/thanks` arrives with a checkout reservation id and
+`/s/?c=…` carries a practitioner's name and their note to a client — caching
+those would write them to CacheStorage keyed on the full URL. And the audio cache
+(`hmb-audio`) is never purged on activate: it holds roughly 4 MB a paying
+customer chose to download for offline use.
+
+Bump `CACHE_NAME` on every deploy that changes CSS, JS or the app shell.
 
 ---
 

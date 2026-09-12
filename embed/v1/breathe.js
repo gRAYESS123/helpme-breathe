@@ -1,9 +1,16 @@
 /*!
  * Help Me Breathe — embed loader v1. Docs: https://helpmebreath.com/embed
  *
- * Replaces its own <script> tag with a responsive iframe of /embed/v1/frame.html
- * and resizes it from the frame's hmb:resize messages. Several embeds per page
- * are fine; it never throws. v1 is frozen - breaking changes ship as v2.
+ * Replaces its own <script> tag with a responsive iframe of the breathing
+ * widget and resizes it from the frame's hmb:resize messages. Several embeds
+ * per page are fine; it never throws. v1 is frozen - breaking changes ship as v2.
+ *
+ * Two frame URLs, one document:
+ *   - no data-wl  -> /embed/v1/frame, the static, cacheable free widget;
+ *   - data-wl set -> /api/embed/frame, the same document served by a function
+ *     that verifies the credential against the page it is embedded on and
+ *     inlines the verdict. Every failure there is the free widget, never an
+ *     error, so a host page cannot break because of a billing state.
  */
 (function () {
   'use strict';
@@ -50,19 +57,29 @@
     var origin = base.replace(/^(https?:\/\/[^/]+).*$/, '$1');
 
     var query = [];
+    var whitelabel = false;
     for (var i = 0; i < PARAMS.length; i++) {
       var value = tag.getAttribute('data-' + PARAMS[i]);
       if (value === null || value === '') continue;
+      if (PARAMS[i] === 'wl') whitelabel = true;
       query.push(encodeURIComponent(PARAMS[i]) + '=' + encodeURIComponent(value));
     }
 
+    // Clean URL for the static frame: vercel.json sets cleanUrls, so
+    // "frame.html" would 308 first. The function has no extension to drop.
+    var frameUrl = whitelabel ? origin + '/api/embed/frame' : base + 'frame';
+
     var frame = document.createElement('iframe');
-    // Clean URL: vercel.json sets cleanUrls, so "frame.html" would 308 first.
-    frame.setAttribute('src', base + 'frame' + (query.length ? '?' + query.join('&') : ''));
+    frame.setAttribute('src', frameUrl + (query.length ? '?' + query.join('&') : ''));
     frame.setAttribute('title', 'Guided breathing exercise');
     frame.setAttribute('loading', 'lazy');
     frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');
     frame.setAttribute('allow', 'screen-wake-lock');
+    // The white-label check reads the Referer of the frame document request.
+    // Pinning the policy on the iframe sends the host page's origin (never its
+    // path) even when the host sets `no-referrer` site-wide; without it the
+    // credential would silently verify nowhere on such a site.
+    frame.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
     frame.setAttribute('data-hmb-embed', '1');
     frame.style.cssText = 'display:block;width:100%;max-width:100%;min-height:420px;border:0;background:transparent';
 

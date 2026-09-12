@@ -7,26 +7,49 @@
  * /api/health serves.
  */
 
-/** Every variable the API knows about, with the one-line meaning kept in .env.example. */
+/**
+ * Every variable the API knows about, with the one-line meaning kept in
+ * .env.example. The accounts and billing build (2026-09-11,
+ * docs/private/ACCOUNTS_BILLING_DESIGN.md section 10.2) added the Supabase,
+ * pepper, price, cron and alert variables and retired MOR_PRODUCT_*.
+ */
 export const KNOWN_VARS = [
+  // signing
   'LICENSE_SECRET',
+  // accounts
+  'SUPABASE_URL',
+  'SUPABASE_PUBLISHABLE_KEY',
+  'SUPABASE_SECRET_KEY',
+  'TRIAL_PEPPER',
+  'DEVICE_PEPPER',
+  'TRIAL_ENABLED',
+  'SITE_ORIGIN',
+  // merchant of record
   'MOR_PROVIDER',
   'MOR_API_KEY',
   'MOR_API_BASE',
   'MOR_WEBHOOK_SECRET',
-  'MOR_PRODUCT_LIFETIME',
-  'MOR_PRODUCT_MONTHLY',
-  'MOR_PRODUCT_PRACTITIONER',
-  'MOR_PRODUCT_STUDIO',
-  'MOR_PRODUCT_PACK',
+  'MOR_CLIENT_TOKEN',
+  'MOR_SANDBOX',
+  'MOR_PRICE_MONTHLY_TRIAL',
+  'MOR_PRICE_MONTHLY',
+  'MOR_PRICE_YEARLY_TRIAL',
+  'MOR_PRICE_YEARLY',
+  'MOR_PRICE_PRACTITIONER',
+  'MOR_STOREFRONT',
   'MOR_API_USERNAME',
   'MOR_API_PASSWORD',
+  // jobs and alerts
+  'CRON_SECRET',
+  'ALERT_EMAIL',
+  // email capture (the third-session card) and alert delivery
   'EMAIL_PROVIDER',
   'EMAIL_API_KEY',
   'EMAIL_LIST_ID',
   'EMAIL_DOI_TEMPLATE_ID',
   'EMAIL_DOI_REDIRECT_URL',
   'EMAIL_API_BASE',
+  // CORS
   'ALLOWED_ORIGINS',
 ];
 
@@ -35,10 +58,11 @@ export const DEV_DEFAULTS = Object.freeze({
   // 64 characters, obviously fake, so a token minted in dev can never verify in production.
   LICENSE_SECRET: 'dev-license-secret-not-for-production-'.padEnd(64, '0'),
   MOR_PROVIDER: 'paddle',
+  MOR_SANDBOX: 'true',
   EMAIL_PROVIDER: 'brevo',
   EMAIL_LIST_ID: '0',
   EMAIL_DOI_TEMPLATE_ID: '0',
-  EMAIL_DOI_REDIRECT_URL: 'https://helpmebreath.com/pro/thanks',
+  EMAIL_DOI_REDIRECT_URL: 'https://helpmebreath.com/pro/thanks?confirmed=1',
 });
 
 /** Thrown by requireEnv() in production. Carries the missing names, never the values. */
@@ -168,33 +192,43 @@ export function allowedOrigins() {
 
 /**
  * Booleans only — safe to serve publicly from /api/health.
+ *
+ * `missing` lists what a WORKING deployment needs: sign-in, the entitlement
+ * token, the trial ledger, checkout, webhooks and the two cron jobs. The trial
+ * price ids are needed unless TRIAL_ENABLED is literally "false" — that read is
+ * for this report only; the product decision is made in api/trial/eligibility.js
+ * and nowhere else.
  * @returns {{provider:string, email:string, env:string, configured:Record<string,boolean>, missing:string[]}}
  */
 export function describeConfig() {
   const provider = providerName();
   const email = emailProviderName();
 
-  const configured = {
-    license_secret: hasEnv('LICENSE_SECRET'),
-    mor_provider: hasEnv('MOR_PROVIDER'),
-    mor_api_key: hasEnv('MOR_API_KEY'),
-    mor_api_base: hasEnv('MOR_API_BASE'),
-    mor_webhook_secret: hasEnv('MOR_WEBHOOK_SECRET'),
-    mor_product_lifetime: hasEnv('MOR_PRODUCT_LIFETIME'),
-    mor_product_monthly: hasEnv('MOR_PRODUCT_MONTHLY'),
-    mor_product_practitioner: hasEnv('MOR_PRODUCT_PRACTITIONER'),
-    mor_product_studio: hasEnv('MOR_PRODUCT_STUDIO'),
-    mor_product_pack: hasEnv('MOR_PRODUCT_PACK'),
-    email_provider: hasEnv('EMAIL_PROVIDER'),
-    email_api_key: hasEnv('EMAIL_API_KEY'),
-    email_list_id: hasEnv('EMAIL_LIST_ID'),
-    email_doi_template_id: hasEnv('EMAIL_DOI_TEMPLATE_ID'),
-    email_doi_redirect_url: hasEnv('EMAIL_DOI_REDIRECT_URL'),
-  };
+  const configured = {};
+  for (const name of KNOWN_VARS) configured[name.toLowerCase()] = hasEnv(name);
 
-  // Which variables a working deployment actually needs, given the two provider choices.
-  const required = ['LICENSE_SECRET', 'MOR_API_KEY', 'MOR_PRODUCT_LIFETIME', 'EMAIL_API_KEY', 'EMAIL_LIST_ID'];
-  if (email === 'brevo') required.push('EMAIL_DOI_TEMPLATE_ID', 'EMAIL_DOI_REDIRECT_URL');
+  const required = [
+    'LICENSE_SECRET',
+    'SUPABASE_URL',
+    'SUPABASE_PUBLISHABLE_KEY',
+    'SUPABASE_SECRET_KEY',
+    'TRIAL_PEPPER',
+    'DEVICE_PEPPER',
+    'SITE_ORIGIN',
+    'MOR_API_KEY',
+    'MOR_WEBHOOK_SECRET',
+    'MOR_CLIENT_TOKEN',
+    'MOR_PRICE_MONTHLY',
+    'MOR_PRICE_YEARLY',
+    'CRON_SECRET',
+    'ALERT_EMAIL',
+    'EMAIL_API_KEY',
+  ];
+  if (readEnv('TRIAL_ENABLED').toLowerCase() !== 'false') {
+    required.push('MOR_PRICE_MONTHLY_TRIAL', 'MOR_PRICE_YEARLY_TRIAL');
+  }
+  if (provider === 'fastspring') required.push('MOR_STOREFRONT');
+  if (email === 'brevo') required.push('EMAIL_LIST_ID', 'EMAIL_DOI_TEMPLATE_ID', 'EMAIL_DOI_REDIRECT_URL');
   const missing = required.filter((name) => !hasEnv(name));
 
   return { provider, email, env: envName(), configured, missing };

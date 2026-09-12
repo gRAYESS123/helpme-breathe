@@ -6,7 +6,7 @@
     <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
     <title>Security Overview — Help Me Breathe</title>
-    <meta name="description" content="How Help Me Breathe is built and run: architecture, data flows, hosting and TLS, subprocessors, accounts and tokens, accessibility, support and disclosure.">
+    <meta name="description" content="How Help Me Breathe is built and run: architecture, data flows, hosting, the account database, subprocessors, tokens, accessibility, support and disclosure.">
 
     <link rel="canonical" href="https://helpmebreath.com/compliance/security-overview">
 
@@ -15,7 +15,7 @@
 
     <!-- Open Graph -->
     <meta property="og:title" content="Security Overview — Help Me Breathe">
-    <meta property="og:description" content="How Help Me Breathe is built and run: architecture, data flows, hosting and TLS, subprocessors, accounts and tokens, accessibility, support and disclosure.">
+    <meta property="og:description" content="How Help Me Breathe is built and run: architecture, data flows, hosting, the account database, subprocessors, tokens, accessibility, support and disclosure.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpmebreath.com/compliance/security-overview">
     <meta property="og:image" content="https://helpmebreath.com/images/og/security-overview.jpg">
@@ -24,7 +24,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Security Overview — Help Me Breathe">
-    <meta name="twitter:description" content="How Help Me Breathe is built and run: architecture, data flows, hosting and TLS, subprocessors, accounts and tokens, accessibility, support and disclosure.">
+    <meta name="twitter:description" content="How Help Me Breathe is built and run: architecture, data flows, hosting, the account database, subprocessors, tokens, accessibility, support and disclosure.">
     <meta name="twitter:image" content="https://helpmebreath.com/images/og/security-overview.jpg">
 
     <!-- Favicon: the ring with a gap. No emoji anywhere. -->
@@ -266,7 +266,7 @@
                 </ol>
             </nav>
             <h1>Security Overview</h1>
-            <p class="lead">Two pages on how this is built, where the data goes, and what a one-person operation can and cannot promise.</p>
+            <p class="lead">How this is built, where the data goes, what is stored when you subscribe, and what a one-person operation can and cannot promise.</p>
         </header>
 
         <main id="main">
@@ -276,10 +276,13 @@
                 <div class="doc-meta">
                     <dl>
                         <dt>Document</dt>
-                        <dd>Security overview, version 1.0</dd>
+                        <dd>Security overview, version 1.1</dd>
 
                         <dt>Published</dt>
-                        <dd><time datetime="2026-09-09">9 September 2026</time></dd>
+                        <dd><time datetime="2026-09-12">12 September 2026</time></dd>
+
+                        <dt>Supersedes</dt>
+                        <dd>Version 1.0 of 9 September 2026, which was written before subscriber accounts existed</dd>
 
                         <dt>Prepared by</dt>
                         <dd>Georges Rayess, an individual trading as Help Me Breathe, Lebanon</dd>
@@ -294,23 +297,25 @@
 
                 <section class="doc-section">
                     <h2>1. Architecture</h2>
-                    <p>Help Me Breathe is a static website with a small number of serverless functions attached to it. There is no application server that stays running, no message queue, no cache layer and no admin panel. The only personal data stored anywhere is a subscriber's own account record — an email address, a sign-in identity, a plan and its dates. The attack surface is deliberately close to the smallest one a working product can have.</p>
+                    <p>Help Me Breathe is a static website with a small number of serverless functions and one database attached to it. There is no application server that stays running, no message queue, no cache layer and no admin panel. The personal data stored anywhere is a subscriber's own record: an account, a subscription, a trial entry and any embed credentials they have minted. Nothing about a practitioner's clients is stored at all. The attack surface is deliberately close to the smallest one a working product can have.</p>
                     <ul>
-                        <li><strong>Static pages.</strong> Every page is a plain HTML file built ahead of time and served from a content delivery network. There is no server-side rendering, no template engine and no user input reflected into a page by a server.</li>
+                        <li><strong>Static pages.</strong> Every page is a plain HTML file built ahead of time and served from a content delivery network. Nothing is rendered server-side, there is no template engine, and no user input is reflected into a page by a server.</li>
                         <li><strong>Client-side JavaScript.</strong> The timer is native ES modules with no bundler, no framework and no third-party runtime dependencies at all. That means no dependency tree to be compromised through, and nothing to patch when a popular package is hijacked.</li>
-                        <li><strong>Serverless functions.</strong> A handful of endpoints under <code>/api/</code> handle sign-in, the subscription lifecycle and the optional email list. They receive a JSON body and return a JSON response. They are written to the Web standard <code>Request</code>/<code>Response</code> interface, so they can be moved to another host without being rewritten.</li>
+                        <li><strong>Serverless functions.</strong> A handful of endpoints under <code>/api/</code> handle sign-in, the subscription lifecycle, the trial check, embed credentials, account export and deletion, and the optional email list. They run on Vercel, they receive a JSON body and return a JSON response, and they are written to the Web standard <code>Request</code>/<code>Response</code> interface, so they can be moved to another host without being rewritten.</li>
+                        <li><strong>The database.</strong> A Postgres database at Supabase holds the account tables. <strong>The browser never talks to it.</strong> Every read and every write goes through one of those serverless functions, using a secret key that exists only as an environment variable on the server. Row level security is enabled and forced on every table, with no policies granting a browser anything, so a key that escaped into a page would still read nothing. The user's identity is always taken from the verified sign-in token, never from the request body.</li>
                         <li><strong>Service worker.</strong> A service worker caches the pages and assets so the timer keeps working offline. It caches the application shell only. It never caches an API response and never stores anything about a session.</li>
-                        <li><strong>The embedded widget.</strong> A separate, versioned page under <code>/embed/v1/</code> designed to be put in an iframe on someone else's site. It loads its own HTML, CSS and one script from helpmebreath.com and nothing else, from anywhere. A client session link at <code>/s/</code> is a different page and is not held to that rule — see section 2.</li>
+                        <li><strong>The embedded widget.</strong> A separate, versioned page under <code>/embed/v1/</code> designed to be put in an iframe on someone else's site. It loads its own HTML, CSS and one script from helpmebreath.com and nothing else, from anywhere. <strong>Zero third-party requests happen inside that frame</strong>, and the visitor needs no account, is asked for nothing, and has nothing created for them. The document itself is now served by a function rather than as a file, so that a white-label credential can be checked before the page is drawn, and that function is on this domain like everything else in the frame. A client session link at <code>/s/</code> is a different page and is not held to the same rule, as section 2 explains.</li>
                     </ul>
                 </section>
 
                 <section class="doc-section">
                     <h2>2. Data flows</h2>
-                    <p>There are four flows in the whole system. Three of them concern the practitioner. None of them carries client data.</p>
+                    <p>There are six flows in the whole system. Four of them concern the subscriber. None of them carries client data.</p>
 
                     <p><strong>A person practises breathing.</strong></p>
-                    <div class="flow-line">browser → CDN: GET /box-breathing → HTML, CSS, JS. Then: nothing.</div>
+                    <div class="flow-line">browser → CDN: GET /box-breathing → HTML, CSS, JS<br>main site only, when a session finishes → a count against the device cookie, and nothing else</div>
                     <p>The session runs entirely in the page. Phase timing, cue tones and vibration are all local. Settings and session history are written to that browser's own local storage under the <code>hmb.</code> prefix and are never read by a server.</p>
+                    <p>One thing did change when the subscription arrived, and it belongs here rather than in a footnote. On helpmebreath.com the first few sessions on a device are free, so when a session finishes the page tells the server that a session finished, against the signed device identifier in the <code>__Host-hmb_did</code> cookie. That message is a count against the device identifier, and it carries nothing about the session itself and nothing that identifies the person. The count is deliberately soft, so clearing the cookie resets it, because the alternative is a hard wall on a breathing timer and that is not a trade worth making. The embedded widget and the client session links send no such beacon and have no allowance at all.</p>
 
                     <p><strong>A client opens a co-branded session link.</strong></p>
                     <div class="flow-line">browser → CDN: GET /s/?c=&lt;base64url config&gt; → HTML, CSS, JS<br>browser → Google Fonts: the site's typefaces. Then: nothing.</div>
@@ -318,12 +323,20 @@
                     <p>This page differs from the embedded widget in one respect, and it is listed rather than glossed: it requests the site's typefaces from Google Fonts, so Google's font servers see the reader's IP address and user agent. Nothing about the session is sent with that request, and the page works if it is blocked. A practitioner's own logo, if the link carries one, is fetched by the reader's browser from the practitioner's own server. The widget under <code>/embed/v1/</code> makes neither request.</p>
 
                     <p><strong>A subscriber signs in.</strong></p>
-                    <div class="flow-line">browser → sign-in request { email } → a one-time link by email, or a Google sign-in   ·   a short-lived signed token kept by the browser</div>
-                    <p>There is no password at any point. A one-time email link, or a Google account, is exchanged for a short-lived signed token. An email address is never written to a log, an analytics event or an error report in full.</p>
+                    <div class="flow-line">browser → sign-in request { email } → a one-time link by email, a 6-digit code, or a Google sign-in   ·   a short-lived signed token kept by the browser</div>
+                    <p>There is no password at any point, so there is no credential store to leak. A one-time email link, a one-time code, or a Google account, is exchanged for a short-lived signed token. The link and the code are single use. An email address is never written to a log, an analytics event or an error report in full.</p>
 
-                    <p><strong>A white-label embed checks its entitlement.</strong></p>
-                    <div class="flow-line">iframe → entitlement check { token, host } → { active, host allowed }</div>
-                    <p>The frame asks whether the token belongs to an active subscription, and sends the hostname of the page it is embedded in. The server answers for that hostname and no other, and the frame checks the same answer again before it changes anything on screen, so a token copied out of a public page's source is of no use on a site it was not issued for. If the check fails for any reason — an unreachable server, a lapsed subscription, a hostname that is not covered — the frame renders the free attributed widget rather than failing open.</p>
+                    <p><strong>A subscriber starts a trial or subscribes.</strong></p>
+                    <div class="flow-line">browser → POST /api/trial/eligibility { signed-in user } → { trial: yes or no }<br>browser → the merchant of record's own checkout → card details go to it, never here</div>
+                    <p>The price is never chosen by the browser. The server decides which plan is being bought and hands the merchant of record a checkout for it, so a price edited in the developer tools buys nothing. The trial check runs on the server: it compares a one-way hash of the account email address, computed with a secret key that never leaves the server, against a ledger of trials already taken, and it reads the signed device identifier in the <code>__Host-hmb_did</code> cookie. It can only ever withdraw the trial offer, never access, and if the ledger is unreachable it fails to no trial rather than to no service. <strong>There is no browser fingerprinting anywhere in this flow.</strong> No card number, expiry date or security code ever reaches this site.</p>
+
+                    <p><strong>The merchant of record reports a payment.</strong></p>
+                    <div class="flow-line">provider → POST /api/webhooks/mor { signed event } → verify signature and timestamp → write the subscription state</div>
+                    <p>Every incoming message is verified against the provider's signature before it is read, using a constant-time comparison and a shared secret held in the environment, and a message whose timestamp is outside a narrow window is rejected so an old one cannot be replayed. Each event is recorded once and applied once, by its provider identifier, so a duplicate delivery cannot double-apply. An event that cannot be processed is kept and retried rather than dropped, because a lost payment message is a subscriber locked out of something they paid for.</p>
+
+                    <p><strong>A white-label embed is served.</strong></p>
+                    <div class="flow-line">someone else's page → GET /embed/v1/frame.html?wl=&lt;credential&gt; (Sec-Fetch-Dest: iframe, Referer: the embedding page) → HTML with the verdict already in it</div>
+                    <p>The check happens when the frame document is requested, not afterwards from inside the frame. The server verifies the signed credential, reads the browser's own <code>Sec-Fetch-Dest</code>, <code>Sec-Fetch-Site</code> and <code>Referer</code> headers to see which page is doing the embedding, and writes the answer straight into the HTML it returns. It has to work this way round. A request the frame made from inside itself would be same-origin, and would tell the server only this site's own address, so a check made from in there could not see whose page the widget is actually on. If anything at all is wrong, an expired credential, a domain that was not registered, a lapsed subscription, a missing referrer, the frame renders the free attributed widget. It never fails open, and it never shows an error to a clinic's visitor. What this is not is proof against someone who proxies the frame from their own server, and nothing served to a browser can be. A per-credential count of verified renders makes that visible, and a credential can be revoked in one action.</p>
 
                     <div class="doc-callout">
                         <p>There is no flow in which a client's name, contact details, health information or practice history reaches a server. The <a href="/compliance/privacy-attestation">privacy attestation</a> states this as a signed statement, and the <a href="/compliance/dpa">Data Processing Addendum</a> records it contractually.</p>
@@ -334,17 +347,19 @@
                     <h2>3. Hosting, TLS and headers</h2>
                     <ul>
                         <li>The site is hosted on Vercel and served from its content delivery network. Vercel manages the TLS certificates and terminates TLS at the edge; plain HTTP requests are redirected to HTTPS, and <code>www</code> is redirected to the bare domain.</li>
-                        <li>Secrets — the token signing key, the merchant of record's API key and webhook secret, and the email provider's key — exist only as encrypted environment variables in the hosting platform. They are not in the source repository, which carries a <code>.gitignore</code> entry for local environment files, and they are never logged.</li>
+                        <li>Secrets exist only as encrypted environment variables in the hosting platform: the token signing key, the database secret key, the two peppers used for the email hash and the device identifier, the merchant of record's API key and webhook secret, and the email provider's key. They are not in the source repository, which carries a <code>.gitignore</code> entry for local environment files, and they are never logged.</li>
+                        <li>The database secret key bypasses every access rule, so it lives on the server only and is never sent to a browser, never put in a page, and never given to a third party. Row level security is enabled and forced on every table, and no policy grants a browser read or write anywhere.</li>
+                        <li>Messages from the merchant of record are verified against its signature, with a constant-time comparison and a narrow timestamp window, so a forged or replayed message is rejected before it is read. Each one is applied exactly once.</li>
                         <li>Response headers set at the edge for every path: <code>X-Content-Type-Options: nosniff</code>, <code>Referrer-Policy: strict-origin-when-cross-origin</code>, and <code>Permissions-Policy: camera=(), microphone=(), geolocation=()</code>.</li>
                         <li><code>X-Frame-Options: DENY</code> is set on every path except the two that are meant to be embedded — the widget under <code>/embed/</code> and the client session link at <code>/s/</code> — which instead carry a <code>Content-Security-Policy</code> with <code>frame-ancestors *</code> because being embeddable is their purpose.</li>
                         <li>The serverless functions apply best-effort per-address rate limiting, and reject a request body that is larger or differently shaped than expected.</li>
-                        <li>The Provider's accounts with the hosting platform, the domain registrar, the merchant of record and the email provider each use a unique password held in a password manager, with two-factor authentication enabled.</li>
+                        <li>The Provider's accounts with the hosting platform, the database provider, the domain registrar, the merchant of record and the email provider each use a unique password held in a password manager, with two-factor authentication enabled.</li>
                     </ul>
                 </section>
 
                 <section class="doc-section">
                     <h2>4. Subprocessors</h2>
-                    <p>Four, listed with what each one can see. The same list appears in clause 7 of the <a href="/compliance/dpa">Data Processing Addendum</a>, and changes are notified to subscribers at least ten days ahead.</p>
+                    <p>Five, listed with what each one can see. The same list appears in clause 7 of the <a href="/compliance/dpa">Data Processing Addendum</a>, and changes are notified to subscribers at least ten days ahead.</p>
                     <div class="table-scroll">
                         <table class="doc-table">
                             <caption class="sr-only">Subprocessors and what each can see</caption>
@@ -358,9 +373,14 @@
                                     <td>Ordinary request logs: IP address, user agent, URL, timestamp. Vercel publishes its own <a href="https://vercel.com/legal/dpa">Data Processing Addendum</a> and keeps its subprocessor list on its trust centre.</td>
                                 </tr>
                                 <tr>
+                                    <td>Supabase, in a European Union region (Frankfurt, Germany)</td>
+                                    <td>Authentication and the Postgres database that holds the account tables</td>
+                                    <td>Your account record: email address, sign-in identities, creation date, subscription state and dates, the provider's identifiers, the one-way trial hash, the device record, and your embed credentials. It sees no card details and nothing about anybody's clients. Supabase publishes its own <a href="https://supabase.com/legal/dpa">Data Processing Addendum</a> and subprocessor list.</td>
+                                </tr>
+                                <tr>
                                     <td>The merchant of record</td>
                                     <td>Sells the subscription as the seller on record, takes payment, handles sales tax and VAT, issues receipts, processes refunds</td>
-                                    <td>Your name, email address, billing country, payment method, and any business name or tax identifier you enter. The company named on your receipt is the current merchant of record; this page is updated if it changes.</td>
+                                    <td>Your name, email address, billing country, payment method, and any business name or tax identifier you enter. It holds its own copy of the payment record as a controller in its own right, not as a processor for me, so erasing that copy means asking it directly. The company named on your receipt is the current merchant of record; this page is updated if it changes.</td>
                                 </tr>
                                 <tr>
                                     <td>Google LLC (Analytics 4 and Google Fonts)</td>
@@ -384,17 +404,29 @@
                 <p class="page-label hmb-no-print">Part two</p>
 
                 <section class="doc-section">
-                    <h2>5. Accounts and the subscription token</h2>
-                    <p>There are no passwords. Signing in is a one-time email link or a Google account, so there is no credential store to leak. An account holds an email address, the sign-in identities used, the date it was created, the plan with its status and period dates, and the payment provider's subscription and customer identifiers. What the browser holds is a signed token, and that design choice is the reason a stolen token ages out on its own.</p>
+                    <h2>5. Accounts, tokens and what is stored</h2>
+                    <p><strong>There are no passwords, anywhere, so there is nothing to leak, nothing to reuse and nothing to reset.</strong> Signing in is a one-time email link, a one-time six-digit code, or a Google account. What the browser holds afterwards is a signed token, and that design choice is the reason a stolen token ages out on its own.</p>
+                    <p>When you subscribe, this is the whole of what is stored about you, and the <a href="/legal/privacy-policy">privacy policy</a> gives the same list with its legal bases:</p>
+                    <ul>
+                        <li><strong>The account:</strong> your email address, the sign-in identities you have used, and the date the account was created.</li>
+                        <li><strong>The subscription:</strong> the plan, its status, its period dates, the provider's subscription and customer identifiers, and the amount and currency the provider charges you, taken from the provider rather than invented here. <strong>No card number, expiry date or security code ever reaches this site.</strong></li>
+                        <li><strong>The trial ledger:</strong> a one-way hash of your email address, computed on the server with a secret pepper, and a signed random identifier in the <code>__Host-hmb_did</code> cookie, which lasts 2 years. This is what keeps the rule to one free trial per person. There is no browser fingerprinting, no device profile and no use of your IP address to decide anything. The hash is pseudonymous rather than anonymous, because the pepper is held here, so it is treated as personal data and given a retention period like everything else.</li>
+                        <li><strong>Embed credentials:</strong> for each one you mint, its identifiers, the domains you registered, the dates it was issued and expires, and a count of verified renders.</li>
+                        <li><strong>Provider messages:</strong> the record of each payment message, so a dispute or a missed delivery can be checked against what happened.</li>
+                    </ul>
+                    <p>How long: account data while the account exists, plus up to 30 days in the database provider's backups. The body of a provider message 30 days, the record of it 180 days. The trial hash and the device record 24 months from last activity, then deleted, because otherwise deleting an account would reset the free-trial limit. Invoices sit with the merchant of record under its own tax retention.</p>
+                    <p>Two endpoints exist for your own data. One exports it, handing back your account record, your subscription records and your embed credentials, and no hashes, no keys and nobody else's data. The other deletes the account, and it cancels a live subscription at the provider and confirms the cancellation before it touches anything, because an account deleted with billing still running is the worst outcome available. It refuses while a payment dispute is open, and says so.</p>
+                    <p>On the token itself:</p>
                     <ul>
                         <li>A sign-in is exchanged for a token of the form <code>base64url(payload) + "." + base64url(HMAC-SHA256)</code>.</li>
                         <li>The payload carries a version, a subject reference, issue and expiry timestamps, and whether the subscription is active. It carries no name, no email address, no card data and nothing about anybody's practice.</li>
                         <li>Signing uses HMAC-SHA256 through the platform's WebCrypto implementation, with a secret held only in the hosting platform's environment. The signature is verified on the server, and that is what protects the things worth protecting: removing the attribution from a white-label embed, and the co-branded client session link. Be clear about what this does not do. In the browser the stored token is decoded but not verified, so what a person sees unlocked in their own browser is a convenience rather than a security boundary, and someone editing their own stored data can turn on the local conveniences without paying. Anything a practitioner actually sells &mdash; white-label attribution removal, class mode, co-branded links &mdash; is decided by the server, not by the browser.</li>
                         <li>Tokens are short-lived: 14 days. A cancelled subscription therefore expires on its own within a fortnight, with no revocation list to maintain and no action needed from anyone.</li>
                         <li>That 14-day life doubles as an offline grace period, so paid features keep working with no network and a practitioner in a room with poor signal is never locked out mid-session.</li>
-                        <li>An account is for one person or one household. There is no device count and no domain count to administer, and no activation ledger to keep.</li>
+                        <li>An account is for one person or one household. Sign in on as many devices as you like: there is no device count, no seat count, no licence key and no activation ledger to administer. An embed credential names the domains you chose to register, and nothing limits how many you register.</li>
                         <li>A sign-in link is single use and short-lived. Where a sign-in or a checkout returns someone to the site with a token in the address bar, the page removes it from the URL before anything else runs, and the analytics configuration is pinned to the path so a query string cannot reach it.</li>
                     </ul>
+                    <p>What happens when something upstream is down is worth stating, because it is where a subscription usually fails a person. Entitlement is read from this site's own database and never from the payment provider, so a provider outage does not stop anybody breathing: only the billing screens degrade, to "try again in a minute, or cancel from the receipt the provider emailed you". If the database itself is unreachable, a subscriber who is already signed in notices nothing for up to 14 days, because the signed token in the browser carries the plan and its dates. A brand new sign-in during that outage fails, and there is no way around that on a one-person operation. The trial check fails to no trial rather than to no service, so an outage never locks anyone out of the timer.</p>
                 </section>
 
                 <section class="doc-section">
@@ -413,7 +445,7 @@
                         <li><strong>Hours.</strong> Business days are Monday to Friday, excluding public holidays in Lebanon.</li>
                         <li><strong>What support covers.</strong> Activation problems, billing and refunds, embed and white-label setup, the handout pack, the compliance documents, and bug reports.</li>
                         <li><strong>What it does not cover.</strong> Clinical or teaching advice about which pattern to use with whom, custom development, integration work on your own site, or a service level agreement with credits attached to it. None of those exists.</li>
-                        <li><strong>Uptime.</strong> No uptime guarantee is offered. The site is static and served from a CDN, which is about as resilient as a small site gets, and the timer keeps working offline once a page has been visited. But there is no SLA, and claiming one would be a promise the operation cannot keep.</li>
+                        <li><strong>Uptime.</strong> No uptime guarantee is offered. The site is static and served from a CDN, which is about as resilient as a small site gets, and for a subscriber the timer keeps working offline once a page has been visited, for as long as the signed token in the browser is valid. Section 5 describes what an outage at the database or the payment provider actually does. But there is no SLA, and claiming one would be a promise the operation cannot keep.</li>
                         <li><strong>Refunds.</strong> Fourteen days, unconditional, processed by the merchant of record. The full policy is in the <a href="/legal/terms-of-service">terms of service</a>.</li>
                     </ul>
                 </section>
@@ -441,14 +473,14 @@
                         <li>No legal entity, no data protection officer, no security team. One person, in Lebanon, who answers his own email.</li>
                         <li>No 24/7 on-call, no incident status page, no service level agreement.</li>
                     </ul>
-                    <p>If any of that is a requirement for you, this is the wrong tool and it is better to know now. If none of it is, you have the whole picture, and the picture is unusually simple: a static site whose only stored personal data is your own account record, with nothing of your clients' in it.</p>
+                    <p>If any of that is a requirement for you, this is the wrong tool and it is better to know now. If none of it is, you have the whole picture, and the picture is still unusually simple: a static site, a handful of functions, and one small database holding your own account, your subscription and your trial entry, with nothing of your clients' in it.</p>
                 </section>
 
                 <div class="doc-actions hmb-no-print">
                     <button class="doc-btn" type="button" data-role="print">Print this document</button>
                 </div>
 
-                <p class="doc-foot">Help Me Breathe — Security overview v1.0 · Published 9 September 2026 · helpmebreath.com/compliance/security-overview · Companion documents: <a href="/compliance/dpa">Data Processing Addendum</a> and <a href="/compliance/privacy-attestation">privacy attestation</a>. This document describes the system as built on the date above and is updated when the system changes.</p>
+                <p class="doc-foot">Help Me Breathe — Security overview v1.1 · Published 12 September 2026 · helpmebreath.com/compliance/security-overview · Companion documents: <a href="/compliance/dpa">Data Processing Addendum</a> and <a href="/compliance/privacy-attestation">privacy attestation</a>. This document describes the system as built on the date above and is updated when the system changes.</p>
             </article>
         </main>
 
