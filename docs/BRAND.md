@@ -1,229 +1,187 @@
 # Help Me Breathe — Brand Guide
 
-**Paper and Ink.** Owner decision, 2026-09-10.
+**Lantern.** Owner decision, 2026-09-13, on the second pass of the proposal
+board (the first pass drew eight comments; every one of them is a rule below).
+It replaces Paper and Ink (2026-09-10 to 2026-09-13).
 
-The site is a printed leaflet that happens to run. Warm paper, charcoal ink,
-one deep green, a serif for the words you read and a sans for everything you
-operate. One mark: a ring with a single gap at the top, because the pause
-between breaths is the part that does the work. The breathing circle is that
-mark alive.
+The breathing circle is a soft light in still air. The **stage** is where you
+breathe: daylight, faintly coloured by the pattern you chose, slowly moving,
+with the orb as the light in the middle. The **page** is where you read: the
+same quiet ground, rounded white cards, one deep teal for links, black pills
+for actions. Deep Sleep dims the room to dusk, never black. Night mode, chosen
+or preferred, makes the whole site the dimmed room. One mark stays from the
+previous identity: the ring with a 48° gap at twelve o'clock, as the logo and
+as the gauge around the orb.
 
-The name stays **Help Me Breathe**. There is no emoji anywhere on the site, in
-any file, at any size. No gradient backgrounds. No blur. No glow. No shadowed
-type. Not Quicksand.
+The name stays **Help Me Breathe**. No emoji anywhere, at any size.
 
 `css/styles.css` is the implementation of this document. `docs/PAGE_CONTRACT.md`
 is the copy-paste recipe for building or converting a page.
 
 ---
 
-## 1. Tokens
+## 1. The owner's rules
 
-One palette for the whole site. Techniques differ only by a rim/fill accent
-pair on the breathing circle, the progress bar and small labels — never by the
-colour of the page.
+These came from the owner's own comments on the board. They are not up for
+re-interpretation by an agent.
 
-### Day
+1. **A calming animated background is valuable.** Three washes of the
+   pattern's colour drift behind the orb on a loop of about a minute. Keep it.
+2. **No black background unless it is necessary, like sleep.** Every stage is
+   daylight. Deep Sleep dims to dusk (`#1F2745`, a deep blue). Night mode is
+   the only time the whole site goes dark, and the visitor chooses it (or
+   their OS prefers it).
+3. **No borders, only rounded cards.** Nothing has a `border`. A card is a
+   rounded shape lifted by one soft shadow; a control is a filled pill; a
+   field is a well. The only lines are hairlines between the rows of a list
+   or a table.
+4. **No coloured dot circles**, on chips, on cards, anywhere. A pattern is
+   named in words and counted in mono. The only circles on the site are the
+   orb, its halos, the gauge and the mark.
+5. **No cheap hues.** The seven pattern colours are tonal and low in chroma:
+   a deep tone and a soft orb of the same hue. Pastel-on-black is gone.
+6. **No coloured stripe on the caution card.** The caution is a sand card,
+   the crisis block a rose card. The words carry the weight.
+
+---
+
+## 2. Tokens
+
+### The page, day
 
 | Token | Value | Role |
 |---|---|---|
-| `--paper` | `#F5F1E8` | Page ground. Warm leaflet stock. |
-| `--leaf` | `#FFFDF7` | Surface: cards, panels, the header, the breathing section. |
-| `--ink` | `#1C2320` | Text. Charcoal with a green undertone. |
-| `--graphite` | `#575F58` | Muted text: captions, metadata, labels. |
-| `--rule` | `#E3DCCC` | **Decorative hairline only.** Never a control's boundary. The one deliberate exception is `.control-btn:disabled`, where the point is that the control is *not* operable — a disabled control is the single state WCAG 1.4.11 exempts, and giving it an `--edge` boundary would make it look live. |
-| `--edge` | `#83887E` | **Control outlines**: buttons, inputs, toggles, pills, tools, the settings button. |
-| `--track` | `#DFD8C7` | Progress trough, input wells. |
-| `--green` | `#0F5136` | Primary: the Begin button, links, the focus ring, the active nav item. |
-| `--chalk` | `#FFFFFF` | Ink on primary. |
-| `--clay` | `#8A4B24` | **Commerce accent.** Paid surfaces only — price figures and checkout buttons on `/pro`, and the same two elements in the home page's `.plan-band`. Never on the timer screen. |
-| `--ok` | `#1B6B45` | Success. |
-| `--warn` | `#7E5406` | Caution: the contraindication rule. |
-| `--bad` | `#A32721` | Danger: the crisis block border, form errors. |
+| `--ground` | `#F4F6F5` | Page ground. Mist. |
+| `--surface` | `#FFFFFF` | Cards. |
+| `--well` | `#EAEEEC` | Fields, quiet pills, the trough. |
+| `--ink` | `#0F1B1E` | Text. Also the mark and every primary button. |
+| `--muted` | `#5C6B6E` | Muted text. |
+| `--line` | `#DDE3E1` | A hairline **between rows**. Never around a shape. |
+| `--link` | `#1E5F5A` | Links, the active nav item, the focus ring. |
+| `--action` / `--on-action` | `#0F1B1E` / `#F7F8F7` | Primary buttons and their label. |
+| `--sand` | `#F5EEE0` | The caution card. |
+| `--rose` | `#F6E6E3` | The crisis card. |
+| `--ok` / `--warn` / `--bad` | `#1F6B4B` / `#8A5A0A` / `#B23A2E` | Status text only. |
+| `--lift` | `0 1px 2px rgba(15,27,30,.04), 0 14px 34px -22px rgba(15,27,30,.28)` | The card shadow. |
+| `--lift-high` | `0 2px 4px rgba(15,27,30,.05), 0 24px 48px -24px rgba(15,27,30,.35)` | Something raised: a popover, the consent sheet, the mobile menu. |
 
-### Night
+### The page, night
 
 | Token | Value |
 |---|---|
-| `--paper` | `#15191A` |
-| `--leaf` | `#1E2426` |
-| `--ink` | `#EDE7DA` |
-| `--graphite` | `#A7AEA4` |
-| `--rule` | `#2E3536` |
-| `--edge` | `#767D77` |
-| `--track` | `#2B3233` |
-| `--green` | `#5FBF92` |
-| `--chalk` | `#15191A` |
-| `--clay` | `#D9A279` |
-| `--ok` | `#6FCB9B` |
-| `--warn` | `#E0B25C` |
-| `--bad` | `#F0918A` |
+| `--ground` | `#0F1620` |
+| `--surface` | `#182430` |
+| `--well` | `#1F2D3A` |
+| `--ink` | `#EEF2F0` |
+| `--muted` | `#9DB0B3` |
+| `--line` | `#24343A` |
+| `--link` | `#8FD3C4` |
+| `--action` / `--on-action` | `#EEF2F0` / `#0F1620` |
+| `--sand` / `--rose` | `#2B2A22` / `#33262A` |
+| `--ok` / `--warn` / `--bad` | `#6FCB9B` / `#E5B96A` / `#F09A8E` |
 
-### Dark by preference
+Night is honoured for **every** visitor: `@media (prefers-color-scheme: dark)`
+redefines the tokens on `body:not(.day)`, so an explicit `body.day` opts back
+out. `body.night` — set by the Pro night toggle in `js/pro/night.js` —
+redefines them again after the media query, so a manual choice always wins.
 
-Night is honoured for **every** visitor, not only for people who bought Pro.
-`@media (prefers-color-scheme: dark)` redefines the tokens on `body:not(.day)`,
-so an explicit `body.day` opts back out. `body.night` — set by the Pro night
-toggle in `js/pro/night.js` — redefines them again after the media query, so a
-manual choice always wins in both directions.
+### The stage
 
-**Every colour is a token.** No component may define a colour that exists only
-inside a media query or a `.night` block. If a component needs a colour, it
-needs a token.
+The stage's colours are a second set, `--stage-bg`, `--stage-ink`,
+`--stage-muted`, `--stage-surface`, `--stage-well`, `--stage-line`,
+`--stage-link`, `--stage-action`, `--stage-on-action`, `--stage-sand`,
+`--stage-rose`, `--track`, `--chip-on`, `--on-chip`. In daylight they equal
+the page's. Deep Sleep sets them to dusk; night sets them to night. Inside
+`.breathing-section` — and, on a page with a timer, in the site header and
+the page title above it — the page tokens are **remapped** to the stage
+tokens (`--ink: var(--stage-ink)` and so on), so any component placed there
+reads the right colours without knowing which room it is in.
 
-### Shadows
+| Dusk (Deep Sleep, day) | Value |
+|---|---|
+| `--stage-bg` | `#1F2745` |
+| `--stage-ink` / `--stage-muted` | `#EEF2F0` / `#A9B2CC` |
+| `--stage-surface` | `#2A3253` |
+| `--stage-well` / `--stage-line` / `--track` | `rgba(238,242,240,.09)` / `.14` / `.14` |
+| `--stage-link` | `#B9C3F0` |
+| `--stage-action` / `--stage-on-action` | `#EEF2F0` / `#1F2745` |
+| `--stage-sand` / `--stage-rose` | `#3A3552` / `#3F2F3E` |
 
-There are exactly two, and nothing else in the system is allowed a `box-shadow`.
-
-```
---shadow-sheet: 0 1px 0 rgba(28,35,32,.05);
---shadow-lift:  0 1px 0 rgba(28,35,32,.05), 0 10px 28px -20px rgba(28,35,32,.45);
-```
-
-`--shadow-sheet` is a sheet lying on the stock (cards, the breathing section).
-`--shadow-lift` is something raised above the page (the settings popover, the
-cookie banner, the keyboard hint, the collapsed mobile nav). Night swaps both
-for black-based equivalents. Focus rings are `outline`, never a shadow.
+**Every colour is a token.** No component may define a colour that exists
+only inside a media query or a `.night` block.
 
 ### Legacy aliases
 
-The old token names still resolve, so a page that has not been converted yet
-keeps rendering: `--bg-primary`, `--text-primary`, `--text-secondary`,
-`--surface`, `--border`, `--shadow`, `--theme-primary`, `--theme-secondary`,
-`--theme-glow`, `--progress-color`. They are declared on `body` (not on
-`:root`) so that they resolve against whichever token set is live.
-`--theme-glow` is now `transparent`: any surviving `0 0 60px var(--theme-glow)`
-renders as nothing. `--border` maps to `--rule`, which is decorative — **new
-work must use `--edge` for a control's boundary.**
+The Paper and Ink names still resolve, in the new palette, so `css/pro.css`,
+`css/account.css` and any page not yet converted keep rendering: `--paper`,
+`--leaf`, `--graphite`, `--rule`, `--edge` (now a hairline, not an outline),
+`--green` (now `--link`), `--chalk`, `--clay` (now `--ink`), `--track`,
+`--shadow-sheet`, `--shadow-lift`, `--rim` (now `--pat`), `--fill` (now
+`--orb`), `--display` and `--ui` (both Figtree). Do not use them in new work.
 
 ---
 
-## 2. The seven technique pairs
+## 3. The seven patterns
 
-Each technique gets a **pair**. The deep **rim** hue carries every text and
-control duty. The chalky **fill** is the circle's interior — decoration, not a
-boundary, and deliberately about 1.5:1 against the page so the circle stays
-soft. That is the honest reading of WCAG 1.4.11: the 3px rim is the thing that
-identifies the control, and it measures 6.06–8.54:1 on paper.
+Each pattern is a **deep tone** (`--pat-*`: the gauge, the eyebrow, the active
+chip) and an **orb** (`--orb-*`: the disc), with three **washes** for the air.
+All seven measure at least 5.5:1 as a deep tone on the ground and carry white
+chip text at 6:1 or better. The phase word is ink on every orb, at 10.7:1 or
+better.
 
-### Day
-
-| Technique | Rim | Fill | Rim L\* / C / hue |
+| Pattern | Deep tone | Orb | Air |
 |---|---|---|---|
-| 4-7-8 (`478`) | `#33407F` | `#C5C5E0` | 29.2 / 40.4 / **292.1°** |
-| Box (`box`) | `#6E3C69` | `#DABFD6` | 33.1 / 33.7 / **329.8°** |
-| Coherence (`coherent`) | `#8C2F49` | `#E5BDC4` | 34.2 / 42.0 / **7.8°** |
-| Cyclic sighing (`sigh`) | `#125A62` | `#A2CFD5` | 34.6 / 21.0 / **210.8°** |
-| Extended exhale (`extended`) | `#7A5310` | `#D8C4AD` | 38.5 / 43.3 / **76.1°** |
-| Triangle (`triangle`) | `#2C5273` | `#B5C9E2` | 33.6 / 23.1 / **263.5°** |
-| Energizing (`wim`) | `#993A20` | `#E4BFB4` | 37.7 / 52.4 / **43.0°** |
+| Deep Sleep (`478`) | dusk, `#C3C9E6` as the working colour | `#C3C9E6` | `#39447E` `#2B3D6B` `#4A3E72` on `#1F2745` |
+| Focus & Grounding (`box`) | plum `#5B4A5E` | `#D6C7D7` | `#E4D2E4` `#F0E2DC` `#D2DADE` |
+| Heart Coherence (`coherent`) | dusty rose `#7A4A52` | `#E3CACC` | `#F0D5D7` `#F2E6D8` `#D9DEE2` |
+| Cyclic Sighing (`sigh`) | sea `#2F5F66` | `#C6DCDE` | `#D0E6E8` `#E5ECDE` `#DADBEA` |
+| Extended Exhale (`extended`) | sand `#7A5F34` | `#E4D6BC` | `#EEE0C4` `#EAE2D7` `#D8E0DD` |
+| Quick Calm (`triangle`) | slate `#3E5670` | `#C9D5E2` | `#D4E0EC` `#E8E6DC` `#D6DEDE` |
+| Energizing Breath (`wim`) | terracotta `#8A4E38` | `#E8CCBB` | `#F2D8C8` `#EEE6DA` `#DCE0DE` |
 
-Every fill is placed at L\* 80.3 with chroma 14.8–15.5 on the rim's own hue, so
-all seven measure 1.50:1 on paper and 9.46:1 or better against the phase word.
+**Deep Sleep dims the room.** `body.theme-478` — and a 4-7-8 timer root on
+any other page, via `[data-breathing-app][data-technique="478"]` — sets the
+dusk stage tokens. Every other pattern is daylight. A technique switch
+cross-fades the room over 500ms: the stage tokens and the washes are
+registered with `@property` so the transition is smooth.
 
-### Hue separation, and why box changed
-
-The primary green `#0F5136` sits at hue **159.5°**. The concept board's box rim
-was `#1C5140` at **167.7°** — 8.2° from the primary, a near-twin that made the
-box pill read as "the site's green" rather than as a technique. It has been
-replaced with a mulberry at **329.8°**, chosen at the midpoint of the largest
-gap left in the wheel.
-
-Eight hues, sorted, with each one's nearest-neighbour gap:
-
-| Hue | Owner | Nearest neighbour |
-|---|---|---|
-| 7.8° | coherent | 35.2° |
-| 43.0° | wim | 33.1° |
-| 76.1° | extended | 33.1° |
-| 159.5° | **primary green** | 51.4° |
-| 210.8° | sigh | 51.4° |
-| 263.5° | triangle | 28.7° |
-| 292.1° | 478 | 28.7° |
-| 329.8° | box | 37.7° |
-
-Smallest gap anywhere: **28.7°** (478 / triangle). Every rim is at least 28°
-from the primary green and from every other rim.
-
-**The 28° rule is measured in CIELAB LCh (D65). Never in HSL.** HSL hue is not
-perceptually uniform and compresses badly exactly where three of these rims sit
-— the blue-to-violet arc. `#33407F` and `#613878` are 48.7° apart in HSL and
-only **23.9°** apart in CIELAB LCh; they read as the same colour on a pill row.
-`#6E3C69` was chosen because it clears the rule in **both** perceptual spaces:
-28.7° in CIELAB LCh and 36.0° in OKLCH. If a rim is ever re-picked, quote the
-CIELAB LCh number, and check OKLCH as a second opinion.
-
-> `tools/brand/tokens.mjs` audits this separation in **HSL**, which is not
-> perceptually uniform. Its table now mirrors this one exactly (box `#6E3C69` /
-> `#DABFD6`, night rim `#D59CCB`), and `node tools/brand/build-assets.mjs
-> --palette` re-verifies it. This document and `css/styles.css` remain the
-> source of truth; the generator follows them. Any social card rendered before
-> 2026-09-10 carried the older `#613878` box violet; every card in `images/og/`
-> and `images/pins/` was re-rendered from the corrected table on 2026-09-11, so
-> the deprecated violet is no longer in any shipped asset.
->
-> The `hue` column in `tools/brand/tokens.mjs` is an **HSL** angle (box 306.0°);
-> the angles quoted in this document are **CIELAB LCh** (box 329.8°). They
-> describe the same colour in two spaces and are not in conflict.
-
-### Night
-
-At night the fills collapse to **one** value — `#1E2426`, the night surface.
-A dark ground cannot carry seven distinguishable tints, and a light filled disc
-at two in the morning is a torch in the face. The rim carries the hue.
-
-| Technique | Night rim |
-|---|---|
-| 4-7-8 | `#93A2E8` |
-| Box | `#D59CCB` (derived: hue 331.4°, L\* 71, C 33) |
-| Coherence | `#F2909F` |
-| Cyclic sighing | `#5FC7D1` |
-| Extended exhale | `#E0B25C` |
-| Triangle | `#8FBBE3` |
-| Energizing | `#F0916B` |
-
-**Night circle = dark fill, light rim, bone phase word. Never a light filled
-disc at night.**
+**At night** the deep tones lighten to their orbs (`--pat-*` = `--orb-*`),
+because a deep tone on a night ground would not clear 3:1, and the washes
+are the pattern's colour mixed into the night ground at 12–22%.
 
 ---
 
-## 3. Type
+## 4. Type
 
 | Face | Where |
 |---|---|
-| **Newsreader** (Google Fonts, OFL; `opsz 6..72`; 400/500/600) | Display, `h1`, `h2`, the wordmark, the phase word inside the circle, technique titles, price figures, post-session headings, the article lead. |
-| **IBM Plex Sans** (400/500/600) | Everything a person operates or scans: body, `h3` and below, nav, buttons, pills, labels, forms, tables, metadata, the timer digits, every number that changes. |
+| **Figtree 300** (Google Fonts, OFL) | Display: `h1`, `h2`, the phase word, the hero. Never under 24px. |
+| **Figtree 400 / 500 / 600** | Everything else: body, `h3` and below, nav, buttons, chips, labels, forms. Nothing a person taps is lighter than 500. |
+| **DM Mono 400 / 500** | Anything counted: the pattern line ("In 4 · Hold 7 · Out 8"), the count under the phase word, the session clock, prices, dates, table numerics, and every small uppercase label (`.eyebrow`, breadcrumbs, footer headings). |
 
-**The rule: the moment a line of type is clickable, it is sans.** A serif that
-can be tapped is a serif that will be misread at one in the morning.
+The real unit of the site is the second. Counts, clocks, prices and dates in
+mono line up, tabulate for free, and mark the instrument out from the prose.
 
-Nothing lighter than 400, anywhere. Micro type floor is **11px**
-(`--fs-micro: 0.6875rem`). The timer digits and every numeric column carry
-`font-variant-numeric: tabular-nums`.
+Micro type floor is **12px** (`--fs-micro: 0.75rem`). Body is 16px / 1.6.
 
 ```
---display: 'Newsreader', ui-serif, Georgia, 'Times New Roman', serif;
---ui: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-      'Helvetica Neue', Arial, sans-serif;
+--sans: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        'Helvetica Neue', Arial, sans-serif;
+--mono: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 ```
 
 Loading (preconnect + non-blocking, on every page):
 
 ```
-https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap
+https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap
 ```
-
-Measured on the shipped timer at a 1240px viewport: phase word 40px Newsreader,
-`h1` 36px Newsreader, timer digits 28px IBM Plex Sans. The phase word is the
-largest thing on the breathing screen, by design.
 
 ---
 
-## 4. The mark
+## 5. The mark
 
-A ring: a circle of radius 40 on a 100-unit grid, stroke 9 (9% of the grid),
-butt caps — not round; this is an instrument, not a bubble — with a **48° gap
-centred at twelve o'clock**, which is 13.3% of the circumference.
+Unchanged in geometry from Paper and Ink: a ring, radius 40 on a 100-unit
+grid, stroke 9, butt caps, a **48° gap centred at twelve o'clock**.
 
 ```html
 <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
@@ -232,324 +190,187 @@ centred at twelve o'clock**, which is 13.3% of the circumference.
 </svg>
 ```
 
-- **Green on paper** in normal use. **Paper on green** when it sits on the
-  primary. **Ink** in monochrome.
-- **Wordmark:** Newsreader 500, "Help Me Breathe", tracking `-0.012em`.
-- **Lockup:** ring + wordmark, with clear space on every side equal to the
-  stroke width times four. At the header's 26px mark that is a 0.6rem gap.
-- At 375px the lockup **shortens to the ring** and the wordmark is hidden.
+- **Ink on mist** in normal use; **bone** at night and on the dusk stage. The
+  lockup inherits `currentColor`, so it is always the same colour as the
+  wordmark beside it.
+- **Wordmark:** Figtree 500, "Help Me Breathe", 17px, tracking `-0.01em`.
+- At 420px and below the lockup shortens to the ring.
 
 ### Favicon and app icon
 
-| Size | Stroke | Gap | Ground |
-|---|---|---|---|
-| 16px | 20% of the grid | 56° | transparent, ring in `--green` |
-| 32px | 16% of the grid | 52° | transparent, ring in `--green` |
-| 192 / 512 app icon | 9% (the master) | 48° | `#0F5136` tile, radius 22%, paper ring, maskable safe zone respected |
+`tools/brand/build-assets.mjs --only=icons,logo` regenerates everything from
+`tools/brand/tokens.mjs`: `favicon.svg` (ink ring, bone in dark chrome, on a
+transparent ground), `favicon-16.png`, `favicon-32.png`, and the app icons as
+an **ink tile with a mist ring** (`images/icon-192.png`, `icon-512.png`,
+`apple-touch-icon.png`). `manifest.json` carries `background_color #F4F6F5`
+and `theme_color #0F1B1E`; every page's `theme-color` is `#F4F6F5` with a
+`#0F1620` dark-scheme entry listed first.
 
-The stroke thickens and the gap widens as the icon shrinks so that both survive
-a single device pixel. The favicon ring is green on a **transparent** ground so
-it reads on light and dark browser chrome alike.
-
-Pages reference `/favicon.svg`, `/favicon-32.png`, `/favicon-16.png` and
-`/images/apple-touch-icon.png`. **Never an emoji data URI.**
-
----
-
-## 5. The breathing object
-
-The circle is the mark, running. Two objects, one idea (revised 2026-09-11,
-after the owner rejected the first build's pale disc and dotted calipers):
-
-- The **disc** is the technique's ink: a solid circle filled with `--rim`,
-  no border, 260 units across on the 320-unit stage, scaling between 0.72 and
-  1.00 with the breath. The phase word sits on it in `--disc-ink` (`--chalk`
-  in both modes: white type on a deep ink by day, dark type on a pale wash by
-  night).
-- The **ring** around it is the mark itself, drawn at r=150 on the same stage
-  as three SVG circles:
-  - `.ring-track`, the rail: 2.5px in `--track`, a full turn minus the 48°
-    gap, which starts 24° past twelve o'clock (`rotate(-66deg)`, dasharray
-    816.81 / 942.48).
-  - `.ring-live`, the gauge: 3.5px in `--rim` on the same rail. It **fills
-    clockwise on an in-breath, drains on an out-breath and stays where it is
-    through a hold**. `js/app.js` publishes `--ring-from` and `--ring-to`
-    (stroke-dashoffset values: 816.81 is empty, 0 is full) at every phase
-    boundary; four animation names, one per phase kind, restart the sweep.
-  - `.ring-bridge`, the gap: 3.5px in `--rim` over the 48° at twelve o'clock,
-    opacity 0. On a **hold** it fades in over 240ms, so the ring completes
-    itself for as long as you are holding your breath, and fades out when the
-    hold ends.
-- Above the stage: the technique's short name as an eyebrow in `--rim`
-  (`data-role="technique-eyebrow"`), the technique name in Newsreader
-  (`data-role="technique-title"`) and the pattern in words
-  (`data-role="pattern-line"`, "In 4 · Hold 7 · Out 8"). The gear sits to the
-  right of that block, inside the app root.
-- The **phase word** is the largest text on the screen — Newsreader, larger than
-  the timer digits — with a per-second count beneath it (`Inhale` / `3`). Both
-  sit outside the scaled disc so they never shrink with it.
-- During a hold the disc is **still**, with a 0.4% drift so the frame never
-  reads as a crashed tab. The gauge holds its level; the bridge is closed.
-- The per-phase progress bar is gone from view (the ring carries the phase);
-  the session bar and the remaining time sit under the instruction line.
-- **Begin is disabled while a session runs. Pause is the primary control during
-  a session. Stop is secondary.** On a phone the three controls are equal
-  thirds on one row.
-- The `.circle-notch` span and the `.caliper` / `.pacer-ring` classes are
-  legacy: still in the markup contract, they draw nothing.
+The Open Graph cards and the Pinterest pins (`images/og/`, `images/pins/`)
+were rendered under Paper and Ink and have **not** been re-rendered yet. They
+are images; nothing on the site depends on them being updated first.
 
 ---
 
-## 6. Motion
+## 6. The stage
 
-Scale is the whole animation.
+`css/styles.css` section 7. Three objects, one idea.
+
+- **The orb** (`.breathing-circle`) is the pattern's tint, 74% of the stage
+  at full inhale, scaling between 0.72 and 1.00 with the breath, lit from
+  within by a soft glow (`box-shadow` in the orb's own colour at 55%). Two
+  **halo rings** are drawn on it as pseudo-elements at −6% and −13%, in the
+  deep tone at 22% and 11% opacity, so they scale with it and just reach the
+  gauge at the top of the breath. The phase word sits on it in ink
+  (`--disc-ink: #0F1B1E`) in Figtree 300, with the count beneath in mono.
+- **The gauge** (`.ring-track` / `.ring-live` / `.ring-bridge` at r=150 on a
+  320 stage) is the mark, alive: a 2px rail in `--track` with the 48° gap; a
+  3px live arc in the deep tone that **fills clockwise on an in-breath,
+  drains on an out-breath and holds through a hold**; and a bridge that
+  closes the gap for as long as you hold. `js/app.js` publishes `--ring-from`
+  / `--ring-to` (816.81 empty, 0 full) at every phase boundary. This contract
+  is unchanged.
+- **The air** (`.breathing-section > .air`, three `<i>` washes) is dropped in
+  by `js/stage.js` and reaches from the top of the page to the bottom of the
+  timer section. Each wash is a radial of one of the pattern's air colours,
+  84vmin across (the third 64vmin), drifting and swelling over 52–64 seconds
+  and reversing. `js/stage.js` also measures `--stage-h` and `--stage-above`
+  so the stage's ground (painted as a band on `body`) ends exactly where the
+  section does. Without the script the band is one screen tall and the
+  washes start at the section — still correct.
+
+The **app bar** is left-aligned: the eyebrow (the pattern's short name, mono),
+the pattern's name (Figtree 500), the pattern line (mono), and the gear at the
+right as a well circle. Begin is the black pill; Pause takes it over while a
+session runs; Stop is a well pill. The seven chips are well pills with no dot;
+the active one is filled in the pattern's deep tone (its orb at dusk and at
+night). On a phone the chips scroll sideways in one row.
+
+**Two timers on one page** (`.timer-pair`): each timer root is its own room —
+a rounded card in its own stage colours — and the page-wide band and the
+washes are off.
+
+---
+
+## 7. Motion
 
 | | |
 |---|---|
-| Inhale | 0.72 → 1.00, `cubic-bezier(.33, 0, .20, 1)` |
+| Inhale | orb 0.72 → 1.00, `cubic-bezier(.33, 0, .20, 1)` |
 | Exhale | 1.00 → 0.72, `cubic-bezier(.42, 0, .30, 1)` |
 | Hold | still (0.4% drift) |
 | Cyclic sighing top-up | overshoots to 1.08 |
 | Phase word | cross-fade, 160ms, opacity only |
-| Ring gauge | `stroke-dashoffset`, linear, over the phase duration, from `--ring-from` to `--ring-to` |
-| Ring bridge | 240ms linear, opacity only |
-| Technique switch | the accent tokens cross-fade over 400ms; the page ground never moves |
+| Gauge | `stroke-dashoffset`, linear, over the phase duration |
+| Bridge | 240ms linear, opacity only |
+| The air | each wash: translate 7% / 5% and scale 1 → 1.14, 52–64s, ease-in-out, alternate |
+| Technique switch | stage tokens, washes and orb cross-fade over 500ms; the page below never moves |
+| A press | 1px of travel, no transition |
 
-Each pattern has its own keyframe block whose percentages are that pattern's
-phase boundaries. The cycle length is declared **in CSS** as well as inline by
-`js/app.js`: the engine clears the whole `animation` shorthand to force a
-restart on a technique swap, which also clears its own inline duration, so CSS
-has to carry the canonical value. Change a phase duration in
-`js/techniques.js` and you must change the matching `animation-duration` in
-`css/styles.css`.
+The pattern keyframes (`breathe-478` … `breathe-wim`) are unchanged: each
+block's percentages are that pattern's phase boundaries, and the cycle length
+is declared in CSS as well as inline by `js/app.js`. Change a duration in
+`js/techniques.js` and you must change the matching `animation-duration`.
 
 ### Reduced motion
 
-`prefers-reduced-motion: reduce` gets **targeted rules, never a blanket
-transition kill** — the old blanket rule murdered the phase cross-fade, which is
-the one cue a person actually needs.
-
-- The disc holds one size (scale 0.86) and its scale animation is off.
-- The pace is carried by the ring gauge, which is the same object everyone
-  else sees: a thin line filling linearly is the cue a person asked to keep,
-  not the vestibular trigger they asked to lose.
-- The numeric count still ticks.
-- The session bar still advances, in whole-second steps (`js/app.js` quantises
-  it under this preference).
-- The bridge still opens and closes — instantly.
-- **Audio and vibration cues are exempt.** They are not motion.
+Targeted rules, never a blanket transition kill. The orb holds one size
+(0.86); the gauge still fills and drains; the count still ticks; the bridge
+opens and closes instantly; **the air holds still**; the technique cross-fade
+is off. Audio and vibration cues are not motion and are not touched.
 
 ---
 
-## 7. Components
+## 8. Components
 
 | Component | Rule |
 |---|---|
-| Buttons | radius 8px, **1px borders only**, minimum **44px rendered height** (measure the box, not the padding). Primary = green / chalk. Secondary = leaf with an `--edge` border. Quiet = borderless graphite. |
-| Technique pills | radius 999px, `--edge` border, an accent dot (`::before`) in **that technique's own** rim colour. Active = a doubled border in the rim colour (`::after` inset ring, so nothing shifts) **plus weight 600** — never colour alone. |
-| Settings | a printed form in a popover: leaf, `--edge` border, `--shadow-lift`. The toggle has an `--edge` border in its off state and turns green when on; the track is 30px but the hit area is 44px. Native `<select>` for the duration. |
-| App bar | technique title left, settings gear right, hairline beneath, sitting directly under the site header so the two read as one header stack. |
-| Technique card | a 3px top rule in the rim colour. |
-| Contraindication callout | 3px `--warn` left rule on leaf. |
-| Crisis block | a full 1px `--bad` border on leaf. Carries **Embrace 1564** (Lebanon) alongside 988, 116 123 and findahelpline.com. |
-| Article header | breadcrumb eyebrow → `h1` → lead → a hairline-ruled strip with the author's name and role on the left and Published / Reviewed dates in tabular figures on the right. **The site has no medical reviewer. Never invent one.** |
-| Pricing | one plan card on `/pro`: the interval toggle, the price, the honest trial statement, one filled primary button, the fine print, and one list of what is included. No matrix, no columns, no ticks and crosses. Directly under the card, a small line saying the price is in US dollars, sold by our merchant of record who collects any VAT or sales tax, and that there is a 14-day unconditional refund. |
-| Cookie banner | a leaf card. **Decline is listed first and weighted exactly the same as Accept.** |
-| Ad slot | 1px dashed `--edge` on paper, label in `--graphite` (never `--edge` for text), reserved height so CLS stays 0. |
-| Footer | 1px `--ink` top rule, four link columns, an authorship byline naming a person, then the legal row. |
-| Site header | on **every** page: leaf ground, hairline bottom rule, the lockup linking to `/`, nav Timer · Guides · Science · Pro. **The Pro link is not accent-coloured.** At 640px and below the nav collapses behind a menu button; at 420px and below the wordmark drops and the lockup is the ring alone. |
+| Buttons | pills (`--radius-pill`), no border, 44px minimum rendered height (52px for Begin). Primary = `--action` / `--on-action`. Secondary = `--well`. Quiet = text in `--link`. Hover on a primary is opacity .88, never a colour change. |
+| Chips | well pills, no dot. Active = the pattern's `--chip-on` fill with `--on-chip` text, weight 600. |
+| Fields | wells (`--well`), radius 14px, no border. The focus ring is the boundary. |
+| Switch | a well track with a muted knob; `--action` with an `--on-action` knob when on. The track is 30px, the hit area 44px. |
+| Settings | a sheet: `--surface`, radius 18px, `--lift-high`. |
+| Cards | `--surface`, radius 18px (24px for the plan card), `--lift`. Hover lifts to `--lift-high`. Never a border. |
+| Caution callout | a `--sand` card, no stripe. |
+| Crisis block | a `--rose` card; helpline numbers in mono. |
+| Neutral callout | a `--surface` card. |
+| Steps | one card per step, the number in mono (`01`, `02` …) at the left. |
+| FAQ | one card per question. |
+| Article header | breadcrumb (mono eyebrow) → `h1` (Figtree 300) → lead → a hairline-ruled strip: author and role on the left, Published / Reviewed dates in mono on the right. **The site has no medical reviewer. Never invent one.** |
+| Pricing | the price is the biggest thing on the surface, in mono, in ink; the tax line beneath in the same voice; the interval switch a segmented pill on a well; the trial terms in one well; one black pill. No matrix, no columns, no ticks and crosses. |
+| Consent sheet | a rounded `--surface` sheet along the bottom edge. **Decline is listed first and weighted exactly the same as Accept**; both are well pills. |
+| Ad slot | a well, radius 18px, the "Advertisement" label in mono. Reserved height so CLS stays 0. |
+| Footer | hairline top rule, four link columns with mono headings, the authorship byline, the legal row. |
+| Site header | on every page: the lockup and nav Timer · Guides · Science · Pro. **White on a reading page; transparent on the stage.** The Pro link is not accent-coloured. At 640px and below the nav collapses into a lifted sheet behind a Menu pill. |
 
 ---
 
-## 8. Do and don't
+## 9. Do and don't
 
 **Do**
 
-- Let the accent touch three things: the circle, the progress fill, the pill dot.
-- Use `--edge` for anything a person can operate, `--rule` for anything they
-  merely read across.
-- Set numbers that change in tabular figures.
-- Keep the page ground identical on every page and in every technique.
+- Let the pattern's colour touch four things: the orb, the gauge, the eyebrow,
+  the active chip.
+- Put anything counted in DM Mono.
+- Keep the page ground identical on every reading page.
 - Write the count, the phase and the remaining time as plain text. A person
   half-asleep should not have to interpret a colour.
 
 **Don't**
 
-- Don't use `--clay` on the timer screen. It is the commerce voice; the timer is
-  not for sale.
-- Don't colour the Pro link in the nav. It is a page, not a pitch.
-- Don't put a technique hue on the page background, the header, or body text.
-- Don't add a third shadow.
-- Don't use `--rule` as a control boundary or `--edge` as a text colour.
-- Don't reach for an emoji, a gradient, a blur or a glow. They are gone on
-  purpose.
+- Don't draw a border. If a shape needs an edge, it needs a shadow or a fill.
+- Don't put a dot next to a name.
+- Don't make anything black that is not the dusk room or a primary button.
+- Don't put a coloured stripe on a card.
+- Don't add a third shadow, a fourth wash, or a gradient anywhere but the air.
+- Don't reach for an emoji.
 
 ---
 
-## 9. Measured contrast
+## 10. Measured contrast
 
-Computed in Node with the WCAG 2.x relative-luminance formula (sRGB
-linearisation, then `(L_light + 0.05) / (L_dark + 0.05)`).
-**163 pairs checked, 0 failures.** Minimum text ratio 4.64:1; minimum control
-ratio 3.22:1. `tools/` has no contrast runner; the audit is re-run by parsing
-the token blocks straight out of `css/styles.css`, so the table cannot drift
-from the stylesheet without someone noticing.
+Computed with the WCAG 2.x relative-luminance formula. Nothing on the site sits
+below 4.5:1 as text or 3:1 as a control.
 
-Three pairs were missing from the first audit and one of them failed. They are
-in the table now:
+| Pair | Ratio |
+|---|---|
+| ink on ground / on white | 16.18 / 17.56 |
+| muted on ground / on white | 5.11 / 5.55 |
+| link on white / on ground | 7.40 / 6.81 |
+| on-action on action | 17.56 |
+| ink on sand / on rose | 15.21 / 14.51 |
+| muted on sand / in a well | 4.81 / 4.74 |
+| each deep tone on ground | box 7.48 · coherent 6.61 · sigh 6.56 · extended 5.51 · triangle 6.98 · wim 5.99 |
+| white on each deep tone (the active chip) | 8.12 · 7.17 · 7.12 · 5.98 · 7.58 · 6.51 |
+| ink on each orb (the phase word) | 10.88 · 11.36 · 12.29 · 12.25 · 11.79 · 11.53; dusk orb 10.72 |
+| bone on dusk / dusk muted on dusk | 12.96 / 6.92 |
+| dusk orb on dusk (the gauge) | 8.94 |
+| NIGHT ink on ground / on surface | 16.09 / 14.26 |
+| NIGHT muted on surface | 6.97 |
+| NIGHT link on ground | 10.63 |
 
-- The **session progress fill** was `--edge` on `--track` — `#83887E` on
-  `#DFD8C7`, **2.55:1**. It is `--graphite` now (4.64:1 day, 5.75:1 night).
-- The **caliper rings** were `--edge` at `opacity: 0.5`, an effective
-  `#C1C3BB` at **1.75:1**. They mark full inhale and full exhale, so they carry
-  no opacity now: plain `--edge`, 3.22:1 on `--paper` (the kiosk ground) and
-  3.57:1 on `--leaf`. `opacity: 0.9` was tried first and still failed on paper
-  at 2.79:1.
-- The **breadcrumb separator glyph** was drawn in `--rule` at 1.15:1. A
-  separator is type, not a hairline; it inherits `--graphite` now.
-
-| Pair | Foreground | Background | Ratio | Needs | |
-|---|---|---|---|---|---|
-| body text on page ground | `#1C2320` | `#F5F1E8` | 14.21 | 4.5 | PASS |
-| body text on surface | `#1C2320` | `#FFFDF7` | 15.75 | 4.5 | PASS |
-| muted text on page ground | `#575F58` | `#F5F1E8` | 5.85 | 4.5 | PASS |
-| muted text on surface | `#575F58` | `#FFFDF7` | 6.49 | 4.5 | PASS |
-| link / primary text on ground | `#0F5136` | `#F5F1E8` | 8.28 | 4.5 | PASS |
-| link / primary text on surface | `#0F5136` | `#FFFDF7` | 9.17 | 4.5 | PASS |
-| button label on primary | `#FFFFFF` | `#0F5136` | 9.33 | 4.5 | PASS |
-| commerce accent on ground | `#8A4B24` | `#F5F1E8` | 5.99 | 4.5 | PASS |
-| commerce accent on surface | `#8A4B24` | `#FFFDF7` | 6.63 | 4.5 | PASS |
-| label on commerce accent | `#FFFFFF` | `#8A4B24` | 6.75 | 4.5 | PASS |
-| success on surface | `#1B6B45` | `#FFFDF7` | 6.38 | 4.5 | PASS |
-| warning on surface | `#7E5406` | `#FFFDF7` | 6.54 | 4.5 | PASS |
-| danger on surface | `#A32721` | `#FFFDF7` | 7.19 | 4.5 | PASS |
-| muted text on progress trough | `#575F58` | `#DFD8C7` | 4.64 | 4.5 | PASS |
-| control outline on ground | `#83887E` | `#F5F1E8` | 3.22 | 3.0 | PASS |
-| control outline on surface | `#83887E` | `#FFFDF7` | 3.57 | 3.0 | PASS |
-| session progress fill on trough | `#575F58` | `#DFD8C7` | 4.64 | 3.0 | PASS |
-| caliper ring on surface | `#83887E` | `#FFFDF7` | 3.57 | 3.0 | PASS |
-| caliper ring on ground (kiosk) | `#83887E` | `#F5F1E8` | 3.22 | 3.0 | PASS |
-| breadcrumb separator on surface | `#575F58` | `#FFFDF7` | 6.49 | 4.5 | PASS |
-| link-card boundary on surface | `#83887E` | `#FFFDF7` | 3.57 | 3.0 | PASS |
-| focus ring on ground | `#0F5136` | `#F5F1E8` | 8.28 | 3.0 | PASS |
-| progress trough on ground | `#DFD8C7` | `#F5F1E8` | 1.26 | — | decoration |
-| hairline rule on ground | `#E3DCCC` | `#F5F1E8` | 1.21 | — | decoration |
-| rim (478) on ground | `#33407F` | `#F5F1E8` | 8.54 | 3.0 | PASS |
-| rim (box) on ground | `#6E3C69` | `#F5F1E8` | 7.41 | 3.0 | PASS |
-| rim (coherent) on ground | `#8C2F49` | `#F5F1E8` | 7.12 | 3.0 | PASS |
-| rim (sigh) on ground | `#125A62` | `#F5F1E8` | 6.99 | 3.0 | PASS |
-| rim (extended) on ground | `#7A5310` | `#F5F1E8` | 6.06 | 3.0 | PASS |
-| rim (triangle) on ground | `#2C5273` | `#F5F1E8` | 7.27 | 3.0 | PASS |
-| rim (wim) on ground | `#993A20` | `#F5F1E8` | 6.25 | 3.0 | PASS |
-| rim (478) on its own fill | `#33407F` | `#C5C5E0` | 5.70 | 3.0 | PASS |
-| rim (box) on its own fill | `#6E3C69` | `#DABFD6` | 4.94 | 3.0 | PASS |
-| rim (coherent) on its own fill | `#8C2F49` | `#E5BDC4` | 4.74 | 3.0 | PASS |
-| rim (sigh) on its own fill | `#125A62` | `#A2CFD5` | 4.66 | 3.0 | PASS |
-| rim (extended) on its own fill | `#7A5310` | `#D8C4AD` | 4.04 | 3.0 | PASS |
-| rim (triangle) on its own fill | `#2C5273` | `#B5C9E2` | 4.85 | 3.0 | PASS |
-| rim (wim) on its own fill | `#993A20` | `#E4BFB4` | 4.16 | 3.0 | PASS |
-| phase word on fill (478) | `#1C2320` | `#C5C5E0` | 9.49 | 7.0 | PASS |
-| phase word on fill (box) | `#1C2320` | `#DABFD6` | 9.46 | 7.0 | PASS |
-| phase word on fill (coherent) | `#1C2320` | `#E5BDC4` | 9.47 | 7.0 | PASS |
-| phase word on fill (sigh) | `#1C2320` | `#A2CFD5` | 9.48 | 7.0 | PASS |
-| phase word on fill (extended) | `#1C2320` | `#D8C4AD` | 9.48 | 7.0 | PASS |
-| phase word on fill (triangle) | `#1C2320` | `#B5C9E2` | 9.47 | 7.0 | PASS |
-| phase word on fill (wim) | `#1C2320` | `#E4BFB4` | 9.47 | 7.0 | PASS |
-| fill (478) on ground | `#C5C5E0` | `#F5F1E8` | 1.50 | — | decoration |
-| fill (box) on ground | `#DABFD6` | `#F5F1E8` | 1.50 | — | decoration |
-| fill (coherent) on ground | `#E5BDC4` | `#F5F1E8` | 1.50 | — | decoration |
-| fill (sigh) on ground | `#A2CFD5` | `#F5F1E8` | 1.50 | — | decoration |
-| fill (extended) on ground | `#D8C4AD` | `#F5F1E8` | 1.50 | — | decoration |
-| fill (triangle) on ground | `#B5C9E2` | `#F5F1E8` | 1.50 | — | decoration |
-| fill (wim) on ground | `#E4BFB4` | `#F5F1E8` | 1.50 | — | decoration |
-| NIGHT body text on ground | `#EDE7DA` | `#15191A` | 14.37 | 4.5 | PASS |
-| NIGHT body text on surface | `#EDE7DA` | `#1E2426` | 12.76 | 4.5 | PASS |
-| NIGHT muted on ground | `#A7AEA4` | `#15191A` | 7.79 | 4.5 | PASS |
-| NIGHT muted on surface | `#A7AEA4` | `#1E2426` | 6.91 | 4.5 | PASS |
-| NIGHT link / primary on ground | `#5FBF92` | `#15191A` | 7.89 | 4.5 | PASS |
-| NIGHT label on primary | `#15191A` | `#5FBF92` | 7.89 | 4.5 | PASS |
-| NIGHT commerce accent on ground | `#D9A279` | `#15191A` | 7.92 | 4.5 | PASS |
-| NIGHT success on surface | `#6FCB9B` | `#1E2426` | 8.01 | 4.5 | PASS |
-| NIGHT warning on surface | `#E0B25C` | `#1E2426` | 8.01 | 4.5 | PASS |
-| NIGHT danger on surface | `#F0918A` | `#1E2426` | 6.83 | 4.5 | PASS |
-| NIGHT control outline on ground | `#767D77` | `#15191A` | 4.19 | 3.0 | PASS |
-| NIGHT control outline on surface | `#767D77` | `#1E2426` | 3.72 | 3.0 | PASS |
-| NIGHT session progress fill on trough | `#A7AEA4` | `#2B3233` | 5.75 | 3.0 | PASS |
-| NIGHT caliper ring on surface | `#767D77` | `#1E2426` | 3.72 | 3.0 | PASS |
-| NIGHT caliper ring on ground (kiosk) | `#767D77` | `#15191A` | 4.19 | 3.0 | PASS |
-| NIGHT rim (478) on ground | `#93A2E8` | `#15191A` | 7.23 | 3.0 | PASS |
-| NIGHT rim (box) on ground | `#D59CCB` | `#15191A` | 7.97 | 3.0 | PASS |
-| NIGHT rim (coherent) on ground | `#F2909F` | `#15191A` | 7.81 | 3.0 | PASS |
-| NIGHT rim (sigh) on ground | `#5FC7D1` | `#15191A` | 8.92 | 3.0 | PASS |
-| NIGHT rim (extended) on ground | `#E0B25C` | `#15191A` | 9.02 | 3.0 | PASS |
-| NIGHT rim (triangle) on ground | `#8FBBE3` | `#15191A` | 8.76 | 3.0 | PASS |
-| NIGHT rim (wim) on ground | `#F0916B` | `#15191A` | 7.56 | 3.0 | PASS |
-| NIGHT rim (478) on the one dark fill | `#93A2E8` | `#1E2426` | 6.42 | 3.0 | PASS |
-| NIGHT rim (box) on the one dark fill | `#D59CCB` | `#1E2426` | 7.07 | 3.0 | PASS |
-| NIGHT rim (coherent) on the one dark fill | `#F2909F` | `#1E2426` | 6.94 | 3.0 | PASS |
-| NIGHT rim (sigh) on the one dark fill | `#5FC7D1` | `#1E2426` | 7.92 | 3.0 | PASS |
-| NIGHT rim (extended) on the one dark fill | `#E0B25C` | `#1E2426` | 8.01 | 3.0 | PASS |
-| NIGHT rim (triangle) on the one dark fill | `#8FBBE3` | `#1E2426` | 7.78 | 3.0 | PASS |
-| NIGHT rim (wim) on the one dark fill | `#F0916B` | `#1E2426` | 6.71 | 3.0 | PASS |
-| NIGHT phase word on the one dark fill | `#EDE7DA` | `#1E2426` | 12.76 | 7.0 | PASS |
-
-Do **not** publish a formal WCAG or EN 301 549 conformance claim (hard rule 12).
-This table is our own measurement, nothing more.
+Do **not** publish a formal WCAG or EN 301 549 conformance claim. This table is
+our own measurement, nothing more.
 
 ---
 
-## 10. Where this could go wrong
+## 11. Where this could go wrong
 
-An honest register of the bets in this identity, and what to do if one of them
-turns out badly.
-
-1. **Warm paper is bright on OLED.** `#F5F1E8` full-screen on a modern phone at
-   night is a lot of light. This is why dark-by-preference is honoured for
-   everyone rather than sold as a Pro feature, and why the night circle is a
-   dark disc with a light rim. If people still complain, dim `--paper` toward
-   `#EFEADF` before touching anything else — the contrast table has headroom.
-
-2. **Newsreader is fragile below 30px on low-DPI Windows.** It is an optical-size
-   serif and at 13–15px on a 96dpi panel the hairlines thin out. The system
-   already forbids serif on anything small or clickable; if a page turns out to
-   be setting Newsreader at body size, that is a bug in the page, not a reason
-   to change the face.
-
-3. **Box vs the primary green.** The board's box rim was 8.2° from `--green` and
-   read as the site colour rather than as a technique. It is now mulberry at
-   329.8°. If mulberry ever tests badly for "grounding", move it — but keep the
-   28° minimum from the primary and from every other rim, and re-run the hue
-   table.
-
-4. **28.7° is the tightest hue gap** (478 vs triangle, both blues). They are far
-   apart in chroma (40.4 vs 23.1) which does most of the separating work, but
-   the pill dot is only 9px. That is why the active state is a doubled border
-   *plus* weight 600, and why every pill carries its name in words.
-
-5. **The fill is 1.5:1 against the page.** That is deliberate — the rim is the
-   boundary — but it will look "washed out" to anyone expecting the old solid
-   disc. Resist raising it. Raising the fill's chroma is what pushes the phase
-   word toward failing.
-
-6. **If session completion drops after this rebrand, slow the exhale easing
-   before you restore anything.** The most likely cause is that the exhale now
-   ends decisively rather than fading away. Try
-   `cubic-bezier(.42, 0, .18, 1)` on the exhale, then a longer notch fade.
-   Do not bring back the glow: it was never what made people finish.
-
-7. **The notch fade depends on a CSS transition.** In a throttled preview the
-   transition can sit pinned at its start value. On a real, visible tab it runs;
-   the cascade itself was verified (removing the transition puts the notch at
-   opacity 0 during a hold). If the closed notch is ever reported as not
-   working in a real browser, move it to a keyframe animation keyed to
-   `[data-phase]` — the mechanism is already used for the phase word and the
-   reduced-motion pacing ring.
-
-8. **`--clay` on paid surfaces only** now has a mechanism behind it. It did
-   leak — into the post-session paywall card in `css/pro.css` — and
-   `tools/site-check.mjs` gained a `clay-on-timer` rule on 2026-09-11 that fails
-   the build on `var(--clay)` under any selector scoped to `.breathing-section`,
-   `[data-slot="post-session"]`, `.post-session-card` or `.paywall-card`. The
-   on-timer offer speaks in the neutral voice: `--ink` price, `--green` button.
-   `--clay` stays on `/pro` (and on the home page's `.plan-band` price figure
-   and button, which point there).
+1. **The dusk room on a daytime page.** Deep Sleep dims the room wherever it
+   is the pattern, including `/breathing-exercises-anxiety`, which opens on
+   4-7-8. If that reads wrong, the fix is the page's `data-technique`, not the
+   rule.
+2. **The washes are subtle by design.** On a low-contrast panel they can
+   vanish. Before raising their chroma, raise their size; the tints are one
+   step from the ground so the text on top never loses contrast.
+3. **`:has()` carries the stage band.** Browsers without it (Firefox before
+   121, Safari before 15.4) get a white header on a timer page and no band;
+   the timer itself is unaffected.
+4. **`@property` carries the cross-fade.** Without it the technique switch
+   cuts instead of fading. Nothing breaks.
+5. **Three drifting elements on a phone.** They are transform-only and
+   `will-change: transform`; if a low-end device stutters, drop the third
+   wash before touching the orb.
+6. **Figtree 300 on low-DPI Windows** thins out under 24px. The system already
+   forbids it there; if a page sets 300 at body size, that is a bug in the
+   page.

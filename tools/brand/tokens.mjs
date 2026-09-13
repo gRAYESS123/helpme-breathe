@@ -1,5 +1,5 @@
 /**
- * Help Me Breathe — "Paper and Ink" brand tokens.
+ * Help Me Breathe — "Lantern" brand tokens.
  *
  * The single source of truth for every generated brand asset (favicons, app
  * icons, the lockup, Open Graph cards, Pinterest pins). These values mirror
@@ -13,38 +13,38 @@
  * Day tokens — the one brand palette
  * ------------------------------------------------------------------ */
 export const DAY = {
-  paper: '#F5F1E8', // page ground — warm leaflet stock
-  leaf: '#FFFDF7', // surface: cards, panels, header
-  ink: '#1C2320', // text
-  graphite: '#575F58', // muted text
-  rule: '#E3DCCC', // decorative hairline ONLY
-  edge: '#83887E', // control outlines
-  track: '#DFD8C7', // progress trough, input wells
-  green: '#0F5136', // primary
-  chalk: '#FFFFFF', // ink on primary
-  clay: '#8A4B24', // commerce accent — paid surfaces only
-  ok: '#1B6B45',
-  warn: '#7E5406',
-  bad: '#A32721',
+  paper: '#F4F6F5', // page ground — mist
+  leaf: '#FFFFFF', // surface: cards
+  ink: '#0F1B1E', // text, and the mark
+  graphite: '#5C6B6E', // muted text
+  rule: '#DDE3E1', // hairline between rows
+  edge: '#DDE3E1', // legacy alias: nothing has a control outline any more
+  track: '#EAEEEC', // wells
+  green: '#1E5F5A', // links
+  chalk: '#F7F8F7', // ink on a primary button
+  clay: '#0F1B1E', // legacy alias: the price is ink now
+  ok: '#1F6B4B',
+  warn: '#8A5A0A',
+  bad: '#B23A2E',
 };
 
 /* ------------------------------------------------------------------ *
  * Night tokens
  * ------------------------------------------------------------------ */
 export const NIGHT = {
-  paper: '#15191A',
-  leaf: '#1E2426',
-  ink: '#EDE7DA',
-  graphite: '#A7AEA4',
-  rule: '#2E3536',
-  edge: '#767D77',
-  track: '#2B3233',
-  green: '#5FBF92',
-  chalk: '#15191A',
-  clay: '#D9A279',
+  paper: '#0F1620',
+  leaf: '#182430',
+  ink: '#EEF2F0',
+  graphite: '#9DB0B3',
+  rule: '#24343A',
+  edge: '#24343A',
+  track: '#1F2D3A',
+  green: '#8FD3C4',
+  chalk: '#0F1620',
+  clay: '#EEF2F0',
   ok: '#6FCB9B',
-  warn: '#E0B25C',
-  bad: '#F0918A',
+  warn: '#E5B96A',
+  bad: '#F09A8E',
 };
 
 /* ------------------------------------------------------------------ *
@@ -65,14 +65,17 @@ export const NIGHT = {
  * ------------------------------------------------------------------ */
 export const TECHNIQUE_ORDER = ['478', 'box', 'coherent', 'sigh', 'extended', 'triangle', 'wim'];
 
+/* Lantern: `rim` is the pattern's deep tone (the gauge, the active chip);
+ * `fill` is the orb. 4-7-8 dims the room to dusk, so its working colour is
+ * the moonlight orb itself. At night every rim lightens to its orb. */
 export const ACCENTS = {
-  478: { rim: '#33407F', fill: '#C5C5E0', hue: 229.7, nightRim: '#93A2E8', label: '4-7-8' },
-  box: { rim: '#6E3C69', fill: '#DABFD6', hue: 306.0, nightRim: '#D59CCB', label: 'Box' },
-  coherent: { rim: '#8C2F49', fill: '#E5BDC4', hue: 343.2, nightRim: '#F2909F', label: 'Coherence' },
-  sigh: { rim: '#125A62', fill: '#A2CFD5', hue: 186.0, nightRim: '#5FC7D1', label: 'Cyclic sighing' },
-  extended: { rim: '#7A5310', fill: '#D8C4AD', hue: 37.9, nightRim: '#E0B25C', label: 'Extended exhale' },
-  triangle: { rim: '#2C5273', fill: '#B5C9E2', hue: 207.9, nightRim: '#8FBBE3', label: 'Triangle' },
-  wim: { rim: '#993A20', fill: '#E4BFB4', hue: 12.9, nightRim: '#F0916B', label: 'Energizing' },
+  478: { rim: '#1F2745', fill: '#C3C9E6', hue: 229.0, nightRim: '#C3C9E6', label: '4-7-8' },
+  box: { rim: '#5B4A5E', fill: '#D6C7D7', hue: 291.0, nightRim: '#D6C7D7', label: 'Box' },
+  coherent: { rim: '#7A4A52', fill: '#E3CACC', hue: 350.0, nightRim: '#E3CACC', label: 'Coherence' },
+  sigh: { rim: '#2F5F66', fill: '#C6DCDE', hue: 187.6, nightRim: '#C6DCDE', label: 'Cyclic sighing' },
+  extended: { rim: '#7A5F34', fill: '#E4D6BC', hue: 36.9, nightRim: '#E4D6BC', label: 'Extended exhale' },
+  triangle: { rim: '#3E5670', fill: '#C9D5E2', hue: 211.2, nightRim: '#C9D5E2', label: 'Triangle' },
+  wim: { rim: '#8A4E38', fill: '#E8CCBB', hue: 16.1, nightRim: '#E8CCBB', label: 'Energizing' },
 };
 
 /** The night fill collapses to one dark value — a dark ground cannot carry
@@ -90,12 +93,14 @@ export function accentFor(theme) {
  * Type
  * ------------------------------------------------------------------ */
 export const FONT_CSS_URL =
-  'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap';
+  'https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap';
 
 export const DISPLAY_STACK =
-  "'Newsreader', ui-serif, Georgia, 'Times New Roman', serif";
+  "'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
 export const UI_STACK =
-  "'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+  "'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+export const MONO_STACK =
+  "'DM Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 
 /** Fallback-only stacks, used inside images/logo.svg where no webfont can be
  *  loaded. Kept identical to the site stacks minus the webfont name only when

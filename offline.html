@@ -14,8 +14,8 @@
     <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
-    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
-    <meta name="theme-color" content="#F5F1E8">
+    <meta name="theme-color" content="#0F1620" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F4F6F5">
 
     <!--
       This page renders with no network at all: no webfont, no stylesheet
@@ -26,37 +26,37 @@
     -->
     <style>
         :root {
-            --paper: #F5F1E8;
-            --leaf: #FFFDF7;
-            --ink: #1C2320;
-            --graphite: #575F58;
-            --rule: #E3DCCC;
-            --edge: #83887E;
-            --green: #0F5136;
-            --chalk: #FFFFFF;
+            --paper: #F4F6F5;
+            --leaf: #FFFFFF;
+            --ink: #0F1B1E;
+            --graphite: #5C6B6E;
+            --rule: #DDE3E1;
+            --edge: #DDE3E1;
+            --green: #1E5F5A;
+            --chalk: #F7F8F7;
 
             /* No webfont offline: the fallback stacks are the type. */
-            --display: ui-serif, Georgia, 'Times New Roman', serif;
+            --display: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             --ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
                   'Helvetica Neue', Arial, sans-serif;
 
-            --fs-micro: 0.6875rem;
-            --fs-small: 0.8125rem;
-            --radius: 8px;
+            --fs-micro: 0.75rem;
+            --fs-small: 0.875rem;
+            --radius: 14px;
             --hit: 44px;
             --page: 62rem;
         }
 
         @media (prefers-color-scheme: dark) {
             body:not(.day) {
-                --paper: #15191A;
-                --leaf: #1E2426;
-                --ink: #EDE7DA;
-                --graphite: #A7AEA4;
-                --rule: #2E3536;
-                --edge: #767D77;
-                --green: #5FBF92;
-                --chalk: #15191A;
+                --paper: #0F1620;
+                --leaf: #182430;
+                --ink: #EEF2F0;
+                --graphite: #9DB0B3;
+                --rule: #24343A;
+                --edge: #24343A;
+                --green: #8FD3C4;
+                --chalk: #0F1620;
                 color-scheme: dark;
             }
         }
@@ -187,7 +187,7 @@
             font-family: var(--ui);
             font-size: 0.9375rem;
             font-weight: 500;
-            border-radius: var(--radius);
+            border-radius: 999px;
             border: 1px solid var(--green);
             background: var(--green);
             color: var(--chalk);

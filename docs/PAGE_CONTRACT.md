@@ -1,6 +1,6 @@
 # Page Contract — Help Me Breathe
 
-Copy-paste blocks for building or converting a page to the **Paper and Ink**
+Copy-paste blocks for building or converting a page to the **Lantern**
 identity (owner decision, 2026-09-10). Everything here is exact: paste it, then
 change only what the notes tell you to change. `docs/BRAND.md` says why.
 
@@ -28,7 +28,7 @@ Rules that are not negotiable:
 
 ---
 
-## 0. Conversion recipe — turning an old page into a Paper and Ink page
+## 0. Conversion recipe — turning an old page into a Lantern page
 
 Work top to bottom. Everything in **DELETE** is gone from the design system, so
 leaving it in produces unstyled markup, not a fallback.
@@ -127,8 +127,8 @@ one wins.
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
-    <meta name="theme-color" content="#F5F1E8">
+    <meta name="theme-color" content="#0F1620" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F4F6F5">
 
     <!-- PERFORMANCE -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -136,8 +136,8 @@ one wins.
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"></noscript>
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -506,7 +506,7 @@ you opened yourself with WebFetch and quoted in your structured return.
 
 ## 7. Callout, crisis block, citations, tables
 
-### Contraindication callout — 3px `--warn` left rule on leaf
+### Contraindication callout — a `--sand` card, no stripe
 
 ```html
 <div class="callout callout--caution">
@@ -518,9 +518,9 @@ you opened yourself with WebFetch and quoted in your structured return.
 </div>
 ```
 
-A neutral aside uses `<div class="callout">` on its own (an `--edge` left rule).
+A neutral aside uses `<div class="callout">` on its own (a white card).
 
-### Crisis block — 1px `--bad` border on leaf
+### Crisis block — a `--rose` card; the numbers set themselves in mono
 
 Required near the top of `/breathing-exercises-anxiety` and
 `/breathing-exercises-for-panic-attacks`. Those pages carry **zero**
@@ -658,7 +658,7 @@ card lands there. Prices and the trial length come from `PLANS` in
 the only page with the full plan card (`.plan`, `.plan-card`, `.plan-toggle`,
 `.included-list` in `css/pro.css`): an interval toggle, the price, the honest
 trial statement, one button, the fine print, and one list of what is included.
-No matrix, no tiers, no ticks and crosses. `--clay` appears on the price and
+No matrix, no tiers, no ticks and crosses. The price is mono ink and the button is the black pill; nothing wears a commerce colour any more. (Historical note: `--clay` appeared on the price and
 the button here and on the home page's `.plan-band`, and nowhere near the
 timer.
 
@@ -681,7 +681,7 @@ contents in the tab order is the axe `aria-hidden-focus` failure, and WCAG 4.1.2
 and 2.4.3 with it. Label the region instead — the visible "Advertisement" label
 the CSS prints then has a real accessible counterpart.
 
-1px dashed `--edge` on paper with an "Advertisement" label in `--graphite`.
+A well (`--well`, radius 18px, no border) with an "Advertisement" label in mono.
 Height is reserved in CSS (280px, or 90px for the leaderboard variant) so
 toggling measures CLS 0. `body.session-active .ad-slot { display: none }` hides
 them while someone is breathing, and
@@ -799,8 +799,9 @@ only on `/pro`. Every FAQ question and answer must also appear as visible text.
 Run against every page you touch. Every one of these must return nothing.
 
 - [ ] `Quicksand`
-- [ ] `linear-gradient`
-- [ ] `radial-gradient`
+- [ ] `linear-gradient` or `radial-gradient` in a page `<style>` block (the
+      only gradients on the site are the stage band and the three washes in
+      `css/styles.css`; a page never adds its own)
 - [ ] `backdrop-filter`
 - [ ] `text-shadow`
 - [ ] `nature-bg`
@@ -819,13 +820,17 @@ Run against every page you touch. Every one of these must return nothing.
       codepoints on purpose: this checklist has to pass its own emoji scan.
 - [ ] `theme-color` still `#8b5cf6`
 - [ ] an emoji favicon `data:` URI
-- [ ] a `box-shadow` that is not `var(--shadow-sheet)` or `var(--shadow-lift)`
+- [ ] a `box-shadow` that is not `var(--lift)` or `var(--lift-high)`
 - [ ] a hard-coded hex in a page `<style>` block instead of a token
-- [ ] `--rule` used as a control boundary, or `--edge` used as a text colour
-- [ ] `--clay` anywhere on a timer screen
-- [ ] a font-weight below 400
-- [ ] a font-size below 11px
-- [ ] a serif face on anything clickable
+- [ ] a `border` on a card, a button, a field or a chip (Lantern has none; a
+      hairline `border-top` / `border-bottom` between the rows of a list or
+      table is the one allowed line)
+- [ ] a coloured dot (`::before` disc, `<i>` bullet) beside a name
+- [ ] a coloured left stripe (`border-left`) on a callout
+- [ ] a font-weight below 300, or 300 on anything under 24px or clickable
+- [ ] a font-size below 12px
+- [ ] a serif face anywhere; a monospace face on anything that is not a number,
+      a date, a price or a small uppercase label
 
 ## 13a. If your page needs its own `<style>` block
 
@@ -844,15 +849,17 @@ Four rules, because these are the ones that break the identity quietly:
    physical substrate: `css/styles.css` §10 and `css/print.css` re-declare the
    whole token set there in literal ink-on-paper values. Do not copy that
    pattern for anything on a screen.
-3. **`--rule` is decoration, `--edge` is a boundary you can operate.** If a
-   person can click, tap, type into or focus the thing, its border is `--edge`.
+3. **Nothing has a border.** A card is `--surface` + `--lift`; a control is
+   a filled pill (`--action` or `--well`); a field is a `--well`. `--line` is a
+   hairline between rows only. `--edge` still resolves, as a hairline, for
+   unconverted pages; do not reach for it.
 4. **Do not restyle the phase word, the timer digits or any `.control-btn`.**
    The phase word is the largest type on a timer screen and the timer digits are
    sans with tabular figures; a page-level override that breaks either of those
    is a design-system change, not a page change.
 
-Also: `--clay` never appears on a timer screen, nothing is smaller than 11px,
-nothing is lighter than weight 400, and anything clickable is `var(--ui)`.
+Also: nothing is smaller than 12px, nothing clickable is lighter than weight
+500, anything counted is `var(--mono)`, and anything clickable is `var(--sans)`.
 
 ## 14. Checklist before you hand a page over
 
@@ -862,7 +869,7 @@ nothing is lighter than weight 400, and anything clickable is `var(--ui)`.
 - [ ] Absolute canonical to the clean URL; no other page claims it.
 - [ ] OG title/description/type/url/image/site_name + `twitter:card` all present.
 - [ ] The four favicon links and both `theme-color` metas, dark one first.
-- [ ] The Newsreader + IBM Plex Sans font link, preload + `<noscript>` twin.
+- [ ] The Figtree + DM Mono font link, preload + `<noscript>` twin.
 - [ ] Exactly one `<h1>`; heading levels do not skip.
 - [ ] Consent + GA4 block pasted verbatim, defaults before config.
 - [ ] Every JSON-LD block parses (`JSON.parse`) and every FAQ answer also appears as visible text.
@@ -882,7 +889,7 @@ nothing is lighter than weight 400, and anything clickable is `var(--ui)`.
 - [ ] Root-relative asset paths; clean-URL links only.
 - [ ] §13 forbidden-pattern checklist all clear.
 - [ ] Any page `<style>` block obeys §13a: tokens only, no colour defined solely
-      inside a media or `.night` block, `--edge` on anything operable.
+      inside a media or `.night` block, no border on any shape.
 - [ ] If the file was copied from `templates/technique-page.template.html`, the `noindex` meta is **deleted**.
 - [ ] `node tools/site-check.mjs` reports no ERROR mentioning your file.
 - [ ] `node tools/build-sitemap.mjs` lists your page (it will not if the canonical is missing).
