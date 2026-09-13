@@ -58,20 +58,20 @@ export const SUPABASE = Object.freeze({
 /** The merchant-of-record overlay checkout, public values only (design §5.5). */
 export const CHECKOUT = Object.freeze({
   /** Client-side token (`test_…` or `live_…`). Public by design. Empty = checkout closed. */
-  clientToken: '',
+  clientToken: 'live_7ccc4b00c41fb043db32cbe3a3a',
   /**
    * `true` points the overlay at the provider's sandbox. It defaults to `true`
    * because the safer mistake is a live token refusing to open in sandbox, not
    * a test token silently pointed at production. Set `false` at go-live.
    */
-  sandbox: true,
+  sandbox: false,
   /**
    * Optional. The public no-trial price ids (`pri_…`), used by /pro ONLY to
    * show the localized total for the visitor's country before checkout
    * (design §5.6). Never used to open a checkout: the server picks the price.
    * Leave empty and the card shows the US list price with "plus any tax".
    */
-  previewPriceIds: Object.freeze({ monthly: '', yearly: '' }),
+  previewPriceIds: Object.freeze({ monthly: 'pri_01m2cr6sejcqthc7kzmnmf33vq', yearly: 'pri_01m2cr7nzfdmkkxmgk9dk22574' }),
 });
 
 /**

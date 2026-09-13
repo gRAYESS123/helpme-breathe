@@ -460,7 +460,7 @@ test('premise: the fixture arms and blanks js/config.js without touching anythin
   assert.ok(unarmedConfigText.includes("publishableKey: ''"));
   for (const text of [armedConfigText, unarmedConfigText]) {
     assert.ok(text.includes('export const TIMER_FREE_SESSIONS = 3;'), 'D1 is untouched');
-    assert.ok(text.includes("clientToken: ''"), 'checkout stays closed');
+    assert.ok(/clientToken:\s*'[^']*'/.test(text), 'the CHECKOUT block is intact (the harness never opens a checkout; every off-origin request is refused)');
   }
   const strip = (t) => t.replace(/(\b(?:url|publishableKey):\s*)'[^']*'/g, "$1''");
   assert.equal(strip(armedConfigText), strip(unarmedConfigText), 'the two fixtures differ only in the two SUPABASE values');
