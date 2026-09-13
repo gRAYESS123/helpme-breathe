@@ -526,14 +526,22 @@ Only a 12-character hash prefix of the address is ever logged.
 ```json
 {
   "ok": false,
-  "provider": "paddle",
-  "email": "brevo",
+  "provider": null,
+  "email": null,
   "env": "production",
   "time": "2026-09-12T10:00:00.000Z",
   "configured": { "license_secret": true, "supabase_url": true, "mor_api_key": false, "…": false },
   "missing": ["MOR_API_KEY"]
 }
 ```
+
+`provider` and `email` are **`null` until `MOR_PROVIDER` / `EMAIL_PROVIDER` are
+actually set** in the environment. The code falls back to a default adapter so
+`missing` can be computed, but this response is public and no merchant of record
+or email service may be named on the site before one has accepted the owner in
+writing — so the fallback is never echoed here. Once a variable is set, the field
+carries the adapter id the API resolved from it (the value of `MOR_PROVIDER`,
+lowercased, or the default adapter when the value is unrecognised).
 
 `configured` has one lowercased key for **every** name in `KNOWN_VARS`, set or
 not. `missing` lists only what a *working* deployment needs: sign-in, the

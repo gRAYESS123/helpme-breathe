@@ -53,6 +53,7 @@ import { getEmailProvider } from '../api/_lib/email/index.js';
 import { isAlreadySubscribed } from '../api/_lib/email/brevo.js';
 
 import { validateSubscribe, EMAIL_RE, SUCCESS_MESSAGE } from '../api/subscribe.js';
+import { GET as healthGet } from '../api/health.js';
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -105,6 +106,11 @@ function siteRequest(options = {}) {
   });
 }
 
+/**
+ * Run `fn` with a patched process.env, restoring every touched key afterwards.
+ * `undefined` in the patch means "unset". A sync `fn` is restored on return; an
+ * async `fn` (a request handler) is restored once its promise settles.
+ */
 function withEnv(patch, fn) {
   const saved = {};
   for (const [name, value] of Object.entries(patch)) {
@@ -112,14 +118,22 @@ function withEnv(patch, fn) {
     if (value === undefined) delete process.env[name];
     else process.env[name] = value;
   }
-  try {
-    return fn();
-  } finally {
+  const restore = () => {
     for (const [name, value] of Object.entries(saved)) {
       if (value === undefined) delete process.env[name];
       else process.env[name] = value;
     }
+  };
+  let result;
+  try {
+    result = fn();
+  } catch (error) {
+    restore();
+    throw error;
   }
+  if (result && typeof result.then === 'function') return result.finally(restore);
+  restore();
+  return result;
 }
 
 /* --------------------------------------------------------------- base64url */
@@ -490,6 +504,45 @@ test('describeConfig reports booleans and names only, never a value', () => {
       assert.equal(serialised.includes('another-secret'), false);
     },
   );
+});
+
+const HEALTH_URL = 'https://helpmebreath.com/api/health';
+
+/** Every provider-shaped variable unset, plus one required secret unset so `ok` must be false. */
+const NOTHING_CONFIGURED = {
+  MOR_PROVIDER: undefined,
+  EMAIL_PROVIDER: undefined,
+  MOR_API_KEY: undefined,
+  MOR_STOREFRONT: undefined,
+};
+
+test('health: provider and email are null until MOR_PROVIDER / EMAIL_PROVIDER are actually set', async () => {
+  const response = await withEnv(NOTHING_CONFIGURED, () => healthGet(new Request(HEALTH_URL)));
+  assert.equal(response.status, 200, 'a report, not a probe');
+  const body = await response.json();
+
+  assert.equal(body.ok, false);
+  assert.equal(body.provider, null, 'the code default must not leak into a public response');
+  assert.equal(body.email, null, 'the code default must not leak into a public response');
+  assert.equal(body.configured.mor_provider, false);
+  assert.equal(body.configured.email_provider, false);
+  assert.ok(body.missing.includes('MOR_API_KEY'), 'the missing list is unchanged');
+  assert.equal(typeof body.env, 'string');
+  assert.ok(!Number.isNaN(Date.parse(body.time)));
+
+  const serialised = JSON.stringify(body);
+  assert.doesNotMatch(serialised, /paddle|fastspring|brevo|mailerlite/i, 'no merchant of record or email service is named while none is configured');
+});
+
+test('health: a provider that is set in the environment is reported by name', async () => {
+  const response = await withEnv({ ...NOTHING_CONFIGURED, MOR_PROVIDER: 'fastspring' }, () => healthGet(new Request(HEALTH_URL)));
+  const body = await response.json();
+
+  assert.equal(body.provider, 'fastspring');
+  assert.equal(body.email, null, 'the other field stays null when its variable is unset');
+  assert.equal(body.configured.mor_provider, true);
+  assert.ok(body.missing.includes('MOR_STOREFRONT'), "the provider's own requirement still counts");
+  assert.equal(body.ok, false);
 });
 
 test('getProvider and getEmailProvider reject unknown names loudly', () => {
