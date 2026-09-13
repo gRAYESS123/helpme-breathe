@@ -1,5 +1,5 @@
 /* ==========================================================================
-   css/pro.css — the Pro layer, in Paper and Ink.
+   css/pro.css — the Pro layer, in Lantern.
 
    Loaded two ways:
      - js/pro/index.js injects it on any page with a timer
@@ -7,18 +7,19 @@
 
    Every colour is a token from css/styles.css. Nothing here defines a colour
    that only exists in a media query or a .night block, because the token set
-   already swaps for night. Control boundaries are --edge; --rule is decorative.
+   already swaps for night. Nothing has a border: cards are lifted by
+   --lift, fields are wells, buttons are pills.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
    Panels (custom pattern, your practice, soundscapes)
    -------------------------------------------------------------------------- */
 .pro-panel {
-    background: var(--leaf);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sheet);
-    padding: 1.25rem 1.25rem 1rem;
+    background: var(--surface);
+    border: 0;
+    border-radius: var(--radius-card);
+    box-shadow: var(--lift);
+    padding: 1.35rem 1.4rem 1.15rem;
     margin: 0 0 1.25rem;
     text-align: left;
 }
@@ -67,25 +68,25 @@
     gap: 0.4rem;
     min-height: var(--hit);
     padding: 0.6rem 1.1rem;
-    border-radius: var(--radius);
-    border: 1px solid var(--edge);
-    background: var(--leaf);
+    border-radius: var(--radius-pill);
+    border: 0;
+    background: var(--well);
     color: var(--ink);
     font-family: var(--ui);
     font-size: var(--fs-small);
     font-weight: 500;
     cursor: pointer;
     text-decoration: none;
-    transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+    transition: background-color 180ms ease, color 180ms ease, opacity 180ms ease;
 }
 
 .pro-btn:hover:not(:disabled) {
-    border-color: var(--ink);
+    background: var(--line);
 }
 
 .pro-btn:disabled {
     color: var(--graphite);
-    border-color: var(--rule);
+    opacity: 0.6;
     cursor: not-allowed;
 }
 
@@ -96,27 +97,26 @@
    the label green on a green button: the invisible-CTA bug of 2026-09-10. */
 .pro-btn-primary,
 .prose a.pro-btn-primary {
-    background: var(--green);
-    border-color: var(--green);
-    color: var(--chalk);
+    background: var(--action);
+    color: var(--on-action);
     font-weight: 600;
 }
 
 .pro-btn-primary:hover:not(:disabled) {
-    background: var(--ink);
-    border-color: var(--ink);
+    background: var(--action);
+    opacity: 0.88;
 }
 
 .pro-pill {
     display: inline-block;
     padding: 0.1rem 0.45rem;
     border-radius: var(--radius-pill);
-    background: var(--leaf);
-    border: 1px solid var(--edge);
+    background: var(--well);
+    border: 0;
     color: var(--graphite);
-    font-family: var(--ui);
+    font-family: var(--mono);
     font-size: var(--fs-micro);
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     line-height: 1.5;
@@ -185,8 +185,8 @@
     margin: 0.9rem 0 0;
     padding: 0.65rem 0.85rem;
     border-radius: var(--radius);
-    background: var(--paper);
-    border: 1px solid var(--rule);
+    background: var(--well);
+    border: 0;
 }
 
 .pattern-name-row {
@@ -200,10 +200,10 @@
 .pro-panel input[type='text'] {
     width: 100%;
     min-height: var(--hit);
-    padding: 0.55rem 0.75rem;
+    padding: 0.55rem 0.85rem;
     border-radius: var(--radius);
-    border: 1px solid var(--edge);
-    background: var(--leaf);
+    border: 0;
+    background: var(--well);
     color: var(--ink);
     font-family: var(--ui);
     font-size: 0.875rem;
@@ -244,8 +244,8 @@
     gap: 0.4rem;
     padding: 0.35rem 0.5rem;
     border-radius: var(--radius);
-    background: var(--paper);
-    border: 1px solid var(--rule);
+    background: var(--well);
+    border: 0;
 }
 
 .preset-load {
@@ -268,10 +268,10 @@
 
 .preset-action {
     min-height: var(--hit);
-    padding: 0.3rem 0.8rem;
-    border-radius: var(--radius);
-    border: 1px solid var(--edge);
-    background: var(--leaf);
+    padding: 0.3rem 0.85rem;
+    border-radius: var(--radius-pill);
+    border: 0;
+    background: var(--surface);
     color: var(--graphite);
     font-family: var(--ui);
     font-size: var(--fs-micro);
@@ -280,7 +280,7 @@
 
 .preset-action:hover {
     color: var(--ink);
-    border-color: var(--ink);
+    background: var(--line);
 }
 
 /* --------------------------------------------------------------------------
@@ -298,14 +298,14 @@
     flex-direction: column;
     align-items: center;
     gap: 0.15rem;
-    padding: 0.7rem 0.4rem;
+    padding: 0.8rem 0.4rem;
     border-radius: var(--radius);
-    background: var(--paper);
-    border: 1px solid var(--rule);
+    background: var(--well);
+    border: 0;
 }
 
 .practice-stat-value {
-    font-family: var(--ui);
+    font-family: var(--mono);
     font-size: 1.375rem;
     font-weight: 600;
     color: var(--ink);
@@ -364,9 +364,8 @@
     left: 50%;
     transform: translate(-50%, -50%);
     white-space: nowrap;
-    background: var(--leaf);
-    border-color: var(--edge);
-    box-shadow: var(--shadow-lift);
+    background: var(--surface);
+    box-shadow: var(--lift-high);
 }
 
 .technique-breakdown {
@@ -388,9 +387,9 @@
    screen, so the on-timer offer speaks in the neutral voice: ink price, green
    button. --clay stays on /pro. */
 .paywall-card .paywall-price {
-    font-family: var(--display);
-    font-size: 1.375rem;
-    font-weight: 500;
+    font-family: var(--mono);
+    font-size: 1.5rem;
+    font-weight: 400;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.012em;
     color: var(--ink);
@@ -409,27 +408,26 @@
     align-items: center;
     justify-content: center;
     min-height: var(--hit);
-    padding: 0.7rem 1.35rem;
-    border-radius: var(--radius);
-    border: 1px solid var(--green);
-    background: var(--green);
-    color: var(--chalk);
+    padding: 0.7rem 1.5rem;
+    border-radius: var(--radius-pill);
+    border: 0;
+    background: var(--action);
+    color: var(--on-action);
     font-family: var(--ui);
     font-weight: 600;
     font-size: 0.9375rem;
     cursor: pointer;
     text-decoration: none;
-    transition: background-color 180ms ease, border-color 180ms ease;
+    transition: opacity 180ms ease;
 }
 
 .paywall-buy:hover {
-    background: var(--ink);
-    border-color: var(--ink);
+    opacity: 0.88;
 }
 
 .paywall-more {
     font-size: 0.875rem;
-    color: var(--green);
+    color: var(--link);
     text-decoration: underline;
 }
 
@@ -463,8 +461,8 @@ body.night .ad-slot {
 
 /* --------------------------------------------------------------------------
    /pro — the plan
-   One card, two intervals, everything listed once. --clay is the commerce
-   accent and this is a commerce page, so the price and the button wear it.
+   One card, two intervals, everything listed once. The price is the biggest
+   thing on the page, in mono, in ink; the button is the black pill.
    -------------------------------------------------------------------------- */
 .plan {
     display: grid;
@@ -477,20 +475,21 @@ body.night .ad-slot {
 .plan-card {
     position: sticky;
     top: 1.5rem;
-    padding: 1.5rem;
-    background: var(--leaf);
-    border: 1px solid var(--edge);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sheet);
+    padding: 1.6rem;
+    background: var(--surface);
+    border: 0;
+    border-radius: 24px;
+    box-shadow: var(--lift);
     text-align: left;
 }
 
 .plan-toggle {
     display: flex;
     margin: 0 0 1.35rem;
-    border: 1px solid var(--edge);
-    border-radius: var(--radius);
-    overflow: hidden;
+    padding: 4px;
+    background: var(--well);
+    border: 0;
+    border-radius: var(--radius-pill);
 }
 
 .plan-interval {
@@ -506,31 +505,34 @@ body.night .ad-slot {
     font-size: var(--fs-small);
     font-weight: 500;
     color: var(--graphite);
-    background: var(--leaf);
+    background: transparent;
     border: 0;
+    border-radius: var(--radius-pill);
     cursor: pointer;
 }
-
-.plan-interval + .plan-interval { border-left: 1px solid var(--edge); }
 
 .plan-interval:hover { color: var(--ink); }
 
 .plan-interval.is-active {
-    color: var(--chalk);
-    background: var(--ink);
+    color: var(--ink);
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgba(15, 27, 30, 0.08);
     font-weight: 600;
 }
 
 .plan-save {
+    font-family: var(--mono);
     font-size: var(--fs-micro);
-    font-weight: 500;
-    letter-spacing: 0.04em;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .plan-price { margin: 0 0 1rem; }
 
 .plan-price .price-figure {
     font-size: 3.25rem;
+    letter-spacing: -0.03em;
     line-height: 1;
 }
 
@@ -545,8 +547,8 @@ body.night .ad-slot {
     font-size: var(--fs-small);
     line-height: 1.6;
     color: var(--graphite);
-    border: 1px solid var(--rule);
-    border-left: 3px solid var(--clay);
+    background: var(--well);
+    border: 0;
     border-radius: var(--radius);
 }
 
@@ -572,7 +574,7 @@ body.night .ad-slot {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
     gap: 0 2.5rem;
-    border-top: 1px solid var(--ink);
+    border-top: 1px solid var(--line);
 }
 
 .included-list li {
@@ -609,8 +611,9 @@ body.night .ad-slot {
     display: inline-block;
     padding: 0.35rem 0.8rem;
     border-radius: var(--radius-pill);
-    background: var(--leaf);
-    border: 1px solid var(--edge);
+    background: var(--well);
+    border: 0;
+    font-family: var(--mono);
     font-size: var(--fs-small);
     font-variant-numeric: tabular-nums;
     color: var(--ink);
@@ -627,10 +630,10 @@ body.night .ad-slot {
 .pro-page .restore-form input[type='text'] {
     flex: 1 1 16rem;
     min-height: var(--hit);
-    padding: 0.7rem 0.9rem;
+    padding: 0.7rem 0.95rem;
     border-radius: var(--radius);
-    border: 1px solid var(--edge);
-    background: var(--leaf);
+    border: 0;
+    background: var(--well);
     color: var(--ink);
     font-family: var(--ui);
     font-size: 0.9375rem;
@@ -669,6 +672,6 @@ body.night .ad-slot {
 .pro-panel button:focus-visible,
 .post-session-card button:focus-visible,
 .pro-page .restore-form button:focus-visible {
-    outline: 2px solid var(--green);
+    outline: 2px solid var(--link);
     outline-offset: 3px;
 }

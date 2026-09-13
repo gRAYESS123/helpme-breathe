@@ -35,8 +35,8 @@
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
-    <meta name="theme-color" content="#F5F1E8">
+    <meta name="theme-color" content="#0F1620" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F4F6F5">
 
     <!-- PERFORMANCE: font origins + render-critical CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,8 +46,8 @@
 
     <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate.
          Loaded without blocking render; display=swap prevents invisible text. -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"></noscript>
 
     <!--
       Google Consent Mode v2. The DENIED defaults must be pushed before
@@ -219,7 +219,7 @@
     }
     </script>
 </head>
-<body class="theme-478">
+<body class="theme-coherent">
     <!-- Accessibility: skip straight to the breathing tool -->
     <a class="skip-link" href="#main">Skip to main content</a>
 
@@ -239,6 +239,7 @@
                 <a href="/science">Science</a>
                 <a href="/pro">Pro</a>
             </nav>
+            <a class="nav-cta" href="/signin">Sign in</a>
         </div>
     </header>
 
@@ -252,13 +253,13 @@
           The whole timer UI sits inside one app root, so the engine can find
           every [data-role] with a single scoped query. See docs/PAGE_CONTRACT.md.
         -->
-        <main class="main-content" id="main" data-breathing-app>
+        <main class="main-content" id="main" data-breathing-app data-technique="coherent">
             <section class="breathing-section" aria-labelledby="breathing-tool-heading">
                 <div class="app-bar">
                     <div class="technique-head">
-                        <p class="technique-eyebrow" data-role="technique-eyebrow">4-7-8</p>
-                        <h2 id="breathing-tool-heading" data-role="technique-title">Deep Sleep</h2>
-                        <p class="pattern-line" data-role="pattern-line">In 4 · Hold 7 · Out 8</p>
+                        <p class="technique-eyebrow" data-role="technique-eyebrow">Coherence</p>
+                        <h2 id="breathing-tool-heading" data-role="technique-title">Heart Coherence</h2>
+                        <p class="pattern-line" data-role="pattern-line">In 5 · Out 5</p>
                     </div>
                     <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
@@ -296,7 +297,7 @@
                         <circle class="ring-live" cx="160" cy="160" r="150"/>
                         <circle class="ring-bridge" cx="160" cy="160" r="150"/>
                     </svg>
-                    <div class="breathing-circle technique-478" data-role="circle">
+                    <div class="breathing-circle technique-coherent" data-role="circle">
                         <span class="circle-notch" aria-hidden="true"></span>
                     </div>
                     <div class="circle-text-container">
@@ -356,9 +357,9 @@
 
                 <h3 class="sr-only" id="technique-picker-heading">Choose a technique</h3>
                 <div class="technique-buttons" data-role="technique-buttons" role="group" aria-labelledby="technique-picker-heading">
-                    <button class="technique-btn active" type="button" data-action="select-technique" data-technique="478" aria-pressed="true" aria-describedby="desc-478">Deep Sleep</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="478" aria-pressed="false" aria-describedby="desc-478">Deep Sleep</button>
                     <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false" aria-describedby="desc-box">Focus &amp; Grounding</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="false" aria-describedby="desc-coherent">Heart Coherence</button>
+                    <button class="technique-btn active" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="true" aria-describedby="desc-coherent">Heart Coherence</button>
                     <button class="technique-btn" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="false" aria-describedby="desc-sigh">Cyclic Sighing</button>
                     <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false" aria-describedby="desc-extended">Extended Exhale</button>
                     <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false" aria-describedby="desc-triangle">Quick Calm</button>
@@ -525,6 +526,7 @@
 
     <script type="module" src="/js/consent.js"></script>
     <script type="module" src="/js/app.js"></script>
+    <script type="module" src="/js/stage.js"></script>
     <script type="module" src="/js/pro/index.js"></script>
 </body>
 </html>

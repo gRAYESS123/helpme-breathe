@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Help Me Breathe — brand asset builder ("Paper and Ink").
+ * Help Me Breathe — brand asset builder ("Lantern").
  *
  * Renders every shipped brand raster from the templates in this folder using
  * Playwright's Chromium, so the real Newsreader and IBM Plex Sans letterforms
@@ -115,7 +115,7 @@ function paletteReport() {
     );
     if (contrast(a.rim, DAY.paper) < 5.3) problems.push(`ACCENT ${key}: rim contrast below 5.3:1 on paper`);
     const fl = lstar(a.fill);
-    if (fl < 78 || fl > 83) problems.push(`ACCENT ${key}: fill L* ${fl.toFixed(1)} outside 78-83`);
+    if (fl < 80 || fl > 88) problems.push(`ACCENT ${key}: orb L* ${fl.toFixed(1)} outside 80-88`);
     if (contrast(DAY.ink, a.fill) < 7) problems.push(`ACCENT ${key}: phase word below 7:1 on its fill`);
   }
   lines.push('');
@@ -236,10 +236,10 @@ async function shoot(browser, { html, width, height, out, type = 'png', quality,
  * Vector assets — written straight from the geometry module.
  * ------------------------------------------------------------------ */
 function writeVectors() {
-  const favicon = faviconSvg({ day: DAY.green, night: NIGHT.green });
+  const favicon = faviconSvg({ day: DAY.ink, night: NIGHT.ink });
   writeFileSync(join(ROOT, 'favicon.svg'), favicon, 'utf8');
 
-  const logo = logoSvg({ ring: DAY.green, ink: DAY.ink, displayStack: DISPLAY_STACK });
+  const logo = logoSvg({ ring: DAY.ink, ink: DAY.ink, displayStack: DISPLAY_STACK });
   mkdirSync(join(ROOT, 'images'), { recursive: true });
   writeFileSync(join(ROOT, 'images', 'logo.svg'), logo, 'utf8');
 
@@ -253,14 +253,14 @@ function writeVectors() {
 async function buildIcons(browser) {
   // Favicon rasters: the 16px file carries its own thicker geometry.
   await shoot(browser, {
-    html: svgHtml({ svg: ringDocument({ size: 16, ring: FAVICON_16, color: DAY.green }), width: 16, height: 16 }),
+    html: svgHtml({ svg: ringDocument({ size: 16, ring: FAVICON_16, color: DAY.ink }), width: 16, height: 16 }),
     width: 16,
     height: 16,
     out: 'favicon-16.png',
     transparent: true,
   });
   await shoot(browser, {
-    html: svgHtml({ svg: ringDocument({ size: 32, ring: FAVICON_32, color: DAY.green }), width: 32, height: 32 }),
+    html: svgHtml({ svg: ringDocument({ size: 32, ring: FAVICON_32, color: DAY.ink }), width: 32, height: 32 }),
     width: 32,
     height: 32,
     out: 'favicon-32.png',
@@ -269,7 +269,7 @@ async function buildIcons(browser) {
   record('favicon-16.png', { width: 16, height: 16 });
   record('favicon-32.png', { width: 32, height: 32 });
 
-  // App icons: green tile, paper ring, ring inside the central 80%.
+  // App icons: ink tile, mist ring, ring inside the central 80%.
   // The PWA tiles keep the 22% corner radius with TRANSPARENT corners, not
   // white ones: manifest.json declares them "any maskable", and a launcher
   // mask (circle or squircle) falls inside a 22%-radius rounded rect at every
@@ -283,7 +283,7 @@ async function buildIcons(browser) {
     { size: 180, out: 'images/apple-touch-icon.png', squareTile: true, transparent: false },
   ];
   for (const t of tiles) {
-    const svg = appIconSvg({ size: t.size, tile: DAY.green, ring: DAY.paper, squareTile: t.squareTile });
+    const svg = appIconSvg({ size: t.size, tile: DAY.ink, ring: DAY.paper, squareTile: t.squareTile });
     await shoot(browser, {
       html: svgHtml({ svg, width: t.size, height: t.size }),
       width: t.size,
@@ -297,7 +297,7 @@ async function buildIcons(browser) {
 
 async function buildLogo(browser) {
   await shoot(browser, {
-    html: logoHtml({ width: 1200, height: 300, ringColor: DAY.green, ink: DAY.ink }),
+    html: logoHtml({ width: 1200, height: 300, ringColor: DAY.ink, ink: DAY.ink }),
     width: 1200,
     height: 300,
     out: 'images/logo.png',

@@ -13,53 +13,53 @@
     <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 
-    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
-    <meta name="theme-color" content="#F5F1E8">
+    <meta name="theme-color" content="#0F1620" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F4F6F5">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"></noscript>
 
     <!--
       This page is deliberately self-contained: a 404 has to render even when
       css/styles.css is the thing that failed to load. The token block below is
-      the same Paper and Ink palette as css/styles.css, declared locally.
+      the same Lantern palette as css/styles.css, declared locally.
       Every colour here is a token; nothing is defined only inside the dark
       media query. See docs/BRAND.md.
     -->
     <style>
         :root {
-            --paper: #F5F1E8;
-            --leaf: #FFFDF7;
-            --ink: #1C2320;
-            --graphite: #575F58;
-            --rule: #E3DCCC;
-            --edge: #83887E;
-            --green: #0F5136;
-            --chalk: #FFFFFF;
+            --paper: #F4F6F5;
+            --leaf: #FFFFFF;
+            --ink: #0F1B1E;
+            --graphite: #5C6B6E;
+            --rule: #DDE3E1;
+            --edge: #DDE3E1;
+            --green: #1E5F5A;
+            --chalk: #F7F8F7;
 
-            --display: 'Newsreader', ui-serif, Georgia, 'Times New Roman', serif;
-            --ui: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+            --display: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --ui: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
                   'Helvetica Neue', Arial, sans-serif;
 
-            --fs-micro: 0.6875rem;
-            --fs-small: 0.8125rem;
-            --radius: 8px;
+            --fs-micro: 0.75rem;
+            --fs-small: 0.875rem;
+            --radius: 14px;
             --hit: 44px;
             --page: 62rem;
         }
 
         @media (prefers-color-scheme: dark) {
             body:not(.day) {
-                --paper: #15191A;
-                --leaf: #1E2426;
-                --ink: #EDE7DA;
-                --graphite: #A7AEA4;
-                --rule: #2E3536;
-                --edge: #767D77;
-                --green: #5FBF92;
-                --chalk: #15191A;
+                --paper: #0F1620;
+                --leaf: #182430;
+                --ink: #EEF2F0;
+                --graphite: #9DB0B3;
+                --rule: #24343A;
+                --edge: #24343A;
+                --green: #8FD3C4;
+                --chalk: #0F1620;
                 color-scheme: dark;
             }
         }
@@ -150,6 +150,7 @@
         }
 
         .site-nav a:hover { color: var(--ink); }
+        .nav-cta { display: inline-flex; align-items: center; min-height: 40px; padding: 0.4rem 1.05rem; margin-left: 0.25rem; font-size: var(--fs-small); font-weight: 500; color: var(--ink); background: var(--rule); border-radius: 999px; text-decoration: none; white-space: nowrap; }
 
         /* ---------------------------------------------------------- main --- */
 
@@ -224,8 +225,8 @@
             font-family: var(--ui);
             font-size: 0.9375rem;
             font-weight: 500;
-            border-radius: var(--radius);
-            border: 1px solid var(--edge);
+            border-radius: 999px;
+            border: 0; background: var(--rule);
             background: var(--leaf);
             color: var(--ink);
             text-decoration: none;
@@ -289,6 +290,7 @@
                 <a href="/science">Science</a>
                 <a href="/pro">Pro</a>
             </nav>
+            <a class="nav-cta" href="/signin">Sign in</a>
         </div>
     </header>
 

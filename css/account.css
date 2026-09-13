@@ -1,11 +1,10 @@
 /* ==========================================================================
-   css/account.css — /signin, /auth/callback and /account, in Paper and Ink.
+   css/account.css — /signin, /auth/callback and /account, in Lantern.
 
    Every colour is a token from css/styles.css. Nothing here defines a colour
    that only exists in a media query or a .night block: the token set already
-   swaps for night. Control boundaries are --edge; --rule is decorative.
-   Anything clickable is var(--ui). Nothing below 11px, nothing lighter than 400.
-   --clay appears only on the subscribe call-to-action (a paid surface).
+   swaps for night. Nothing has a border: the card is lifted by --lift, a field
+   is a well, a button is a pill. Anything clickable is var(--ui).
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -17,19 +16,19 @@
 }
 
 .auth-card {
-    background: var(--leaf);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sheet);
-    padding: 1.5rem;
+    background: var(--surface);
+    border: 0;
+    border-radius: 24px;
+    box-shadow: var(--lift);
+    padding: 1.75rem;
     margin: 0 0 1.5rem;
 }
 
 .auth-card h2 {
-    font-family: var(--display);
-    font-size: 1.375rem;
-    font-weight: 500;
-    letter-spacing: -0.012em;
+    font-family: var(--sans);
+    font-size: 1.5rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
     margin: 0 0 0.5rem;
 }
 
@@ -66,19 +65,20 @@
     font-family: var(--ui);
     font-size: 1rem;
     color: var(--ink);
-    background: var(--leaf);
-    border: 1px solid var(--edge);
+    background: var(--well);
+    border: 0;
     border-radius: var(--radius);
 }
 
 .auth-input:focus-visible {
-    outline: 2px solid var(--green);
+    outline: 2px solid var(--link);
     outline-offset: 1px;
 }
 
 .auth-input::placeholder { color: var(--graphite); }
 
 .auth-input--code {
+    font-family: var(--mono);
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.35em;
     font-size: 1.375rem;
@@ -86,7 +86,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Buttons — sans, 1px borders, 44px minimum, radius 8px.
+   Buttons — sans pills, no borders, 44px minimum.
    -------------------------------------------------------------------------- */
 .btn {
     display: inline-flex;
@@ -100,19 +100,19 @@
     font-weight: 600;
     line-height: 1.3;
     color: var(--ink);
-    background: var(--leaf);
-    border: 1px solid var(--edge);
-    border-radius: var(--radius);
+    background: var(--well);
+    border: 0;
+    border-radius: var(--radius-pill);
     cursor: pointer;
     text-decoration: none;
     text-align: center;
-    transition: border-color var(--dur-tap) var(--ease-ui), background-color var(--dur-tap) var(--ease-ui), color var(--dur-tap) var(--ease-ui);
+    transition: background-color var(--dur-tap) var(--ease-ui), color var(--dur-tap) var(--ease-ui), opacity var(--dur-tap) var(--ease-ui);
 }
 
-.btn:hover { border-color: var(--ink); text-decoration: none; }
+.btn:hover { background: var(--line); text-decoration: none; }
 
 .btn:focus-visible {
-    outline: 2px solid var(--green);
+    outline: 2px solid var(--link);
     outline-offset: 2px;
 }
 
@@ -120,44 +120,40 @@
 .btn[aria-disabled="true"] {
     cursor: not-allowed;
     color: var(--graphite);
-    border-color: var(--rule);
+    opacity: 0.6;
 }
 
 .btn--primary {
-    color: var(--chalk);
-    background: var(--green);
-    border-color: var(--green);
+    color: var(--on-action);
+    background: var(--action);
 }
 
-.btn--primary:hover { background: var(--ink); border-color: var(--ink); color: var(--chalk); }
+.btn--primary:hover { background: var(--action); color: var(--on-action); opacity: 0.88; }
 
-.btn--primary:disabled { background: var(--track); border-color: var(--track); color: var(--graphite); }
+.btn--primary:disabled { background: var(--well); color: var(--graphite); opacity: 0.6; }
 
 .btn--quiet {
-    border-color: transparent;
     background: transparent;
     color: var(--graphite);
     font-weight: 500;
 }
 
-.btn--quiet:hover { color: var(--ink); border-color: transparent; background: transparent; }
+.btn--quiet:hover { color: var(--ink); background: var(--well); }
 
 .btn--danger {
     color: var(--bad);
-    border-color: var(--bad);
-    background: var(--leaf);
+    background: var(--rose);
 }
 
-.btn--danger:hover { color: var(--chalk); background: var(--bad); border-color: var(--bad); }
+.btn--danger:hover { color: var(--bad); background: var(--rose); opacity: 0.85; }
 
-/* The one paid surface on /account: the subscribe button. */
+/* The subscribe button on /account: the same black pill as everywhere. */
 .btn--commerce {
-    color: var(--chalk);
-    background: var(--clay);
-    border-color: var(--clay);
+    color: var(--on-action);
+    background: var(--action);
 }
 
-.btn--commerce:hover { background: var(--ink); border-color: var(--ink); color: var(--chalk); }
+.btn--commerce:hover { background: var(--action); color: var(--on-action); opacity: 0.88; }
 
 .btn--block { width: 100%; }
 
@@ -236,7 +232,7 @@
     width: 28px;
     height: 28px;
     flex: 0 0 auto;
-    color: var(--green);
+    color: var(--link);
     animation: auth-ring-turn 1.6s linear infinite;
 }
 
@@ -257,19 +253,19 @@
 }
 
 .account-section {
-    background: var(--leaf);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sheet);
-    padding: 1.5rem;
+    background: var(--surface);
+    border: 0;
+    border-radius: var(--radius-card);
+    box-shadow: var(--lift);
+    padding: 1.6rem;
     margin: 0 0 1.25rem;
 }
 
 .account-section > h2 {
-    font-family: var(--display);
-    font-size: 1.375rem;
-    font-weight: 500;
-    letter-spacing: -0.012em;
+    font-family: var(--sans);
+    font-size: 1.5rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
     margin: 0 0 0.75rem;
 }
 
@@ -309,6 +305,8 @@
 .account-dl dd {
     margin: 0;
     color: var(--ink);
+    font-family: var(--mono);
+    font-size: var(--fs-small);
     font-variant-numeric: tabular-nums;
     overflow-wrap: anywhere;
 }
@@ -326,24 +324,24 @@
     display: inline-block;
     padding: 0.1rem 0.55rem;
     margin-right: 0.35rem;
-    border: 1px solid var(--edge);
+    background: var(--well);
+    border: 0;
     border-radius: var(--radius-pill);
     font-size: var(--fs-small);
     font-weight: 600;
     color: var(--ink);
 }
 
-.status-line[data-tone="ok"] .status-word { border-color: var(--ok); color: var(--ok); }
-.status-line[data-tone="warn"] .status-word { border-color: var(--warn); color: var(--warn); }
-.status-line[data-tone="bad"] .status-word { border-color: var(--bad); color: var(--bad); }
+.status-line[data-tone="ok"] .status-word { color: var(--ok); }
+.status-line[data-tone="warn"] .status-word { background: var(--sand); color: var(--warn); }
+.status-line[data-tone="bad"] .status-word { background: var(--rose); color: var(--bad); }
 
 /* Banners: the past-due card notice and the one-time notices. */
 .account-banner {
     padding: 0.9rem 1.1rem;
     margin: 0 0 1.25rem;
-    background: var(--leaf);
-    border: 1px solid var(--rule);
-    border-left: 3px solid var(--edge);
+    background: var(--well);
+    border: 0;
     border-radius: var(--radius);
     font-family: var(--ui);
     font-size: var(--fs-small);
@@ -351,9 +349,9 @@
 }
 
 .account-banner[hidden] { display: none; }
-.account-banner--warn { border-left-color: var(--warn); }
-.account-banner--bad { border-left-color: var(--bad); }
-.account-banner--ok { border-left-color: var(--ok); }
+.account-banner--warn { background: var(--sand); }
+.account-banner--bad { background: var(--rose); }
+.account-banner--ok { background: var(--well); }
 
 .account-banner p { margin: 0 0 0.5rem; font-size: inherit; }
 .account-banner p:last-child { margin-bottom: 0; }
@@ -378,9 +376,10 @@
 }
 
 .cancel-option {
-    border: 1px solid var(--rule);
+    background: var(--well);
+    border: 0;
     border-radius: var(--radius);
-    padding: 1rem 1.1rem;
+    padding: 1rem 1.15rem;
 }
 
 .cancel-option h3 {
@@ -397,7 +396,8 @@
 }
 
 .cancel-option--final {
-    border-color: var(--edge);
+    background: var(--surface);
+    box-shadow: var(--lift);
 }
 
 .cancel-option[hidden] { display: none; }
@@ -412,8 +412,9 @@
 /* Delete: a bordered zone, a checkbox, then the button. */
 .danger-zone {
     margin-top: 1rem;
-    padding: 1rem 1.1rem;
-    border: 1px solid var(--bad);
+    padding: 1rem 1.15rem;
+    background: var(--rose);
+    border: 0;
     border-radius: var(--radius);
 }
 
@@ -434,7 +435,7 @@
     height: 1.2rem;
     margin: 0.15rem 0 0;
     flex: 0 0 auto;
-    accent-color: var(--green);
+    accent-color: var(--link);
 }
 
 .account-actions {
