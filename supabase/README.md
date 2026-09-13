@@ -18,7 +18,7 @@ supabase/
 ## Before you run it
 
 1. The Supabase project must exist (owner checklist step 1 in the design
-   document). Region is chosen once; `eu-central-1` is the recommendation.
+   document). Region is chosen once; the owner chose `us-west-1` (North California) on 2026-09-13 and the privacy policy (§3.4 and the transfers section) says so.
 2. **Settings → JWT Keys** must show an **asymmetric** signing key (ES256 or
    RS256). Projects created after 1 October 2025 default to this. If it says
    HS256, switch it before running anything — `api/_lib/supabase.js` refuses
