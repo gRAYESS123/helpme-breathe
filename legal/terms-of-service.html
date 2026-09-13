@@ -59,12 +59,12 @@
             'wait_for_update': 500
         });
         gtag('js', new Date());
-        gtag('config', 'G-09WY9JD4YM', {
+        gtag('config', 'G-TYLYLJSFHN', {
             'anonymize_ip': true,
             'cookie_expires': 63072000
         });
     </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
 
     <script type="application/ld+json">
     {
@@ -95,7 +95,7 @@
       "description": "The terms for using Help Me Breathe: one subscription plan, the 3-day free trial, automatic renewal, an unconditional 14-day refund, and the health disclaimer.",
       "url": "https://helpmebreath.com/legal/terms-of-service",
       "datePublished": "2026-09-09",
-      "dateModified": "2026-09-11",
+      "dateModified": "2026-09-12",
       "inLanguage": "en",
       "author": {
         "@type": "Person",
@@ -115,8 +115,27 @@
     </script>
 
     <style>
-        /* `.callout > h2` and `.legal-nav` are now shared components in
-           css/styles.css section 7. Nothing page-scoped is left here. */
+        /* The two disclosures consumer law and the card networks care about
+           most sit in their own full-bordered blocks, distinct from the
+           left-ruled callout. Tokens only, no colour defined in a media
+           query: the token set flips on its own. */
+        .disclosure {
+            margin: 1.5rem 0;
+            padding: 1rem 1.25rem;
+            background: var(--leaf);
+            border: 1px solid var(--ink);
+            border-radius: var(--radius);
+            font-size: 0.9375rem;
+            line-height: 1.7;
+        }
+        .disclosure h3,
+        .disclosure > h2 {
+            font-family: var(--ui);
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0 0 0.4rem;
+        }
+        .disclosure p:last-child { margin-bottom: 0; }
     </style>
 </head>
 <body class="theme-478 article-page" data-no-ads="true" data-no-asks="true">
@@ -136,7 +155,6 @@
                 <a href="/timer">Timer</a>
                 <a href="/guides">Guides</a>
                 <a href="/science">Science</a>
-                <a href="/for-practitioners">For practitioners</a>
                 <a href="/pro">Pro</a>
             </nav>
         </div>
@@ -153,7 +171,7 @@
             <h1>Terms of Service</h1>
             <div class="article-meta">
                 <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
-                <p class="article-dates">Last updated <time datetime="2026-09-11">11 September 2026</time>. Published by Georges Rayess, an individual.</p>
+                <p class="article-dates">Last updated <time datetime="2026-09-12">12 September 2026</time>. Published by Georges Rayess, an individual.</p>
             </div>
         </header>
 
@@ -162,16 +180,18 @@
                 <section>
                     <p class="lead">Help Me Breathe is a guided breathing timer at <a href="https://helpmebreath.com/">helpmebreath.com</a>. These terms are the agreement between you and <strong>Georges Rayess, an individual resident in Lebanon</strong>, who builds and publishes it. There is no company behind this site, and these terms do not pretend otherwise.</p>
 
-                    <p>By using the site, the timer, the embeddable widget or anything you buy here, you accept these terms. If you do not accept them, please do not use the site. They are written in plain words on purpose. If a sentence here is unclear, write to <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and ask.</p>
+                    <p>By using the site, the timer or anything you buy here, you accept these terms. If you do not accept them, please do not use the site. They are written in plain words on purpose. If a sentence here is unclear, write to <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and ask.</p>
 
                     <div class="callout">
                         <h2>The short version</h2>
                         <ul>
-                            <li>Every breathing technique, every session length and the embeddable widget stay <strong>free</strong>, and the timer works without an account.</li>
-                            <li>There is <strong>one plan</strong>. It costs <strong>$10 a month or $100 a year</strong>, everything included, and it renews until you cancel.</li>
-                            <li>The <strong>free trial lasts 3 days</strong>. A card is required and is charged when the trial ends unless you cancel first. One free trial per person.</li>
-                            <li><strong>Fourteen days, unconditional refund.</strong> Ask by email. No reason needed.</li>
-                            <li>The seller named on your receipt is our <strong>merchant of record</strong>, not me.</li>
+                            <li>Every guide and article is free to read. The first <strong>three timer sessions on a device</strong> run without an account. After that, running the timer needs an account and the subscription below.</li>
+                            <li>The anxiety and panic-attack pages <strong>always run without an account</strong>.</li>
+                            <li>There is <strong>one plan</strong>. It costs <strong>$10 a month or $100 a year</strong> at the US list price, everything included, and it renews until you cancel.</li>
+                            <li>The <strong>free trial lasts 3 days</strong>. A card is required and is charged when the trial ends unless you cancel first. <strong>One free trial per person.</strong></li>
+                            <li><strong>Fourteen days, unconditional refund.</strong> Ask by email. No reason needed. The <a href="/legal/refund-policy">refund policy</a> has the details.</li>
+                            <li>The seller named on your receipt is a <strong>merchant of record</strong>, not me.</li>
+                            <li><strong>An account is for one person or one household.</strong></li>
                             <li>None of this is medical care. Read the <a href="/legal/medical-disclaimer">medical disclaimer</a>.</li>
                         </ul>
                     </div>
@@ -186,25 +206,25 @@
                 <section id="parties">
                     <h2>1. Who these terms are with</h2>
 
-                    <p>The site is published by Georges Rayess, an individual, contactable at <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. In these terms, "we", "us" and "I" all mean the same person. "You" means whoever is using the site or holds a subscription.</p>
+                    <p>The site is published by Georges Rayess, an individual, contactable at <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. In these terms, "we", "us" and "I" all mean the same person. "You" means whoever is using the site or holds an account.</p>
 
-                    <p>The timer works without an account. When you subscribe you get one, and it is described in section 5. There are no passwords here at all. Your settings and your session history stay in your own browser. What that means for your data is set out in the <a href="/legal/privacy-policy">Privacy Policy</a>, which forms part of these terms.</p>
+                    <p>There are no passwords here at all. You sign in with an email link, a six-digit code sent to that email, or a Google account. Your settings and your session history stay in your own browser. What the account holds, and what leaves your device, is set out in the <a href="/legal/privacy-policy">Privacy Policy</a>, which forms part of these terms.</p>
                 </section>
 
                 <section id="who-may-use">
                     <h2>2. Who may use the site</h2>
 
-                    <p>You must be at least 13 years old to use Help Me Breathe. If you are under 18, use it with the agreement of a parent or guardian. The site is not directed at children under 13.</p>
+                    <p>You must be at least 13 years old to use Help Me Breathe, and at least 18, or the age of majority where you live, to hold a subscription. If you are under 18, use the free parts of the site with the agreement of a parent or guardian. The site is not directed at children under 13.</p>
 
                     <p>Use the site lawfully and leave it working for everyone else. You agree not to:</p>
 
                     <ul>
                         <li>use it in a way that breaks any law that applies to you;</li>
-                        <li>attack, probe or overload the site, its servers or the widget;</li>
+                        <li>attack, probe or overload the site or its servers;</li>
                         <li>upload or transmit malicious code;</li>
                         <li>scrape the site with automated tools beyond ordinary search-engine crawling;</li>
-                        <li>strip, alter or hide the attribution on a free embed;</li>
                         <li>resell, sublicense or repackage the code, the audio or the written guides as your own;</li>
+                        <li>open a second account, or use a second email address, to take a second free trial;</li>
                         <li>impersonate me, this site, or a health professional.</li>
                     </ul>
                 </section>
@@ -214,17 +234,19 @@
 
                     <p>I do not claim that this timer treats, cures, prevents or diagnoses any condition. Nothing on the site is a promise of a health outcome. Where a page describes research, it names the study and links to it, and it says plainly what the evidence does and does not show.</p>
 
-                    <p><strong>If you use Help Me Breathe with other people, you must not make medical claims either.</strong> Do not present the timer, the widget or the handouts as a treatment, a therapy, a diagnosis or a replacement for care. Do not imply that I endorse your practice, your programme or your clinical judgement. Do not use it in place of emergency care.</p>
-
-                    <p>You use the breathing patterns at your own risk, and you are responsible for deciding whether a pattern is safe for you or for the people you work with.</p>
+                    <p>You use the breathing patterns at your own risk, and you are responsible for deciding whether a pattern is safe for you. Do not use the timer in place of emergency care.</p>
                 </section>
 
                 <section id="free-tier">
-                    <h2>4. What is free</h2>
+                    <h2>4. What is free, and where the account starts</h2>
 
-                    <p>All seven breathing techniques, every session length including unlimited, the audio and vibration cues, the offline install, saved settings, session history and the embeddable widget are free, and <strong>the timer works without an account</strong>. They were free before there was anything to buy, and <strong>they stay free</strong>. Nothing that works today will be moved behind a payment later.</p>
+                    <p>Every guide, article, comparison page and research page on this site is free to read, without an account and without a subscription. So are the crisis helpline lines on the anxiety and panic-attack pages, which are shown to everyone.</p>
 
-                    <p>The free site is offered as it is, with no commitment about uptime. It carries advertising on some written guides, and no advertising at all inside the timer, inside the widget, or on the anxiety and panic-attack pages.</p>
+                    <p><strong>The timer runs your first three sessions on a device without an account.</strong> The count is kept by a cookie on the device, described in the Privacy Policy. After three completed sessions, the timer shows you the pattern but does not run a timed session until you create an account and start the subscription in section 5, or its free trial. The written parts of every timer page stay readable either way.</p>
+
+                    <p>One surface never asks for an account, and never will. <strong>The anxiety and panic-attack pages</strong> run the full timer for anyone, with no sign-in prompt, no advertising and no ask of any kind. A breathing timer for a bad moment must not have a wall in front of it.</p>
+
+                    <p>The free parts of the site are offered as they are, with no commitment about uptime. They carry advertising on some written guides, below the fold, and no advertising at all inside the timer or on the anxiety and panic-attack pages.</p>
                 </section>
 
                 <section id="licence">
@@ -232,37 +254,37 @@
 
                     <h3>5.1 Accounts</h3>
 
-                    <p><strong>An account is for one person or one household.</strong> It is not a shared login for a team, a class, a clinic or a school, and it may not be sold, lent or passed to anyone else.</p>
+                    <p><strong>An account is for one person or one household.</strong> The people who share your home may share your account. It is not a shared login for a team, a class, a clinic, a school or a group of friends, and it may not be sold, lent or passed to anyone outside your household. You may sign in on as many of your own devices as you like.</p>
 
-                    <p>You sign in with an email link or a Google account. There is no password to choose, to forget or to lose. The account holds your email address, the sign-in identities you have used, the date it was created, your plan, its status and period dates, and the payment provider's subscription and customer identifiers. It holds nothing about what you practised. <strong>No card number, expiry date or security code ever reaches us.</strong></p>
+                    <p>You sign in with an email link, a six-digit code, or a Google account. There is no password to choose, to forget or to lose. The account holds your email address, the sign-in identities you have used, the date it was created, your plan, its status and period dates, the payment provider's subscription and customer identifiers, and the amount and currency the provider charges you. It holds nothing about what you practised. <strong>No card number, expiry date or security code ever reaches us.</strong></p>
 
-                    <p>Keep the email address on the account current, because it is how you sign in and how a receipt reaches you. You must meet the age requirement in section 2 to hold an account.</p>
+                    <p>Keep the email address on the account current, because it is how you sign in and how a receipt reaches you. You must meet the age requirement in section 2 to hold an account. You can export a copy of your account data, and delete the account, from your account page or by email; the Privacy Policy explains both.</p>
 
                     <h3>5.2 The plan</h3>
 
-                    <p>There is <strong>one plan</strong> and everything is in it, for individuals and practitioners alike: the timer and the practice tools, the printable material, and the commercial use, white-label embed, client links, class mode and handouts described in section 9. There are no tiers, no add-ons and no upgrades to buy.</p>
+                    <p>There is <strong>one plan</strong> and everything is in it: the timer beyond the free sessions, the custom pattern builder and saved presets, streaks, the heatmap and CSV export, ambient soundscapes, night mode, no advertising, and offline use. There are no tiers, no add-ons and no upgrades to buy.</p>
 
-                    <p>It costs <strong>$10 a month or $100 a year</strong>, the United States list price, in US dollars. Tax is added at checkout by the merchant of record, so the total shown to you at checkout is what you pay. The subscription is <strong>billed in advance</strong> and renews automatically until you cancel.</p>
+                    <p>It costs <strong>$10 a month or $100 a year</strong>. Those are the United States list prices, in US dollars. The merchant of record shows you a localised total at checkout, which may be in your own currency and includes any VAT or sales tax due where you are, and <strong>the price shown to you at checkout is the price you pay</strong>. The subscription is <strong>billed in advance</strong> and renews automatically until you cancel.</p>
 
-                    <div class="table-scroll">
+                    <div class="table-scroll" tabindex="0" role="region" aria-label="Free and paid features table, scrollable">
                         <table class="data-table">
-                            <caption class="sr-only">What the free site includes and what the subscription costs</caption>
+                            <caption class="sr-only">What is free, and what the subscription costs</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">What</th>
                                     <th scope="col">What it covers</th>
-                                    <th scope="col">Price</th>
+                                    <th scope="col">US list price</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <th scope="row">Free</th>
-                                    <td>Personal and non-commercial use of the site, the timer at every session length, and the embeddable widget with its attribution link intact. No account needed.</td>
+                                    <td>Every written page; the first three timer sessions on a device; the anxiety and panic-attack timers, without an account.</td>
                                     <td class="num">$0</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Subscription, monthly</th>
-                                    <td>Everything, including the commercial use and white-label terms in section 9. Billed in advance each month and renews until cancelled.</td>
+                                    <td>Everything in the plan. Billed in advance each month and renews until cancelled.</td>
                                     <td class="num">$10 a month</td>
                                 </tr>
                                 <tr>
@@ -276,25 +298,29 @@
 
                     <p>What you buy is a <strong>limited, non-exclusive, non-transferable licence to use</strong> the paid features while the subscription is active. You are not buying the software, the source code, the audio, the artwork or the written material, and no ownership passes to you. All of it stays mine or my licensors'.</p>
 
-                    <div class="callout">
+                    <div class="disclosure" id="automatic-renewal">
                         <h3>Automatic renewal</h3>
-                        <p>Your subscription renews automatically at the end of each billing period at the price shown to you at checkout, which includes any applicable tax, and your card is charged without further notice. You can cancel at any time from your account page; cancelling stops the next charge and you keep access until the end of the period you have paid for.</p>
+                        <p>Your subscription renews automatically at the end of each billing period at the price shown to you at checkout, which includes any applicable tax, and your card is charged without further notice. You can cancel at any time from your account page or from the merchant of record's customer portal; cancelling stops the next charge and you keep access until the end of the period you have paid for.</p>
                     </div>
 
                     <h3>5.3 The free trial</h3>
 
-                    <div class="callout">
+                    <div class="disclosure" id="trial">
                         <h3>The trial, and what happens when it ends</h3>
-                        <p>The free trial lasts 3 days from the moment you start it. A payment card is required to begin the trial and is not charged during the trial. When the 3 days end, the card is charged the price shown to you at checkout, $10 for the monthly plan or $100 for the annual plan in US dollars, plus any tax due in your country, and your subscription begins, unless you cancel first. You can cancel during the trial from your account page in two clicks. One free trial per person.</p>
+                        <p>The free trial lasts 3 days from the moment you start it. A payment card is required to begin the trial and is not charged during the trial. When the 3 days end, the card is charged the price shown to you at checkout — $10 for the monthly plan or $100 for the annual plan in US dollars, plus any tax due in your country — and your subscription begins, unless you cancel first. You can cancel during the trial from your account page in two clicks. One free trial per person.</p>
                     </div>
 
-                    <p><strong>One free trial per person.</strong> To hold to that, we check whether the email address starting a trial has had one before, and we keep a random identifier in a cookie on the device that started it. The <a href="/legal/privacy-policy">Privacy Policy</a> says exactly what is stored and for how long. Opening a second account to take a second trial is a breach of these terms.</p>
+                    <p>When you start a trial, you receive an email confirming the plan, the date the card will be charged and the amount, with a link to your account page where you can cancel. <strong>Cancelling during the trial means the card is not charged.</strong> If the card is declined when the trial ends, your access ends with the trial and nothing further is charged until you update the card.</p>
 
-                    <h3>5.4 Cancelling</h3>
+                    <p><strong>One free trial per person.</strong> To hold to that, we check whether the email address starting a trial has had one before, and we keep a random identifier in a cookie on the device that started it. Someone who has had a trial before, or who has ever held a subscription, is offered a straight subscription at the same price instead, with the same 14-day refund. The <a href="/legal/privacy-policy#trial-check">Privacy Policy</a> says exactly what is stored and for how long.</p>
 
-                    <p>You can cancel at any time from your account page. It takes two clicks, and there is no retention flow and no phone call. Cancelling stops the next charge; your access runs to the end of the period you have already paid for and then returns to the free timer.</p>
+                    <h3>5.4 Cancelling, pausing and switching</h3>
 
-                    <p>Nothing of yours is deleted when a subscription ends. Your settings and your session history are in your own browser, where they have always been.</p>
+                    <p>You can cancel at any time from your account page, in the same number of clicks it took to subscribe, and also from the merchant of record's customer portal linked from your receipt. Both paths do the same thing. On the cancel screen you will see two alternatives beside the cancel button — <strong>pause</strong> for one or three months, or <strong>switch a monthly plan to annual</strong> — and you can ignore both. The cancel button is never hidden behind them, and there is no phone call and no chat you have to sit through.</p>
+
+                    <p>Cancelling stops the next charge. Your access runs to the end of the period you have already paid for, and then returns to the free site. Pausing also stops the next charge; you keep access to the end of the period you have paid for, and the subscription resumes on the date you chose. Switching to annual is offered only where it saves you money.</p>
+
+                    <p>If a renewal payment fails after you have paid at least once, you keep access for seven days while the merchant of record retries the card and you are shown a banner asking you to update it. If it still fails, the subscription is cancelled and nothing more is charged. Nothing of yours is deleted when a subscription ends. Your settings and your session history are in your own browser, where they have always been.</p>
                 </section>
 
                 <section id="buying">
@@ -302,83 +328,47 @@
 
                     <p>I do not sell to you directly. The subscription is sold through a <strong>merchant of record</strong>, who is the <strong>seller of record</strong> for the transaction. <strong>The contract of sale is between you and the merchant of record.</strong> The service itself is provided by Georges Rayess, under these terms.</p>
 
-                    <p>The merchant of record takes the payment, calculates and remits sales tax and VAT, issues your receipt, and handles refunds and chargebacks. Its own terms apply to the sale alongside these ones, and the company named as seller on your receipt is the one you bought from. That provider is being appointed, and it will be named on this page and in the <a href="/legal/privacy-policy">Privacy Policy</a> before checkout opens.</p>
+                    <p>The merchant of record takes the payment, calculates and remits sales tax and VAT, issues your receipt, runs the customer portal, and processes refunds and chargebacks. Its own terms of sale apply alongside these ones, and the company named as seller on your receipt and on your card statement is the one you bought from. The provider will be named on this page and in the <a href="/legal/privacy-policy">Privacy Policy</a> before checkout opens.</p>
 
-                    <p>Prices are shown in US dollars unless your checkout says otherwise, and tax is added at checkout depending on where you are. I never see or store your card details. What reaches me is an order reference, the plan, the email address you subscribed with, the provider's subscription and customer identifiers, and the country used for tax.</p>
+                    <p>Prices are shown in US dollars unless your checkout says otherwise, and tax is added at checkout depending on where you are. I never see or store your card details. What reaches me is the plan, the email address you subscribed with, the provider's subscription and customer identifiers, the country used for tax, and the amount and currency you were charged.</p>
                 </section>
 
                 <section id="advertising">
                     <h2>7. Advertising, affiliate links and other sites</h2>
 
-                    <p>Some written guides carry Google AdSense advertising. Ads never appear inside the timer, inside the widget, on the product pages, or on the anxiety and panic-attack pages, and <strong>anyone with an active subscription sees no advertising anywhere</strong>. I do not control what an ad says and I do not endorse advertised products.</p>
+                    <p>Some written guides carry Google AdSense advertising. Ads never appear inside the timer, on the product pages, on the account and sign-in pages, or on the anxiety and panic-attack pages, and <strong>anyone with an active subscription sees no advertising anywhere</strong>. I do not control what an ad says and I do not endorse advertised products.</p>
 
                     <p>A few pages link to products I rate — currently Headspace and moonbird. Those are <strong>affiliate links</strong>, and <strong>I may earn a commission if you buy after clicking one</strong>, at no extra cost to you. The recommendation is not for sale, and the comparison pages still say when the free option is enough. Once you follow a link off this site, that company's terms and privacy policy govern what happens next, and I am not responsible for it.</p>
                 </section>
 
-                <section id="embedding">
-                    <h2>8. The widget and embedding</h2>
-
-                    <p>You may embed the breathing widget on your own site, including a site that makes money, free of charge. In return:</p>
-
-                    <ul>
-                        <li><strong>The free embed must keep its attribution link.</strong> Do not remove it, hide it, cover it, shrink it out of sight or point it elsewhere. That link is always marked <code>nofollow noopener</code>, and there is no paid option to change that.</li>
-                        <li><strong>An active subscription may remove the attribution</strong> — on your own site, and only while the subscription is active. If it lapses, the frame goes back to showing attribution.</li>
-                        <li><strong>Do not copy, rehost, modify or redistribute the widget code.</strong> Embed it from this domain. Do not bundle it into a theme, a plugin, a template or a product you sell.</li>
-                        <li><strong>Do not frame the main site.</strong> Use the embed frame, which exists for exactly this. The rest of the site is served with a header that refuses framing.</li>
-                        <li>Do not use the widget on a page that is unlawful, hateful, or that presents breathing as a treatment for a medical condition.</li>
-                        <li>Do not add tracking to the frame or try to read what happens inside it. Nothing about your visitors is sent to me, and it should stay that way.</li>
-                    </ul>
-
-                    <p>I may ask you to remove an embed that breaks these rules, and I may block a domain that keeps breaking them.</p>
-                </section>
-
-                <section id="commercial-use">
-                    <h2>9. Commercial use and white label</h2>
-
-                    <p>An active subscription carries a <strong>commercial-use grant</strong>. With it you may use Help Me Breathe in paid work: one-to-one client sessions, group classes, workshops, courses and programmes you run yourself, in person or online. You may put the white-label embed on your own site, send clients a co-branded session link, run class mode, and hand out the printable material with your name on it. None of that costs extra; it is part of the one plan.</p>
-
-                    <p>The limits are as simple as the grant:</p>
-
-                    <ul>
-                        <li><strong>Your own clients and classes only.</strong> The grant covers the one person or household that holds the account.</li>
-                        <li><strong>No resale.</strong> You may not sell, sublicense or give away access to the paid features, on their own or bundled into something else.</li>
-                        <li><strong>No wrapping it into a product.</strong> Do not build the timer into an app, a platform or a service you charge for, and do not offer it as a feature of your own software.</li>
-                        <li><strong>No white-labelling for third parties.</strong> Removing the attribution is for sites you run, not for sites you build for clients. Those need their own subscription.</li>
-                        <li><strong>Attribution comes back when the subscription ends.</strong> The white-label embed, the co-branded link and the commercial-use grant all run for as long as the subscription does, and stop when it does. An embed left in place goes back to showing the attribution link rather than breaking.</li>
-                        <li><strong>Your logo is yours to stand behind.</strong> If you set a logo on a white-label embed, you choose where it is hosted, and the visitor's browser fetches it from there. Point it at an address you control, and do not use it to load anything that tracks the people who visit the site you embedded on.</li>
-                        <li><strong>No claim of endorsement.</strong> You hold a subscription; you are not certified, accredited, partnered or approved by me, and you may not say that you are.</li>
-                        <li><strong>You are the professional in the room.</strong> You are responsible for the safety, screening and consent of the people you work with, and for your own insurance and professional obligations. As the Privacy Policy explains, I never receive any data about your clients, so you are the controller of your own client relationship.</li>
-                    </ul>
-                </section>
-
                 <section id="refund-section">
-                    <h2 id="refund">10. The 14-day refund policy</h2>
+                    <h2 id="refund">8. The 14-day refund policy</h2>
 
-                    <p><strong>Every purchase is covered by an unconditional 14-day refund.</strong> This is the one clause in this document with no small print.</p>
+                    <p><strong>Every charge is covered by an unconditional 14-day refund.</strong> This is the one clause in this document with no small print, and it has its own page: the <a href="/legal/refund-policy">Refund Policy</a>, which forms part of these terms.</p>
 
                     <ul>
                         <li>Ask within <strong>fourteen days of the charge</strong> and you get the full amount back.</li>
                         <li><strong>No reason is needed.</strong> You will not be asked why, offered a discount to stay, or sent through a retention flow. "I changed my mind" is enough. So is nothing at all.</li>
-                        <li><strong>How to ask: email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a></strong> from the address you bought with, or quote the order reference on your receipt. There is no form.</li>
+                        <li><strong>How to ask: email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a></strong> from the address on your account, or quote the order reference on your receipt. There is no form.</li>
                         <li><strong>The refund is issued by the merchant of record</strong> named on your receipt, back to the payment method you used. It usually lands within five to ten business days, depending on your bank.</li>
-                        <li>The subscription ends when the refund is issued. Please stop using the paid features and delete any printable material you downloaded.</li>
+                        <li>The subscription ends when the refund is issued. Please stop using the paid features.</li>
                         <li>It applies to the monthly plan and the yearly plan alike, to the first charge after a free trial, and to a renewal charge you did not expect.</li>
                     </ul>
 
-                    <p>After fourteen days, a charge already taken is final. The subscription runs to the end of the period already paid for and simply does not renew once you cancel. If something is broken, or a feature does not do what this site says it does, tell me at any time — that is a fault to fix, and outside the refund window I will still make it right rather than argue.</p>
+                    <p>A cancelled trial has nothing to refund, because nothing was charged. After fourteen days, a charge already taken is final. The subscription runs to the end of the period already paid for and simply does not renew once you cancel. If something is broken, or a feature does not do what this site says it does, tell me at any time — that is a fault to fix, and outside the refund window I will still make it right rather than argue.</p>
 
                     <p>Where the law where you live gives you stronger rights than this — a statutory right of withdrawal, for example — <strong>those rights apply on top of this policy, not instead of it</strong>. Nothing here takes away a consumer right you cannot waive.</p>
                 </section>
 
                 <section id="provider-change">
-                    <h2>11. If the payment provider changes or stops</h2>
+                    <h2>9. If the payment provider changes or stops</h2>
 
                     <p>A one-person project depends on a merchant of record, and providers do sometimes change terms, close accounts or leave markets. Here is what happens if that occurs, in advance and in writing:</p>
 
                     <ul>
                         <li><strong>Your account stays yours.</strong> It is not held by the payment provider, so a change of provider does not take your access away while a period you have paid for is still running.</li>
                         <li><strong>You will be asked before you are charged again.</strong> If your subscription cannot be moved across, it ends at the end of the period you have paid for, you are not charged again, and you can subscribe through the new provider if you want to.</li>
-                        <li><strong>Nothing is charged twice.</strong> A subscription is not restarted at a new provider on your behalf.</li>
+                        <li><strong>Nothing is charged twice.</strong> A subscription is not restarted at a new provider on your behalf. If two live subscriptions ever end up on one account, email me and one is refunded.</li>
                         <li><strong>You will be told.</strong> A change of provider will be announced on the site and by email to subscribers.</li>
                     </ul>
 
@@ -386,9 +376,9 @@
                 </section>
 
                 <section id="ip">
-                    <h2>12. Intellectual property and your feedback</h2>
+                    <h2>10. Intellectual property and your feedback</h2>
 
-                    <p>The site, its code, its design, its written guides, its audio and its printable material are protected by copyright and remain mine or my licensors'. The name "Help Me Breathe" and the site's branding are mine. None of it may be used in another product, or in a way that suggests I endorse something, without written permission.</p>
+                    <p>The site, its code, its design, its written guides and its audio are protected by copyright and remain mine or my licensors'. The name "Help Me Breathe" and the site's branding are mine. None of it may be used in another product, or in a way that suggests I endorse something, without written permission.</p>
 
                     <p>Breathing patterns themselves are not owned by anyone. Practise them, teach them and write about them freely. What these terms protect is this implementation of them.</p>
 
@@ -396,75 +386,75 @@
                 </section>
 
                 <section id="availability">
-                    <h2>13. Availability and changes to the service</h2>
+                    <h2>11. Availability and changes to the service</h2>
 
                     <p>The site is offered as it is, with no promised uptime. I may add, change, move or remove features, and I may retire a feature that is not used. If a paid feature is retired while your subscription is running, I will either replace it with something equivalent or refund a fair share of what you paid.</p>
 
-                    <p>Existing free techniques are the exception: they stay, and they stay free.</p>
+                    <p>The subscription is built to keep working for up to fourteen days without a network connection, so a flight, a tunnel or an outage on my side does not stop a paid session. The number of free sessions on a device, the length of the trial and the price may change for new subscribers; a change never applies to a period you have already paid for.</p>
                 </section>
 
                 <section id="termination">
-                    <h2>14. Termination</h2>
+                    <h2>12. Termination</h2>
 
-                    <p>You can stop using the site at any time, and you can cancel a subscription at any time from your account page. Clearing this site's storage removes your settings and your history from that browser.</p>
+                    <p>You can stop using the site at any time, cancel a subscription at any time from your account page, and delete your account from your account page or by email. Clearing this site's storage removes your settings and your history from that browser. Deleting the account cancels any live subscription first, and the Privacy Policy says what is kept afterwards and why.</p>
 
-                    <p>I may suspend or end your subscription, or block your access, if you materially breach these terms — sharing an account, opening a second account to take a second free trial, stripping attribution from a free embed, reselling access, attacking the service, or using the widget to make medical claims. Where the breach can be fixed, I will ask you to fix it first and give you a reasonable chance to do so. Where a subscription is ended for a breach, no refund is due beyond the fourteen-day window. If I end it for any other reason, I will refund the unused part.</p>
+                    <p>I may suspend or end your subscription, or block your access, if you materially breach these terms — sharing an account beyond one household, taking a second free trial through a second account or email address, reselling access, attacking the service, or using the timer to make medical claims. Where the breach can be fixed, I will ask you to fix it first and give you a reasonable chance to do so. Where a subscription is ended for a breach, no refund is due beyond the fourteen-day window. If I end it for any other reason, I will refund the unused part.</p>
 
-                    <p>Sections 3, 10, 12, 15, 16, 17, 18 and 20 survive the end of this agreement, so a refund you were already owed is still owed.</p>
+                    <p>Sections 3, 8, 10, 13, 14, 15, 16 and 18 survive the end of this agreement, so a refund you were already owed is still owed.</p>
                 </section>
 
                 <section id="warranties">
-                    <h2>15. Disclaimer of warranties</h2>
+                    <h2>13. Disclaimer of warranties</h2>
 
                     <p>The service is provided "as is" and "as available", without warranties of any kind, whether express or implied, including any implied warranty of merchantability, fitness for a particular purpose or non-infringement. I do not warrant that the service will be uninterrupted, error-free, secure, or that any particular breathing practice will produce any particular result. Nothing in this section limits a warranty that the law where you live does not allow to be excluded.</p>
                 </section>
 
                 <section id="liability">
-                    <h2>16. Limitation of liability</h2>
+                    <h2>14. Limitation of liability</h2>
 
                     <p>To the fullest extent the law allows, I am not liable for indirect, incidental, special, consequential or punitive damages, or for lost profits, lost data or lost opportunity, arising from your use of the service.</p>
 
-                    <p>To the fullest extent the law allows, my total liability for any claim connected to the service is limited to <strong>the amount you paid me in the twelve months before the claim</strong>, or twenty US dollars if you paid nothing.</p>
+                    <p>To the fullest extent the law allows, my total liability for any claim connected to the service is limited to <strong>the amount you paid for the service in the twelve months before the claim</strong>, or twenty US dollars if you paid nothing.</p>
 
                     <p>Nothing in these terms excludes liability for death or personal injury caused by negligence, for fraud, or for anything else that cannot lawfully be excluded. If you are a consumer, your statutory rights are unaffected.</p>
                 </section>
 
                 <section id="indemnity">
-                    <h2>17. Indemnity</h2>
+                    <h2>15. Indemnity</h2>
 
-                    <p>If you use Help Me Breathe in your own commercial practice, you agree to cover me for claims, losses and reasonable costs that arise from your use of it with your clients, from your breach of these terms, or from anything you claim about the practice that these terms do not say.</p>
+                    <p>You agree to cover me for claims, losses and reasonable costs that arise from your breach of these terms, or from anything you claim about the practice that these terms do not say.</p>
                 </section>
 
                 <section id="law">
-                    <h2>18. Governing law and disputes</h2>
+                    <h2>16. Governing law and disputes</h2>
 
                     <p>These terms are governed by the laws of the <strong>Republic of Lebanon</strong>, without regard to conflict-of-law rules, and the courts of Beirut, Lebanon have jurisdiction over any dispute.</p>
 
                     <p><strong>Before anything formal, we talk.</strong> If something goes wrong, email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> with what happened and what you want. I will answer within fourteen days, and both of us agree to try in good faith to settle it between ourselves for at least thirty days before starting proceedings. Most problems in a project this size are a refund and an apology, and that is usually the fastest answer for everyone.</p>
 
-                    <p>If you are a consumer, this clause does not take away your right to bring a claim in the courts of the country where you live, or to rely on the mandatory consumer protections that apply there.</p>
+                    <p>If you are a consumer, this clause does not take away your right to bring a claim in the courts of the country where you live, or to rely on the mandatory consumer protections that apply there. A dispute about the sale itself — the charge, the receipt, the tax — is with the merchant of record under its own terms.</p>
                 </section>
 
                 <section id="changes">
-                    <h2>19. Changes to these terms</h2>
+                    <h2>17. Changes to these terms</h2>
 
-                    <p>I will update this page when the facts change — a new price, a different provider, a clearer sentence. The date at the top always says when it last changed. If a change is material, I will say so on the page, and subscribers will be emailed. <strong>A price change never applies to a period you have already paid for</strong>, and you will be told before a renewal at a new price. Continuing to use the site after a change means the updated terms apply. <strong>A change will never shorten the refund window on a purchase you have already made</strong>, and it will never move a free technique behind a payment.</p>
+                    <p>I will update this page when the facts change — a new price, a different provider, a clearer sentence. The date at the top always says when it last changed. If a change is material, I will say so on the page, and subscribers will be emailed. <strong>A price change never applies to a period you have already paid for</strong>, and you will be told before a renewal at a new price. Continuing to use the site after a change means the updated terms apply. <strong>A change will never shorten the refund window on a purchase you have already made.</strong></p>
                 </section>
 
                 <section id="the-rest">
-                    <h2>20. The rest</h2>
+                    <h2>18. The rest</h2>
 
-                    <p>If a court finds part of these terms unenforceable, the rest stays in force. If I do not enforce something straight away, I have not given up the right to enforce it later. You may not transfer your rights under these terms; I may transfer mine if the site changes hands, and your subscription and your refund rights travel with it. These terms, the <a href="/legal/privacy-policy">Privacy Policy</a> and the <a href="/legal/medical-disclaimer">medical disclaimer</a> are the whole agreement between us about the service, and they replace anything said before.</p>
+                    <p>If a court finds part of these terms unenforceable, the rest stays in force. If I do not enforce something straight away, I have not given up the right to enforce it later. You may not transfer your rights under these terms; I may transfer mine if the site changes hands, and your subscription and your refund rights travel with it. These terms, the <a href="/legal/privacy-policy">Privacy Policy</a>, the <a href="/legal/refund-policy">Refund Policy</a> and the <a href="/legal/medical-disclaimer">medical disclaimer</a> are the whole agreement between us about the service, and they replace anything said before.</p>
                 </section>
 
                 <section id="contact">
-                    <h2>21. Contact</h2>
+                    <h2>19. Contact</h2>
 
                     <p>Questions, refunds, account problems and complaints all go to the same place: <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. This site is <a href="https://helpmebreath.com/">helpmebreath.com</a>, published by Georges Rayess, an individual.</p>
 
                     <p>By using the service, you confirm that you have read these terms and agree to them.</p>
 
-                    <p class="legal-nav">See also: <a href="/legal/privacy-policy">Privacy Policy</a> &middot; <a href="/legal/medical-disclaimer">Medical Disclaimer</a> &middot; <a href="/about">About this site</a></p>
+                    <p class="legal-nav">See also: <a href="/legal/privacy-policy">Privacy Policy</a> &middot; <a href="/legal/refund-policy">Refund Policy</a> &middot; <a href="/legal/medical-disclaimer">Medical Disclaimer</a> &middot; <a href="/about">About this site</a></p>
                 </section>
             </article>
         </main>
@@ -504,9 +494,7 @@
                     <p class="footer-heading">The site</p>
                     <a href="/about">About</a>
                     <a href="/pro">Pro</a>
-                    <a href="/for-practitioners">For practitioners</a>
-                    <a href="/embed">Embed the timer</a>
-                    <a href="/handouts">Printable handouts</a>
+                    <a href="/account">Your account</a>
                 </nav>
             </div>
 
@@ -514,6 +502,7 @@
 
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
+                <a href="/legal/refund-policy">Refund Policy</a>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>

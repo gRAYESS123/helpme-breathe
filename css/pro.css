@@ -89,7 +89,13 @@
     cursor: not-allowed;
 }
 
-.pro-btn-primary {
+
+.prose a.pro-btn { color: var(--ink); }
+
+/* `.prose a` (0,1,1) would otherwise out-rank these (0,1,0) selectors and paint
+   the label green on a green button: the invisible-CTA bug of 2026-09-10. */
+.pro-btn-primary,
+.prose a.pro-btn-primary {
     background: var(--green);
     border-color: var(--green);
     color: var(--chalk);
@@ -380,7 +386,7 @@
 /* This card renders inside [data-slot="post-session"], which lives in
    .breathing-section. BRAND.md sections 1 and 8 keep --clay off the timer
    screen, so the on-timer offer speaks in the neutral voice: ink price, green
-   button. --clay stays on /pro, /for-practitioners and the pricing matrix. */
+   button. --clay stays on /pro. */
 .paywall-card .paywall-price {
     font-family: var(--display);
     font-size: 1.375rem;
@@ -446,9 +452,6 @@
     color: var(--ok);
 }
 
-.checkout-waitlist-host {
-    margin: 1rem 0 0;
-}
 
 /* --------------------------------------------------------------------------
    Night mode. Every token is already swapped by css/styles.css when

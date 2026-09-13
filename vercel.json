@@ -6,6 +6,10 @@
     {
       "source": "/4-7-8-breathing-technique",
       "destination": "/blog/4-7-8-breathing-technique.html"
+    },
+    {
+      "source": "/favicon.ico",
+      "destination": "/favicon-32.png"
     }
   ],
   "redirects": [
@@ -13,6 +17,31 @@
       "source": "/breathing-techniques",
       "destination": "/timer",
       "permanent": true
+    },
+    {
+      "source": "/for-practitioners",
+      "destination": "/pro",
+      "permanent": true
+    },
+    {
+      "source": "/handouts",
+      "destination": "/guides",
+      "permanent": true
+    },
+    {
+      "source": "/embed/:path*",
+      "destination": "/timer",
+      "permanent": true
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/reconcile",
+      "schedule": "17 * * * *"
+    },
+    {
+      "path": "/api/cron/retention",
+      "schedule": "0 4 * * 1"
     }
   ],
   "headers": [
@@ -33,7 +62,7 @@
         },
         {
           "key": "Content-Security-Policy-Report-Only",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://pagead2.googlesyndication.com https://cdn.paddle.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com; base-uri 'self'; object-src 'none'; form-action 'self'"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://pagead2.googlesyndication.com https://cdn.paddle.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://*.supabase.co wss://*.supabase.co https://*.paddle.com; frame-src 'self' https://*.paddle.com https://accounts.google.com; base-uri 'self'; object-src 'none'; form-action 'self' https://accounts.google.com https://*.supabase.co"
         }
       ]
     },
@@ -64,51 +93,11 @@
       ]
     },
     {
-      "source": "/((?!embed/|s/|s$).*)",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "X-Frame-Options",
           "value": "DENY"
-        }
-      ]
-    },
-    {
-      "source": "/embed/(.*)",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; frame-ancestors *"
-        }
-      ]
-    },
-    {
-      "source": "/s",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "frame-ancestors *"
-        }
-      ]
-    },
-    {
-      "source": "/s/(.*)",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "frame-ancestors *"
-        }
-      ]
-    },
-    {
-      "source": "/embed/v1/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; base-uri 'self'; object-src 'none'; form-action 'none'; frame-ancestors *"
         }
       ]
     },

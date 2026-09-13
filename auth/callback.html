@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
+
+    <title>Signing you in — Help Me Breathe</title>
+    <meta name="description" content="Finishing your Help Me Breathe sign-in.">
+
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <meta name="author" content="Georges Rayess">
+
+    <!--
+      FIRST script on the page. The sign-in link lands here with a one-time
+      code or token hash in the URL. Read it into memory, then take it out of
+      the address bar so it never reaches history, the bfcache, the service
+      worker or an analytics hit. Everything downstream reads window.__hmbAuth.
+    -->
+    <script>
+        (function () {
+            try {
+                window.__hmbAuth = window.location.search;
+                var q = new URLSearchParams(window.location.search);
+                var keep = new URLSearchParams();
+                if (q.get('next')) keep.set('next', q.get('next'));
+                if (q.get('intent')) keep.set('intent', q.get('intent'));
+                var clean = window.location.pathname + (keep.toString() ? '?' + keep.toString() : '');
+                if (window.history && typeof window.history.replaceState === 'function' && clean !== window.location.pathname + window.location.search) {
+                    window.history.replaceState(null, '', clean);
+                }
+            } catch (error) {
+                window.__hmbAuth = window.__hmbAuth || '';
+            }
+        }());
+    </script>
+
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
+
+    <!-- PERFORMANCE -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="/css/styles.css" as="style">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/account.css">
+
+    <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
+
+    <!--
+      Google Consent Mode v2 — copy verbatim, do not reorder. The DENIED
+      defaults must be pushed before gtag('config', …). js/consent.js replays
+      the visitor's stored choice and owns the banner.
+    -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'wait_for_update': 500
+        });
+        gtag('js', new Date());
+        gtag('config', 'G-TYLYLJSFHN', {
+            'anonymize_ip': true,
+            'cookie_expires': 63072000,
+            // The one-time code never reaches Google, whatever the address bar held.
+            'page_location': window.location.origin + window.location.pathname
+        });
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
+</head>
+<body class="theme-478 article-page auth-page" data-no-ads="true" data-no-asks="true">
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <header class="article-header">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/signin">Sign in</a></li>
+                    <li>Finishing</li>
+                </ol>
+            </nav>
+            <h1>Signing you in</h1>
+            <p class="lead">This takes a moment. Nothing to do.</p>
+        </header>
+
+        <main id="main">
+            <!-- 1. Working -->
+            <section class="auth-card auth-state" data-state="working">
+                <div class="auth-working">
+                    <svg class="auth-ring" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                        <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                    </svg>
+                    <p role="status" aria-live="polite" data-role="working-text">Checking your sign-in link…</p>
+                </div>
+            </section>
+
+            <!-- 2. Expired, used, or opened in the wrong browser -->
+            <section class="auth-card auth-state" data-state="expired" hidden>
+                <h2>That sign-in link has expired</h2>
+                <p data-role="expired-reason">Links work once and expire after an hour. Send a new one and open it on this device.</p>
+                <form class="auth-form" data-role="resend-form" novalidate>
+                    <label class="auth-label" for="resend-email">Email address</label>
+                    <input class="auth-input" id="resend-email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" required>
+                    <button class="btn btn--primary btn--block" type="submit" data-action="resend">Send a new link</button>
+                </form>
+                <p class="auth-status" data-role="resend-status" role="status" aria-live="polite"></p>
+                <p class="auth-note">Links opening in a different app or browser? <a data-role="code-link" href="/signin">Use a 6-digit code instead</a>.</p>
+            </section>
+
+            <!-- 3. Done -->
+            <section class="auth-card auth-state" data-state="done" hidden>
+                <div class="auth-working">
+                    <svg class="auth-ring" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                        <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                    </svg>
+                    <p role="status" aria-live="polite" data-role="done-text">Signed in. Taking you back…</p>
+                </div>
+                <div data-checkout-slot></div>
+                <p class="auth-note" data-role="done-fallback" hidden>Not moving? <a data-role="done-link" href="/account">Continue</a>.</p>
+            </section>
+
+            <!-- 4. Accounts not switched on -->
+            <section class="auth-card auth-state" data-state="closed" hidden>
+                <h2>Accounts are not open yet</h2>
+                <p>This link does not do anything yet. The timer keeps working without an account.</p>
+                <div class="btn-row"><a class="btn" href="/timer">Back to the timer</a></div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/account">Your account</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician: <a href="/about">what that means for what you read here</a>.</p>
+
+            <div class="legal-links">
+                <a href="/legal/privacy-policy">Privacy Policy</a>
+                <a href="/legal/terms-of-service">Terms of Service</a>
+                <a href="/legal/refund-policy">Refund Policy</a>
+                <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
+                <a href="mailto:contact@helpmebreath.com">Contact</a>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="/js/consent.js"></script>
+    <script type="module" src="/js/app.js"></script>
+    <script type="module">
+        /*
+         * /auth/callback — design section 4.2 (both link shapes), 4.3 (the
+         * two-tab case reads as "expired", never a stack trace) and 4.4 (the
+         * checkout resume: on intent=subscribe:<plan> we do NOT bounce to
+         * `next`; we open checkout here, and if that fails for any reason we
+         * land on /pro?plan=<plan>&resume=1, which has a single button).
+         */
+        import { configured, completeCallback, parseAuthParams, signInWithEmail, lastSignInMethod, signInUrl } from '/js/auth.js';
+        import { subscribe } from '/js/checkout.js';
+        import { track, EVENTS } from '/js/analytics.js';
+
+        const params = parseAuthParams(window.__hmbAuth || '');
+        const next = params.next || '/account';
+        const plan = params.plan || null;
+        const $ = (sel) => document.querySelector(sel);
+
+        function show(name) {
+            for (const el of document.querySelectorAll('.auth-state')) el.hidden = el.dataset.state !== name;
+        }
+
+        function say(el, text, tone) {
+            el.textContent = text || '';
+            el.classList.toggle('is-error', tone === 'error');
+            el.classList.toggle('is-ok', tone === 'ok');
+        }
+
+        async function resume() {
+            show('done');
+            const link = $('[data-role="done-link"]');
+            if (plan) {
+                $('[data-role="done-text"]').textContent = 'Signed in. Opening checkout…';
+                link.href = `/pro?plan=${encodeURIComponent(plan)}&resume=1`;
+                track(EVENTS.SIGNIN_RESUME_CHECKOUT || 'signin_resume_checkout', { plan });
+                let result = null;
+                try {
+                    result = await subscribe(plan, { container: $('[data-state="done"] [data-checkout-slot]') });
+                } catch { result = null; }
+                if (result && result.ok) {
+                    $('[data-role="done-text"]').textContent = 'Signed in. Checkout is open.';
+                    $('[data-role="done-fallback"]').hidden = false;
+                    return;
+                }
+                location.assign(link.href);
+                return;
+            }
+            link.href = next;
+            window.setTimeout(() => { $('[data-role="done-fallback"]').hidden = false; }, 2500);
+            location.replace(next);
+        }
+
+        $('[data-role="resend-form"]').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const input = $('#resend-email');
+            const email = (input.value || '').trim();
+            const status = $('[data-role="resend-status"]');
+            if (!email) { say(status, 'Enter your email address first.', 'error'); input.focus(); return; }
+            const btn = $('[data-action="resend"]');
+            btn.disabled = true;
+            say(status, 'Sending…');
+            const result = await signInWithEmail(email, { intent: params.intent, next: params.next });
+            btn.disabled = false;
+            if (!result.ok) { say(status, result.error || 'Something went wrong. Please try again.', 'error'); return; }
+            say(status, `Sent. Check the inbox for ${email} and open the link on this device.`, 'ok');
+        });
+
+        async function boot() {
+            $('[data-role="code-link"]').href = signInUrl({ next: params.next, intent: params.intent });
+            if (!configured()) { show('closed'); return; }
+
+            const hasParams = !!(params.code || params.tokenHash || params.error || params.errorDescription);
+            const result = await completeCallback(params);
+            const method = lastSignInMethod();
+
+            if (result.ok) {
+                track(EVENTS.SIGNIN_COMPLETE || 'signin_complete', { method });
+                await resume();
+                return;
+            }
+
+            // A person who wandered here with no parameters and no session: /signin is the page they want.
+            if (!hasParams && result.reason === 'no_session') { location.replace(signInUrl({ next: params.next, intent: params.intent })); return; }
+
+            track(EVENTS.SIGNIN_FAIL || 'signin_fail', { method, reason: result.reason || 'unknown' });
+            const reason = $('[data-role="expired-reason"]');
+            if (result.reason === 'verifier_missing') {
+                $('[data-state="expired"] h2').textContent = 'That link opened in a different browser';
+                reason.textContent = 'Sign-in links only work in the browser that asked for them. Send a new one from here, or use a 6-digit code, which works anywhere.';
+            } else if (result.reason === 'network') {
+                $('[data-state="expired"] h2').textContent = 'We could not reach the sign-in service';
+                reason.textContent = result.message || 'Check your connection and reload this page.';
+            } else if (result.message) {
+                reason.textContent = result.message;
+            }
+            show('expired');
+            $('#resend-email').focus();
+        }
+
+        boot();
+    </script>
+</body>
+</html>

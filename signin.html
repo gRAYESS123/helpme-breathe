@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
+
+    <title>Sign in — Help Me Breathe</title>
+    <meta name="description" content="Sign in to Help Me Breathe with an email link, a 6-digit code or a Google account. No password.">
+
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <meta name="author" content="Georges Rayess">
+
+    <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#15191A" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F5F1E8">
+
+    <!-- PERFORMANCE -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="/css/styles.css" as="style">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/account.css">
+
+    <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate. -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"></noscript>
+
+    <!--
+      Google Consent Mode v2 — copy verbatim, do not reorder. The DENIED
+      defaults must be pushed before gtag('config', …). js/consent.js replays
+      the visitor's stored choice and owns the banner.
+    -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'wait_for_update': 500
+        });
+        gtag('js', new Date());
+        gtag('config', 'G-TYLYLJSFHN', {
+            'anonymize_ip': true,
+            'cookie_expires': 63072000,
+            // `next` and `intent` never reach Google.
+            'page_location': window.location.origin + window.location.pathname
+        });
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
+</head>
+<body class="theme-478 article-page auth-page" data-no-ads="true" data-no-asks="true">
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a class="lockup" href="/" aria-label="Help Me Breathe, home">
+                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                </svg>
+                <span class="wordmark">Help Me Breathe</span>
+            </a>
+            <button class="nav-toggle" type="button" data-action="toggle-nav" aria-controls="site-nav" aria-expanded="false">Menu</button>
+            <nav class="site-nav" id="site-nav" aria-label="Main">
+                <a href="/timer">Timer</a>
+                <a href="/guides">Guides</a>
+                <a href="/science">Science</a>
+                <a href="/pro">Pro</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <header class="article-header">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li><a href="/">Home</a></li>
+                    <li>Sign in</li>
+                </ol>
+            </nav>
+            <h1>Sign in</h1>
+            <p class="lead" data-role="lead">One email address is the whole account. No password, ever.</p>
+        </header>
+
+        <main id="main">
+            <!-- Accounts not switched on yet (js/config.js SUPABASE is empty). -->
+            <section class="auth-card" data-state="closed" hidden>
+                <h2>Accounts are not open yet</h2>
+                <p>The timer keeps working without one. When accounts open, this page is where you sign in with an email link, a 6-digit code or a Google account.</p>
+                <p class="auth-muted">Questions? Email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>.</p>
+                <div class="btn-row">
+                    <a class="btn" href="/timer" data-role="back-link">Back to the timer</a>
+                </div>
+            </section>
+
+            <!-- Already signed in: nothing to do here. -->
+            <section class="auth-card" data-state="signed-in" hidden>
+                <h2>You are signed in</h2>
+                <p>Signed in as <strong data-role="signed-in-email"></strong>.</p>
+                <div class="btn-row">
+                    <a class="btn btn--primary" href="/account" data-role="continue-link">Continue</a>
+                    <button class="btn btn--quiet" type="button" data-action="signout">Sign out</button>
+                </div>
+            </section>
+
+            <!-- The form. -->
+            <section class="auth-card" data-state="form" hidden>
+                <h2 data-role="form-heading">Sign in or create an account</h2>
+                <p data-role="form-why">An account keeps the timer, your presets and your history on every device you sign in on. The first three sessions on a device need no account.</p>
+
+                <form class="auth-form" data-role="email-form" novalidate>
+                    <label class="auth-label" for="signin-email">Email address</label>
+                    <input class="auth-input" id="signin-email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" required>
+                    <button class="btn btn--primary btn--block" type="submit" data-action="send-link">Email me a sign-in link</button>
+                    <button class="btn btn--quiet btn--block" type="button" data-action="send-code">Send me a 6-digit code instead</button>
+                </form>
+
+                <p class="auth-or" aria-hidden="true">or</p>
+
+                <div class="btn-row btn-row--stack">
+                    <button class="btn btn--block" type="button" data-action="google">Continue with Google</button>
+                </div>
+
+                <p class="auth-status" data-role="status" role="status" aria-live="polite"></p>
+
+                <ul class="auth-rules">
+                    <li>The link in the email works once and expires after an hour. Open it on this device.</li>
+                    <li>If your email app opens links somewhere else, use the 6-digit code instead.</li>
+                    <li>An account is for one person or one household.</li>
+                </ul>
+            </section>
+
+            <!-- A link or code has been sent. -->
+            <section class="auth-card" data-state="sent" hidden>
+                <h2 data-role="sent-heading">Check your inbox</h2>
+                <p data-role="sent-body">We sent a sign-in link to <strong data-role="sent-email"></strong>. Open it on this device and you are in.</p>
+
+                <form class="auth-form" data-role="code-form" hidden novalidate>
+                    <label class="auth-label" for="signin-code">The 6-digit code from the email</label>
+                    <input class="auth-input auth-input--code" id="signin-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required placeholder="000000">
+                    <button class="btn btn--primary btn--block" type="submit" data-action="verify-code">Sign in</button>
+                </form>
+
+                <p class="auth-status" data-role="sent-status" role="status" aria-live="polite"></p>
+
+                <div class="btn-row">
+                    <button class="btn btn--quiet" type="button" data-action="use-code" data-role="use-code">Use a 6-digit code instead</button>
+                    <button class="btn btn--quiet" type="button" data-action="start-over">Use a different email</button>
+                </div>
+                <p class="auth-note">Nothing arrived after a minute? Check the spam folder, then send it again.</p>
+            </section>
+
+            <!-- Signed in with a code; resuming what the person was doing. -->
+            <section class="auth-card" data-state="done" hidden>
+                <div class="auth-working">
+                    <svg class="auth-ring" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                        <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                    </svg>
+                    <p data-role="done-text">Signed in. Taking you back…</p>
+                </div>
+                <div data-checkout-slot></div>
+            </section>
+
+            <p class="auth-note"><a href="/" data-role="back-home">Back to Help Me Breathe</a> · <a href="/legal/privacy-policy">What an account stores</a></p>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-cols">
+                <nav class="footer-nav" aria-label="Breathing timers">
+                    <p class="footer-heading">Timers</p>
+                    <a href="/timer">All timers</a>
+                    <a href="/4-7-8-breathing">4-7-8 breathing</a>
+                    <a href="/box-breathing">Box breathing</a>
+                    <a href="/heart-coherence-breathing">Heart coherence</a>
+                    <a href="/cyclic-sighing">Cyclic sighing</a>
+                    <a href="/extended-exhale-breathing">Extended exhale</a>
+                    <a href="/triangle-breathing">Triangle breathing</a>
+                    <a href="/energizing-breath">Energizing breath</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Guides">
+                    <p class="footer-heading">Guides</p>
+                    <a href="/breathing-exercises-anxiety">For anxious moments</a>
+                    <a href="/breathing-exercises-for-sleep">For sleep</a>
+                    <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
+                    <a href="/breathing-exercises-for-focus">For focus</a>
+                    <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
+                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="Compare and research">
+                    <p class="footer-heading">Compare</p>
+                    <a href="/box-breathing-vs-4-7-8">Box vs 4-7-8</a>
+                    <a href="/breathing-apps-compared">Apps compared</a>
+                    <a href="/science">What the research says</a>
+                </nav>
+
+                <nav class="footer-nav" aria-label="About and products">
+                    <p class="footer-heading">The site</p>
+                    <a href="/about">About</a>
+                    <a href="/pro">Pro</a>
+                    <a href="/account">Your account</a>
+                </nav>
+            </div>
+
+            <p class="footer-byline">Written and maintained by Georges Rayess. Not a clinician: <a href="/about">what that means for what you read here</a>.</p>
+
+            <div class="legal-links">
+                <a href="/legal/privacy-policy">Privacy Policy</a>
+                <a href="/legal/terms-of-service">Terms of Service</a>
+                <a href="/legal/refund-policy">Refund Policy</a>
+                <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
+                <a href="mailto:contact@helpmebreath.com">Contact</a>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="/js/consent.js"></script>
+    <script type="module" src="/js/app.js"></script>
+    <script type="module">
+        /*
+         * /signin — design section 4.2 and 4.4.
+         *
+         * Carries ?next= (a same-origin path to return to) and ?intent=
+         * (none | subscribe:monthly | subscribe:yearly). Both are validated by
+         * js/auth.js#parseAuthParams and passed into the email redirect, so
+         * /auth/callback can resume a checkout without a second click.
+         *
+         * The 6-digit code path establishes the session on THIS page, so the
+         * resume happens here instead: a subscribe intent opens checkout in
+         * place; anything else goes to `next`, or to /account.
+         */
+        import {
+            configured, ready, signedIn, user, signOut,
+            signInWithEmail, signInWithCode, verifyCode, signInWithGoogle,
+            parseAuthParams, lastSignInMethod,
+        } from '/js/auth.js';
+        import { subscribe } from '/js/checkout.js';
+        import { track, EVENTS } from '/js/analytics.js';
+
+        const params = parseAuthParams();
+        const next = params.next || '/account';
+        const plan = params.plan || null;
+
+        const $ = (sel) => document.querySelector(sel);
+        const cards = {
+            closed: $('[data-state="closed"]'),
+            signedIn: $('[data-state="signed-in"]'),
+            form: $('[data-state="form"]'),
+            sent: $('[data-state="sent"]'),
+            done: $('[data-state="done"]'),
+        };
+        const emailInput = $('#signin-email');
+        const codeInput = $('#signin-code');
+        const status = $('[data-role="status"]');
+        const sentStatus = $('[data-role="sent-status"]');
+        const codeForm = $('[data-role="code-form"]');
+
+        let email = '';
+        let method = 'magic_link';
+        let busy = false;
+
+        function show(name) {
+            for (const [key, el] of Object.entries(cards)) el.hidden = key !== name;
+        }
+
+        function say(el, text, tone) {
+            el.textContent = text || '';
+            el.classList.toggle('is-error', tone === 'error');
+            el.classList.toggle('is-ok', tone === 'ok');
+        }
+
+        function setBusy(on) {
+            busy = on;
+            for (const b of document.querySelectorAll('.auth-card button')) b.disabled = on;
+        }
+
+        // An installed iOS app is its own storage container: a link opens in
+        // Safari and lands the session in the wrong place, so the code is the
+        // method that works there (design section 13). Offer it first.
+        function standalone() {
+            try {
+                return !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+            } catch { return false; }
+        }
+
+        function describeIntent() {
+            if (plan) {
+                $('[data-role="form-heading"]').textContent = 'Sign in to start your plan';
+                $('[data-role="form-why"]').textContent = 'Your subscription follows your email address, so it works on every device you sign in on. Sign in and checkout opens straight away.';
+                $('[data-role="lead"]').textContent = 'One step before checkout: the email address the plan belongs to.';
+            }
+            const back = $('[data-role="back-link"]');
+            if (back && params.next) back.href = params.next;
+            const cont = $('[data-role="continue-link"]');
+            if (cont) cont.href = next;
+        }
+
+        async function resume() {
+            show('done');
+            if (plan) {
+                $('[data-role="done-text"]').textContent = 'Signed in. Opening checkout…';
+                track(EVENTS.SIGNIN_RESUME_CHECKOUT || 'signin_resume_checkout', { plan });
+                const result = await subscribe(plan, { container: cards.done.querySelector('[data-checkout-slot]') });
+                if (result && result.ok) return; // the overlay is open on this page
+                location.assign(`/pro?plan=${encodeURIComponent(plan)}&resume=1`);
+                return;
+            }
+            location.replace(next);
+        }
+
+        async function send(kind) {
+            if (busy) return;
+            email = (emailInput.value || '').trim();
+            if (!email) { say(status, 'Enter your email address first.', 'error'); emailInput.focus(); return; }
+            setBusy(true);
+            say(status, kind === 'otp_code' ? 'Sending the code…' : 'Sending the link…');
+            const fn = kind === 'otp_code' ? signInWithCode : signInWithEmail;
+            const result = await fn(email, { intent: params.intent, next: params.next });
+            setBusy(false);
+            if (!result.ok) { say(status, result.error || 'Something went wrong. Please try again.', 'error'); return; }
+            method = kind;
+            say(status, '');
+            $('[data-role="sent-email"]').textContent = email;
+            if (kind === 'otp_code') {
+                $('[data-role="sent-heading"]').textContent = 'Enter the code';
+                $('[data-role="sent-body"]').innerHTML = 'We emailed a 6-digit code to <strong></strong>. It works for one hour.';
+                $('[data-role="sent-body"] strong').textContent = email;
+                codeForm.hidden = false;
+                $('[data-role="use-code"]').hidden = true;
+                show('sent');
+                codeInput.focus();
+            } else {
+                $('[data-role="sent-heading"]').textContent = 'Check your inbox';
+                $('[data-role="sent-body"]').innerHTML = 'We sent a sign-in link to <strong></strong>. Open it on this device and you are in.';
+                $('[data-role="sent-body"] strong').textContent = email;
+                codeForm.hidden = true;
+                $('[data-role="use-code"]').hidden = false;
+                show('sent');
+            }
+        }
+
+        async function verify() {
+            if (busy) return;
+            const code = (codeInput.value || '').replace(/\D/g, '');
+            if (code.length !== 6) { say(sentStatus, 'Enter the 6-digit code from the email.', 'error'); codeInput.focus(); return; }
+            setBusy(true);
+            say(sentStatus, 'Checking the code…');
+            const result = await verifyCode(email, code);
+            setBusy(false);
+            if (!result.ok) {
+                track(EVENTS.SIGNIN_FAIL || 'signin_fail', { method: 'otp_code', reason: result.reason || 'unknown' });
+                say(sentStatus, result.error || 'That code did not work. Check it and try again, or send a new one.', 'error');
+                return;
+            }
+            track(EVENTS.SIGNIN_COMPLETE || 'signin_complete', { method: 'otp_code' });
+            await resume();
+        }
+
+        document.addEventListener('click', async (event) => {
+            const btn = event.target.closest('[data-action]');
+            if (!btn) return;
+            const action = btn.dataset.action;
+            if (action === 'send-code') { event.preventDefault(); send('otp_code'); }
+            else if (action === 'google') {
+                event.preventDefault();
+                if (busy) return;
+                setBusy(true);
+                say(status, 'Taking you to Google…');
+                const result = await signInWithGoogle({ intent: params.intent, next: params.next });
+                if (!result.ok) { setBusy(false); say(status, result.error || 'Google sign-in could not start.', 'error'); }
+            }
+            else if (action === 'use-code') {
+                event.preventDefault();
+                // The link is already on its way; the same email carries a code the
+                // person can type here instead (one signInWithOtp, two ways in).
+                $('[data-role="sent-heading"]').textContent = 'Enter the code';
+                $('[data-role="sent-body"]').innerHTML = 'The email we sent to <strong></strong> also contains a 6-digit code. Type it here.';
+                $('[data-role="sent-body"] strong').textContent = email;
+                codeForm.hidden = false;
+                btn.hidden = true;
+                codeInput.focus();
+            }
+            else if (action === 'start-over') { event.preventDefault(); say(sentStatus, ''); codeInput.value = ''; show('form'); emailInput.focus(); }
+            else if (action === 'signout') { event.preventDefault(); setBusy(true); await signOut(); location.reload(); }
+        });
+
+        $('[data-role="email-form"]').addEventListener('submit', (event) => { event.preventDefault(); send(standalone() ? 'otp_code' : 'magic_link'); });
+        codeForm.addEventListener('submit', (event) => { event.preventDefault(); verify(); });
+
+        async function boot() {
+            describeIntent();
+            if (!configured()) { show('closed'); return; }
+            await ready();
+            if (signedIn()) {
+                const u = user();
+                $('[data-role="signed-in-email"]').textContent = (u && u.email) || 'your account';
+                show('signedIn');
+                // A subscribe intent from someone already signed in: go straight on.
+                if (plan) resume();
+                return;
+            }
+            if (standalone()) {
+                $('[data-action="send-link"]').textContent = 'Email me a 6-digit code';
+                $('[data-action="send-code"]').hidden = true;
+            }
+            show('form');
+            track(EVENTS.SIGNIN_VIEW || 'signin_view', { source: plan ? 'checkout' : 'direct', feature: plan ? 'subscribe' : 'account' });
+            emailInput.focus();
+        }
+
+        boot();
+    </script>
+</body>
+</html>

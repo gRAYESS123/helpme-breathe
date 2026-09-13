@@ -6,12 +6,6 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8080"],
       "port": 8080
-    },
-    {
-      "name": "easystoryboards",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8090", "--directory", "C:/Users/georg/Desktop/Side hustkes/easystoryboards"],
-      "port": 8090
     }
   ]
 }

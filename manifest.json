@@ -10,7 +10,7 @@
   "theme_color": "#0F5136",
   "lang": "en-US",
   "dir": "ltr",
-  "categories": ["health", "lifestyle", "medical"],
+  "categories": ["health", "lifestyle"],
   "icons": [
     {
       "src": "/images/icon-192.png",

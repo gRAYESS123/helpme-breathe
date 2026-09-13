@@ -128,7 +128,7 @@ ${head(`
     </div>
   </div>
   <div class="ui label" style="position:absolute;left:${gutter}px;top:${footerY}px;color:${DAY.ink}">${SITE_LABEL}</div>
-  <div class="ui label" style="position:absolute;right:${gutter}px;top:${footerY}px;color:${DAY.graphite}">${esc(entry.footer || 'Free · No account · Offline')}</div>
+  <div class="ui label" style="position:absolute;right:${gutter}px;top:${footerY}px;color:${DAY.graphite}">${esc(entry.footer || 'Three sessions free · Offline')}</div>
   ${signatureStrip({ x: gutter, y: stripY, width: W - gutter * 2, active: entry.theme })}
 </div>`;
 }

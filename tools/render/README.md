@@ -7,13 +7,12 @@ the marginal cost of one more post is a few seconds of CPU.
 This folder has its **own** `package.json` on purpose. The site itself stays
 dependency-free; Playwright lives here and only here.
 
-One thing to know about deployment: the repo has no `.vercelignore`, so a static
-Vercel deploy currently serves everything committed, `tools/` included — nothing
-secret, but `https://helpmebreath.com/tools/render/batch.json` would be readable.
-`node_modules/` and `out/` are not committed, so nothing large is uploaded. If you
-want `tools/` off the deployment entirely, add a `.vercelignore` at the repo root
-containing `tools/` and `docs/` (filed as an integration request; that file is not
-owned by this tool).
+Deployment: the repo-root `.vercelignore` keeps `tools/` and `docs/` out of every
+Vercel deploy, so nothing in this folder is ever served from the site.
+
+Output: pins need no ffmpeg at all. MP4 clips need a full ffmpeg on `PATH`
+(`winget install Gyan.FFmpeg`); without one the tool keeps the `.webm`. See
+section 1.
 
 ---
 
@@ -34,11 +33,12 @@ That downloads ~300 MB into `%LOCALAPPDATA%\ms-playwright` on Windows — outsid
 the repo, shared by every project. It is only needed when Playwright is upgraded
 to a version that wants a newer Chromium build.
 
-### ffmpeg (optional, but you want it)
+### ffmpeg (optional for pins, required for MP4 clips)
 
-Clips come out of Chromium as VP8 `.webm`. Pinterest, TikTok, Instagram and
-YouTube Shorts all prefer H.264 MP4 with a real audio track, so the tool muxes
-to MP4 **when it can find a capable ffmpeg**. It looks in this order:
+Pins are plain PNG screenshots and never touch ffmpeg. Clips come out of
+Chromium as VP8 `.webm`. Pinterest, TikTok, Instagram and YouTube Shorts all
+prefer H.264 MP4 with a real audio track, so the tool muxes to MP4 **when it
+can find a capable ffmpeg**. It looks in this order:
 
 1. `ffmpeg` on `PATH`
 2. `<playwright browsers dir>/ffmpeg-*/ffmpeg*`
@@ -132,19 +132,11 @@ Everything lands in `tools/render/out/`, named `<slug>-<size>`:
 | `<slug>-story.png` | poster frame, taken one second into the clip |
 | `<slug>-pin.png` | 1000×1500 Pinterest still |
 
-`out/` is scratch space — regenerate it, do not commit it. The one exception is
-`out/sample.png`, a small reference frame kept in the repo so you can see what
-the surface looks like without running anything.
-
-That needs these two lines in the repo-root `.gitignore` (in this order — git
-will not descend into a directory excluded with a trailing slash, so
-`tools/render/out/` followed by a negation would silently keep `sample.png` out
-too):
-
-```gitignore
-tools/render/out/*
-!tools/render/out/sample.png
-```
+`out/` is scratch space — regenerate it, do not commit it. The repo-root
+`.gitignore` excludes the whole folder (`tools/render/out/`), so nothing in it
+is tracked. If an `out/sample.png` is sitting on your machine it is local
+scratch from an earlier run, not a committed reference, and it may show an
+older design; render a pin to see what the surface looks like today.
 
 Pinterest descriptions live in `batch.json` (`pinDescription`), already under
 500 characters and already carrying the page link. Copy them straight across.
@@ -184,7 +176,8 @@ Before anything goes public:
 - [ ] Nothing on screen claims the timer treats, cures or replaces treatment for
       any condition. Describe the pattern, not an outcome.
 - [ ] Energizing-breath posts carry the safety line (seated only, never in or
-      near water) in the caption **and** the description.
+      near water) in the on-screen sub line **and** the description (the
+      caption is the headline of the capture and stays a headline).
 - [ ] Panic and anxiety posts point at the crisis-safe pages and stay free of
       anything that reads as a sales pitch.
 - [ ] The phrase "Wim Hof" appears nowhere — in the caption, the description,

@@ -1588,7 +1588,7 @@ function checkAdsTxt() {
  *
  * A stylesheet rule whose selector is scoped to the breathing section or to the
  * post-session slot may not use var(--clay). The commerce accent belongs on
- * /pro, /for-practitioners and the pricing matrix; the timer is not for sale.
+ * /pro; the timer is not for sale.
  */
 function checkClayOnTimer() {
   const TIMER_SCOPES = ['.breathing-section', '[data-slot="post-session"]', '.post-session-card', '.paywall-card'];
@@ -1670,6 +1670,897 @@ function checkVercelJson() {
   }
 }
 
+/* ------------------------------------------- accounts model guardrails ---- */
+/**
+ * Four checks added with the accounts and billing build (2026-09-11 decision,
+ * docs/private/ACCOUNTS_BILLING_DESIGN.md section 15, task 12).
+ *
+ *  1. `data-open-timer` is a safety feature, not a config knob: it runs the
+ *     timer for anyone, forever. It belongs on the two crisis pages only, and
+ *     must be present there.
+ *  2. No provider is named in api/ or js/ outside the seam (the adapters, the
+ *     env registry, js/config.js and js/checkout.js), so one env var can swap
+ *     the payment rail. And no trace of a second plan: one plan, no switch.
+ *  3. The "no account / free forever" promises that were true before accounts
+ *     existed must not come back. A short allowlist covers the sentences that
+ *     are still true (the first three sessions).
+ *  4. Gated timer pages keep `isAccessibleForFree: true`; the prose is never
+ *     paywalled, so paywall structured data would be a false signal.
+ */
+const OPEN_TIMER_ALLOWED = new Set([
+  'breathing-exercises-anxiety.html',
+  'breathing-exercises-for-panic-attacks.html',
+]);
+const OPEN_TIMER_REQUIRED = ['breathing-exercises-anxiety.html', 'breathing-exercises-for-panic-attacks.html'];
+const PROVIDER_SEAM = ['api/_lib/providers/', 'api/_lib/env.js', 'js/config.js', 'js/checkout.js'];
+const PROVIDER_RE = /\b(paddle|fastspring)\b/gi;
+/** Owner decision 2026-09-12: one plan, no practitioner or therapist plan, no switch for one. */
+const SECOND_PLAN_RE = /practitioner_yearly|MOR_PRICE_PRACTITIONER|practitionerPlanOffered|PLAN_MODE/g;
+const COPY_TRUTH_HARD = [
+  { re: /free forever/gi, label: 'free forever' },
+  { re: /always free/gi, label: 'always free' },
+  { re: /no sign-?ups?\b(?!\s+form)/gi, label: 'no sign-up' },
+];
+const NO_ACCOUNT_RE = /\bno account\b/gi;
+/** Sentences that are still true after accounts exist. Tested against ~120 chars around the match. */
+const NO_ACCOUNT_ALLOW = [
+  /(first|three|3)\b[^.]{0,80}sessions?[^.]{0,60}no account/i,
+  /no account (is )?(needed|required) for the first/i,
+  /(without|with) (an? )?account/i,
+  /no account manager/i,
+  /about having no account/i,
+  /no account,? (no client record|no database)/i,
+];
+
+function checkAccountsModel() {
+  // 1. data-open-timer
+  for (const page of pages.values()) {
+    const body = page.tags.find((t) => !t.closing && t.name === 'body');
+    const has = !!(body && body.attrNode('data-open-timer'));
+    if (has && !OPEN_TIMER_ALLOWED.has(page.file)) {
+      ERR(
+        page.file,
+        body.line,
+        'open-timer-allowlist',
+        'data-open-timer runs the timer for anyone, forever; it is allowed only on the two crisis pages',
+      );
+    }
+  }
+  for (const file of OPEN_TIMER_REQUIRED) {
+    const page = pages.get(file);
+    if (!page) continue;
+    const body = page.tags.find((t) => !t.closing && t.name === 'body');
+    if (!body || !body.attrNode('data-open-timer')) {
+      ERR(file, body ? body.line : null, 'open-timer-missing', 'a crisis page must carry data-open-timer="true" on <body> so the timer runs without an account');
+    }
+  }
+
+  // 2. provider names outside the seam
+  for (const file of [...allFiles].filter((f) => /^(api|js)\/.*\.js$/.test(f)).sort()) {
+    if (PROVIDER_SEAM.some((seam) => file.startsWith(seam))) continue;
+    const raw = readText(file);
+    if (raw == null) continue;
+    const lineOf = makeLineLookup(raw);
+    const code = raw
+      .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
+      .replace(/\/\/[^\n]*/g, (m) => ' '.repeat(m.length));
+    PROVIDER_RE.lastIndex = 0;
+    let m;
+    while ((m = PROVIDER_RE.exec(code)) !== null) {
+      ERR(file, lineOf(m.index), 'provider-outside-seam', `"${m[0]}" named outside the provider seam; go through api/_lib/providers/ or js/config.js`);
+    }
+  }
+  for (const file of [...allFiles].filter((f) => /^(api|js)\/.*\.js$/.test(f)).sort()) {
+    const raw = readText(file);
+    if (raw == null) continue;
+    const lineOf = makeLineLookup(raw);
+    SECOND_PLAN_RE.lastIndex = 0;
+    let m;
+    while ((m = SECOND_PLAN_RE.exec(raw)) !== null) {
+      ERR(file, lineOf(m.index), 'second-plan', `"${m[0]}": there is one plan and no switch for a second (owner decision 2026-09-12)`);
+    }
+  }
+
+  // 3. copy truth
+  for (const page of pages.values()) {
+    const spans = [];
+    for (const t of page.texts) spans.push({ text: t.text, index: t.index, where: 'text' });
+    for (const tag of page.tags) {
+      if (tag.closing || tag.name !== 'meta') continue;
+      const content = tag.attrNode('content');
+      if (content && content.hasValue) spans.push({ text: content.value, index: content.valueIndex, where: 'meta content' });
+    }
+    for (const raw of page.rawText) {
+      const type = (raw.attrs?.find((a) => a.name === 'type')?.decoded || '').toLowerCase();
+      if (raw.name === 'title') spans.push({ text: raw.text, index: raw.index, where: 'title' });
+      if (raw.name === 'script' && type === 'application/ld+json') spans.push({ text: raw.text, index: raw.index, where: 'JSON-LD' });
+    }
+    for (const span of spans) {
+      for (const { re, label } of COPY_TRUTH_HARD) {
+        re.lastIndex = 0;
+        let m;
+        while ((m = re.exec(span.text)) !== null) {
+          ERR(page.file, page.lineOf(span.index + m.index), 'copy-truth', `"${label}" is no longer true now that accounts exist (${span.where}): "${snippet(span.text, m.index)}"`);
+        }
+      }
+      NO_ACCOUNT_RE.lastIndex = 0;
+      let m;
+      while ((m = NO_ACCOUNT_RE.exec(span.text)) !== null) {
+        const around = span.text.slice(Math.max(0, m.index - 120), m.index + 60);
+        if (NO_ACCOUNT_ALLOW.some((re) => re.test(around))) continue;
+        ERR(page.file, page.lineOf(span.index + m.index), 'copy-truth', `"no account" claim needs qualifying (${span.where}): "${snippet(span.text, m.index)}"`);
+      }
+    }
+  }
+
+  // 4. paywall structured data
+  for (const page of pages.values()) {
+    for (const raw of page.rawText) {
+      const type = (raw.attrs?.find((a) => a.name === 'type')?.decoded || '').toLowerCase();
+      if (raw.name !== 'script' || type !== 'application/ld+json') continue;
+      const m = /"isAccessibleForFree"\s*:\s*false/.exec(raw.text);
+      if (m) {
+        ERR(page.file, page.lineOf(raw.index + m.index), 'paywall-markup', 'isAccessibleForFree:false marks the prose as paywalled; only the interactive timer is gated (design section 8.4)');
+      }
+      if (/"cssSelector"/.test(raw.text) && /"hasPart"/.test(raw.text)) {
+        ERR(page.file, page.lineOf(raw.index), 'paywall-markup', 'hasPart/cssSelector paywall markup is not allowed (design section 8.4)');
+      }
+    }
+  }
+}
+
+/* ------------------------------------------------------- CSP origins ------ */
+/**
+ * The site-wide Content-Security-Policy in vercel.json is report-only, and
+ * docs/private/KNOWN_GAPS.md lists promoting it to enforcing as deferred. The
+ * day it is promoted, every origin a page or its scripts touch must already be
+ * allowed by the directive that governs that kind of fetch, or the browser
+ * drops the request silently and the timer goes down with it.
+ *
+ * This rule is the static half of that promotion check. It parses each
+ * Content-Security-Policy / Content-Security-Policy-Report-Only header for the
+ * "/(.*)" source into directives, then walks every page the checker already
+ * walks plus the JavaScript those pages load (static and dynamic imports
+ * followed transitively, inline <script> bodies included) and the stylesheets
+ * they link, collecting every absolute URL by the directive that would govern
+ * it:
+ *
+ *   <script src>, <link rel=modulepreload>, import()/import from, and a
+ *   script element's .src assignment           -> script-src
+ *   <link rel=stylesheet>, <link rel=preload as=style>, CSS @import
+ *                                              -> style-src
+ *   <link rel=preload as=font>, @font-face url(), fonts.gstatic.com
+ *                                              -> font-src
+ *   <img src/srcset>, <source srcset>, <video poster>, icons, CSS url()
+ *                                              -> img-src
+ *   <video/audio/source/track src>              -> media-src
+ *   <iframe src>                                -> frame-src
+ *   <embed src>, <object data>                  -> object-src
+ *   <link rel=manifest>                         -> manifest-src
+ *   <form action>, formaction=                  -> form-action
+ *   fetch(), XMLHttpRequest.open(), EventSource, WebSocket, sendBeacon
+ *                                              -> connect-src
+ *   new Worker(), serviceWorker.register()      -> worker-src
+ *   <link rel=preconnect>                       -> the directive the page uses
+ *                                                 that origin for, else
+ *                                                 style-src (fonts.gstatic.com:
+ *                                                 font-src)
+ *
+ * Matching honours 'self' (the --base host), 'none', '*', scheme-only sources
+ * (https:, wss:, data:), wildcard subdomains (https://*.paddle.com matches
+ * a.paddle.com, not paddle.com), ports and path prefixes, and the CSP3
+ * fallback chain (frame-src -> child-src -> default-src; form-action has no
+ * fallback). Plain <a href> links and prose are never fetched by the page and
+ * are never collected. api/ and tools/ are not scanned.
+ *
+ * Deliberately not modelled: URLs assembled at runtime (the Supabase project
+ * URL from js/config.js, Paddle's own sub-requests, gtag/AdSense beacons and
+ * frames). The report-only telemetry is the only evidence for those.
+ */
+const CSP_SOURCE_PATTERN = '/(.*)';
+const CSP_HEADER_KEYS = new Set(['content-security-policy', 'content-security-policy-report-only']);
+/** CSP3 fallback order for each fetch kind this rule collects. */
+const CSP_FALLBACK = {
+  'script-src': ['script-src-elem', 'script-src', 'default-src'],
+  'style-src': ['style-src-elem', 'style-src', 'default-src'],
+  'font-src': ['font-src', 'default-src'],
+  'img-src': ['img-src', 'default-src'],
+  'media-src': ['media-src', 'default-src'],
+  'connect-src': ['connect-src', 'default-src'],
+  'frame-src': ['frame-src', 'child-src', 'default-src'],
+  'worker-src': ['worker-src', 'child-src', 'script-src', 'default-src'],
+  'object-src': ['object-src', 'default-src'],
+  'manifest-src': ['manifest-src', 'default-src'],
+  'form-action': ['form-action'],
+  'base-uri': ['base-uri'],
+};
+const CSP_DEFAULT_PORTS = { 'http:': '80', 'https:': '443', 'ws:': '80', 'wss:': '443' };
+const CSP_HOST_SOURCE_RE = /^(?:([a-z][a-z0-9+.-]*):\/\/)?(\*|(?:\*\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*)(?::(\d+|\*))?(\/\S*)?$/;
+/** Directories never scanned for CSP origins: serverless code and the tooling. */
+const CSP_SKIP_PREFIXES = ['api/', 'tools/'];
+const CSP_HTTP_VERBS = /^(get|post|put|patch|delete|head|options)$/i;
+
+/** Every CSP header for the site-wide source in vercel.json. */
+function loadCspHeaders() {
+  if (!allFiles.has('vercel.json')) return [];
+  const raw = readText('vercel.json');
+  if (raw == null) return [];
+  let cfg;
+  try {
+    cfg = JSON.parse(raw);
+  } catch {
+    return []; // already reported at load time
+  }
+  const lineOf = makeLineLookup(raw);
+  const out = [];
+  for (const entry of Array.isArray(cfg.headers) ? cfg.headers : []) {
+    if (!entry || entry.source !== CSP_SOURCE_PATTERN) continue;
+    for (const h of Array.isArray(entry.headers) ? entry.headers : []) {
+      if (!h || typeof h.key !== 'string' || typeof h.value !== 'string') continue;
+      if (!CSP_HEADER_KEYS.has(h.key.toLowerCase())) continue;
+      const idx = raw.indexOf(h.value) !== -1 ? raw.indexOf(h.value) : raw.indexOf(h.key);
+      out.push({
+        name: h.key,
+        value: h.value,
+        source: entry.source,
+        line: idx === -1 ? null : lineOf(idx),
+        policy: parseCsp(h.value),
+      });
+    }
+  }
+  return out;
+}
+
+/** "a b; c d" -> Map { a => [b], c => [d] }. A repeated directive is ignored, as browsers do. */
+function parseCsp(value) {
+  const directives = new Map();
+  for (const part of String(value).split(';')) {
+    const tokens = part.trim().split(/\s+/).filter(Boolean);
+    if (!tokens.length) continue;
+    const name = tokens[0].toLowerCase();
+    if (!directives.has(name)) directives.set(name, tokens.slice(1));
+  }
+  return directives;
+}
+
+/** The directive that governs a fetch of this kind after fallback, or null when the policy leaves it unrestricted. */
+function cspGoverning(policy, directive) {
+  for (const name of CSP_FALLBACK[directive] || [directive]) {
+    if (policy.has(name)) return { name, sources: policy.get(name) };
+  }
+  return null;
+}
+
+/** CSP3 scheme-part matching: http also covers https, ws covers wss/http/https, wss covers https. */
+function cspSchemeMatches(source, actual) {
+  if (source === actual) return true;
+  if (source === 'http') return actual === 'https';
+  if (source === 'ws') return actual === 'wss' || actual === 'http' || actual === 'https';
+  if (source === 'wss') return actual === 'https';
+  return false;
+}
+
+function cspIsSelf(u) {
+  if (u.hostname.toLowerCase() !== BASE_HOST.replace(/:\d+$/, '')) return false;
+  const scheme = u.protocol.slice(0, -1);
+  if (scheme !== 'https' && scheme !== 'wss') return false;
+  return !u.port || u.port === CSP_DEFAULT_PORTS[u.protocol];
+}
+
+/** Does one source expression allow this URL? */
+function cspSourceAllows(source, u) {
+  const s = source.toLowerCase();
+  const scheme = u.protocol.slice(0, -1);
+  if (s === "'none'") return false;
+  if (s === "'self'") return cspIsSelf(u);
+  if (s.startsWith("'")) return false; // 'unsafe-inline', 'strict-dynamic', nonces, hashes: not host sources
+  if (s === '*') return scheme !== 'data' && scheme !== 'blob' && scheme !== 'filesystem';
+  const schemeOnly = /^([a-z][a-z0-9+.-]*):$/.exec(s);
+  if (schemeOnly) return cspSchemeMatches(schemeOnly[1], scheme);
+  const m = CSP_HOST_SOURCE_RE.exec(s);
+  if (!m) return false;
+  const [, srcScheme, hostPattern, port, pathPart] = m;
+  if (srcScheme) {
+    if (!cspSchemeMatches(srcScheme, scheme)) return false;
+  } else if (!cspSchemeMatches('https', scheme)) {
+    return false; // a schemeless host-source takes the page's scheme, and the site is https
+  }
+  const host = u.hostname.toLowerCase();
+  if (hostPattern === '*') {
+    /* any host */
+  } else if (hostPattern.startsWith('*.')) {
+    const suffix = hostPattern.slice(1); // ".paddle.com"
+    if (!host.endsWith(suffix) || host.length <= suffix.length) return false;
+  } else if (host !== hostPattern) {
+    return false;
+  }
+  const actualPort = u.port || CSP_DEFAULT_PORTS[u.protocol] || '';
+  if (port) {
+    if (port !== '*' && port !== actualPort) return false;
+  } else if (u.port && u.port !== CSP_DEFAULT_PORTS[u.protocol]) {
+    return false;
+  }
+  if (pathPart && pathPart !== '/') {
+    if (pathPart.endsWith('/')) {
+      if (!u.pathname.toLowerCase().startsWith(pathPart)) return false;
+    } else if (u.pathname.toLowerCase() !== pathPart) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/** Absolute network/data URL or null: relative paths, fragments, mailto:, javascript: and templates are not origins. */
+function cspUrlOf(raw) {
+  const value = String(raw ?? '').trim();
+  if (!value || value.includes('{') || value.includes('}')) return null;
+  const s = value.startsWith('//') ? 'https:' + value : value;
+  if (!/^(https?|wss?|data|blob):/i.test(s)) return null;
+  try {
+    return new URL(s);
+  } catch {
+    return null;
+  }
+}
+
+function cspOriginOf(u) {
+  return u.protocol === 'data:' || u.protocol === 'blob:' ? u.protocol : `${u.protocol}//${u.host}`;
+}
+
+/**
+ * Light JavaScript scan. Returns two same-length views of the source: `code`
+ * with comments blanked, and `bare` with comments, string bodies, template
+ * bodies and regex bodies blanked too (quotes kept). Call sites are located in
+ * `bare`, so a "fetch(" inside a string is not a call; their arguments are
+ * read back from `code` at the same offsets. Newlines are preserved, so an
+ * index in either view maps to a line in the original.
+ */
+function cspScanJs(src) {
+  const code = src.split('');
+  const bare = src.split('');
+  const n = src.length;
+  const blank = (arr, from, to) => {
+    for (let k = from; k < to && k < n; k++) if (arr[k] !== '\n') arr[k] = ' ';
+  };
+  const REGEX_BEFORE = /[(,=:[!&|?{};+\-*%<>~^]/;
+  const REGEX_WORDS = new Set(['return', 'typeof', 'instanceof', 'in', 'of', 'new', 'delete', 'void', 'throw', 'case', 'do', 'else', 'yield', 'await']);
+
+  const skipString = (i, quote) => {
+    let j = i + 1;
+    while (j < n && src[j] !== quote && src[j] !== '\n') {
+      if (src[j] === '\\') j++;
+      j++;
+    }
+    blank(bare, i + 1, j);
+    return Math.min(j + 1, n);
+  };
+  const skipTemplate = (i) => {
+    let j = i + 1;
+    while (j < n) {
+      const ch = src[j];
+      if (ch === '\\') {
+        j += 2;
+        continue;
+      }
+      if (ch === '`') break;
+      if (ch === '$' && src[j + 1] === '{') {
+        let depth = 1;
+        j += 2;
+        while (j < n && depth > 0) {
+          const c = src[j];
+          if (c === '{') depth++;
+          else if (c === '}') depth--;
+          else if (c === '"' || c === "'") {
+            j = skipString(j, c);
+            continue;
+          } else if (c === '`') {
+            j = skipTemplate(j);
+            continue;
+          }
+          j++;
+        }
+        continue;
+      }
+      j++;
+    }
+    blank(bare, i + 1, j);
+    return Math.min(j + 1, n);
+  };
+  const regexAhead = (i) => {
+    let k = i - 1;
+    while (k >= 0 && /\s/.test(src[k])) k--;
+    if (k < 0) return true;
+    if (REGEX_BEFORE.test(src[k])) return true;
+    if (/[\w$]/.test(src[k])) {
+      let w = k;
+      while (w >= 0 && /[\w$]/.test(src[w])) w--;
+      return REGEX_WORDS.has(src.slice(w + 1, k + 1));
+    }
+    return false;
+  };
+
+  let i = 0;
+  while (i < n) {
+    const ch = src[i];
+    const next = src[i + 1];
+    if (ch === '/' && next === '/') {
+      const end = src.indexOf('\n', i);
+      const stop = end === -1 ? n : end;
+      blank(code, i, stop);
+      blank(bare, i, stop);
+      i = stop;
+      continue;
+    }
+    if (ch === '/' && next === '*') {
+      const end = src.indexOf('*/', i + 2);
+      const stop = end === -1 ? n : end + 2;
+      blank(code, i, stop);
+      blank(bare, i, stop);
+      i = stop;
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      i = skipString(i, ch);
+      continue;
+    }
+    if (ch === '`') {
+      i = skipTemplate(i);
+      continue;
+    }
+    if (ch === '/' && regexAhead(i)) {
+      let j = i + 1;
+      let inClass = false;
+      while (j < n && src[j] !== '\n') {
+        const c = src[j];
+        if (c === '\\') {
+          j += 2;
+          continue;
+        }
+        if (c === '[') inClass = true;
+        else if (c === ']') inClass = false;
+        else if (c === '/' && !inClass) break;
+        j++;
+      }
+      blank(bare, i + 1, j);
+      i = Math.min(j + 1, n);
+      continue;
+    }
+    i++;
+  }
+  return { code: code.join(''), bare: bare.join('') };
+}
+
+/** The simple argument (string, template, identifier) starting at `p` in `bare`, or null. */
+function cspJsArgAt(js, p) {
+  const { code, bare } = js;
+  while (p < bare.length && /\s/.test(bare[p])) p++;
+  const ch = bare[p];
+  if (ch === '"' || ch === "'" || ch === '`') {
+    const end = bare.indexOf(ch, p + 1);
+    if (end === -1) return null;
+    return { kind: ch === '`' ? 'template' : 'string', value: code.slice(p + 1, end), index: p + 1, end: end + 1 };
+  }
+  const m = /^[A-Za-z_$][\w$]*/.exec(bare.slice(p, p + 200));
+  if (m) return { kind: 'ident', value: m[0], index: p, end: p + m[0].length };
+  return null;
+}
+
+/** Up to `count` simple arguments of a call whose "(" ends at `p`; stops at the first argument it cannot read. */
+function cspJsArgsAt(js, p, count) {
+  const args = [];
+  let pos = p;
+  for (let k = 0; k < count; k++) {
+    const arg = cspJsArgAt(js, pos);
+    if (!arg) break;
+    args.push(arg);
+    pos = arg.end;
+    while (pos < js.bare.length && /\s/.test(js.bare[pos])) pos++;
+    if (js.bare[pos] !== ',') break;
+    pos++;
+  }
+  return args;
+}
+
+/**
+ * Turn a call argument into a URL: a string literal directly, a template
+ * literal by its static prefix (only when that prefix carries the whole host),
+ * an identifier via a `const NAME = '...'` in the same source. `index` is the
+ * call site, so a finding points at the line that does the loading, not at
+ * the constant it reads.
+ */
+function cspJsArgUrl(js, arg) {
+  const resolved = cspJsArgValue(js, arg, 0);
+  return resolved ? { ...resolved, index: arg.index } : null;
+}
+
+function cspJsArgValue(js, arg, depth) {
+  if (!arg || depth > 3) return null;
+  if (arg.kind === 'string') return { url: cspUrlOf(arg.value), spec: arg.value };
+  if (arg.kind === 'template') {
+    const prefix = arg.value.split('${')[0];
+    if (arg.value.includes('${') && !/^[a-z][a-z0-9+.-]*:\/\/[^/?#\s]+[/?#]/i.test(prefix)) {
+      return { url: null, spec: null };
+    }
+    return { url: cspUrlOf(prefix), spec: arg.value.includes('${') ? null : arg.value };
+  }
+  const re = new RegExp(`(?:^|[^\\w$.])(?:const|let|var)\\s+${arg.value.replace(/\$/g, '\\$')}\\s*=`, 'g');
+  const m = re.exec(js.bare);
+  if (!m) return null;
+  return cspJsArgValue(js, cspJsArgAt(js, m.index + m[0].length), depth + 1);
+}
+
+/**
+ * Collect CSP-relevant references from JavaScript source.
+ * @param {string} src
+ * @param {{file:string, lineOf:(i:number)=>number, basePath:string}} ctx
+ * @returns {{refs:any[], follow:string[]}} refs by directive; same-origin scripts to scan next
+ */
+function cspCollectFromJs(src, ctx) {
+  const js = cspScanJs(src);
+  const { bare } = js;
+  const refs = [];
+  const follow = [];
+
+  const note = (via, resolved, directive) => {
+    if (!resolved || !resolved.url) return;
+    refs.push({
+      file: ctx.file,
+      line: ctx.lineOf(resolved.index),
+      via,
+      directive,
+      u: resolved.url,
+      url: resolved.url.href,
+      origin: cspOriginOf(resolved.url),
+    });
+  };
+  const followOrNote = (via, resolved) => {
+    if (!resolved) return;
+    if (resolved.url) {
+      note(via, resolved, 'script-src');
+      return;
+    }
+    if (!resolved.spec || cspUrlOf(resolved.spec)) return;
+    const target = resolveUrl(resolveAgainst(ctx.basePath, resolved.spec));
+    if (target && target.file && /\.m?js$/i.test(target.file)) follow.push(target.file);
+  };
+
+  // Static imports and re-exports: import x from 'spec' / import 'spec' / export { x } from 'spec'.
+  const staticRe = /(?:^|[^\w$.])(import|export)(?=[\s{*'"])/g;
+  let m;
+  while ((m = staticRe.exec(bare)) !== null) {
+    let p = m.index + m[0].length;
+    while (p < bare.length && /\s/.test(bare[p])) p++;
+    let quoteAt = -1;
+    if (bare[p] === '"' || bare[p] === "'") {
+      if (m[1] === 'import') quoteAt = p;
+    } else {
+      const q = bare.slice(p).search(/['"]/);
+      if (q !== -1 && /\bfrom\s*$/.test(bare.slice(p, p + q))) quoteAt = p + q;
+    }
+    if (quoteAt === -1) continue;
+    followOrNote(m[1] === 'import' ? 'import from' : 'export from', cspJsArgUrl(js, cspJsArgAt(js, quoteAt)));
+  }
+
+  const calls = [
+    { re: /(?:^|[^\w$.])import\s*\(/g, via: 'import()', follow: true },
+    { re: /(?:^|[^\w$.]|(?:window|globalThis|self)\.)fetch\s*\(/g, via: 'fetch()', directive: 'connect-src' },
+    { re: /navigator\.sendBeacon\s*\(/g, via: 'navigator.sendBeacon()', directive: 'connect-src' },
+    { re: /new\s+EventSource\s*\(/g, via: 'new EventSource()', directive: 'connect-src' },
+    { re: /new\s+WebSocket\s*\(/g, via: 'new WebSocket()', directive: 'connect-src' },
+    { re: /new\s+(?:Shared)?Worker\s*\(/g, via: 'new Worker()', directive: 'worker-src' },
+    { re: /serviceWorker\.register\s*\(/g, via: 'serviceWorker.register()', directive: 'worker-src', followWorker: true },
+  ];
+  for (const call of calls) {
+    call.re.lastIndex = 0;
+    while ((m = call.re.exec(bare)) !== null) {
+      const resolved = cspJsArgUrl(js, cspJsArgAt(js, m.index + m[0].length));
+      if (call.follow) followOrNote(call.via, resolved);
+      else if (call.followWorker) {
+        if (resolved && resolved.url) note(call.via, resolved, call.directive);
+        else if (resolved && resolved.spec) {
+          const target = resolveUrl(resolveAgainst(ctx.basePath, resolved.spec));
+          if (target && target.file && /\.m?js$/i.test(target.file)) follow.push(target.file);
+        }
+      } else note(call.via, resolved, call.directive);
+    }
+  }
+
+  // XMLHttpRequest: xhr.open(method, url). window.open(url, '_blank') never yields an absolute second argument.
+  const openRe = /\.open\s*\(/g;
+  while ((m = openRe.exec(bare)) !== null) {
+    const args = cspJsArgsAt(js, m.index + m[0].length, 2);
+    if (args.length < 2) continue;
+    if (args[0].kind === 'string' && !CSP_HTTP_VERBS.test(args[0].value)) continue;
+    if (args[0].kind === 'template') continue;
+    note('XMLHttpRequest.open()', cspJsArgUrl(js, args[1]), 'connect-src');
+  }
+
+  // Script elements built in code: const s = document.createElement('script'); s.src = URL;
+  const createRe = /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:[A-Za-z_$][\w$.]*\s*\|\|\s*)?document\.createElement\s*\(/g;
+  while ((m = createRe.exec(bare)) !== null) {
+    const tagArg = cspJsArgAt(js, m.index + m[0].length);
+    if (!tagArg || tagArg.kind !== 'string' || tagArg.value.toLowerCase() !== 'script') continue;
+    const name = m[1].replace(/\$/g, '\\$');
+    const srcRe = new RegExp(`(?:^|[^\\w$.])${name}\\.src\\s*=(?!=)`, 'g');
+    let s;
+    while ((s = srcRe.exec(bare)) !== null) {
+      note(`${m[1]}.src =`, cspJsArgUrl(js, cspJsArgAt(js, s.index + s[0].length)), 'script-src');
+    }
+    const setRe = new RegExp(`(?:^|[^\\w$.])${name}\\.setAttribute\\s*\\(`, 'g');
+    while ((s = setRe.exec(bare)) !== null) {
+      const args = cspJsArgsAt(js, s.index + s[0].length, 2);
+      if (args.length === 2 && args[0].kind === 'string' && args[0].value.toLowerCase() === 'src') {
+        note(`${m[1]}.setAttribute('src')`, cspJsArgUrl(js, args[1]), 'script-src');
+      }
+    }
+  }
+
+  return { refs, follow };
+}
+
+/** Collect CSP-relevant references from CSS text: @import -> style-src, @font-face url() -> font-src, other url() -> img-src. */
+function cspCollectFromCss(cssText, ctx) {
+  const refs = [];
+  const css = cssText.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '));
+  const note = (via, value, index, directive) => {
+    const u = cspUrlOf(value);
+    if (!u) return;
+    refs.push({ file: ctx.file, line: ctx.lineOf(index), via, directive, u, url: u.href, origin: cspOriginOf(u) });
+  };
+  const importRe = /@import\s+(?:url\(\s*)?(['"]?)([^'")\s;]+)\1/g;
+  let m;
+  while ((m = importRe.exec(css)) !== null) note('@import', m[2], m.index, 'style-src');
+  const fontFaceRanges = [];
+  const faceRe = /@font-face\s*\{[^}]*\}/g;
+  while ((m = faceRe.exec(css)) !== null) fontFaceRanges.push([m.index, m.index + m[0].length]);
+  const urlRe = /url\(\s*(['"]?)([^'")\s]+)\1\s*\)/g;
+  while ((m = urlRe.exec(css)) !== null) {
+    if (/@import\s*$/.test(css.slice(Math.max(0, m.index - 12), m.index))) continue;
+    const inFace = fontFaceRanges.some(([a, b]) => m.index >= a && m.index < b);
+    note(inFace ? '@font-face url()' : 'url()', m[2], m.index, inFace ? 'font-src' : 'img-src');
+  }
+  return refs;
+}
+
+function cspSkipped(file) {
+  return CSP_SKIP_PREFIXES.some((p) => file.startsWith(p));
+}
+
+function checkCspOrigins() {
+  const headers = loadCspHeaders();
+  if (!headers.length) {
+    INFO(
+      'vercel.json',
+      null,
+      'csp-origins',
+      `no Content-Security-Policy or Content-Security-Policy-Report-Only header for "${CSP_SOURCE_PATTERN}" — nothing to check`,
+    );
+    return;
+  }
+
+  /** file -> {refs, follow}; each script and stylesheet is scanned once. */
+  const scriptCache = new Map();
+  const cssCache = new Map();
+  const scanScript = (file) => {
+    if (!scriptCache.has(file)) {
+      const raw = readText(file);
+      scriptCache.set(
+        file,
+        raw == null ? { refs: [], follow: [] } : cspCollectFromJs(raw, { file, lineOf: makeLineLookup(raw), basePath: '/' + file }),
+      );
+    }
+    return scriptCache.get(file);
+  };
+  const scanCss = (file) => {
+    if (!cssCache.has(file)) {
+      const raw = readText(file);
+      cssCache.set(file, raw == null ? [] : cspCollectFromCss(raw, { file, lineOf: makeLineLookup(raw) }));
+    }
+    return cssCache.get(file);
+  };
+
+  const allRefs = [];
+  for (const page of pages.values()) {
+    if (cspSkipped(page.file)) continue;
+    const basePath = page.primaryPath || '/' + page.file;
+    const pageRefs = [];
+    const preconnects = [];
+    const scripts = new Set();
+    const sheets = new Set();
+
+    const note = (tag, attrName, value, directive, via) => {
+      const attr = tag.attrNode(attrName);
+      const u = cspUrlOf(value);
+      if (!u) return;
+      pageRefs.push({
+        file: page.file,
+        line: attr ? page.lineOf(attr.valueIndex) : tag.line,
+        via: via || `<${tag.name} ${attrName}>`,
+        directive,
+        u,
+        url: u.href,
+        origin: cspOriginOf(u),
+      });
+    };
+    const localFile = (value) => {
+      const cls = classifyUrl(value);
+      if (cls.kind !== 'internal') return null;
+      const res = resolveUrl(resolveAgainst(basePath, (cls.path || '/').split('#')[0] || '/'));
+      return res && res.file ? res.file : null;
+    };
+    const srcsetValues = (attr) => attr.decoded.split(',').map((part) => part.trim().split(/\s+/)[0]).filter(Boolean);
+
+    for (const tag of page.tags) {
+      if (tag.closing) continue;
+      const name = tag.name;
+      if (name === 'script') {
+        const type = (tag.attr('type') || '').trim().toLowerCase();
+        const src = tag.attr('src');
+        if (src && (!type || type === 'module' || type === 'text/javascript' || type === 'application/javascript')) {
+          note(tag, 'src', src, 'script-src');
+          const local = localFile(src);
+          if (local && /\.m?js$/i.test(local)) scripts.add(local);
+        }
+      } else if (name === 'link') {
+        const rels = (tag.attr('rel') || '').toLowerCase().split(/\s+/).filter(Boolean);
+        const href = tag.attr('href');
+        if (!href) continue;
+        const as = (tag.attr('as') || '').trim().toLowerCase();
+        if (rels.includes('stylesheet') || (rels.includes('preload') && as === 'style')) {
+          note(tag, 'href', href, 'style-src', `<link rel="${rels.includes('stylesheet') ? 'stylesheet' : 'preload'}"${as ? ` as="${as}"` : ''}>`);
+          const local = localFile(href);
+          if (local && /\.css$/i.test(local)) sheets.add(local);
+        } else if (rels.includes('modulepreload') || (rels.includes('preload') && as === 'script')) {
+          note(tag, 'href', href, 'script-src', `<link rel="${rels.includes('modulepreload') ? 'modulepreload' : 'preload'}">`);
+          const local = localFile(href);
+          if (local && /\.m?js$/i.test(local)) scripts.add(local);
+        } else if (rels.includes('preload') && as) {
+          const map = { font: 'font-src', image: 'img-src', fetch: 'connect-src', audio: 'media-src', video: 'media-src', track: 'media-src', worker: 'worker-src', object: 'object-src' };
+          if (map[as]) note(tag, 'href', href, map[as], `<link rel="preload" as="${as}">`);
+        } else if (rels.includes('preconnect') || rels.includes('dns-prefetch')) {
+          const u = cspUrlOf(href);
+          if (u) {
+            const attr = tag.attrNode('href');
+            preconnects.push({
+              file: page.file,
+              line: attr ? page.lineOf(attr.valueIndex) : tag.line,
+              via: `<link rel="${rels.includes('preconnect') ? 'preconnect' : 'dns-prefetch'}">`,
+              u,
+              url: u.href,
+              origin: cspOriginOf(u),
+            });
+          }
+        } else if (rels.some((r) => /icon$/.test(r) || r === 'apple-touch-icon-precomposed')) {
+          note(tag, 'href', href, 'img-src', `<link rel="${rels.join(' ')}">`);
+        } else if (rels.includes('manifest')) {
+          note(tag, 'href', href, 'manifest-src', '<link rel="manifest">');
+        }
+      } else if (name === 'iframe' || name === 'frame') {
+        if (tag.attr('src')) note(tag, 'src', tag.attr('src'), 'frame-src');
+      } else if (name === 'embed') {
+        if (tag.attr('src')) note(tag, 'src', tag.attr('src'), 'object-src');
+      } else if (name === 'object') {
+        if (tag.attr('data')) note(tag, 'data', tag.attr('data'), 'object-src');
+      } else if (name === 'img') {
+        if (tag.attr('src')) note(tag, 'src', tag.attr('src'), 'img-src');
+        const srcset = tag.attrNode('srcset');
+        if (srcset) for (const v of srcsetValues(srcset)) note(tag, 'srcset', v, 'img-src');
+      } else if (name === 'source') {
+        const srcset = tag.attrNode('srcset');
+        if (srcset) for (const v of srcsetValues(srcset)) note(tag, 'srcset', v, 'img-src');
+        if (tag.attr('src')) note(tag, 'src', tag.attr('src'), 'media-src');
+      } else if (name === 'video' || name === 'audio' || name === 'track') {
+        if (tag.attr('src')) note(tag, 'src', tag.attr('src'), 'media-src');
+        if (name === 'video' && tag.attr('poster')) note(tag, 'poster', tag.attr('poster'), 'img-src');
+      } else if (name === 'input') {
+        if ((tag.attr('type') || '').toLowerCase() === 'image' && tag.attr('src')) note(tag, 'src', tag.attr('src'), 'img-src');
+        if (tag.attr('formaction')) note(tag, 'formaction', tag.attr('formaction'), 'form-action');
+      } else if (name === 'button') {
+        if (tag.attr('formaction')) note(tag, 'formaction', tag.attr('formaction'), 'form-action');
+      } else if (name === 'form') {
+        if (tag.attr('action')) note(tag, 'action', tag.attr('action'), 'form-action');
+      } else if (name === 'base') {
+        if (tag.attr('href')) note(tag, 'href', tag.attr('href'), 'base-uri');
+      }
+      const style = tag.attrNode('style');
+      if (style && style.hasValue && /url\(/i.test(style.decoded)) {
+        pageRefs.push(...cspCollectFromCss(style.decoded, { file: page.file, lineOf: () => page.lineOf(style.valueIndex) }).map((r) => ({ ...r, via: `style="${r.via}"` })));
+      }
+    }
+
+    // Inline <script> bodies (not JSON-LD) and <style> blocks.
+    for (const raw of page.rawText) {
+      const type = (raw.attrs?.find((a) => a.name === 'type')?.decoded || '').trim().toLowerCase();
+      if (raw.name === 'script') {
+        if (type && type !== 'module' && type !== 'text/javascript' && type !== 'application/javascript') continue;
+        if (raw.attrs?.some((a) => a.name === 'src')) continue; // body of an external script tag is ignored by browsers
+        const { refs, follow } = cspCollectFromJs(raw.text, {
+          file: page.file,
+          lineOf: (i) => page.lineOf(raw.index + i),
+          basePath,
+        });
+        pageRefs.push(...refs.map((r) => ({ ...r, via: `inline <script> ${r.via}` })));
+        for (const f of follow) scripts.add(f);
+      } else if (raw.name === 'style') {
+        pageRefs.push(...cspCollectFromCss(raw.text, { file: page.file, lineOf: (i) => page.lineOf(raw.index + i) }).map((r) => ({ ...r, via: `<style> ${r.via}` })));
+      }
+    }
+
+    // Follow the module graph the page loads.
+    const queue = [...scripts];
+    const visited = new Set();
+    while (queue.length) {
+      const file = queue.shift();
+      if (visited.has(file) || cspSkipped(file)) continue;
+      visited.add(file);
+      const { refs, follow } = scanScript(file);
+      pageRefs.push(...refs);
+      for (const f of follow) if (!visited.has(f)) queue.push(f);
+    }
+    for (const file of sheets) {
+      if (cspSkipped(file)) continue;
+      pageRefs.push(...scanCss(file));
+    }
+
+    // A preconnect is checked under whatever directive the page uses that
+    // origin for; a preconnect nothing on the page fetches from is a fonts
+    // hint (fonts.gstatic.com -> font-src, otherwise style-src).
+    const covered = new Map();
+    for (const r of pageRefs) {
+      if (!covered.has(r.origin)) covered.set(r.origin, new Set());
+      covered.get(r.origin).add(r.directive);
+    }
+    for (const pc of preconnects) {
+      const used = covered.get(pc.origin);
+      if (used && used.size) continue;
+      pageRefs.push({ ...pc, directive: pc.u.hostname.toLowerCase() === 'fonts.gstatic.com' ? 'font-src' : 'style-src' });
+    }
+    allRefs.push(...pageRefs);
+  }
+
+  const origins = new Map(); // origin -> Set(directive), 'self' excluded
+  const exercised = new Set();
+  for (const ref of allRefs) {
+    exercised.add(ref.directive);
+    if (cspIsSelf(ref.u)) continue;
+    if (!origins.has(ref.origin)) origins.set(ref.origin, new Set());
+    origins.get(ref.origin).add(ref.directive);
+  }
+  const originList = [...origins.entries()]
+    .sort((a, b) => (a[0] < b[0] ? -1 : 1))
+    .map(([origin, dirs]) => `${origin} (${[...dirs].sort().join(', ')})`)
+    .join(', ');
+
+  for (const header of headers) {
+    const seen = new Set();
+    for (const ref of allRefs) {
+      const gov = cspGoverning(header.policy, ref.directive);
+      if (!gov) continue;
+      if (gov.sources.some((s) => cspSourceAllows(s, ref.u))) continue;
+      const key = `${ref.file}|${ref.line}|${ref.origin}|${ref.directive}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      ERR(
+        ref.file,
+        ref.line,
+        'csp-origins',
+        `${ref.via} loads ${ref.origin}, which ${ref.directive}` +
+          `${gov.name !== ref.directive ? ` (falling back to ${gov.name})` : ''} in the ${header.name} header for "${header.source}" ` +
+          `does not allow — an enforcing policy would block "${ref.url}"`,
+      );
+    }
+    INFO(
+      'vercel.json',
+      header.line,
+      'csp-origins',
+      `${header.name} for "${header.source}": ${header.policy.size} directive(s) in the policy, ` +
+        `${exercised.size} exercised (${[...exercised].sort().join(', ') || 'none'}); ` +
+        `${pages.size} page(s), ${scriptCache.size} script(s), ${cssCache.size} stylesheet(s) scanned; ` +
+        `${origins.size} external origin(s) found${origins.size ? `: ${originList}` : ''}; ${seen.size} not allowed`,
+    );
+  }
+}
+
 /* ------------------------------------------------------ orphan/extra pages */
 function checkOrphans() {
   // Indexable pages nothing on the site links to are dead ends for crawlers.
@@ -1734,6 +2625,16 @@ try {
   checkClayOnTimer();
 } catch (e) {
   ERR(null, null, 'internal-error', `--clay check failed: ${e.message}`);
+}
+try {
+  checkAccountsModel();
+} catch (e) {
+  ERR(null, null, 'internal-error', `accounts-model check failed: ${e.message}`);
+}
+try {
+  checkCspOrigins();
+} catch (e) {
+  ERR('vercel.json', null, 'internal-error', `csp-origins check failed: ${e.message}`);
 }
 try {
   checkOrphans();

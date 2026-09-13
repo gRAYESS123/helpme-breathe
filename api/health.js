@@ -15,9 +15,15 @@
  * `ok` is false when a variable a working deployment actually needs is missing.
  * The endpoint still answers 200 in that case: it is a report, not a probe that
  * should take the site down.
+ *
+ * `provider` and `email` are null until MOR_PROVIDER / EMAIL_PROVIDER are
+ * actually set in the environment. describeConfig() falls back to the code
+ * defaults so `missing` can be computed, but this response is public and no
+ * merchant of record or email service may be named on the site before one has
+ * accepted the owner in writing. The `missing` list is unaffected.
  */
 
-import { describeConfig } from './_lib/env.js';
+import { describeConfig, hasEnv } from './_lib/env.js';
 import { errorResponse, json, methodNotAllowed, preflight } from './_lib/respond.js';
 
 export const config = { runtime: 'nodejs', maxDuration: 10 };
@@ -51,8 +57,8 @@ export async function GET(request) {
       200,
       {
         ok: report.missing.length === 0,
-        provider: report.provider,
-        email: report.email,
+        provider: hasEnv('MOR_PROVIDER') ? report.provider : null,
+        email: hasEnv('EMAIL_PROVIDER') ? report.email : null,
         env: report.env,
         time: new Date().toISOString(),
         configured: report.configured,

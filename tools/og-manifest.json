@@ -13,7 +13,7 @@
     ],
     "sub_lines": [
       "Guided breathing for sleep,",
-      "stress and focus. Free."
+      "stress and focus."
     ]
   },
   {
@@ -30,7 +30,7 @@
     ],
     "sub_lines": [
       "Guided breathing for sleep,",
-      "stress and focus. Free."
+      "stress and focus."
     ]
   },
   {
@@ -69,6 +69,24 @@
     ]
   },
   {
+    "file": "images/og/guides.jpg",
+    "layout": "og",
+    "size": [
+      1200,
+      630
+    ],
+    "theme": "478",
+    "kicker": "Five situations · three deeper reads",
+    "title_lines": [
+      "Breathing Guides",
+      "by Situation"
+    ],
+    "sub_lines": [
+      "Anxious moments, sleep, panic,",
+      "focus and blood pressure"
+    ]
+  },
+  {
     "file": "images/og/box-breathing.jpg",
     "layout": "og",
     "size": [
@@ -83,7 +101,7 @@
     ],
     "sub_lines": [
       "Equal counts in, hold, out, hold",
-      "— with a free guided timer"
+      "— with a guided timer"
     ]
   },
   {
@@ -209,7 +227,8 @@
     "sub_lines": [
       "Five slow patterns with a free",
       "guided timer on the page"
-    ]
+    ],
+    "footer": "Free · No account · Offline"
   },
   {
     "file": "images/og/breathing-exercises-for-sleep.jpg",
@@ -245,7 +264,8 @@
     "sub_lines": [
       "Something steady to follow",
       "in the first minute"
-    ]
+    ],
+    "footer": "Free · No account · Offline"
   },
   {
     "file": "images/og/breathing-exercises-for-focus.jpg",
@@ -351,8 +371,8 @@
       "Me Breathe"
     ],
     "sub_lines": [
-      "Free breathing tools, built by",
-      "one person who needed them"
+      "Guided breathing, built by",
+      "one person who needed it"
     ]
   },
   {
@@ -373,60 +393,6 @@
       "$10 a month or $100 a year"
     ],
     "footer": "Cancel any time · 14-day refund"
-  },
-  {
-    "file": "images/og/for-practitioners.jpg",
-    "layout": "og",
-    "size": [
-      1200,
-      630
-    ],
-    "theme": "box",
-    "kicker": "For practitioners",
-    "title_lines": [
-      "Tools for Therapists",
-      "and Coaches"
-    ],
-    "sub_lines": [
-      "White-label embeds, client links",
-      "and a commercial licence"
-    ]
-  },
-  {
-    "file": "images/og/embed.jpg",
-    "layout": "og",
-    "size": [
-      1200,
-      630
-    ],
-    "theme": "478",
-    "kicker": "Free widget",
-    "title_lines": [
-      "Embed a Breathing",
-      "Timer on Your Site"
-    ],
-    "sub_lines": [
-      "One line of HTML and zero",
-      "third-party requests"
-    ]
-  },
-  {
-    "file": "images/og/handouts.jpg",
-    "layout": "og",
-    "size": [
-      1200,
-      630
-    ],
-    "theme": "box",
-    "kicker": "Printable",
-    "title_lines": [
-      "Breathing Handouts",
-      "for Clients"
-    ],
-    "sub_lines": [
-      "Print-ready cards for each",
-      "of the seven patterns"
-    ]
   },
   {
     "file": "images/og/medical-disclaimer.jpg",
@@ -481,58 +447,22 @@
     ]
   },
   {
-    "file": "images/og/dpa.jpg",
+    "file": "images/og/refund-policy.jpg",
     "layout": "og",
     "size": [
       1200,
       630
     ],
     "theme": "neutral",
-    "kicker": "For practitioners",
+    "kicker": "Refunds",
     "title_lines": [
-      "Data Processing",
-      "Addendum"
+      "Refund Policy"
     ],
     "sub_lines": [
-      "The paperwork a clinic asks for,",
-      "in plain language"
-    ]
-  },
-  {
-    "file": "images/og/privacy-attestation.jpg",
-    "layout": "og",
-    "size": [
-      1200,
-      630
+      "Fourteen days, unconditional,",
+      "in full. One email to ask."
     ],
-    "theme": "neutral",
-    "kicker": "For practitioners",
-    "title_lines": [
-      "Privacy",
-      "Attestation"
-    ],
-    "sub_lines": [
-      "What the timer collects",
-      "when your client uses it"
-    ]
-  },
-  {
-    "file": "images/og/security-overview.jpg",
-    "layout": "og",
-    "size": [
-      1200,
-      630
-    ],
-    "theme": "neutral",
-    "kicker": "For practitioners",
-    "title_lines": [
-      "Security",
-      "Overview"
-    ],
-    "sub_lines": [
-      "No accounts, no database,",
-      "nothing to breach"
-    ]
+    "footer": "Cancel any time · 14-day refund"
   },
   {
     "file": "images/pins/4-7-8-breathing.jpg",
@@ -549,8 +479,8 @@
       "Out for eight."
     ],
     "sub_lines": [
-      "A free guided timer",
-      "counts it for you"
+      "A guided timer counts it for you,",
+      "three sessions free"
     ]
   },
   {
@@ -694,7 +624,7 @@
       "your eyes"
     ],
     "sub_lines": [
-      "Free guided timer,",
+      "Three sessions free,",
       "works offline"
     ]
   },

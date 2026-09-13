@@ -19,7 +19,7 @@ Rules that are not negotiable:
 - No inline `onclick`. `data-action` only.
 - No ad slot, no paywall prompt, no email capture and no affiliate link on
   `/breathing-exercises-anxiety`, `/breathing-exercises-for-panic-attacks`,
-  `/pro`, `/pro/thanks`, `/for-practitioners` or `/embed`.
+  `/pro` or `/pro/thanks`.
 - Never put "Wim Hof" in a title, H1, meta description or slug.
 - **No emoji. Anywhere. In any file.** Not in nav labels, not in card titles,
   not in a favicon data URI, not in a footer.
@@ -64,8 +64,9 @@ leaving it in produces unstyled markup, not a fallback.
    where the page has warnings or sources.
 7. **Footer** — replace the three `<nav class="footer-nav">` blocks with the
    four-column block in §8, plus the byline and legal row.
-8. **Support links** — replace `class="patreon-btn"` with a plain link inside
-   `.support-options` (§9).
+8. **Support links** — delete the whole block (`class="patreon-btn"`,
+   `.support-options` and its heading). Nothing replaces it: there is no
+   support ask anywhere on the site (§9).
 
 ### CHECK
 
@@ -150,12 +151,12 @@ one wins.
             'wait_for_update': 500
         });
         gtag('js', new Date());
-        gtag('config', 'G-09WY9JD4YM', {
+        gtag('config', 'G-TYLYLJSFHN', {
             'anonymize_ip': true,
             'cookie_expires': 63072000
         });
     </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
 
     <!-- JSON-LD blocks go here. See section 10. -->
 </head>
@@ -190,7 +191,6 @@ allowed.
                 <a href="/timer">Timer</a>
                 <a href="/guides">Guides</a>
                 <a href="/science">Science</a>
-                <a href="/for-practitioners">For practitioners</a>
                 <a href="/pro">Pro</a>
             </nav>
         </div>
@@ -224,19 +224,14 @@ Notes:
 - Add `aria-current="page"` to **one** `.site-nav` link, the one whose section
   this page belongs to. Do not remove the link — the header is identical
   everywhere.
-- **`/guides` does not exist yet.** `node tools/site-check.mjs` will report it
-  as a `broken-link` ERROR on your page. That is expected and it is not yours to
-  fix: the Integrate agent adds a `/guides` rewrite to `vercel.json`, and a
-  content agent later builds the real hub. Do not drop the link, do not point it
-  somewhere else, and do not create `guides.html` yourself. The same is true of
-  `/extended-exhale-breathing` in the footer and the switcher.
 - The `Menu` button needs no page script. `js/app.js` wires
   `[data-action="toggle-nav"]` once per page, and every page already loads it.
 - The **Pro link is not accent-coloured.** It is a nav item like the others.
 - Body classes: `theme-*` (the technique's theme from `js/techniques.js`),
   `article-page` (prose typography), `technique-page` (timer on top, prose
   below). Crisis-safe pages also carry
-  `data-no-ads="true" data-no-asks="true"` on `<body>`.
+  `data-no-ads="true" data-no-asks="true" data-open-timer="true"` on `<body>`
+  (and nowhere else: `tools/site-check.mjs` enforces the allowlist).
 - The cookie banner is **not** page markup. `js/consent.js` injects it, with
   "Essential only" listed first.
 
@@ -267,7 +262,7 @@ role on the left, dates in tabular figures on the right.
 reviewed by anyone, it says Published and Updated and nothing else. Writing
 "Reviewed by …" for a review that did not happen is a fabricated credential.
 
-On a page with no author strip (a legal page, `/embed`), drop `.article-meta`
+On a page with no author strip (a legal page, `/pro`), drop `.article-meta`
 and keep the breadcrumb, `h1` and lead.
 
 ## 4. The timer section — exact snippet
@@ -529,7 +524,8 @@ A neutral aside uses `<div class="callout">` on its own (an `--edge` left rule).
 
 Required near the top of `/breathing-exercises-anxiety` and
 `/breathing-exercises-for-panic-attacks`. Those pages carry **zero**
-monetisation surfaces and `<body data-no-ads="true" data-no-asks="true">`.
+monetisation surfaces and `<body data-no-ads="true" data-no-asks="true"
+data-open-timer="true">`: the timer runs for anyone there, always.
 
 ```html
 <div class="crisis-block">
@@ -573,7 +569,7 @@ sideways. Numeric columns get `class="num"` for tabular figures.
 
 Four link columns, an authorship byline naming a person, then the legal row.
 Drop the link to the page you are on. On the crisis-safe pages, remove the
-`/pro` and `/for-practitioners` links.
+`/pro` link.
 
 ```html
 <footer class="footer">
@@ -611,9 +607,7 @@ Drop the link to the page you are on. On the crisis-safe pages, remove the
             <p class="footer-heading">The site</p>
             <a href="/about">About</a>
             <a href="/pro">Pro</a>
-            <a href="/for-practitioners">For practitioners</a>
-            <a href="/embed">Embed the timer</a>
-            <a href="/handouts">Printable handouts</a>
+            <a href="/account">Your account</a>
         </nav>
     </div>
 
@@ -622,6 +616,7 @@ Drop the link to the page you are on. On the crisis-safe pages, remove the
     <div class="legal-links">
         <a href="/legal/privacy-policy">Privacy Policy</a>
         <a href="/legal/terms-of-service">Terms of Service</a>
+        <a href="/legal/refund-policy">Refund Policy</a>
         <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
         <a href="mailto:contact@helpmebreath.com">Contact</a>
     </div>
@@ -648,12 +643,14 @@ button:
 ```
 
 `data-plan` is `monthly` or `yearly`. `js/checkout.js` handles the click; while
-`js/config.js` is in `waitlist` mode the button renders an email capture card
-instead of a checkout, so it is never dead. A page that carries a checkout
-button must load `/js/checkout.js` (or `/js/pro/index.js`, which imports it).
-Put a `<div data-checkout-slot></div>` under the button so the card lands
-there. Prices and the trial length come from `js/config.js` (`PRICES`,
-`CHECKOUT.trialDays`); do not hard-code them in a script.
+`CHECKOUT.clientToken` in `js/config.js` is empty the button renders a calm
+"Checkout is not open yet" card instead of a checkout, so it is never dead
+(there is no waitlist mode and no capture card here). A page that carries a
+checkout button must load `/js/checkout.js` (or `/js/pro/index.js`, which
+imports it). Put a `<div data-checkout-slot></div>` under the button so the
+card lands there. Prices and the trial length come from `PLANS` in
+`js/config.js` (`PLANS.monthly.price`, `PLANS.yearly.price`,
+`PLANS.trialDays`, `PLANS.refundDays`); do not hard-code them in a script.
 
 ## 10. The plan card (`/pro`)
 
@@ -664,11 +661,6 @@ trial statement, one button, the fine print, and one list of what is included.
 No matrix, no tiers, no ticks and crosses. `--clay` appears on the price and
 the button here and on the home page's `.plan-band`, and nowhere near the
 timer.
-
-`/for-practitioners` points at the same plan with a ruled list of what it
-means for a practitioner and one `data-plan="yearly"` button. The
-`.pricing-matrix` classes still exist in `css/styles.css` for any old page
-that has not been converted; do not build new ones.
 
 Structured data on `/pro`: two `Offer`s (10.00 USD, `unitCode` `MON`; 100.00
 USD, `unitCode` `ANN`), `availability` `https://schema.org/PreOrder` until
@@ -693,7 +685,7 @@ the CSS prints then has a real accessible counterpart.
 Height is reserved in CSS (280px, or 90px for the leaderboard variant) so
 toggling measures CLS 0. `body.session-active .ad-slot { display: none }` hides
 them while someone is breathing, and
-`body[data-tier="pro"|"practitioner"|"studio"] .ad-slot { display: none }` keeps
+`body[data-tier="pro"] .ad-slot { display: none }` keeps
 a paying customer from ever seeing reserved ad space (`js/ads.js` also removes
 the nodes outright).
 
@@ -702,11 +694,11 @@ never between the Begin button and the circle. At most two in-content units per
 page. Add `<script type="module" src="/js/ads.js"></script>`.
 
 **Forbidden:** `/`, `/timer`, any technique landing page's timer viewport, `/pro`,
-`/pro/thanks`, `/for-practitioners`, `/embed`, `/breathing-exercises-anxiety`,
+`/pro/thanks`, `/breathing-exercises-anxiety`,
 `/breathing-exercises-for-panic-attacks`.
 
-Any monetisation ask that is not an ad slot (tip button, upgrade card, capture
-form) gets `data-ask="…"` so the same CSS rule hides it during a session.
+Any monetisation ask that is not an ad slot (upgrade card, capture form,
+sign-in card) gets `data-ask="…"` so the same CSS rule hides it during a session.
 
 ## 12. JSON-LD patterns
 
@@ -886,7 +878,7 @@ nothing is lighter than weight 400, and anything clickable is `var(--ui)`.
 - [ ] No invented medical reviewer.
 - [ ] No inline `onclick`; every control uses `data-action`.
 - [ ] No AdSense script tag pasted by hand; `js/ads.js` only, and only where ads are allowed.
-- [ ] Crisis-safe pages: `data-no-ads="true" data-no-asks="true"`, zero monetisation, crisis lines near the top including Embrace 1564.
+- [ ] Crisis-safe pages: `data-no-ads="true" data-no-asks="true" data-open-timer="true"`, zero monetisation, crisis lines near the top including Embrace 1564.
 - [ ] Root-relative asset paths; clean-URL links only.
 - [ ] §13 forbidden-pattern checklist all clear.
 - [ ] Any page `<style>` block obeys §13a: tokens only, no colour defined solely

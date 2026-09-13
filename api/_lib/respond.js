@@ -3,19 +3,11 @@
  *
  * CORS policy, decided deliberately:
  *
- *   /api/license, /api/subscribe, /api/health -> SAME ORIGIN ONLY. The Origin
- *     header is echoed back only when its host equals the request host (or one
- *     of ALLOWED_ORIGINS). A cross-site page therefore cannot read the response.
- *
- *   /api/entitlement -> Access-Control-Allow-Origin: * , because the embed frame
- *     is rendered inside third-party sites and the client session link at /s/ is
- *     framed too. What that exposes is exactly one thing: whether a token that
- *     the caller already possesses is a valid, unexpired token, and what tier
- *     and domains it claims. It exposes no secret, no key, no email, no order
- *     data, and it never sets Access-Control-Allow-Credentials, so no browser
- *     will attach cookies to it. A caller who does not already hold a token
- *     learns nothing; a caller who holds one already knows its contents,
- *     because the payload half of the token is plain base64url JSON.
+ *   Every endpoint -> SAME ORIGIN ONLY. The Origin header is echoed back only
+ *     when its host equals the request host (or one of ALLOWED_ORIGINS). A
+ *     cross-site page therefore cannot read the response. The `anyOrigin`
+ *     option below is kept for completeness; no handler passes it since the
+ *     embed frame was removed on 2026-09-12.
  *
  * Every response is `no-store`. None of these endpoints returns anything a CDN
  * or a browser should ever keep.

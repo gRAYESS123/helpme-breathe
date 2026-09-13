@@ -1,0 +1,496 @@
+/* ==========================================================================
+   css/account.css — /signin, /auth/callback and /account, in Paper and Ink.
+
+   Every colour is a token from css/styles.css. Nothing here defines a colour
+   that only exists in a media query or a .night block: the token set already
+   swaps for night. Control boundaries are --edge; --rule is decorative.
+   Anything clickable is var(--ui). Nothing below 11px, nothing lighter than 400.
+   --clay appears only on the subscribe call-to-action (a paid surface).
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   The auth card (sign-in, callback)
+   -------------------------------------------------------------------------- */
+.auth-page main {
+    max-width: 30rem;
+    margin: 0 auto;
+}
+
+.auth-card {
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sheet);
+    padding: 1.5rem;
+    margin: 0 0 1.5rem;
+}
+
+.auth-card h2 {
+    font-family: var(--display);
+    font-size: 1.375rem;
+    font-weight: 500;
+    letter-spacing: -0.012em;
+    margin: 0 0 0.5rem;
+}
+
+.auth-card p {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    margin: 0 0 0.85rem;
+}
+
+.auth-card p:last-child { margin-bottom: 0; }
+
+.auth-muted {
+    color: var(--graphite);
+    font-size: var(--fs-small);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.auth-label {
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--ink);
+}
+
+.auth-input {
+    width: 100%;
+    min-height: var(--hit);
+    padding: 0.6rem 0.8rem;
+    font-family: var(--ui);
+    font-size: 1rem;
+    color: var(--ink);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+}
+
+.auth-input:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 1px;
+}
+
+.auth-input::placeholder { color: var(--graphite); }
+
+.auth-input--code {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.35em;
+    font-size: 1.375rem;
+    text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   Buttons — sans, 1px borders, 44px minimum, radius 8px.
+   -------------------------------------------------------------------------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: var(--hit);
+    padding: 0.6rem 1.2rem;
+    font-family: var(--ui);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--ink);
+    background: var(--leaf);
+    border: 1px solid var(--edge);
+    border-radius: var(--radius);
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: border-color var(--dur-tap) var(--ease-ui), background-color var(--dur-tap) var(--ease-ui), color var(--dur-tap) var(--ease-ui);
+}
+
+.btn:hover { border-color: var(--ink); text-decoration: none; }
+
+.btn:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+    cursor: not-allowed;
+    color: var(--graphite);
+    border-color: var(--rule);
+}
+
+.btn--primary {
+    color: var(--chalk);
+    background: var(--green);
+    border-color: var(--green);
+}
+
+.btn--primary:hover { background: var(--ink); border-color: var(--ink); color: var(--chalk); }
+
+.btn--primary:disabled { background: var(--track); border-color: var(--track); color: var(--graphite); }
+
+.btn--quiet {
+    border-color: transparent;
+    background: transparent;
+    color: var(--graphite);
+    font-weight: 500;
+}
+
+.btn--quiet:hover { color: var(--ink); border-color: transparent; background: transparent; }
+
+.btn--danger {
+    color: var(--bad);
+    border-color: var(--bad);
+    background: var(--leaf);
+}
+
+.btn--danger:hover { color: var(--chalk); background: var(--bad); border-color: var(--bad); }
+
+/* The one paid surface on /account: the subscribe button. */
+.btn--commerce {
+    color: var(--chalk);
+    background: var(--clay);
+    border-color: var(--clay);
+}
+
+.btn--commerce:hover { background: var(--ink); border-color: var(--ink); color: var(--chalk); }
+
+.btn--block { width: 100%; }
+
+.btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.btn-row--stack { flex-direction: column; }
+
+.auth-or {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0.25rem 0;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    color: var(--graphite);
+}
+
+.auth-or::before,
+.auth-or::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+}
+
+.auth-note {
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    line-height: 1.6;
+    color: var(--graphite);
+    margin: 0.5rem 0 0;
+}
+
+.auth-status {
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    line-height: 1.6;
+    min-height: 1.3em;
+    margin: 0.25rem 0 0;
+    color: var(--graphite);
+}
+
+.auth-status.is-error { color: var(--bad); }
+.auth-status.is-ok { color: var(--ok); }
+
+.auth-rules {
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    line-height: 1.6;
+    color: var(--graphite);
+}
+
+.auth-rules li {
+    padding: 0.35rem 0;
+    border-top: 1px solid var(--rule);
+}
+
+/* The working / expired / done states on the callback page. */
+.auth-state[hidden] { display: none; }
+
+.auth-working {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.auth-ring {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 auto;
+    color: var(--green);
+    animation: auth-ring-turn 1.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-ring { animation: none; }
+}
+
+@keyframes auth-ring-turn {
+    to { transform: rotate(360deg); }
+}
+
+/* --------------------------------------------------------------------------
+   The account page
+   -------------------------------------------------------------------------- */
+.account-page main {
+    max-width: 44rem;
+    margin: 0 auto;
+}
+
+.account-section {
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sheet);
+    padding: 1.5rem;
+    margin: 0 0 1.25rem;
+}
+
+.account-section > h2 {
+    font-family: var(--display);
+    font-size: 1.375rem;
+    font-weight: 500;
+    letter-spacing: -0.012em;
+    margin: 0 0 0.75rem;
+}
+
+.account-section h3 {
+    font-family: var(--ui);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1.25rem 0 0.5rem;
+}
+
+.account-section p {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    margin: 0 0 0.75rem;
+}
+
+.account-section p:last-child { margin-bottom: 0; }
+
+.account-section[hidden] { display: none; }
+
+/* Key/value rows: label left, value right, tabular figures. */
+.account-dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.4rem 1.25rem;
+    margin: 0 0 1rem;
+    font-family: var(--ui);
+    font-size: 0.9375rem;
+}
+
+.account-dl dt {
+    color: var(--graphite);
+    font-size: var(--fs-small);
+    padding-top: 0.15rem;
+}
+
+.account-dl dd {
+    margin: 0;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+/* The status line of §6.5 — one sentence, plainly. */
+.status-line {
+    font-family: var(--ui);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.6;
+    margin: 0 0 1rem;
+}
+
+.status-line .status-word {
+    display: inline-block;
+    padding: 0.1rem 0.55rem;
+    margin-right: 0.35rem;
+    border: 1px solid var(--edge);
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.status-line[data-tone="ok"] .status-word { border-color: var(--ok); color: var(--ok); }
+.status-line[data-tone="warn"] .status-word { border-color: var(--warn); color: var(--warn); }
+.status-line[data-tone="bad"] .status-word { border-color: var(--bad); color: var(--bad); }
+
+/* Banners: the past-due card notice and the one-time notices. */
+.account-banner {
+    padding: 0.9rem 1.1rem;
+    margin: 0 0 1.25rem;
+    background: var(--leaf);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--edge);
+    border-radius: var(--radius);
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    line-height: 1.6;
+}
+
+.account-banner[hidden] { display: none; }
+.account-banner--warn { border-left-color: var(--warn); }
+.account-banner--bad { border-left-color: var(--bad); }
+.account-banner--ok { border-left-color: var(--ok); }
+
+.account-banner p { margin: 0 0 0.5rem; font-size: inherit; }
+.account-banner p:last-child { margin-bottom: 0; }
+
+.account-banner .btn-row { margin-top: 0.5rem; }
+
+/* The cancel screen: three peers, visible at once (§5.9). */
+.cancel-screen {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+}
+
+.cancel-screen[hidden] { display: none; }
+
+.cancel-options {
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.cancel-option {
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+}
+
+.cancel-option h3 {
+    margin: 0 0 0.3rem;
+    font-family: var(--ui);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.cancel-option p {
+    margin: 0 0 0.5rem;
+    font-size: var(--fs-small);
+    color: var(--graphite);
+}
+
+.cancel-option--final {
+    border-color: var(--edge);
+}
+
+.cancel-option[hidden] { display: none; }
+
+.cancel-effect {
+    font-family: var(--ui);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    margin: 0 0 0.75rem;
+}
+
+/* Delete: a bordered zone, a checkbox, then the button. */
+.danger-zone {
+    margin-top: 1rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--bad);
+    border-radius: var(--radius);
+}
+
+.danger-zone[hidden] { display: none; }
+
+.check-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    line-height: 1.55;
+    margin: 0 0 0.75rem;
+}
+
+.check-row input[type="checkbox"] {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin: 0.15rem 0 0;
+    flex: 0 0 auto;
+    accent-color: var(--green);
+}
+
+.account-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.account-footer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin: 0.5rem 0 1.5rem;
+}
+
+.account-loading {
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    color: var(--graphite);
+}
+
+.account-loading[hidden] { display: none; }
+
+.account-error {
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    color: var(--bad);
+    min-height: 1.3em;
+    margin: 0.5rem 0 0;
+}
+
+.account-error:empty { display: none; }
+
+.account-ok {
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    color: var(--ok);
+    margin: 0.5rem 0 0;
+}
+
+.account-ok:empty { display: none; }
+
+.sr-only-inline {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+@media (max-width: 30rem) {
+    .account-dl { grid-template-columns: 1fr; gap: 0.1rem 0; }
+    .account-dl dd { margin-bottom: 0.5rem; }
+    .auth-card,
+    .account-section { padding: 1.1rem; }
+}

@@ -2,35 +2,50 @@
  * api/_lib/providers/index.js — the merchant-of-record seam.
  *
  * Swapping the merchant of record is a one-file change: write a new adapter next
- * to paddle.js / fastspring.js, add it to PROVIDERS below, and set MOR_PROVIDER.
- * Nothing outside this folder knows the name of a payment company.
+ * to paddle.js / fastspring.js, add it to listProviders() below, and set
+ * MOR_PROVIDER. Nothing outside this folder knows the name of a payment company
+ * (docs/private/ACCOUNTS_BILLING_DESIGN.md §10.1; enforced by tools/site-check).
  *
  * The owner is a Lebanon-resident individual with no company, so the rail is
  * always a merchant of record. Paddle is primary, FastSpring is the hedge.
  *
- * Adapter contract
- * ----------------
+ * ADAPTER CONTRACT v3 (design §10.1)
+ * ----------------------------------
  * {
  *   id: 'paddle',
- *   keyHint: string,                       // shown to a person who pasted the wrong thing
- *   looksLikeKey(key): boolean,
- *   async lookup(key, ctx): LookupResult,
- *   async recordActivation(record, { domains }, ctx): { ok, activations, reason? }
+ *   // checkout
+ *   priceIdFor({ plan, trial }, env),                        // -> string
+ *   async ensureCustomer(email, ctx),                        // -> { id, existed }   (409-tolerant)
+ *   async createCheckoutSession({ priceId, customerId, customData }, ctx),
+ *                                                            // -> { transactionId, status?, checkoutUrl? }
+ *   async pricePreview({ priceId, countryCode, customerIp }, ctx),
+ *                                                            // -> { amount, currency, taxInclusive, formatted }
+ *   // webhooks
+ *   async verifyWebhook(rawBody, headers, secret),           // -> { ok, reason? }
+ *   parseEvents(rawBody, ctx?),                              // -> NormalizedEvent[]
+ *   // management
+ *   async getSubscription(subscriptionId, ctx),              // -> NormalizedEvent-shaped state
+ *   async cancelSubscription(subscriptionId, { effectiveFrom }, ctx),
+ *   async pauseSubscription(subscriptionId, { resumeAt, effectiveFrom }, ctx),
+ *   async changePlan(subscriptionId, priceId, { prorate }, ctx),
+ *   async createPortalSession(customerId, subscriptionIds, ctx),
  * }
  *
- * LookupResult = { ok: true, record } | { ok: false, reason, message? }
+ * ctx = { env, fetchImpl?, isProd? }
  *
- * record = {
- *   provider, orderId, sku, tier, live,
- *   activations, maxActivations, maxDomains, domains,
- *   subscriptionStatus, ref  // ref holds provider-internal ids the adapter needs to write back
+ * NormalizedEvent (design §6.2) — every adapter produces exactly this shape:
+ * {
+ *   id, type, occurredAt, live, reservationId,
+ *   providerSubscriptionId, providerCustomerId, providerPriceId, providerTransactionId,
+ *   customerEmail, status, plan, hadTrial,
+ *   trialStartsAt, trialEndsAt, currentPeriodStart, currentPeriodEnd, nextBilledAt,
+ *   canceledAt, pausedAt, scheduledChange: { action, effectiveAt, resumeAt } | null,
+ *   amount, currency, taxInclusive, totalIsZero,
  * }
  *
- * ctx = { env, fetchImpl, isProd, sub }
- *
- * `sub` is the first 12 hex characters of sha256(licence key). It is the ONLY
- * identifier an adapter may put in a log line: for both Paddle and FastSpring the
- * order id IS the licence key, so `record.orderId` must never be logged.
+ * Every provider call that fails throws a ProviderError carrying `status`,
+ * `code` and `reason`; the endpoints turn that into a calm 502/503. Adapters
+ * never log a customer email, a transaction id or a subscription id.
  */
 
 import { paddleProvider } from './paddle.js';
@@ -42,78 +57,16 @@ export const PROVIDER_IDS = Object.freeze(['paddle', 'fastspring']);
 /**
  * Every adapter, keyed by the value of MOR_PROVIDER.
  *
- * This is a function rather than a top-level object on purpose: the adapters
- * import their shared constants back from this file, and building the table at
+ * A function rather than a top-level object on purpose: the adapters import
+ * their shared helpers back from this file, and building the table at
  * module-evaluation time would hit the temporal dead zone when an adapter is
- * the entry point of the import graph (which is exactly what the test suite
- * does). Function bodies run after every module in the cycle is initialised.
+ * the entry point of the import graph (which is what the test suite does).
  *
  * @returns {Record<string, object>}
  */
 export function listProviders() {
   return { paddle: paddleProvider, fastspring: fastspringProvider };
 }
-
-/** Internal SKUs. These are ours, not any provider's. */
-export const SKUS = Object.freeze(['lifetime', 'monthly', 'practitioner', 'studio', 'pack']);
-
-/** Which env var holds the provider's product/price id(s) for each SKU. */
-export const PRODUCT_ENV = Object.freeze({
-  lifetime: 'MOR_PRODUCT_LIFETIME',
-  monthly: 'MOR_PRODUCT_MONTHLY',
-  practitioner: 'MOR_PRODUCT_PRACTITIONER',
-  studio: 'MOR_PRODUCT_STUDIO',
-  pack: 'MOR_PRODUCT_PACK',
-});
-
-/** SKU -> the tier the token carries. `pack` is not an app tier (see api/license.js). */
-export const SKU_TIER = Object.freeze({
-  lifetime: 'pro',
-  monthly: 'pro',
-  practitioner: 'practitioner',
-  studio: 'studio',
-  pack: 'pack',
-});
-
-/**
- * Token lifetime in days. A lifetime purchase can never be revoked for
- * non-payment, so it gets the long token; anything renewing gets seven days so
- * a cancellation stops working within a week with no revocation list.
- */
-export const SKU_TOKEN_DAYS = Object.freeze({
-  lifetime: 30,
-  monthly: 7,
-  practitioner: 7,
-  studio: 7,
-  pack: 30,
-});
-
-/** True when the SKU renews and therefore needs a subscription status check. */
-export const SKU_IS_SUBSCRIPTION = Object.freeze({
-  lifetime: false,
-  monthly: true,
-  practitioner: true,
-  studio: true,
-  pack: false,
-});
-
-/** Activation and white-label domain caps per tier (AGENT_BRIEF §1). */
-export const TIER_LIMITS = Object.freeze({
-  free: { activations: 0, domains: 0 },
-  pack: { activations: 0, domains: 0 },
-  pro: { activations: 6, domains: 0 },
-  practitioner: { activations: 25, domains: 1 },
-  studio: { activations: 25, domains: 10 },
-});
-
-/** Ranking used when one order contains several products. */
-export const SKU_RANK = Object.freeze({
-  pack: 1,
-  lifetime: 2,
-  monthly: 2,
-  practitioner: 3,
-  studio: 4,
-});
 
 /**
  * Pick the adapter named by MOR_PROVIDER.
@@ -130,146 +83,405 @@ export function getProvider(name) {
   return provider;
 }
 
+// --------------------------------------------------------------------------
+// Plans and prices (design §3.2 plan enum, §10.2 env vars)
+// --------------------------------------------------------------------------
+
+/** The plan enum, exactly as the subscriptions.plan CHECK constraint spells it. */
+export const PLANS = Object.freeze(['monthly', 'yearly']);
+
 /**
- * Build the product-id -> SKU map from MOR_PRODUCT_* .
+ * Which env var holds the provider price id (Paddle `pri_…`) or product path
+ * (FastSpring) for each (plan, trial) pair. `null` would mean "this plan has
+ * no trial price"; both plans carry one today.
+ */
+export const PRICE_ENV = Object.freeze({
+  monthly: Object.freeze({ trial: 'MOR_PRICE_MONTHLY_TRIAL', paid: 'MOR_PRICE_MONTHLY' }),
+  yearly: Object.freeze({ trial: 'MOR_PRICE_YEARLY_TRIAL', paid: 'MOR_PRICE_YEARLY' }),
+});
+
+/**
+ * True for a plan name we sell.
+ * @param {unknown} plan
+ * @returns {boolean}
+ */
+export function isPlan(plan) {
+  return PLANS.includes(String(plan || ''));
+}
+
+/**
+ * The provider price id for a (plan, trial) pair, read from env — never from
+ * the browser (design §5.4 step 7, §5.5). Shared by both adapters because the
+ * env-var layout is ours, not the provider's.
  *
- * Each variable may hold several ids separated by commas or whitespace. That
- * matters because a Paddle transaction exposes both a price id (`pri_…`) and a
- * product id (`pro_…`), and because a founding-member price is a second price id
- * against the same product.
+ * @param {{plan:string, trial?:boolean}} input
+ * @param {Record<string,string>} env
+ * @returns {string}
+ * @throws {Error} when the plan is unknown or the env var is unset
+ */
+export function priceIdFor(input, env) {
+  const plan = String((input && input.plan) || '');
+  const wantTrial = Boolean(input && input.trial);
+  const slot = PRICE_ENV[plan];
+  if (!slot) throw new Error(`Unknown plan "${plan}". Supported plans: ${PLANS.join(', ')}.`);
+  const varName = wantTrial ? slot.trial : slot.paid;
+  if (!varName) throw new Error(`Plan "${plan}" has no trial price.`);
+  const value = String((env && env[varName]) || '').trim();
+  if (!value) throw new Error(`Missing environment variable ${varName} for plan "${plan}".`);
+  return value;
+}
+
+/**
+ * The full price table from env: every configured price id with its plan and
+ * whether it carries a trial. Missing vars are simply absent.
  *
  * @param {Record<string,string>} env
- * @returns {Map<string,string>} lowercased id -> sku
+ * @returns {Map<string, {plan:string, trial:boolean}>} lowercased id -> meaning
  */
-export function productSkuMap(env) {
+export function priceTable(env) {
   const map = new Map();
-  for (const sku of SKUS) {
-    const raw = env[PRODUCT_ENV[sku]];
-    if (!raw) continue;
-    for (const id of String(raw).split(/[\s,]+/)) {
-      const trimmed = id.trim().toLowerCase();
-      if (trimmed) map.set(trimmed, sku);
+  for (const plan of PLANS) {
+    const slot = PRICE_ENV[plan];
+    for (const [kind, varName] of [['trial', slot.trial], ['paid', slot.paid]]) {
+      if (!varName) continue;
+      const value = String((env && env[varName]) || '').trim().toLowerCase();
+      if (value) map.set(value, { plan, trial: kind === 'trial' });
     }
   }
   return map;
 }
 
 /**
- * Resolve a set of provider product/price identifiers to our best SKU.
- * @param {Array<string|null|undefined>} ids
+ * Resolve a provider price id (or product path) to our plan.
+ * @param {string|null|undefined} priceId
  * @param {Record<string,string>} env
+ * @returns {{plan:string, trial:boolean}|null}
+ */
+export function planForPriceId(priceId, env) {
+  if (!priceId) return null;
+  return priceTable(env).get(String(priceId).trim().toLowerCase()) || null;
+}
+
+/**
+ * True when the price id is one of the trial prices (design §6.3, the
+ * unconditional trial-price check).
+ * @param {string|null|undefined} priceId
+ * @param {Record<string,string>} env
+ * @returns {boolean}
+ */
+export function isTrialPriceId(priceId, env) {
+  const hit = planForPriceId(priceId, env);
+  return Boolean(hit && hit.trial);
+}
+
+// --------------------------------------------------------------------------
+// Normalised events
+// --------------------------------------------------------------------------
+
+/** Every normalised event type an adapter may emit (design §6.2, plus txn.chargeback). */
+export const EVENT_TYPES = Object.freeze([
+  'sub.created',
+  'sub.trialing',
+  'sub.activated',
+  'sub.updated',
+  'sub.past_due',
+  'sub.paused',
+  'sub.resumed',
+  'sub.canceled',
+  'txn.completed',
+  'txn.failed',
+  'txn.refunded',
+  'txn.chargeback',
+  'ignore',
+]);
+
+/** The five provider statuses plus our local `expired` (design §6.4). */
+export const SUBSCRIPTION_STATUSES = Object.freeze([
+  'trialing',
+  'active',
+  'past_due',
+  'paused',
+  'canceled',
+  'expired',
+]);
+
+/** Values `effective_from` may take. Always passed explicitly (design §5.9). */
+export const EFFECTIVE_FROM = Object.freeze(['next_billing_period', 'immediately']);
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * The reservation id out of a provider `custom_data` object. It is the ONLY
+ * field ever read from custom_data (design §6.3): an opaque uuid, or null.
+ * `custom_data.user_id`, if it ever appears, is ignored here and logged by
+ * applyEvent.
+ *
+ * @param {unknown} customData
  * @returns {string|null}
  */
-export function skuForProductIds(ids, env) {
-  const map = productSkuMap(env);
-  let best = null;
-  for (const id of ids || []) {
-    if (!id) continue;
-    const sku = map.get(String(id).trim().toLowerCase());
-    if (!sku) continue;
-    if (!best || (SKU_RANK[sku] || 0) > (SKU_RANK[best] || 0)) best = sku;
-  }
-  return best;
+export function reservationIdFrom(customData) {
+  if (!customData || typeof customData !== 'object') return null;
+  const rid = customData.rid;
+  if (typeof rid !== 'string' || !UUID_RE.test(rid)) return null;
+  return rid.toLowerCase();
 }
 
 /**
- * Limits for a tier, with a safe zero default.
- * @param {string} tier
- * @returns {{activations:number, domains:number}}
+ * Build a normalised event with every field present (null when unknown), so
+ * consumers never have to guard against undefined.
+ *
+ * @param {Partial<object>} partial
+ * @returns {object}
  */
-export function limitsForTier(tier) {
-  return TIER_LIMITS[tier] || TIER_LIMITS.free;
+export function normalizeEvent(partial) {
+  const p = partial || {};
+  const type = EVENT_TYPES.includes(p.type) ? p.type : 'ignore';
+  const scheduled =
+    p.scheduledChange && typeof p.scheduledChange === 'object' && p.scheduledChange.action
+      ? {
+          action: String(p.scheduledChange.action),
+          effectiveAt: p.scheduledChange.effectiveAt || null,
+          resumeAt: p.scheduledChange.resumeAt || null,
+        }
+      : null;
+  return {
+    id: p.id ? String(p.id) : null,
+    type,
+    providerEventType: p.providerEventType ? String(p.providerEventType) : null,
+    occurredAt: p.occurredAt || null,
+    live: typeof p.live === 'boolean' ? p.live : null,
+    reservationId: p.reservationId || null,
+    providerSubscriptionId: p.providerSubscriptionId || null,
+    providerCustomerId: p.providerCustomerId || null,
+    providerPriceId: p.providerPriceId || null,
+    providerTransactionId: p.providerTransactionId || null,
+    customerEmail: p.customerEmail || null,
+    status: SUBSCRIPTION_STATUSES.includes(p.status) ? p.status : null,
+    plan: isPlan(p.plan) ? p.plan : null,
+    hadTrial: typeof p.hadTrial === 'boolean' ? p.hadTrial : null,
+    trialStartsAt: p.trialStartsAt || null,
+    trialEndsAt: p.trialEndsAt || null,
+    currentPeriodStart: p.currentPeriodStart || null,
+    currentPeriodEnd: p.currentPeriodEnd || null,
+    nextBilledAt: p.nextBilledAt || null,
+    canceledAt: p.canceledAt || null,
+    pausedAt: p.pausedAt || null,
+    scheduledChange: scheduled,
+    amount: p.amount == null ? null : String(p.amount),
+    currency: p.currency ? String(p.currency).toUpperCase() : null,
+    taxInclusive: typeof p.taxInclusive === 'boolean' ? p.taxInclusive : null,
+    totalIsZero: typeof p.totalIsZero === 'boolean' ? p.totalIsZero : null,
+    customDataUserIdSeen: Boolean(p.customDataUserIdSeen),
+    // The provider's own delivery for THIS event, exactly as parsed, so that
+    // webhook_events.payload can be fed back through parseEvents() to re-drive
+    // a failed row (design §3.4, §6.1). Null for API-originated state.
+    payload: p.payload && typeof p.payload === 'object' ? p.payload : null,
+  };
+}
+
+// --------------------------------------------------------------------------
+// Env vars the adapters read (design §10.2) — one list, shared by every endpoint
+// --------------------------------------------------------------------------
+
+/** Vars a provider call cannot work without. `requireEnv()` these. */
+export const PROVIDER_ENV_REQUIRED = Object.freeze(['MOR_API_KEY']);
+
+/** Vars an adapter reads when present. `readEnv()` these; blank means unset. */
+export const PROVIDER_ENV_OPTIONAL = Object.freeze([
+  'MOR_API_BASE',
+  'MOR_API_USERNAME',
+  'MOR_API_PASSWORD',
+  'MOR_SANDBOX',
+  'MOR_STOREFRONT',
+  'MOR_PRICE_MONTHLY_TRIAL',
+  'MOR_PRICE_MONTHLY',
+  'MOR_PRICE_YEARLY_TRIAL',
+  'MOR_PRICE_YEARLY',
+  'SITE_ORIGIN',
+]);
+
+/**
+ * True when this deployment is configured against the sandbox (design §10.2:
+ * `MOR_SANDBOX` is `true` until go-live and "also gates the `live` flag check
+ * in §6.1"). Anything but the literal `true` means live, which is the strict
+ * reading: a forgotten var on a live deployment must not accept sandbox events.
+ * @param {Record<string,string>} env
+ * @returns {boolean}
+ */
+export function sandboxMode(env) {
+  return String((env && env.MOR_SANDBOX) || '').trim().toLowerCase() === 'true';
+}
+
+// --------------------------------------------------------------------------
+// Money and time helpers shared by the adapters
+// --------------------------------------------------------------------------
+
+const ZERO_DECIMAL = new Set([
+  'BIF', 'CLP', 'DJF', 'GNF', 'JPY', 'KMF', 'KRW', 'MGA', 'PYG', 'RWF', 'UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF',
+]);
+const THREE_DECIMAL = new Set(['BHD', 'IQD', 'JOD', 'KWD', 'LYD', 'OMR', 'TND']);
+
+/**
+ * Number of minor-unit digits for a currency.
+ * @param {string} currency
+ * @returns {number}
+ */
+export function currencyExponent(currency) {
+  const code = String(currency || '').toUpperCase();
+  if (ZERO_DECIMAL.has(code)) return 0;
+  if (THREE_DECIMAL.has(code)) return 3;
+  return 2;
 }
 
 /**
- * Normalise something a person typed into a hostname.
- * Accepts "https://Example.com/path", "example.com:443", "EXAMPLE.com".
- * @param {string} value
- * @returns {string} '' when it is not a plausible hostname
+ * Convert a lowest-denomination integer string ("1000" for 10 USD, as Paddle
+ * sends it) into a decimal string ("10.00"). Never floats: this is money.
+ *
+ * @param {string|number|null|undefined} minor
+ * @param {string} currency
+ * @returns {string|null}
  */
-export function normalizeDomain(value) {
-  let text = String(value == null ? '' : value).trim().toLowerCase();
-  if (!text) return '';
-  text = text.replace(/^[a-z][a-z0-9+.-]*:\/\//, '');
-  text = text.split('/')[0].split('?')[0].split('#')[0];
-  text = text.replace(/^[^@]*@/, '');
-  text = text.split(':')[0];
-  text = text.replace(/\.$/, '');
-  if (text.length === 0 || text.length > 253) return '';
-  if (!/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$/.test(text)) return '';
-  return text;
+export function moneyFromMinor(minor, currency) {
+  if (minor == null || minor === '') return null;
+  const text = String(minor).trim();
+  if (!/^-?\d+$/.test(text)) return null;
+  const negative = text.startsWith('-');
+  const digits = negative ? text.slice(1) : text;
+  const exp = currencyExponent(currency);
+  if (exp === 0) return `${negative ? '-' : ''}${digits}`;
+  const padded = digits.padStart(exp + 1, '0');
+  const whole = padded.slice(0, padded.length - exp);
+  const frac = padded.slice(padded.length - exp);
+  return `${negative ? '-' : ''}${whole}.${frac}`;
 }
 
 /**
- * Clean, de-duplicate and cap a list of domains.
- * @param {unknown} input
- * @param {number} max
- * @returns {{domains:string[], rejected:string[]}}
+ * Format a decimal number (as FastSpring sends prices) into a fixed decimal
+ * string for the given currency.
+ * @param {number|string|null|undefined} value
+ * @param {string} currency
+ * @returns {string|null}
  */
-export function normalizeDomains(input, max = 10) {
-  const rejected = [];
-  const out = [];
-  if (!Array.isArray(input)) return { domains: out, rejected };
-  for (const value of input.slice(0, 50)) {
-    const domain = normalizeDomain(value);
-    if (!domain) {
-      if (String(value || '').trim()) rejected.push(String(value).trim().slice(0, 64));
-      continue;
-    }
-    if (!out.includes(domain)) out.push(domain);
-    if (out.length >= max) break;
-  }
-  return { domains: out, rejected };
+export function moneyFromDecimal(value, currency) {
+  if (value == null || value === '') return null;
+  const n = Number(value);
+  if (!Number.isFinite(n)) return null;
+  return n.toFixed(currencyExponent(currency));
 }
 
 /**
- * Merge stored and newly requested domains without duplicates.
- * @param {string[]} stored
- * @param {string[]} incoming
- * @returns {string[]}
+ * Milliseconds-since-epoch (FastSpring) to ISO 8601, or null.
+ * @param {unknown} ms
+ * @returns {string|null}
  */
-export function mergeDomains(stored, incoming) {
-  const out = [];
-  for (const list of [stored || [], incoming || []]) {
-    for (const value of list) {
-      const domain = normalizeDomain(value);
-      if (domain && !out.includes(domain)) out.push(domain);
-    }
-  }
+export function isoFromMillis(ms) {
+  if (ms == null || ms === '') return null;
+  const n = Number(ms);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return new Date(n).toISOString();
+}
+
+/**
+ * Validate an ISO/RFC 3339 timestamp string; returns it normalised or null.
+ * @param {unknown} value
+ * @returns {string|null}
+ */
+export function isoOrNull(value) {
+  if (typeof value !== 'string' || !value) return null;
+  const t = Date.parse(value);
+  if (!Number.isFinite(t)) return null;
+  return new Date(t).toISOString();
+}
+
+/**
+ * Lowercase hex of raw bytes. (api/_lib/crypto.js keeps its own copy private;
+ * task 3 exports it, at which point this one can go.)
+ * @param {Uint8Array} bytes
+ * @returns {string}
+ */
+export function bytesToHex(bytes) {
+  let out = '';
+  for (let i = 0; i < bytes.length; i += 1) out += bytes[i].toString(16).padStart(2, '0');
   return out;
 }
 
+// --------------------------------------------------------------------------
+// Errors and the fetch wrapper contract
+// --------------------------------------------------------------------------
+
 /**
- * A human sentence for each machine reason a lookup can fail with. These strings
- * are shown to the buyer, so they are calm and actionable.
- * @param {string} reason
- * @param {object} [adapter]
+ * Thrown by an adapter when the provider says no or cannot be reached.
+ * `reason` is one of provider_unavailable | provider_error | not_found |
+ * conflict | bad_request | unauthorized | rate_limited. Never carries a body
+ * the endpoint might echo.
+ */
+export class ProviderError extends Error {
+  /**
+   * @param {string} reason
+   * @param {{status?:number, code?:string, message?:string, cause?:unknown}} [info]
+   */
+  constructor(reason, info = {}) {
+    super(info.message || `Provider call failed: ${reason}`);
+    this.name = 'ProviderError';
+    this.reason = reason;
+    this.status = Number.isFinite(info.status) ? info.status : 0;
+    this.code = info.code || null;
+    if (info.cause) this.cause = info.cause;
+  }
+}
+
+/**
+ * Map an HTTP status to a ProviderError reason.
+ * @param {number} status
  * @returns {string}
  */
-export function messageForReason(reason, adapter) {
-  const hint = adapter && adapter.keyHint ? ` ${adapter.keyHint}` : '';
-  switch (reason) {
-    case 'unrecognised_key':
-      return `That does not look like a licence key.${hint}`;
-    case 'not_found':
-      return 'We could not find that key. Check it against your receipt email, or reply to it and we will sort it out.';
-    case 'not_paid':
-      return 'That order has not completed yet. If you have just paid, give it a minute and try again.';
-    case 'canceled':
-      return 'That order was cancelled, so it does not carry a licence.';
-    case 'refunded':
-      return 'That order was refunded, so the licence attached to it is no longer active.';
-    case 'test_mode':
-      return 'That is a test-mode order. Test keys do not work on the live site.';
-    case 'unknown_product':
-      return 'That order is not for a Help Me Breathe licence. Check your receipt, or reply to it and we will help.';
-    case 'subscription_inactive':
-      return 'That subscription is not active. Renew it and your licence will start working again straight away.';
-    case 'provider_unavailable':
-      return 'We could not reach the licence server. Please try again in a moment.';
-    case 'provider_error':
-      return 'The licence server returned an error. Please try again in a moment.';
-    default:
-      return 'That key could not be verified. Check it and try again.';
+export function reasonForStatus(status) {
+  if (!status) return 'provider_unavailable';
+  if (status === 404) return 'not_found';
+  if (status === 409) return 'conflict';
+  if (status === 401 || status === 403) return 'unauthorized';
+  if (status === 429) return 'rate_limited';
+  if (status >= 400 && status < 500) return 'bad_request';
+  return 'provider_error';
+}
+
+/** Method names every v3 adapter must implement. Used by tests and by getProvider callers that want to fail early. */
+export const ADAPTER_METHODS = Object.freeze([
+  'priceIdFor',
+  'ensureCustomer',
+  'createCheckoutSession',
+  'pricePreview',
+  'verifyWebhook',
+  'parseEvents',
+  'getSubscription',
+  'cancelSubscription',
+  'pauseSubscription',
+  'changePlan',
+  'createPortalSession',
+]);
+
+/**
+ * Throw if an adapter misses part of the v3 contract.
+ * @param {object} adapter
+ */
+export function assertAdapter(adapter) {
+  if (!adapter || typeof adapter.id !== 'string') throw new Error('Adapter has no id.');
+  for (const name of ADAPTER_METHODS) {
+    if (typeof adapter[name] !== 'function') {
+      throw new Error(`Adapter "${adapter.id}" is missing ${name}().`);
+    }
   }
+}
+
+/**
+ * Normalise a headers-ish value (Headers, plain object, or Map) to a getter.
+ * @param {unknown} headers
+ * @returns {(name:string)=>string|null}
+ */
+export function headerGetter(headers) {
+  if (!headers) return () => null;
+  if (typeof headers.get === 'function') return (name) => headers.get(name);
+  const lower = {};
+  for (const [k, v] of Object.entries(headers)) lower[String(k).toLowerCase()] = Array.isArray(v) ? v.join(',') : v;
+  return (name) => (lower[String(name).toLowerCase()] == null ? null : String(lower[String(name).toLowerCase()]));
 }

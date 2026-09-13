@@ -34,6 +34,7 @@ import {
 } from './techniques.js';
 import * as storage from './storage.js';
 import { track, EVENTS } from './analytics.js';
+import { requireTimer, signedIn } from './entitlements.js';
 
 /* ========================================================================== *
  * Audio — one AudioContext for the whole page, shared by every instance.
@@ -752,6 +753,21 @@ export function createBreathingApp(rootEl, options = {}) {
     return storage.getFlag(`ack.${state.key}`) !== true;
   }
 
+  /**
+   * Preview mode (design section 8.2): nothing runs, nothing is counted, no
+   * audio, no vibration. Dispatch `hmb:preview` so js/pro/preview.js can show
+   * one real cycle and the card; the page stays fully readable.
+   */
+  function enterPreview() {
+    const reason = signedIn() ? 'no_subscription' : 'signed_out';
+    if (el.circle) el.circle.classList.remove('active');
+    emit('hmb:preview', {
+      ...baseDetail(),
+      reason,
+      phases: state.phases.map((p) => ({ ...p })),
+    });
+  }
+
   function start() {
     if (destroyed) return;
     if (state.running && state.paused) {
@@ -764,6 +780,16 @@ export function createBreathingApp(rootEl, options = {}) {
       if (showSafetyAck()) return;
     }
     hideSafetyAck();
+
+    // The one gate on Start (design section 8.1). The two crisis pages carry
+    // data-open-timer and pass straight through; a
+    // subscriber passes; a device inside its free sessions passes. Otherwise
+    // the engine enters the preview state instead of running: js/pro/preview.js
+    // animates one demonstration cycle and renders the account card.
+    if (!requireTimer({ technique: state.key })) {
+      enterPreview();
+      return;
+    }
 
     audioSystem.init();
     if (resetTimer) {
@@ -1377,15 +1403,7 @@ function wireSiteNav() {
   });
 }
 
-function wireSupportAndInstall() {
-  document.addEventListener('click', (event) => {
-    const support = event.target.closest('[data-action="support"]');
-    if (!support) return;
-    track(EVENTS.SUPPORT_CLICK, {
-      label: support.getAttribute('data-support-label') || support.textContent.trim().slice(0, 40),
-    });
-  });
-
+function wireInstallTracking() {
   window.addEventListener('beforeinstallprompt', () => {
     track(EVENTS.PWA_INSTALL, { stage: 'available' });
   });
@@ -1418,7 +1436,7 @@ function initAll() {
 if (typeof document !== 'undefined') {
   document.addEventListener('keydown', onGlobalKeydown);
   wireSiteNav();
-  wireSupportAndInstall();
+  wireInstallTracking();
   registerServiceWorker();
 
   window.addEventListener('beforeunload', () => {

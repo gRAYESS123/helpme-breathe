@@ -6,7 +6,7 @@
     <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
     <title>Thank you — Help Me Breathe</title>
-    <meta name="description" content="Your Help Me Breathe plan is starting. Three days free, then $10 a month or $100 a year. Cancel any time.">
+    <meta name="description" content="Your Help Me Breathe plan is starting. Three days free, then $10 a month or $100 a year. Cancel any time from your account page.">
 
     <meta name="robots" content="noindex, nofollow">
     <meta name="referrer" content="no-referrer">
@@ -16,36 +16,32 @@
       FIRST script on the page, before the gtag block below and before anything
       else can read location.search.
 
-      The merchant of record can return the buyer here with a key (or with the
-      transaction reference that stands in for one) in the query string. A
-      full key must never reach a log, an analytics event or an error report
-      (AGENT_BRIEF hard rule 9), and GA4's default `page_location` is exactly
-      such an event — it is sent even with analytics_storage denied. The address
-      bar, browser history, the bfcache and the service worker's navigation
-      cache would all keep a copy too.
-
-      So: read the parameters into a module-scoped global, then rewrite the URL
-      to the bare path. Everything downstream reads window.__hmbActivation, never
-      location.search. The gtag config below also pins page_location to the path,
-      so even a bypassed strip cannot leak it.
+      The merchant of record returns the buyer here with our reservation id
+      (`rid`, an opaque uuid the checkout was created under) and sometimes its
+      own transaction reference (`_ptxn`). Neither belongs in a GA4 event, the
+      address bar, browser history, the bfcache or the service worker's
+      navigation cache, so: read them into a module-scoped global, then rewrite
+      the URL to the bare path. Everything downstream reads window.__hmbThanks,
+      never location.search. The gtag config below also pins page_location to
+      the path, so even a bypassed strip cannot leak it.
     -->
     <script>
         (function () {
             try {
                 var params = new URLSearchParams(window.location.search);
-                var names = ['key', 'k', 'license', '_ptxn', 'ptxn', 'transaction_id', 'transactionId', 'orderId'];
+                var names = ['rid', '_ptxn', 'ptxn', 'transaction_id', 'transactionId', 'plan', 'confirmed'];
                 var found = {};
                 var dirty = false;
                 for (var i = 0; i < names.length; i += 1) {
                     var value = params.get(names[i]);
                     if (value) { found[names[i]] = value; dirty = true; }
                 }
-                window.__hmbActivation = found;
+                window.__hmbThanks = found;
                 if (dirty && window.history && typeof window.history.replaceState === 'function') {
                     window.history.replaceState(null, '', window.location.pathname);
                 }
             } catch (error) {
-                window.__hmbActivation = window.__hmbActivation || {};
+                window.__hmbThanks = window.__hmbThanks || {};
             }
         }());
     </script>
@@ -88,15 +84,15 @@
             'wait_for_update': 500
         });
         gtag('js', new Date());
-        gtag('config', 'G-09WY9JD4YM', {
+        gtag('config', 'G-TYLYLJSFHN', {
             'anonymize_ip': true,
             'cookie_expires': 63072000,
-            // Belt and braces beside the strip above: a key can never reach
-            // Google in `dl`, whatever the address bar happens to hold.
+            // Belt and braces beside the strip above: a reservation id can
+            // never reach Google in `dl`, whatever the address bar holds.
             'page_location': window.location.origin + window.location.pathname
         });
     </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
 
     <script type="application/ld+json">
     {
@@ -112,7 +108,7 @@
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "Pro",
+          "name": "The plan",
           "item": "https://helpmebreath.com/pro"
         },
         {
@@ -124,6 +120,54 @@
       ]
     }
     </script>
+
+    <style>
+        /* Page-local: the status card's detail list and its actions. Tokens
+           only; --edge on the operable things; nothing defined solely in a
+           media or .night block. */
+        .thanks-card { text-align: left; }
+
+        .thanks-details {
+            margin: 0.75rem 0 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            gap: 0.35rem 1rem;
+            font-size: var(--fs-small);
+            line-height: 1.6;
+            color: var(--graphite);
+        }
+
+        .thanks-details dt {
+            font-family: var(--ui);
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .thanks-details dd { margin: 0; font-variant-numeric: tabular-nums; }
+
+        .thanks-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin: 1rem 0 0;
+        }
+
+        .thanks-actions .pro-btn { min-width: 11rem; }
+
+        .thanks-reference {
+            margin: 0.75rem 0 0;
+            font-size: var(--fs-micro);
+            color: var(--graphite);
+            font-variant-numeric: tabular-nums;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 30rem) {
+            .thanks-details { grid-template-columns: 1fr; gap: 0.1rem 0; }
+            .thanks-details dd { margin-bottom: 0.45rem; }
+        }
+    </style>
 </head>
 <body class="theme-478 article-page pro-page" data-no-ads="true" data-no-asks="true">
     <a class="skip-link" href="#main">Skip to main content</a>
@@ -141,7 +185,6 @@
                 <a href="/timer">Timer</a>
                 <a href="/guides">Guides</a>
                 <a href="/science">Science</a>
-                <a href="/for-practitioners">For practitioners</a>
                 <a href="/pro" aria-current="page">Pro</a>
             </nav>
         </div>
@@ -157,30 +200,19 @@
                 </ol>
             </nav>
             <h1>Thank you</h1>
-            <p class="lead">Your plan is starting. Three days free, then $10 a month or $100 a year.</p>
+            <p class="lead">Your plan is starting. The exact amount and date are on your account page, taken from your receipt.</p>
         </header>
 
         <main id="main">
             <article class="prose">
                 <section>
-                    <div class="post-session-card" data-role="activation-card">
-                        <h2 data-role="activation-title">Checking your purchase…</h2>
-                        <p data-role="activation-body" role="status" aria-live="polite">One moment.</p>
+                    <div class="post-session-card thanks-card" data-role="status-card">
+                        <h2 data-role="status-title">Your trial has started</h2>
+                        <p data-role="status-body" role="status" aria-live="polite">Checking your account. This takes a few seconds while the payment provider confirms the checkout.</p>
+                        <dl class="thanks-details" data-role="status-details" hidden></dl>
+                        <p class="thanks-actions" data-role="status-actions" hidden></p>
+                        <p class="thanks-reference" data-role="status-reference" hidden></p>
                     </div>
-                </section>
-
-                <section>
-                    <h2>Have a key from an earlier purchase?</h2>
-                    <p>Early buyers were sent a key rather than an account. Paste it here and this browser is
-                    unlocked. It is in the receipt email, and it looks like a long line of letters and numbers.
-                    Nothing is uploaded except the key itself, for verification.</p>
-
-                    <form class="restore-form" data-role="restore-form" novalidate>
-                        <label class="sr-only" for="thanks-key">Key from an earlier purchase</label>
-                        <input type="text" id="thanks-key" name="key" autocomplete="off" spellcheck="false" placeholder="Paste your key">
-                        <button class="pro-btn pro-btn-primary" type="submit">Activate</button>
-                        <p class="restore-status" data-role="restore-status" role="status" aria-live="polite"></p>
-                    </form>
                 </section>
 
                 <section>
@@ -188,28 +220,29 @@
                     <div class="steps-container">
                         <div class="step">
                             <h3>1. Your receipt</h3>
-                            <p>The receipt arrives by email from our merchant of record. If it is not in your inbox
-                            within a few minutes, check the spam folder before writing to us.</p>
+                            <p>The receipt arrives by email from our merchant of record, the company named as the seller
+                            on your card statement. If it is not in your inbox within a few minutes, check the spam
+                            folder before writing to us.</p>
                         </div>
                         <div class="step">
                             <h3>2. Your other devices</h3>
-                            <p>Sign in on any other phone, tablet or laptop with an email link or a Google account,
-                            and the plan is there. If you were sent a key instead, paste it into the box above on
-                            each device and keep that email.</p>
+                            <p>Sign in on any other phone, tablet or laptop with an email link or a Google account, and
+                            the plan is there. There is no key to paste and no password to remember; the plan follows
+                            the account, not the browser.</p>
                         </div>
                         <div class="step">
                             <h3>3. The new tools</h3>
                             <p>Open any timer and look under the circle: "Custom pattern", "Your practice" and
-                            "Night mode" are there, plus soundscapes once they are enabled. Nothing else about the
+                            "Night mode" are there, plus the soundscapes once they are enabled. Nothing else about the
                             timer changes.</p>
                         </div>
                     </div>
 
-                    <p>The first three days are free. Your card is not charged during the trial, and on day
-                    three it is charged automatically unless you cancel first. One free trial per person. Cancel
-                    any time from your account page, in two clicks, and access continues to the end of the period
-                    you have paid for. A fourteen-day unconditional refund applies to any charge, as set out on
-                    <a href="/pro">the plan</a>. Email
+                    <p data-role="trial-terms">The first three days are free. Your card is not charged during the trial, and on day
+                    three it is charged the price shown at checkout automatically unless you cancel first. One free
+                    trial per person. Cancel any time from your account page, in two clicks, and access continues to
+                    the end of the period you have paid for. A fourteen-day unconditional refund applies to any
+                    charge, as set out in the <a href="/legal/refund-policy">refund policy</a>. Email
                     <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> if anything at all is
                     wrong, including if you simply changed your mind.</p>
 
@@ -253,9 +286,7 @@
                     <p class="footer-heading">The site</p>
                     <a href="/about">About</a>
                     <a href="/pro">Pro</a>
-                    <a href="/for-practitioners">For practitioners</a>
-                    <a href="/embed">Embed the timer</a>
-                    <a href="/handouts">Printable handouts</a>
+                    <a href="/account">Your account</a>
                 </nav>
             </div>
 
@@ -264,6 +295,7 @@
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
                 <a href="/legal/terms-of-service">Terms of Service</a>
+                <a href="/legal/refund-policy">Refund Policy</a>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
@@ -273,136 +305,309 @@
     <script type="module" src="/js/consent.js"></script>
     <script type="module" src="/js/app.js"></script>
     <script type="module">
-        import { activate, getLicenseInfo, tier } from '/js/entitlements.js';
+        /*
+         * /pro/thanks (design section 5.5):
+         *
+         *   Show "Your trial has started" optimistically, then poll GET /api/me
+         *   every 2 s for up to 30 s until `entitlement.status` is `trialing`
+         *   or `active`. After 30 s: "Payment went through. Your account is
+         *   still catching up — refresh in a minute, or email us." Webhooks
+         *   are not instant and this page must not claim failure while one is
+         *   in flight.
+         *
+         * `?rid=` (the reservation id the checkout was created under) was read
+         * and stripped by the first script in <head>. It is shown as a support
+         * reference and put into the mailto subject; it is never sent to
+         * analytics. There is no licence key any more: an account is the
+         * receipt, and /account is where the plan lives.
+         *
+         * js/auth.js provides the Supabase access token and js/entitlements.js
+         * caches the entitlement; both are imported dynamically so the page
+         * degrades to plain copy if either is missing on a given build.
+         */
+        import * as config from '/js/config.js';
         import { track, EVENTS } from '/js/analytics.js';
 
-        const title = document.querySelector('[data-role="activation-title"]');
-        const body = document.querySelector('[data-role="activation-body"]');
-        const form = document.querySelector('[data-role="restore-form"]');
-        const status = document.querySelector('[data-role="restore-status"]');
-        const input = document.getElementById('thanks-key');
+        const captured = window.__hmbThanks || {};
+        const rid = typeof captured.rid === 'string' && /^[0-9a-f-]{8,64}$/i.test(captured.rid) ? captured.rid : '';
+        const hintedPlan = captured.plan === 'yearly' || captured.plan === 'monthly' ? captured.plan : '';
+
+        const PLANS = config.PLANS && typeof config.PLANS === 'object' ? config.PLANS : {};
+        const LIST = {
+            monthly: Number(PLANS.monthly && PLANS.monthly.price) || 10,
+            yearly: Number(PLANS.yearly && PLANS.yearly.price) || 100,
+        };
+        const trialDays = PLANS.trialDays !== undefined ? Number(PLANS.trialDays) || 0 : 3;
+
+        const POLL_MS = 2000;
+        const POLL_FOR_MS = 30000;
+
+        const titleEl = document.querySelector('[data-role="status-title"]');
+        const bodyEl = document.querySelector('[data-role="status-body"]');
+        const detailsEl = document.querySelector('[data-role="status-details"]');
+        const actionsEl = document.querySelector('[data-role="status-actions"]');
+        const refEl = document.querySelector('[data-role="status-reference"]');
+        const trialTerms = document.querySelector('[data-role="trial-terms"]');
+
+        const supportHref = 'mailto:contact@helpmebreath.com?subject=' +
+            encodeURIComponent(rid ? 'Checkout reference ' + rid : 'My subscription');
+
+        if (trialDays <= 0 && trialTerms) trialTerms.hidden = true;
+
+        /* ------------------------------------------------------------- ui */
 
         function show(headline, text) {
-            if (title) title.textContent = headline;
-            if (body) body.textContent = text;
+            if (titleEl) titleEl.textContent = headline;
+            if (bodyEl) bodyEl.textContent = text;
         }
 
-        function say(text, isError) {
-            if (!status) return;
-            status.textContent = text;
-            status.classList.toggle('is-error', isError === true);
-        }
-
-        function unlocked() {
-            show(
-                'Your plan is active in this browser',
-                'That is everything. Open a timer and the extra tools are under the circle.'
-            );
-        }
-
-        // Captured and erased by the first script in <head>, so the key is not
-        // in location.search, in history, in the bfcache or in any GA4 event.
-        const captured = window.__hmbActivation || {};
-        const pick = (...names) => {
-            for (const name of names) {
-                const value = captured[name];
-                if (value) return String(value);
+        function actions(list) {
+            if (!actionsEl) return;
+            actionsEl.textContent = '';
+            for (const item of list) {
+                const a = document.createElement('a');
+                a.className = 'pro-btn' + (item.primary ? ' pro-btn-primary' : '');
+                a.href = item.href;
+                a.textContent = item.label;
+                actionsEl.appendChild(a);
             }
+            actionsEl.hidden = list.length === 0;
+        }
+
+        function details(rows) {
+            if (!detailsEl) return;
+            detailsEl.textContent = '';
+            for (const [term, value] of rows) {
+                if (!value) continue;
+                const dt = document.createElement('dt');
+                dt.textContent = term;
+                const dd = document.createElement('dd');
+                dd.textContent = value;
+                detailsEl.append(dt, dd);
+            }
+            detailsEl.hidden = detailsEl.childElementCount === 0;
+        }
+
+        function reference() {
+            if (!refEl || !rid) return;
+            refEl.textContent = 'Checkout reference: ' + rid + '. Quote it if you write to us.';
+            refEl.hidden = false;
+        }
+
+        function fmtDate(iso) {
+            if (!iso) return '';
+            const d = new Date(iso);
+            if (Number.isNaN(d.getTime())) return '';
+            try {
+                return new Intl.DateTimeFormat(navigator.language || 'en', {
+                    year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit',
+                }).format(d);
+            } catch {
+                return d.toUTCString();
+            }
+        }
+
+        function fmtMoney(charge) {
+            if (!charge || !charge.amount || !charge.currency) return '';
+            try {
+                return new Intl.NumberFormat(navigator.language || 'en', {
+                    style: 'currency', currency: String(charge.currency),
+                }).format(Number(charge.amount)) + (charge.tax_inclusive ? ', tax included' : '');
+            } catch {
+                return String(charge.amount) + ' ' + String(charge.currency);
+            }
+        }
+
+        // Before the first confirmed transaction next_charge is null; the UI
+        // then falls back to the US list price with the tax wording (design
+        // section 7.1).
+        function listFallback(plan) {
+            const p = plan === 'yearly' ? 'yearly' : 'monthly';
+            return '$' + LIST[p] + (p === 'yearly' ? ' a year' : ' a month') +
+                ' (US list price) plus any tax due in your country, as shown at checkout';
+        }
+
+        function planLabel(plan) {
+            if (plan === 'yearly') return 'Yearly, $100 a year at the US list price';
+            if (plan === 'monthly') return 'Monthly, $10 a month at the US list price';
             return '';
-        };
+        }
 
-        // Our own link format first, then the provider's transaction reference.
-        // Paddle Billing passes a transaction as `_ptxn`; other merchants of
-        // record use `transaction_id` or `orderId`. /api/license accepts either
-        // a key or a transaction reference.
-        const key = pick('key', 'k', 'license');
-        const txn = pick('_ptxn', 'ptxn', 'transaction_id', 'transactionId', 'orderId');
+        /* --------------------------------------------------------- states */
 
-        // /api/license answers 422 pack_only for a key that unlocks a download
-        // rather than the app. That is not a failure worth alarming someone
-        // about — say where the download is instead.
-        const DOWNLOAD_LINE = 'That key unlocks a set of printable PDFs rather than the app, so there is '
-            + 'nothing to activate here — the download link is in your receipt email. If that is not what '
-            + 'you meant to buy, email contact@helpmebreath.com and it will be sorted out.';
+        function renderReady(me) {
+            const ent = me.entitlement || {};
+            const plan = ent.plan || hintedPlan;
+            const trialing = ent.status === 'trialing';
+            const charge = fmtMoney(ent.next_charge) || listFallback(plan);
+            const when = trialing ? ent.trial_ends_at : (ent.next_charge && ent.next_charge.at) || ent.current_period_end;
 
-        async function tryActivate(value, source) {
-            track(EVENTS.ACTIVATE_ATTEMPT, { source: source });
-            const result = await activate(value);
-            if (result.ok) {
-                track(EVENTS.ACTIVATE_SUCCESS, { tier: result.tier || tier(), source: source });
-                unlocked();
-                return { ok: true };
+            if (trialing) {
+                show(
+                    'Your trial has started. Your account is ready.',
+                    'You are on the free trial and nothing has been charged. On ' + (fmtDate(ent.trial_ends_at) || 'the last day of the trial') +
+                    ' your card is charged ' + charge + ' and the subscription begins, unless you cancel first from your account page.'
+                );
+                details([
+                    ['Plan', planLabel(plan)],
+                    ['Trial ends', fmtDate(ent.trial_ends_at)],
+                    ['Then charged', charge],
+                ]);
+            } else {
+                show(
+                    'Your subscription has started. Your account is ready.',
+                    'The plan is active on this account. The amount below is what the payment provider states on your receipt, and it renews automatically until you cancel.'
+                );
+                details([
+                    ['Plan', planLabel(plan)],
+                    ['Renews', fmtDate(when)],
+                    ['Amount', charge],
+                ]);
             }
-            track(EVENTS.ACTIVATE_FAIL, { source: source, reason: result.code || 'rejected' });
-            return {
-                ok: false,
-                code: result.code || 'rejected',
-                // /api/license writes `error` as a finished sentence for the buyer.
-                error: result.code === 'pack_only' ? DOWNLOAD_LINE : result.error
-            };
+            actions([
+                { href: '/account', label: 'Open your account', primary: true },
+                { href: '/timer', label: 'Open a timer' },
+            ]);
+            reference();
+        }
+
+        function renderCatchingUp() {
+            show(
+                'Payment went through. Your account is still catching up.',
+                'The payment provider confirms each checkout to us a few seconds to a few minutes later. Refresh this page in a minute, or open your account page; if the plan is still not there, email us and quote the reference below.'
+            );
+            actions([
+                { href: '/account', label: 'Open your account', primary: true },
+                { href: supportHref, label: 'Email us' },
+            ]);
+            reference();
+        }
+
+        function renderSignedOut() {
+            show(
+                'Sign in to see your plan',
+                'The checkout finished, but this browser is not signed in to the account it was bought under. Sign in with the same email address and the plan is there.'
+            );
+            actions([
+                { href: '/signin?next=' + encodeURIComponent('/pro/thanks'), label: 'Sign in', primary: true },
+                { href: supportHref, label: 'Email us' },
+            ]);
+            reference();
+        }
+
+        /* The email double-opt-in confirmation (EMAIL_DOI_REDIRECT_URL) lands
+           here with ?confirmed=1. Nothing was bought; say so plainly. */
+        function renderConfirmed() {
+            show(
+                'Your email address is confirmed',
+                'Thank you. We write rarely, only when there is something worth saying, and every email has an unsubscribe link. Nothing has been bought and nothing is charged.'
+            );
+            actions([
+                { href: '/timer', label: 'Open a timer', primary: true },
+                { href: '/pro', label: 'See the plan' },
+            ]);
+        }
+
+        function renderNoModules() {
+            show(
+                'Your receipt is on its way',
+                'Nothing else is needed here. Open your account page to see the plan, its dates and the amount on your receipt.'
+            );
+            actions([
+                { href: '/account', label: 'Open your account', primary: true },
+                { href: '/timer', label: 'Open a timer' },
+            ]);
+            reference();
+        }
+
+        /* --------------------------------------------------------- polling */
+
+        let announced = false;
+
+        function announce(me) {
+            if (announced) return;
+            announced = true;
+            const ent = me.entitlement || {};
+            const name = ent.status === 'trialing'
+                ? (EVENTS.TRIAL_START || 'trial_start')
+                : (EVENTS.SUBSCRIBE_START || 'subscribe_start');
+            track(name, { plan: ent.plan || hintedPlan || 'unknown' });
+        }
+
+        async function readMe(token) {
+            const response = await fetch('/api/me', {
+                method: 'GET',
+                credentials: 'same-origin',
+                cache: 'no-store',
+                headers: { Authorization: 'Bearer ' + token, Accept: 'application/json' },
+            });
+            if (response.status === 401) return { unauthenticated: true };
+            if (!response.ok) return null;
+            const body = await response.json().catch(() => null);
+            return body && body.ok ? body : null;
+        }
+
+        function sleep(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
         }
 
         (async () => {
-            if (getLicenseInfo().isPro) {
-                unlocked();
-                return;
-            }
-
-            if (key) {
-                const result = await tryActivate(key, 'thanks-link');
-                if (result.ok) return;
-                if (result.code === 'pack_only') {
-                    show('Your download link is in your receipt email', result.error);
-                    return;
-                }
-                show(
-                    'That key did not verify',
-                    (result.error ? result.error + ' ' : '')
-                        + 'Paste it again below, or email contact@helpmebreath.com with your receipt and it will be sorted out by hand.'
-                );
-                if (input) input.value = key;
-                return;
-            }
-
-            if (txn) {
-                const result = await tryActivate(txn, 'thanks-transaction');
-                if (result.ok) return;
-                if (result.code === 'pack_only') {
-                    show('Your download link is in your receipt email', result.error);
-                    return;
-                }
-                show(
-                    'Payment received — your plan is starting',
-                    'The receipt is emailed within a couple of minutes of the payment clearing. If you were sent a key as well, paste it in the box below. If nothing has arrived in ten minutes, email contact@helpmebreath.com and it will be sorted out by hand.'
-                );
-                return;
-            }
-
             show(
-                'Your receipt is on its way',
-                'Nothing else is needed here. If you hold a key from an earlier purchase, paste it into the box below to unlock this browser. If the receipt email has not arrived yet, give it a couple of minutes — and check the spam folder before writing in.'
+                trialDays > 0 ? 'Your trial has started' : 'Your subscription has started',
+                'Checking your account. This takes a few seconds while the payment provider confirms the checkout.'
             );
-        })();
 
-        if (form) {
-            form.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                const value = input ? String(input.value || '').trim() : '';
-                if (!value) {
-                    say('Paste the key from your receipt email.', true);
+            let auth = null;
+            let ent = null;
+            if (captured.confirmed) {
+                renderConfirmed();
+                return;
+            }
+
+            try { auth = await import('/js/auth.js'); } catch { auth = null; }
+            try { ent = await import('/js/entitlements.js'); } catch { ent = null; }
+
+            if (!auth || typeof auth.accessToken !== 'function') {
+                renderNoModules();
+                return;
+            }
+
+            try {
+                if (typeof auth.ready === 'function') await auth.ready();
+            } catch {
+                /* the token read below decides */
+            }
+
+            const deadline = Date.now() + POLL_FOR_MS;
+            let sawSession = false;
+
+            while (Date.now() < deadline) {
+                let token = null;
+                try { token = await auth.accessToken(); } catch { token = null; }
+                if (!token) break;
+                sawSession = true;
+
+                let me = null;
+                try { me = await readMe(token); } catch { me = null; }
+                if (me && me.unauthenticated) { sawSession = false; break; }
+
+                const status = me && me.entitlement ? me.entitlement.status : '';
+                if (status === 'trialing' || status === 'active') {
+                    renderReady(me);
+                    announce(me);
+                    // Refresh the cached entitlement so the timer unlocks on
+                    // the next page without waiting for its own check-in.
+                    if (ent && typeof ent.refresh === 'function') {
+                        try { ent.refresh({ force: true }); } catch { /* best effort */ }
+                    }
                     return;
                 }
-                say('Checking…');
-                const result = await tryActivate(value, 'thanks-manual');
-                if (result.ok) {
-                    track(EVENTS.RESTORE_SUCCESS, { tier: tier() });
-                    say('Done. This browser is unlocked.');
-                    if (input) input.value = '';
-                } else {
-                    say(result.error || 'That key could not be verified. Check it and try again, or email contact@helpmebreath.com.', true);
-                }
-            });
-        }
+                await sleep(POLL_MS);
+            }
+
+            if (sawSession) renderCatchingUp();
+            else renderSignedOut();
+        })();
     </script>
 </body>
 </html>

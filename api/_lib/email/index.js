@@ -7,30 +7,38 @@
  * Adapter contract
  * ----------------
  * {
- *   id: 'brevo',
+ *   id: 'resend',
  *   requiredEnv: string[],                       // checked by requireEnv() before the call
  *   async subscribe(contact, ctx): { ok, reason?, status? }
+ *   async inspect?(token, ctx):    { ok, who? | reason }     // only when the adapter runs the
+ *   async confirm?(token, ctx):    { ok, reason?, status? }  // double opt-in itself: inspect
+ *                                                            // never writes; confirm does
  * }
  *
  * contact = { email, technique, source }
  * ctx     = { env, fetchImpl }
  *
- * Every adapter MUST create the contact unconfirmed and let the provider send
- * the confirmation email. We never mark anyone subscribed on our say-so.
+ * Nobody is ever marked subscribed on our say-so. Brevo and MailerLite create
+ * the contact unconfirmed and send the confirmation email themselves. Resend
+ * has no double opt-in of its own, so its adapter sends the email and stores
+ * nothing; GET /api/subscribe?confirm=<token> shows a Confirm button after
+ * `inspect()`, and the button's POST calls `confirm()`, which is the first and
+ * only write.
  */
 
 import { brevoProvider } from './brevo.js';
 import { mailerliteProvider } from './mailerlite.js';
+import { resendProvider } from './resend.js';
 
-/** Every adapter id. */
-export const EMAIL_PROVIDER_IDS = Object.freeze(['brevo', 'mailerlite']);
+/** Every adapter id. The first is the default. */
+export const EMAIL_PROVIDER_IDS = Object.freeze(['resend', 'brevo', 'mailerlite']);
 
 /**
  * Built lazily for the same import-cycle reason as the payment providers.
  * @returns {Record<string, object>}
  */
 export function listEmailProviders() {
-  return { brevo: brevoProvider, mailerlite: mailerliteProvider };
+  return { resend: resendProvider, brevo: brevoProvider, mailerlite: mailerliteProvider };
 }
 
 /**
@@ -62,6 +70,10 @@ export function messageForEmailReason(reason) {
       return 'That address was rejected. Check it for a typo and try again.';
     case 'not_configured':
       return 'Email signup is not switched on yet. Please try again later.';
+    case 'confirm_invalid':
+      return 'This confirmation link is not valid. Sign up again from the site and we will send a fresh one.';
+    case 'confirm_expired':
+      return 'This confirmation link has expired. Links work for 48 hours. Sign up again from the site and we will send a fresh one.';
     default:
       return 'We could not sign you up just now. Please try again in a moment.';
   }

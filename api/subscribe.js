@@ -11,15 +11,37 @@
  * and the person in front of the form only needs one instruction either way.
  *
  * `consent` must be literally `true`. The checkbox on the page is the record of
- * consent; the provider's confirmation email is the second half of it. We never
- * add a confirmed contact.
+ * consent; the confirmation email is the second half of it. We never add a
+ * confirmed contact.
+ *
+ * GET /api/subscribe?confirm=<token> — the second half, for the adapters that
+ * run the double opt-in themselves (the default one does; it has no built-in
+ * confirmation flow). The token is minted and signed by the adapter when it
+ * sends the confirmation email. The GET has NO side effects: a valid token
+ * renders a small page with one Confirm button, and only that button's POST
+ * (a form body carrying the token) flips the contact to subscribed and answers
+ * 302 to EMAIL_DOI_REDIRECT_URL — read from the environment, never from the
+ * request. That split exists because mail gateways fetch every link they
+ * deliver; a fetch must never count as consent. An invalid or expired token
+ * gets a small plain page saying so and inviting the person to sign up again;
+ * the token and the address are never echoed on those pages. A GET without
+ * ?confirm is still 405. One serverless function, because the function count
+ * matters.
+ *
+ * Two guards that are not about the visitor: on a preview deployment with no
+ * real LICENSE_SECRET nothing is minted or accepted (the placeholder secret is
+ * in a public repository), and the whole form shares one sending budget so it
+ * can never spend the mailing account's daily quota — the same account sends
+ * the sign-in emails.
  */
 
 import { sha256Hex } from './_lib/crypto.js';
-import { emailProviderName, requireEnv, readEnv } from './_lib/env.js';
+import { emailProviderName, hasEnv, isProduction, requireEnv, readEnv } from './_lib/env.js';
+import { EMAIL_RE, MAX_EMAIL_LENGTH, MAX_LOCAL_LENGTH, normaliseAddress } from './_lib/email/address.js';
 import { getEmailProvider, messageForEmailReason } from './_lib/email/index.js';
 import { createLimiter, rateLimitHeaders } from './_lib/ratelimit.js';
 import {
+  NO_STORE_HEADERS,
   clientIp,
   errorResponse,
   json,
@@ -48,23 +70,28 @@ const limiter = createLimiter({ name: 'subscribe', limit: 5, windowMs: 60 * 1000
  */
 const addressLimiter = createLimiter({ name: 'subscribe-address', limit: 3, windowMs: 60 * 60 * 1000 });
 
+/**
+ * A third limiter with one shared key: how many confirmation emails this
+ * instance will send in an hour, from everyone. The mailing account's free
+ * tier is 100 emails a day and the same account carries the sign-in emails, so
+ * a wordlist pointed at this form must not be able to spend the day's quota.
+ * Twenty an hour is more than a small site's real signups and a small slice of
+ * the quota.
+ */
+const GLOBAL_SEND_LIMIT = 20;
+const globalLimiter = createLimiter({ name: 'subscribe-global', limit: GLOBAL_SEND_LIMIT, windowMs: 60 * 60 * 1000 });
+const GLOBAL_KEY = 'everyone';
+
 /** The confirmation sentence. One string, used for every success. */
 export const SUCCESS_MESSAGE = 'Check your inbox to confirm';
 
-/**
- * RFC-ish: strict enough to catch typos, loose enough not to reject a real
- * address. The deliverability judgement belongs to the email provider, which
- * gets the last word — a 400 from it becomes "check it for a typo".
- */
-export const EMAIL_RE =
-  /^[A-Za-z0-9._%+-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
+/** The address rules live in ./_lib/email/address.js; re-exported for the tests. */
+export { EMAIL_RE, MAX_EMAIL_LENGTH, MAX_LOCAL_LENGTH };
 
 /** Technique keys and acquisition sources are slugs. */
 const SLUG_RE = /^[a-z0-9][a-z0-9_-]*$/;
 const SOURCE_RE = /^[a-z0-9][a-z0-9_.:/-]*$/;
 
-export const MAX_EMAIL_LENGTH = 254;
-export const MAX_LOCAL_LENGTH = 64;
 export const MAX_TECHNIQUE_LENGTH = 40;
 export const MAX_SOURCE_LENGTH = 60;
 
@@ -88,26 +115,13 @@ export function validateSubscribe(body) {
     };
   }
 
-  const rawEmail = typeof body.email === 'string' ? body.email.trim() : '';
-  if (!rawEmail) {
-    return { ok: false, field: 'email', error: 'Enter your email address.' };
-  }
-  if (rawEmail.length > MAX_EMAIL_LENGTH) {
-    return { ok: false, field: 'email', error: 'That address is too long.' };
-  }
-  const email = rawEmail.toLowerCase();
-  const at = email.lastIndexOf('@');
-  const local = at > 0 ? email.slice(0, at) : '';
-  if (
-    !EMAIL_RE.test(email) ||
-    local.length === 0 ||
-    local.length > MAX_LOCAL_LENGTH ||
-    local.startsWith('.') ||
-    local.endsWith('.') ||
-    email.includes('..')
-  ) {
+  const address = normaliseAddress(body.email);
+  if (!address.ok) {
+    if (address.reason === 'empty') return { ok: false, field: 'email', error: 'Enter your email address.' };
+    if (address.reason === 'too_long') return { ok: false, field: 'email', error: 'That address is too long.' };
     return { ok: false, field: 'email', error: 'That does not look like an email address.' };
   }
+  const email = address.email;
 
   let technique = '';
   if (body.technique != null && body.technique !== '') {
@@ -143,11 +157,182 @@ export async function OPTIONS(request) {
 }
 
 /**
+ * A short, calm HTML page for the confirmation link. Every string in it is
+ * static: nothing from the request is ever interpolated.
+ * @param {number} status
+ * @param {string} title
+ * @param {string} text
+ * @param {Record<string,string>} [headers]
+ * @returns {Response}
+ */
+function confirmPage(status, title, text, headers = {}, extraHtml = '') {
+  const body =
+    '<!doctype html>\n<html lang="en"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<meta name="robots" content="noindex">' +
+    `<title>${title}</title>` +
+    '<style>body{margin:0;padding:48px 24px;background:#f5f1e8;color:#15191a;font-family:Georgia,serif;font-size:18px;line-height:1.6}' +
+    'main{max-width:34em;margin:0 auto}h1{font-size:1.5em;font-weight:normal;margin:0 0 .75em}a{color:inherit}' +
+    'button{font:inherit;padding:.6em 1.2em;background:#0f5136;color:#fff;border:0;border-radius:4px;cursor:pointer}</style></head>' +
+    `<body><main><h1>${title}</h1><p>${text}</p>${extraHtml}<p><a href="/">Back to Help Me Breathe</a></p></main></body></html>\n`;
+  return new Response(body, {
+    status,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'X-Robots-Tag': 'noindex',
+      ...NO_STORE_HEADERS,
+      ...headers,
+    },
+  });
+}
+
+/** The pages the confirmation link can land on when it does not redirect. */
+export const CONFIRM_PAGES = Object.freeze({
+  confirm_invalid: {
+    status: 400,
+    title: 'This link is not valid',
+    text: 'The confirmation link did not check out. Sign up again from the site and we will send a fresh one. Nothing else is needed.',
+  },
+  confirm_expired: {
+    status: 410,
+    title: 'This link has expired',
+    text: 'Confirmation links work for 48 hours. Sign up again from the site and we will send a fresh one. Nothing else is needed.',
+  },
+  unavailable: {
+    status: 502,
+    title: 'We could not confirm your address just now',
+    text: 'Please open the link again in a few minutes. It stays valid for 48 hours from when it was sent.',
+  },
+  too_many: {
+    status: 429,
+    title: 'That is a few too many tries',
+    text: 'Wait a minute and open the link again.',
+  },
+  not_configured: {
+    status: 503,
+    title: 'Email signup is not switched on yet',
+    text: 'This part of the site is not set up. Nothing was recorded; please try again another day.',
+  },
+  confirm_ready: {
+    status: 200,
+    title: 'One more click',
+    text: 'Press the button to confirm that you want occasional email from Help Me Breathe at this address. Nothing is sent until you do.',
+  },
+});
+
+/** Only base64url plus one dot ever reaches this; escaping is belt and braces. */
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+/**
+ * The confirmation flow cannot run without a real signing secret. Production
+ * fails loudly through requireEnv(); a preview or development deployment with
+ * no LICENSE_SECRET set would otherwise be handed the public placeholder.
+ * @returns {boolean}
+ */
+function signingSecretUsable() {
+  return isProduction() || hasEnv('LICENSE_SECRET');
+}
+
+/** The adapter, its env and whether it runs its own confirmation flow. */
+function confirmingProvider() {
+  const providerId = emailProviderName();
+  const provider = getEmailProvider(providerId);
+  if (typeof provider.confirm !== 'function' || typeof provider.inspect !== 'function') return null;
+  const env = requireEnv(provider.requiredEnv);
+  const apiBase = readEnv('EMAIL_API_BASE');
+  if (apiBase) env.EMAIL_API_BASE = apiBase;
+  return { providerId, provider, env };
+}
+
+/**
+ * The button's POST: verify, write, redirect. Shared by the form body and a
+ * JSON body carrying { confirm }.
+ * @param {Request} request
+ * @param {string} token
+ * @returns {Promise<Response>}
+ */
+async function completeConfirmation(request, token) {
+  const page = (key, headers) => {
+    const spec = CONFIRM_PAGES[key];
+    return confirmPage(spec.status, spec.title, spec.text, headers);
+  };
+  const rate = limiter.check(clientIp(request));
+  if (!rate.ok) return page('too_many', rateLimitHeaders(rate, { includeRetryAfter: true }));
+  if (!signingSecretUsable()) return page('not_configured');
+
+  const ctx = confirmingProvider();
+  if (!ctx) return methodNotAllowed(request, METHODS);
+
+  const result = await ctx.provider.confirm(String(token || ''), { env: ctx.env });
+  if (result.ok) {
+    console.log('[subscribe] confirmed', { who: result.who || null, provider: ctx.providerId });
+    // The destination comes from the environment and only from there.
+    return new Response(null, {
+      status: 302,
+      headers: { Location: ctx.env.EMAIL_DOI_REDIRECT_URL, ...NO_STORE_HEADERS },
+    });
+  }
+  if (result.reason === 'confirm_invalid' || result.reason === 'confirm_expired') {
+    console.warn('[subscribe] confirm refused', { provider: ctx.providerId, reason: result.reason });
+    return page(result.reason);
+  }
+  if (result.reason === 'not_configured') return page('not_configured');
+  console.warn('[subscribe] confirm failed', {
+    who: result.who || null,
+    provider: ctx.providerId,
+    reason: result.reason,
+    status: result.status || null,
+  });
+  return page('unavailable');
+}
+
+/**
  * @param {Request} request
  * @returns {Promise<Response>}
  */
 export async function GET(request) {
-  return methodNotAllowed(request, METHODS);
+  let url;
+  try {
+    url = new URL(request.url);
+  } catch {
+    return methodNotAllowed(request, METHODS);
+  }
+  if (!url.searchParams.has('confirm')) return methodNotAllowed(request, METHODS);
+
+  const page = (key, headers, extra) => {
+    const spec = CONFIRM_PAGES[key];
+    return confirmPage(spec.status, spec.title, spec.text, headers, extra);
+  };
+
+  try {
+    // The same per-IP bucket as the form. A confirmation click is one request;
+    // anything hammering this path is not a person with an inbox.
+    const rate = limiter.check(clientIp(request));
+    if (!rate.ok) return page('too_many', rateLimitHeaders(rate, { includeRetryAfter: true }));
+    if (!signingSecretUsable()) return page('not_configured');
+
+    const ctx = confirmingProvider();
+    if (!ctx) return methodNotAllowed(request, METHODS);
+
+    // Look, do not touch: the signature and age are checked so the page can say
+    // the right thing, but nothing is written until the button is pressed.
+    const token = url.searchParams.get('confirm') || '';
+    const look = await ctx.provider.inspect(token, { env: ctx.env });
+    if (!look.ok) {
+      if (look.reason === 'not_configured') return page('not_configured');
+      console.warn('[subscribe] confirm link refused', { provider: ctx.providerId, reason: look.reason });
+      return page(look.reason === 'confirm_expired' ? 'confirm_expired' : 'confirm_invalid');
+    }
+    const form =
+      '<form method="post" action="/api/subscribe">' +
+      `<input type="hidden" name="confirm" value="${escapeHtml(token)}">` +
+      '<p><button type="submit">Confirm my email</button></p></form>';
+    return page('confirm_ready', {}, form);
+  } catch (error) {
+    return errorResponse(error, request, { methods: METHODS, label: 'subscribe' });
+  }
 }
 
 /**
@@ -158,6 +343,19 @@ export async function POST(request) {
   const respond = (status, body, headers) => json(status, body, { request, methods: METHODS, headers });
 
   try {
+    // The Confirm button posts a form; a JSON body may carry { confirm } too.
+    const contentType = String(request.headers.get('content-type') || '').toLowerCase();
+    if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
+      let token = '';
+      try {
+        const form = await request.formData();
+        token = String(form.get('confirm') || '');
+      } catch {
+        token = '';
+      }
+      return completeConfirmation(request, token);
+    }
+
     const rate = limiter.check(clientIp(request));
     if (!rate.ok) {
       return respond(
@@ -170,6 +368,9 @@ export async function POST(request) {
     const parsed = await readJsonBody(request, { maxBytes: 2048 });
     if (!parsed.ok) {
       return respond(400, { ok: false, error: 'Send a small JSON body with your email address.' });
+    }
+    if (parsed.data && typeof parsed.data === 'object' && typeof parsed.data.confirm === 'string') {
+      return completeConfirmation(request, parsed.data.confirm);
     }
 
     const valid = validateSubscribe(parsed.data);
@@ -192,6 +393,21 @@ export async function POST(request) {
             'and try again in an hour if it has not arrived.',
         },
         rateLimitHeaders(perAddress, { includeRetryAfter: true }),
+      );
+    }
+
+    if (!signingSecretUsable()) {
+      return respond(503, { ok: false, error: messageForEmailReason('not_configured') });
+    }
+
+    // The shared sending budget, checked last so a rejected request never
+    // spends it.
+    const budget = globalLimiter.check(GLOBAL_KEY);
+    if (!budget.ok) {
+      return respond(
+        429,
+        { ok: false, error: 'A lot of people are signing up right now. Please try again in an hour.' },
+        rateLimitHeaders(budget, { includeRetryAfter: true }),
       );
     }
 

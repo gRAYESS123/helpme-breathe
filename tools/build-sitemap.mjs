@@ -7,7 +7,7 @@
  * Rules:
  *   - every .html file under <root> is a candidate
  *   - skipped: pages with <meta name="robots" content="noindex">, 404.html,
- *     offline.html, 500.html, render.html, and anything under embed/, s/,
+ *     offline.html, 500.html, render.html, and anything under
  *     templates/, docs/, node_modules/, .git/, api/
  *   - the <loc> is the page's own <link rel="canonical"> when it has one (so the
  *     sitemap can never disagree with the canonical), otherwise the clean URL
@@ -55,8 +55,6 @@ const SKIP_DIRS = new Set([
   '.git',
   '.vercel',
   '.next',
-  'embed',
-  's',
   'templates',
   'docs',
   'api',

@@ -6,7 +6,7 @@
     <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
     <title>Help Me Breathe — one plan, everything included</title>
-    <meta name="description" content="Everything in Help Me Breathe for $10 a month or $100 a year: custom patterns, streaks, soundscapes, night mode, no ads and the practitioner tools. Three days free.">
+    <meta name="description" content="Everything in Help Me Breathe for $10 a month or $100 a year: custom patterns, streaks, soundscapes, night mode, no ads and offline use. Three days free.">
 
     <link rel="canonical" href="https://helpmebreath.com/pro">
 
@@ -15,7 +15,7 @@
 
     <!-- Open Graph -->
     <meta property="og:title" content="Help Me Breathe — one plan, everything included">
-    <meta property="og:description" content="Everything in Help Me Breathe for $10 a month or $100 a year: custom patterns, streaks, soundscapes, night mode, no ads and the practitioner tools. Three days free.">
+    <meta property="og:description" content="Everything in Help Me Breathe for $10 a month or $100 a year: custom patterns, streaks, soundscapes, night mode, no ads and offline use. Three days free.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpmebreath.com/pro">
     <meta property="og:image" content="https://helpmebreath.com/images/og/pro.jpg">
@@ -24,7 +24,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Help Me Breathe — one plan, everything included">
-    <meta name="twitter:description" content="Everything in Help Me Breathe for $10 a month or $100 a year: custom patterns, streaks, soundscapes, night mode, no ads and the practitioner tools. Three days free.">
+    <meta name="twitter:description" content="Everything in Help Me Breathe for $10 a month or $100 a year: custom patterns, streaks, soundscapes, night mode, no ads and offline use. Three days free.">
     <meta name="twitter:image" content="https://helpmebreath.com/images/og/pro.jpg">
 
     <!-- Favicon: the ring with a gap. Never an emoji data URI. -->
@@ -65,12 +65,12 @@
             'wait_for_update': 500
         });
         gtag('js', new Date());
-        gtag('config', 'G-09WY9JD4YM', {
+        gtag('config', 'G-TYLYLJSFHN', {
             'anonymize_ip': true,
             'cookie_expires': 63072000
         });
     </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
 
     <script type="application/ld+json">
     {
@@ -94,16 +94,22 @@
     </script>
 
     <!--
-      One product, two intervals. Availability is PreOrder until checkout is
-      genuinely open (js/config.js CHECKOUT.mode is still 'waitlist'); flip both
-      offers to https://schema.org/InStock in the same commit that turns it on.
+      One product, two intervals, nothing else for sale: no lifetime unlock, no
+      licence key, no second tier (docs/AGENT_BRIEF.md rule 8). Availability
+      stays PreOrder while checkout runs against the provider sandbox; flip
+      both offers to https://schema.org/InStock in the go-live commit, after
+      the owner's Step 0 answer and the domain approval.
+
+      Deliberately NO paywall markup (no hasPart, no cssSelector, no
+      isAccessibleForFree:false) anywhere on the site: the prose is never
+      gated, only the interactive timer (design section 8.4).
     -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Product",
       "name": "Help Me Breathe",
-      "description": "One plan for the Help Me Breathe guided breathing timer: a custom pattern builder with saved presets and share links, streaks with a 12-week heatmap and CSV export, ambient soundscapes, night mode, no ads, and the practitioner tools — commercial use, white-label embed, client links, printable handouts and a compliance pack.",
+      "description": "One plan for the Help Me Breathe guided breathing timer: a custom pattern builder with saved presets and share links, streaks with a 12-week heatmap and CSV export, ambient soundscapes, night mode, no ads and offline use. Billed monthly or yearly, renewing automatically until cancelled.",
       "url": "https://helpmebreath.com/pro",
       "image": "https://helpmebreath.com/images/og/pro.jpg",
       "brand": {
@@ -118,14 +124,16 @@
           "price": "10.00",
           "priceCurrency": "USD",
           "availability": "https://schema.org/PreOrder",
-          "url": "https://helpmebreath.com/pro",
+          "priceValidUntil": "2027-09-11",
+          "url": "https://helpmebreath.com/pro?plan=monthly",
           "priceSpecification": {
             "@type": "UnitPriceSpecification",
             "price": "10.00",
             "priceCurrency": "USD",
             "billingDuration": 1,
             "billingIncrement": 1,
-            "unitCode": "MON"
+            "unitCode": "MON",
+            "valueAddedTaxIncluded": false
           }
         },
         {
@@ -134,14 +142,16 @@
           "price": "100.00",
           "priceCurrency": "USD",
           "availability": "https://schema.org/PreOrder",
-          "url": "https://helpmebreath.com/pro",
+          "priceValidUntil": "2027-09-11",
+          "url": "https://helpmebreath.com/pro?plan=yearly",
           "priceSpecification": {
             "@type": "UnitPriceSpecification",
             "price": "100.00",
             "priceCurrency": "USD",
             "billingDuration": 1,
             "billingIncrement": 1,
-            "unitCode": "ANN"
+            "unitCode": "ANN",
+            "valueAddedTaxIncluded": false
           }
         }
       ]
@@ -158,7 +168,7 @@
           "name": "What is free?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Every technique, every session length, the audio and vibration cues and the offline install are free to use today, without an account. The plan adds the tools around the practice listed on this page. It never takes the timer away."
+            "text": "Every written page: the technique guides, the articles and the pages for anxious moments and panic attacks, which run the full timer for anyone, always. The first three sessions on a device run before you are asked for anything. After that the timer is part of the plan, with an account and a card, three days free, then $10 a month or $100 a year. The plan covers the timer with every technique and session length, the audio and vibration cues, offline use and the tools around the practice listed on this page."
           }
         },
         {
@@ -174,7 +184,7 @@
           "name": "Do I need an account?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "For the plan, yes. You sign in with a link sent to your email or with a Google account; there is no password to remember. The account holds your plan so it follows you between your phone, tablet and laptop. Your practice history stays in your browser unless you export it."
+            "text": "For the plan, yes. You sign in with a link sent to your email or with a Google account; there is no password to remember. The account holds your plan so it follows you between your phone, tablet and laptop, and it stores only your email address, the sign-in method, the plan and its dates. Your practice history stays in your browser unless you export it."
           }
         },
         {
@@ -203,10 +213,10 @@
         },
         {
           "@type": "Question",
-          "name": "I teach breathing to clients. Is that included?",
+          "name": "Why is the price on the card different from $10?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. The commercial-use licence, the white-label embed for your own site, co-branded client session links, the printable handout pack with your name on it, class and projector mode, and the signable data-processing agreement are all part of the one plan. There is no separate practitioner tier."
+            "text": "$10 a month and $100 a year are the US list prices. The card on this page asks our merchant of record for the total for your country, in your currency, with any VAT or sales tax already included, so what you see here is what you pay at checkout. If that lookup fails you see the US list price with a note that tax is added at checkout."
           }
         },
         {
@@ -220,6 +230,45 @@
       ]
     }
     </script>
+
+    <style>
+        /* Page-local additions to the plan card. Tokens only; --edge on
+           anything a person operates; nothing defined solely in a media or
+           .night block. */
+        .plan-notice {
+            margin: 0 0 1.25rem;
+            padding: 0.85rem 1rem;
+            font-size: var(--fs-small);
+            line-height: 1.6;
+            color: var(--graphite);
+            border: 1px solid var(--rule);
+            border-left: 3px solid var(--ink);
+            border-radius: var(--radius);
+        }
+
+        .plan-notice strong { color: var(--ink); }
+
+        .plan-card .checkout-btn + .checkout-btn { margin-top: 0.6rem; }
+
+        .plan-card .plan-manage-note {
+            margin: 0.75rem 0 0;
+            font-size: var(--fs-small);
+            line-height: 1.6;
+            color: var(--graphite);
+        }
+
+        .migration-notice {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: 0.75rem 1rem;
+            margin: 0 0 1.5rem;
+        }
+
+        .migration-notice p { flex: 1 1 24rem; margin: 0; }
+
+        .migration-notice .pro-btn { flex: 0 0 auto; }
+    </style>
 </head>
 <body class="theme-478 article-page pro-page" data-no-ads="true" data-no-asks="true">
     <a class="skip-link" href="#main">Skip to main content</a>
@@ -237,7 +286,6 @@
                 <a href="/timer">Timer</a>
                 <a href="/guides">Guides</a>
                 <a href="/science">Science</a>
-                <a href="/for-practitioners">For practitioners</a>
                 <a href="/pro" aria-current="page">Pro</a>
             </nav>
         </div>
@@ -252,10 +300,15 @@
                 </ol>
             </nav>
             <h1>Everything, one plan.</h1>
-            <p class="lead">The timer is free to use. One plan unlocks the tools around your practice, for you and for the people you work with. Three days free, then $10 a month or $100 a year.</p>
+            <p class="lead">Your first three sessions run before you are asked for anything, and every written page stays free. After that, one plan covers the timer and the tools around your practice. Three days free, then $10 a month or $100 a year at the US list price; the card below shows the total for your country, tax included.</p>
         </header>
 
         <main id="main">
+            <div class="callout migration-notice" data-role="migration-notice" hidden>
+                <p>Help Me Breathe now uses accounts. If you bought a licence key before today, email <a href="mailto:contact@helpmebreath.com?subject=Licence%20key%20to%20account">contact@helpmebreath.com</a> with your receipt and we'll move you across at no cost.</p>
+                <button class="pro-btn" type="button" data-action="dismiss-migration-notice">Dismiss</button>
+            </div>
+
             <section class="plan" aria-labelledby="plan-heading">
                 <div class="plan-card">
                     <div class="plan-toggle" role="group" aria-label="Billing interval">
@@ -263,16 +316,21 @@
                         <button class="plan-interval" type="button" data-interval="yearly" aria-pressed="false">Yearly <span class="plan-save">two months free</span></button>
                     </div>
 
-                    <p class="plan-price">
+                    <p class="plan-price" data-role="plan-price-block" data-price-source="list" aria-live="polite">
                         <span class="price-figure" data-role="plan-price">$10</span>
-                        <span class="price-period" data-role="plan-period">a month, billed monthly, US dollars</span>
+                        <span class="price-period" data-role="plan-period">a month, billed monthly. US list price, plus any tax due in your country, shown at checkout.</span>
                     </p>
 
                     <p class="plan-trial" data-role="plan-trial"><strong>3 days free, then $10 a month.</strong> We ask for a card now. You are not charged during the trial. On day 3 the card is charged automatically unless you cancel, and cancelling takes two clicks from your account page at any time during the trial. One free trial per person.</p>
 
+                    <p class="plan-notice" data-role="trial-denied" hidden><strong>One free trial per person.</strong> You've had the free trial before, so this is a straight subscription: the price above, cancel any time, 14-day refund. If that's not right, email <a href="mailto:contact@helpmebreath.com?subject=Free%20trial">contact@helpmebreath.com</a>.</p>
+
                     <button class="checkout-btn" type="button" data-action="checkout" data-plan="monthly" data-role="plan-cta" data-placement="plan-card">Start the free trial</button>
 
-                    <p class="plan-fine">Cancel any time. Cancel later and you keep access until the end of the period you have paid for. Fourteen-day refund, no reason needed. Payments are handled by a merchant of record, who acts as the seller for this purchase; the price at checkout includes any VAT or sales tax due in your country.</p>
+                    <a class="checkout-btn" href="/account" data-role="plan-manage" hidden>Manage your plan</a>
+                    <p class="plan-manage-note" data-role="plan-manage-note" hidden>You are already subscribed. Your plan, its renewal date and the amount you will be charged are on your account page.</p>
+
+                    <p class="plan-fine">Cancel any time. Cancel later and you keep access until the end of the period you have paid for. Fourteen-day refund, no reason needed. <span data-role="mor-legal">Payments are handled by a merchant of record, who acts as the seller of record for this purchase. The price you see at checkout includes any VAT or sales tax due in your country.</span></p>
 
                     <div data-checkout-slot></div>
                 </div>
@@ -287,10 +345,8 @@
                         <li><strong>Six ambient soundscapes</strong><span>No voices, no beat, mixed to sit under the pacing tones. Cached for offline use after the first play.</span></li>
                         <li><strong>Night mode that stays put</strong><span>Hold the page dark on a bright device or light on a dark one, and keep the screen awake while a session runs.</span></li>
                         <li><strong>No ads, anywhere</strong><span>The guide pages carry a small number of ads to pay hosting. The plan removes them site-wide.</span></li>
-                        <li><strong>Commercial-use licence</strong><span>Use the timer in paid one-to-one sessions, classes, workshops and corporate sessions you are paid to run.</span></li>
-                        <li><strong>White-label embed</strong><span>Put the timer on your own site with your logo and accent colour and no Help Me Breathe branding.</span></li>
-                        <li><strong>Client session links and class mode</strong><span>Send a client a link with the technique and length already chosen, or put the timer on a projector for a room.</span></li>
-                        <li><strong>Printable handouts and the compliance pack</strong><span>Seven handout sheets with your name and logo, a signable data-processing agreement, a privacy attestation and a security overview.</span></li>
+                        <li><strong>Offline, for fourteen days at a time</strong><span>Install the site as an app and your plan keeps working with no network for two weeks between check-ins.</span></li>
+                        <li><strong>The same plan on every device</strong><span>Sign in on your phone, tablet and laptop and the plan follows you, with no extra charge for a second device.</span></li>
                     </ul>
                 </div>
             </section>
@@ -300,9 +356,8 @@
                     <h2>Why one plan</h2>
                     <p>Most people want the same three things from a breathing timer once it has become a habit: to
                     keep the habit, to make the timer feel like their own, and to be left alone while they breathe.
-                    Practitioners want those and a licence they can show to whoever asks. Splitting that across tiers
-                    means explaining the split instead of the product, so there is one plan and everything is in
-                    it.</p>
+                    Splitting those across tiers means explaining the split instead of the product, so there is one
+                    plan and everything is in it.</p>
 
                     <p>Someone arriving here at three in the morning because they cannot sleep, or in the middle of a
                     panic attack, still gets a working timer and nothing else. The plan is for the people who come
@@ -320,7 +375,7 @@
                         <div class="step">
                             <h3>Use everything for three days</h3>
                             <p>The whole plan is open from the first minute: your patterns, your history, the
-                            soundscapes, night mode, the practitioner tools. Nothing is held back for later.</p>
+                            soundscapes, night mode, offline use. Nothing is held back for later.</p>
                         </div>
                         <div class="step">
                             <h3>Decide</h3>
@@ -334,18 +389,17 @@
                 </section>
 
                 <section>
-                    <h2>Working with clients?</h2>
-                    <p>If you teach breathing to other people, as a therapist, a yoga or fitness teacher, a coach or a
-                    school counsellor, the plan covers your practice as well as your own. It grants commercial use,
-                    removes our attribution from an embed you put on your own site, lets you set your logo and
-                    colours, and gives you a link you can send a client with the technique and length already chosen.
-                    It also comes with a signable data-processing agreement and a plain attestation that no client
-                    data leaves the browser, which is usually the part your insurer or your employer asks about.
-                    <a href="/for-practitioners">The practitioner page</a> walks through each of those.</p>
+                    <h2>What you pay, and who charges it</h2>
+                    <p>$10 a month and $100 a year are the US list prices. The card at the top of this page asks our
+                    merchant of record for the total for your country, in your currency, with any VAT or sales tax
+                    already included, and that is the figure the checkout charges. If the lookup fails, the card shows
+                    the US list price and says that tax is added at checkout. The amount that is actually charged is
+                    then shown on your account page, taken from your receipt rather than typed by us.</p>
 
-                    <p>This is not an enterprise product. Help Me Breathe is one person, working as an individual. If
-                    your purchase needs a vendor security questionnaire, a SOC 2 report, a HIPAA Business Associate
-                    Agreement or single sign-on, the plan will not clear that bar and you should not buy it.</p>
+                    <p>The seller on your receipt is a merchant of record: the contract of sale is between you and
+                    that company, and the service is provided by Georges Rayess. The provider is named on your
+                    receipt, on your card statement and in the <a href="/legal/terms-of-service">terms of service</a>
+                    the day checkout opens. No card number, expiry date or security code ever reaches this site.</p>
                 </section>
 
                 <section>
@@ -368,7 +422,7 @@
                                 <tr>
                                     <th scope="row">Help Me Breathe</th>
                                     <td>$10 monthly, $100 yearly</td>
-                                    <td>One plan, everything included, three days free. The timer itself is free to use without an account.</td>
+                                    <td>One plan, everything included, three days free. Three sessions run before you are asked for anything; the written pages and the crisis pages stay free for everyone.</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Headspace</th>
@@ -396,17 +450,19 @@
 
                     <p>The point of that table is not that the others are overpriced. Headspace and Calm sell a
                     library of produced sessions and a curriculum, which a pacing circle cannot be, and for some
-                    people that is worth the money. The point is that you can see the whole price here, and that the
-                    timer you actually breathe with is free either way.</p>
+                    people that is worth the money. The point is that you can see the whole price here, that your first
+                    three sessions and every written page cost nothing, and that the pages for anxious moments and
+                    panic attacks run the timer for anyone, always.</p>
                 </section>
 
                 <section>
                     <h2>The refund promise</h2>
                     <p>Fourteen days, unconditional. Email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>
                     within fourteen days of a charge and the money goes back to the card you paid with, with no
-                    reason required and no attempt to talk you out of it. A cancelled trial is not a refund: nothing
-                    was charged, so there is nothing to give back. The rest of the small print is in the
-                    <a href="/legal/terms-of-service">terms of service</a>.</p>
+                    reason required and no attempt to talk you out of it. Refunds are issued by the merchant of record
+                    that took the payment. A cancelled trial is not a refund: nothing was charged, so there is nothing to give
+                    back. The rest of the small print is in the <a href="/legal/refund-policy">refund policy</a> and
+                    the <a href="/legal/terms-of-service">terms of service</a>.</p>
                 </section>
 
                 <section>
@@ -414,9 +470,12 @@
 
                     <div class="faq-item">
                         <h3>What is free?</h3>
-                        <p>Every technique, every session length, the audio and vibration cues and the offline install
-                        are free to use today, without an account. The plan adds the tools around the practice listed
-                        on this page. It never takes the timer away.</p>
+                        <p>Every written page: the technique guides, the articles and the pages for anxious moments and
+                        panic attacks, which run the full timer for anyone, always. The first three sessions on a device
+                        run before you are asked for anything. After that the timer is part of the plan, with an account
+                        and a card, three days free, then $10 a month or $100 a year. The plan covers the timer with
+                        every technique and session length, the audio and vibration cues, offline use and the tools
+                        around the practice listed on this page.</p>
                     </div>
 
                     <div class="faq-item">
@@ -432,7 +491,8 @@
                         <h3>Do I need an account?</h3>
                         <p>For the plan, yes. You sign in with a link sent to your email or with a Google account;
                         there is no password to remember. The account holds your plan so it follows you between your
-                        phone, tablet and laptop. Your practice history stays in your browser unless you export it.</p>
+                        phone, tablet and laptop, and it stores only your email address, the sign-in method, the plan
+                        and its dates. Your practice history stays in your browser unless you export it.</p>
                     </div>
 
                     <div class="faq-item">
@@ -459,11 +519,11 @@
                     </div>
 
                     <div class="faq-item">
-                        <h3>I teach breathing to clients. Is that included?</h3>
-                        <p>Yes. The commercial-use licence, the white-label embed for your own site, co-branded client
-                        session links, the printable handout pack with your name on it, class and projector mode, and
-                        the signable data-processing agreement are all part of the one plan. There is no separate
-                        practitioner tier.</p>
+                        <h3>Why is the price on the card different from $10?</h3>
+                        <p>$10 a month and $100 a year are the US list prices. The card on this page asks our merchant
+                        of record for the total for your country, in your currency, with any VAT or sales tax already
+                        included, so what you see here is what you pay at checkout. If that lookup fails you see the
+                        US list price with a note that tax is added at checkout.</p>
                     </div>
 
                     <div class="faq-item">
@@ -522,9 +582,7 @@
                 <nav class="footer-nav" aria-label="About and products">
                     <p class="footer-heading">The site</p>
                     <a href="/about">About</a>
-                    <a href="/for-practitioners">For practitioners</a>
-                    <a href="/embed">Embed the timer</a>
-                    <a href="/handouts">Printable handouts</a>
+                    <a href="/account">Your account</a>
                 </nav>
             </div>
 
@@ -533,6 +591,7 @@
             <div class="legal-links">
                 <a href="/legal/privacy-policy">Privacy Policy</a>
                 <a href="/legal/terms-of-service">Terms of Service</a>
+                <a href="/legal/refund-policy">Refund Policy</a>
                 <a href="/legal/medical-disclaimer">Medical Disclaimer</a>
                 <a href="mailto:contact@helpmebreath.com">Contact</a>
             </div>
@@ -543,64 +602,336 @@
     <script type="module" src="/js/app.js"></script>
     <script type="module" src="/js/checkout.js"></script>
     <script type="module">
-        import { PRICES, CHECKOUT } from '/js/config.js';
+        /*
+         * The plan card, wired.
+         *
+         *  - The interval toggle changes text and ONE attribute: data-plan on
+         *    the checkout button. js/checkout.js reads it on click. That
+         *    contract is unchanged.
+         *  - Prices come from the merchant of record's own price preview
+         *    (Paddle.PricePreview, design section 5.6): the total for the
+         *    visitor's country, in their currency, tax included. $10 / $100
+         *    stay in the copy as the US list price, labelled as such. If the
+         *    preview cannot run, the US list price is shown with "plus any tax
+         *    due in your country, shown at checkout".
+         *  - The trial block renders only while the trial is on (D3).
+         *  - The MoR/VAT line is rendered from MOR_LEGAL in js/config.js so one
+         *    edit changes every page; the static text is the same line.
+         *  - `?plan=yearly` preselects an interval; `?resume=1` (the sign-in
+         *    resume path, design section 4.4) turns the button into a single
+         *    "Continue to checkout".
+         *
+         * js/config.js is imported as a namespace on purpose: this page must
+         * keep working whatever subset of exports the config ships, and a
+         * missing named import would fail the whole module at link time.
+         */
+        import * as config from '/js/config.js';
+        import { track, EVENTS } from '/js/analytics.js';
 
-        // The interval toggle. Everything it changes is text and one attribute
-        // on the button; the checkout module reads data-plan when the button is
-        // clicked. `?plan=yearly` preselects an interval so a link from
-        // elsewhere lands on the right one.
+        const CHECKOUT = config.CHECKOUT && typeof config.CHECKOUT === 'object' ? config.CHECKOUT : {};
+        const PLANS = config.PLANS && typeof config.PLANS === 'object' ? config.PLANS : {};
+        const LIST = {
+            monthly: Number(PLANS.monthly && PLANS.monthly.price) || 10,
+            yearly: Number(PLANS.yearly && PLANS.yearly.price) || 100,
+        };
+        // Trial length for copy only (js/config.js PLANS.trialDays). Whether a
+        // trial applies to this person is decided by the server at checkout.
+        const trialDays = PLANS.trialDays !== undefined ? Number(PLANS.trialDays) || 0 : 3;
+
+        const PADDLE_SCRIPT = 'https://cdn.paddle.com/paddle/v2/paddle.js';
+
+        const priceBlock = document.querySelector('[data-role="plan-price-block"]');
         const priceEl = document.querySelector('[data-role="plan-price"]');
         const periodEl = document.querySelector('[data-role="plan-period"]');
         const trialEl = document.querySelector('[data-role="plan-trial"]');
+        const deniedEl = document.querySelector('[data-role="trial-denied"]');
         const cta = document.querySelector('[data-role="plan-cta"]');
+        const manageLink = document.querySelector('[data-role="plan-manage"]');
+        const manageNote = document.querySelector('[data-role="plan-manage-note"]');
+        const morEl = document.querySelector('[data-role="mor-legal"]');
         const buttons = Array.from(document.querySelectorAll('.plan-interval'));
-        const trialDays = Number(CHECKOUT.trialDays) || 0;
 
-        const COPY = {
-            monthly: {
-                price: '$' + PRICES.monthly,
-                period: 'a month, billed monthly, US dollars',
-                then: '$' + PRICES.monthly + ' a month',
-            },
-            yearly: {
-                price: '$' + PRICES.yearly,
-                period: 'a year, billed yearly, US dollars. About $' + (PRICES.yearly / 12).toFixed(2) + ' a month.',
-                then: '$' + PRICES.yearly + ' a year',
-            },
-        };
+        const params = new URLSearchParams(window.location.search);
+        const resume = params.get('resume') === '1';
 
-        function trialCopy(plan) {
-            const then = COPY[plan].then;
-            if (trialDays > 0) {
-                return '<strong>' + trialDays + ' days free, then ' + then + '.</strong> We ask for a card now. ' +
-                    'You are not charged during the trial. On day ' + trialDays + ' the card is charged automatically unless you cancel, ' +
-                    'and cancelling takes two clicks from your account page at any time during the trial. One free trial per person.';
-            }
-            return '<strong>' + then + '. Cancel any time.</strong> Fourteen days, unconditional: if it is not for you, email us and we refund it in full.';
+        /** Localized totals from the provider, filled in by preview(). */
+        const preview = { monthly: null, yearly: null };
+        let plan = 'monthly';
+        let trialDenied = false;
+        let subscribed = false;
+
+        /* ------------------------------------------------------------ copy */
+
+        function money(n) {
+            return '$' + (Number.isInteger(n) ? String(n) : n.toFixed(2));
         }
 
-        function select(plan) {
-            if (!COPY[plan]) plan = 'monthly';
+        // "$10.00" reads better as "$10" on a price card; "€11.90" stays as is.
+        function tidy(formatted) {
+            return String(formatted).replace(/([.,]00)(?=\D*$)/, '');
+        }
+
+        function listCopy(which) {
+            const perMonth = (LIST.yearly / 12).toFixed(2);
+            if (which === 'yearly') {
+                return {
+                    figure: money(LIST.yearly),
+                    period: 'a year, billed yearly. US list price, about $' + perMonth + ' a month, two months free, plus any tax due in your country, shown at checkout.',
+                    then: money(LIST.yearly) + ' a year',
+                };
+            }
+            return {
+                figure: money(LIST.monthly),
+                period: 'a month, billed monthly. US list price, plus any tax due in your country, shown at checkout.',
+                then: money(LIST.monthly) + ' a month',
+            };
+        }
+
+        function previewCopy(which) {
+            const p = preview[which];
+            const perMonth = (LIST.yearly / 12).toFixed(2);
+            const total = tidy(p.total);
+            if (which === 'yearly') {
+                return {
+                    figure: total,
+                    period: 'a year, billed yearly, including any tax due in ' + p.where + '. US list price $' + LIST.yearly + ', about $' + perMonth + ' a month, two months free.',
+                    then: total + ' a year',
+                };
+            }
+            return {
+                figure: total,
+                period: 'a month, billed monthly, including any tax due in ' + p.where + '. US list price $' + LIST.monthly + '.',
+                then: total + ' a month',
+            };
+        }
+
+        function copyFor(which) {
+            return preview[which] ? previewCopy(which) : listCopy(which);
+        }
+
+        // One sentence, one rule, everywhere: "One free trial per person."
+        function trialCopy(then) {
+            return '<strong>' + trialDays + ' days free, then ' + then + '.</strong> We ask for a card now. ' +
+                'You are not charged during the trial. On day ' + trialDays + ' the card is charged automatically unless you cancel, ' +
+                'and cancelling takes two clicks from your account page at any time during the trial. One free trial per person.';
+        }
+
+        function ctaLabel() {
+            if (resume) return 'Continue to checkout';
+            return trialDays > 0 && !trialDenied ? 'Start the free trial' : 'Subscribe';
+        }
+
+        /* ---------------------------------------------------------- render */
+
+        function render() {
+            const copy = copyFor(plan);
             for (const b of buttons) {
                 const on = b.getAttribute('data-interval') === plan;
                 b.classList.toggle('is-active', on);
                 b.setAttribute('aria-pressed', on ? 'true' : 'false');
             }
-            if (priceEl) priceEl.textContent = COPY[plan].price;
-            if (periodEl) periodEl.textContent = COPY[plan].period;
-            if (trialEl) trialEl.innerHTML = trialCopy(plan);
+            if (priceEl) priceEl.textContent = copy.figure;
+            if (periodEl) periodEl.textContent = copy.period;
+            if (priceBlock) priceBlock.setAttribute('data-price-source', preview[plan] ? 'preview' : 'list');
+
+            const showTrial = trialDays > 0 && !trialDenied && !subscribed;
+            if (trialEl) {
+                trialEl.hidden = !showTrial;
+                if (showTrial) trialEl.innerHTML = trialCopy(copy.then);
+            }
+            if (deniedEl) deniedEl.hidden = !(trialDenied && !subscribed);
+
             if (cta) {
                 cta.setAttribute('data-plan', plan);
-                cta.textContent = trialDays > 0 ? 'Start the free trial' : 'Subscribe';
+                cta.textContent = ctaLabel();
+                cta.hidden = subscribed;
+            }
+            if (manageLink) manageLink.hidden = !subscribed;
+            if (manageNote) manageNote.hidden = !subscribed;
+        }
+
+        function select(next, fromClick) {
+            plan = next === 'yearly' ? 'yearly' : 'monthly';
+            render();
+            if (fromClick) {
+                track(EVENTS.PLAN_INTERVAL_TOGGLE || 'plan_interval_toggle', { plan });
             }
         }
 
         for (const b of buttons) {
-            b.addEventListener('click', () => select(b.getAttribute('data-interval')));
+            b.addEventListener('click', () => select(b.getAttribute('data-interval'), true));
         }
 
-        const wanted = new URLSearchParams(window.location.search).get('plan');
-        select(wanted === 'yearly' ? 'yearly' : 'monthly');
+        // The MoR/VAT line lives in js/config.js so one edit changes every page.
+        if (morEl && typeof config.MOR_LEGAL === 'string' && config.MOR_LEGAL.trim()) {
+            morEl.textContent = config.MOR_LEGAL.trim();
+        }
+
+        select(params.get('plan') === 'yearly' ? 'yearly' : 'monthly', false);
+
+        if (resume && cta) {
+            try {
+                cta.scrollIntoView({ block: 'center' });
+                cta.focus({ preventScroll: true });
+            } catch {
+                /* focus and scroll are conveniences, not requirements */
+            }
+        }
+
+        /* ------------------------------------------- trial denied notice */
+
+        // js/checkout.js learns from POST /api/trial/eligibility that this
+        // person has had the trial before and tells the page so, before the
+        // overlay opens. The notice uses the same sentence as the Terms.
+        document.addEventListener('hmb:trial-denied', (event) => {
+            const detail = event && event.detail ? event.detail : {};
+            if (detail.plan === 'monthly' || detail.plan === 'yearly') plan = detail.plan;
+            trialDenied = true;
+            render();
+        });
+
+        /* ---------------------------------------------- subscriber state */
+
+        // A subscriber should not be sold the plan again: the button becomes
+        // a link to the account page. entitlements.js is optional here; the
+        // card works without it.
+        (async () => {
+            try {
+                const ent = await import('/js/entitlements.js');
+                const update = () => {
+                    subscribed = typeof ent.isPro === 'function' && ent.isPro() === true;
+                    render();
+                };
+                update();
+                if (typeof ent.onChange === 'function') ent.onChange(update);
+            } catch {
+                /* no entitlement module on this build: nothing to change */
+            }
+        })();
+
+        /* ------------------------------------------ licence-key migration */
+
+        // One release only (design section 11.1): anyone who still holds a
+        // pre-account licence key in this browser sees one dismissible line.
+        // js/entitlements.js removes the old keys on first load and leaves a
+        // marker; either the key or the marker shows the notice.
+        (() => {
+            const notice = document.querySelector('[data-role="migration-notice"]');
+            if (!notice) return;
+            let show = false;
+            try {
+                if (localStorage.getItem('hmb.license.notice') !== 'dismissed') {
+                    show = !!(localStorage.getItem('hmb.license') || localStorage.getItem('hmb.license.migrated'));
+                }
+            } catch {
+                show = false;
+            }
+            if (!show) return;
+            notice.hidden = false;
+            const dismiss = notice.querySelector('[data-action="dismiss-migration-notice"]');
+            if (dismiss) {
+                dismiss.addEventListener('click', () => {
+                    notice.hidden = true;
+                    try { localStorage.setItem('hmb.license.notice', 'dismissed'); } catch { /* fine */ }
+                });
+            }
+        })();
+
+        /* --------------------------------------------------- price preview */
+
+        // Public price ids for the preview, from js/config.js. Only the
+        // no-trial price is ever previewed (same amount as the trial price,
+        // which is an attribute of the price, not a different total). The
+        // checkout itself never receives a price id from this page: the
+        // server picks it (design section 5.5).
+        function previewPriceId(which) {
+            const ids = CHECKOUT.previewPriceIds && typeof CHECKOUT.previewPriceIds === 'object' ? CHECKOUT.previewPriceIds : {};
+            return typeof ids[which] === 'string' ? ids[which].trim() : '';
+        }
+
+        function loadPaddle() {
+            if (window.Paddle) return Promise.resolve(window.Paddle);
+            return new Promise((resolve, reject) => {
+                const existing = document.querySelector('script[src="' + PADDLE_SCRIPT + '"]');
+                const script = existing || document.createElement('script');
+                const done = () => (window.Paddle ? resolve(window.Paddle) : reject(new Error('paddle-missing')));
+                script.addEventListener('load', done, { once: true });
+                script.addEventListener('error', () => reject(new Error('paddle-blocked')), { once: true });
+                if (!existing) {
+                    script.src = PADDLE_SCRIPT;
+                    script.async = true;
+                    document.head.appendChild(script);
+                }
+            });
+        }
+
+        // Paddle.Initialize() may run only once per page and errors on a
+        // second call. This page initialises for the preview, so the guarded
+        // wrapper below turns js/checkout.js's later call into a no-op, and
+        // the shared window flag lets checkout.js skip it outright.
+        function initPaddle(Paddle) {
+            if (!Paddle.__hmbGuarded) {
+                const original = Paddle.Initialize;
+                Paddle.Initialize = function guardedInitialize() {
+                    if (window.__hmbPaddleInitialised) return undefined;
+                    window.__hmbPaddleInitialised = true;
+                    return original.apply(Paddle, arguments);
+                };
+                Paddle.__hmbGuarded = true;
+            }
+            if (!window.__hmbPaddleInitialised) {
+                if (CHECKOUT.sandbox && Paddle.Environment && typeof Paddle.Environment.set === 'function') {
+                    Paddle.Environment.set('sandbox');
+                }
+                Paddle.Initialize({ token: CHECKOUT.clientToken });
+            }
+            return Paddle;
+        }
+
+        async function runPreview() {
+            const ids = { monthly: previewPriceId('monthly'), yearly: previewPriceId('yearly') };
+            if (!CHECKOUT.clientToken || (!ids.monthly && !ids.yearly)) return; // list price stays
+
+            const Paddle = initPaddle(await loadPaddle());
+            if (!Paddle || typeof Paddle.PricePreview !== 'function') return;
+
+            const items = [];
+            for (const which of ['monthly', 'yearly']) {
+                if (ids[which]) items.push({ priceId: ids[which], quantity: 1 });
+            }
+            // No address is sent on purpose: "When location information is
+            // omitted, Paddle.js automatically detects visitor location using
+            // their IP address and returns localized prices."
+            const result = await Paddle.PricePreview({ items });
+            const data = result && result.data ? result.data : result;
+            const details = data && data.details ? data.details : {};
+            const lineItems = Array.isArray(details.lineItems) ? details.lineItems : [];
+            const country = data && data.address && data.address.countryCode ? String(data.address.countryCode) : '';
+            const where = country ? countryName(country) : 'your country';
+
+            for (const which of ['monthly', 'yearly']) {
+                const line = lineItems.find((li) => li && li.price && li.price.id === ids[which]);
+                const total = line && line.formattedTotals && line.formattedTotals.total;
+                if (total) {
+                    preview[which] = { total: String(total), currency: data.currencyCode || '', where };
+                }
+            }
+            render();
+        }
+
+        function countryName(code) {
+            try {
+                const names = new Intl.DisplayNames([navigator.language || 'en'], { type: 'region' });
+                return names.of(code) || 'your country';
+            } catch {
+                return 'your country';
+            }
+        }
+
+        runPreview().catch(() => {
+            // The US list price is already on the card with the "plus any tax
+            // due in your country" wording. Nothing to undo.
+        });
     </script>
 </body>
 </html>

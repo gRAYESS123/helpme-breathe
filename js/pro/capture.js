@@ -3,8 +3,9 @@
  *
  * One inline card on the page's own stock, never a modal, never an overlay,
  * never on top of the breathing circle. It appears in the completing instance's
- * `[data-slot="post-session"]` after a completed session, offering the printable
- * card for the technique that was just practised.
+ * `[data-slot="post-session"]` after a completed session, offering an occasional
+ * email from the site: new patterns and guides, no more than once a month,
+ * double opt-in through the email provider (POST /api/subscribe).
  *
  * Rules it obeys:
  *   - once ever per browser (flag `hmb.capture.shown`)
@@ -13,13 +14,12 @@
  *   - never on the same completion as the Pro offer card — the offer wins and
  *     the capture waits for the next completed session
  *
- * `renderCaptureCard()` is exported so js/checkout.js can reuse the same card
- * for the checkout waitlist shown while checkout is closed.
+ * Nothing else renders this card. js/checkout.js draws its own "Checkout is not
+ * open yet" card while checkout is closed; there is no waitlist any more.
  */
 
 import { getFlag, setFlag } from '../storage.js';
 import { track, EVENTS } from '../analytics.js';
-import { getTechnique } from '../techniques.js';
 
 const FLAG_SHOWN = 'capture.shown';
 const SUBSCRIBE_ENDPOINT = '/api/subscribe';
@@ -35,13 +35,6 @@ function asksBlocked() {
   return false;
 }
 
-function techniqueLabel(key) {
-  if (!key || key === 'custom') return 'your custom pattern';
-  const technique = getTechnique(key);
-  if (!technique) return 'this pattern';
-  return (technique.title || technique.shortName || 'this pattern').toLowerCase();
-}
-
 /* ------------------------------------------------------------------- card */
 
 /**
@@ -52,33 +45,30 @@ function techniqueLabel(key) {
  *   source?:string, technique?:string, message?:string, title?:string,
  *   submitLabel?:string, consentLabel?:string, note?:string,
  *   successMessage?:string, markShown?:boolean
- * }} [options] The copy options exist because the same card is reused for the
- *   checkout waitlist, and a consent line has to describe the email the
- *   person is actually agreeing to receive. `markShown` defaults to true only
- *   for the post-session card.
+ * }} [options] The copy options let a caller describe exactly the email the
+ *   person is agreeing to receive; the consent line must always match what is
+ *   actually sent. `markShown` defaults to true only for the post-session card.
  * @returns {Element|null} the card element
  */
-export function renderCaptureCard(container, options = {}) {
+function renderCaptureCard(container, options = {}) {
   if (!container || typeof document === 'undefined') return null;
 
   const source = options.source || 'post-session';
   const technique = options.technique || '';
   const id = `capture-${++uid}`;
 
-  const title = options.title || `Want a printable card for ${techniqueLabel(technique)}?`;
-  const message = options.message || "We'll email it once.";
-  const submitLabel = options.submitLabel || 'Send it';
+  const title = options.title || 'Want an occasional note from Help Me Breathe?';
+  const message =
+    options.message || 'New patterns and guides, no more than once a month. Unsubscribe in one click.';
+  const submitLabel = options.submitLabel || 'Sign me up';
   const consentText =
     options.consentLabel ||
-    ' Email it to me. You can unsubscribe from any email, and the address is used for nothing else.';
+    ' Yes, email me now and then. You can unsubscribe from any email, and the address is used for nothing else.';
   const noteText =
-    options.note || 'One email to confirm, then the printable. No newsletter unless you ask for one.';
-  const successText =
-    options.successMessage ||
-    'Check your inbox and confirm the address — the printable follows straight after.';
-  // Only the post-session card spends the "asked once" budget. The waitlist card
-  // is something the visitor deliberately opened, so joining it must not silently
-  // cancel the printable offer they have not been shown yet.
+    options.note || 'One email to confirm the address first. Nothing is sent until you confirm.';
+  const successText = options.successMessage || 'Check your inbox and confirm the address.';
+  // Only the post-session card spends the "asked once" budget. A card a visitor
+  // opened deliberately somewhere else must not silently use that budget up.
   const marksShown =
     options.markShown === undefined ? source === 'post-session' : options.markShown === true;
 

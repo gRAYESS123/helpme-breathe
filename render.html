@@ -207,7 +207,13 @@
             display: none;
         }
 
-        body.render-body .breathing-container {
+        /* The stage must be a square, or the disc scales into an ellipse and
+           the ring is drawn off-centre. styles.css sizes the kiosk container
+           with a three-class rule (.breathing-section.kiosk .breathing-container)
+           that out-ranks a plain body.render-body prefix, so name the kiosk
+           selector here too. */
+        body.render-body .breathing-container,
+        body.render-body .breathing-section.kiosk .breathing-container {
             width: var(--r-stage);
             height: var(--r-stage);
             margin: 0;
@@ -337,16 +343,23 @@
             <h2 id="timer-heading" data-role="technique-title">Guided breathing</h2>
 
             <!--
-              The mark, alive: a ring with a 3px rim, two dotted calipers for
-              full inhale and full exhale, and a notch at twelve o'clock that
-              closes while the pattern holds. The phase word and its count sit
-              outside the circle so they never scale with it.
+              The mark, alive. Three circles on one radius, the same markup as
+              timer.html: a thin rail with a 48-degree gap at twelve o'clock, a
+              live arc on the rail that fills on the in-breath, drains on the
+              out-breath and holds where it is on a hold, and a bridge that
+              closes the gap for as long as the pattern holds. The engine drives
+              the arc through --ring-from / --ring-to on the section; the disc
+              breathes inside it. The phase word and its count sit over the
+              disc, outside it in the markup, so they never scale with it.
+              This page carries no technique-eyebrow or pattern-line: the
+              engine null-checks both, and a capture has its own caption and
+              sub line instead.
             -->
             <div class="breathing-container">
                 <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
-                    <circle class="caliper caliper-outer" cx="160" cy="160" r="136"/>
-                    <circle class="caliper caliper-inner" cx="160" cy="160" r="100"/>
-                    <circle class="pacer-ring" cx="160" cy="160" r="112"/>
+                    <circle class="ring-track" cx="160" cy="160" r="150"/>
+                    <circle class="ring-live" cx="160" cy="160" r="150"/>
+                    <circle class="ring-bridge" cx="160" cy="160" r="150"/>
                 </svg>
                 <div class="breathing-circle technique-478" data-role="circle">
                     <span class="circle-notch" aria-hidden="true"></span>
@@ -579,10 +592,8 @@
      * loaded in data-render-font so render-short.mjs can warn, and hold the
      * capture flag until the fonts have settled either way — with a 4s ceiling,
      * because a font that never resolves must not stall the recorder.
-     *
-     * NOTE for tools/render/render-short.mjs: the healthy value is now
-     * "newsreader", not "quicksand". That check lives in a file this agent does
-     * not own and is filed as an integration request.
+     * render-short.mjs treats "newsreader" as the healthy value and warns on
+     * anything else.
      */
     async function fontState() {
         const timeout = new Promise((resolve) => window.setTimeout(() => resolve('timeout'), 4000));
