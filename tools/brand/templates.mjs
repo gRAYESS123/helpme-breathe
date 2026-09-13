@@ -2,12 +2,12 @@
  * Help Me Breathe — HTML templates for the rendered brand assets.
  *
  * Everything here is plain HTML + CSS rendered by headless Chromium so the
- * real Newsreader and IBM Plex Sans letterforms land in the raster. No
- * gradients, no blur, no glow, no shadow, no emoji — the printed-page rules
- * apply to the social cards exactly as they do to the site.
+ * real Figtree and DM Mono letterforms land in the raster. Lantern rules: no
+ * borders, no dots, the ring in ink, one soft wash of the pattern's orb
+ * behind it, nothing else.
  */
 
-import { DAY, FONT_CSS_URL, DISPLAY_STACK, UI_STACK, SITE_LABEL, TECHNIQUE_ORDER, ACCENTS, accentFor } from './tokens.mjs';
+import { DAY, FONT_CSS_URL, DISPLAY_STACK, UI_STACK, MONO_STACK, SITE_LABEL, TECHNIQUE_ORDER, ACCENTS, accentFor } from './tokens.mjs';
 import { ringPath, STROKE_RATIO, CANONICAL } from './mark.mjs';
 
 const esc = (s) =>
@@ -30,6 +30,7 @@ function head(extraCss) {
   body { -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
   .display { font-family: ${DISPLAY_STACK}; }
   .ui { font-family: ${UI_STACK}; }
+  .mono { font-family: ${MONO_STACK}; }
 ${extraCss}
 </style>`;
 }
@@ -107,28 +108,28 @@ export function ogHtml(entry) {
   return `<!-- og card -->
 ${head(`
   .card { position: relative; width: ${W}px; height: ${H}px; background: ${DAY.paper}; overflow: hidden; }
-  .frame { position: absolute; inset: ${pad}px; border: 1px solid ${DAY.rule}; }
-  .kicker { font-size: 17px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: ${rim}; margin: 0 0 20px; }
-  .title { font-size: ${titleSize}px; font-weight: 500; letter-spacing: -0.018em; line-height: 1.06; color: ${DAY.ink}; margin: 0; }
+  .wash { position: absolute; left: ${ringLeft - ringBox * 0.55}px; top: ${ringTop - ringBox * 0.55}px; width: ${ringBox * 2.1}px; height: ${ringBox * 2.1}px; border-radius: 50%; background: radial-gradient(closest-side, ${accent.fill} 0%, ${DAY.paper} 72%); }
+  .kicker { font-size: 17px; font-weight: 400; letter-spacing: .18em; text-transform: uppercase; color: ${rim}; margin: 0 0 20px; }
+  .title { font-size: ${titleSize}px; font-weight: 300; letter-spacing: -0.024em; line-height: 1.06; color: ${DAY.ink}; margin: 0; }
   .title span, .sub span, .kicker { white-space: nowrap; }
   .hair { height: 1px; background: ${DAY.rule}; margin: 30px 0 26px; }
   .sub { font-size: 27px; font-weight: 400; line-height: 1.34; color: ${DAY.graphite}; margin: 0; }
   .label { font-size: 16px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; }
 `)}
 <div class="card">
-  <div class="frame"></div>
-  ${lockup({ x: gutter, y: 78, size: 30, ringColor: DAY.green, ink: DAY.ink })}
-  <div style="position:absolute;left:${ringLeft}px;top:${ringTop}px">${ringSvg({ r: ringR, color: DAY.green })}</div>
+  <div class="wash"></div>
+  ${lockup({ x: gutter, y: 78, size: 30, ringColor: DAY.ink, ink: DAY.ink })}
+  <div style="position:absolute;left:${ringLeft}px;top:${ringTop}px">${ringSvg({ r: ringR, color: DAY.ink })}</div>
   <div style="position:absolute;left:${gutter}px;top:${textTop}px;bottom:${textBottom}px;width:${textWidth}px;display:flex;flex-direction:column;justify-content:center">
     <div>
-      <p class="ui kicker">${esc(entry.kicker || 'Guided breathing')}</p>
+      <p class="mono kicker">${esc(entry.kicker || 'Guided breathing')}</p>
       <h1 class="display title">${title}</h1>
       <div class="hair"></div>
       <p class="ui sub">${sub}</p>
     </div>
   </div>
-  <div class="ui label" style="position:absolute;left:${gutter}px;top:${footerY}px;color:${DAY.ink}">${SITE_LABEL}</div>
-  <div class="ui label" style="position:absolute;right:${gutter}px;top:${footerY}px;color:${DAY.graphite}">${esc(entry.footer || 'Three sessions free · Offline')}</div>
+  <div class="mono label" style="position:absolute;left:${gutter}px;top:${footerY}px;color:${DAY.ink}">${SITE_LABEL}</div>
+  <div class="mono label" style="position:absolute;right:${gutter}px;top:${footerY}px;color:${DAY.graphite}">${esc(entry.footer || 'Three sessions free · Offline')}</div>
   ${signatureStrip({ x: gutter, y: stripY, width: W - gutter * 2, active: entry.theme })}
 </div>`;
 }
@@ -155,28 +156,28 @@ export function pinHtml(entry) {
   return `<!-- pin -->
 ${head(`
   .card { position: relative; width: ${W}px; height: ${H}px; background: ${DAY.paper}; overflow: hidden; }
-  .frame { position: absolute; inset: ${pad}px; border: 1px solid ${DAY.rule}; }
+  .wash { position: absolute; left: ${W / 2 - 420}px; top: ${pad + 40}px; width: 840px; height: 840px; border-radius: 50%; background: radial-gradient(closest-side, ${accent.fill} 0%, ${DAY.paper} 72%); }
   .stack { position: absolute; left: ${gutter}px; right: ${gutter}px; top: ${pad}px; bottom: 210px;
            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 104px; }
-  .kicker { font-size: 19px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: ${rim}; margin: 0 0 26px; }
-  .title { font-size: ${titleSize}px; font-weight: 500; letter-spacing: -0.018em; line-height: 1.12; color: ${DAY.ink}; margin: 0; }
+  .kicker { font-size: 19px; font-weight: 400; letter-spacing: .2em; text-transform: uppercase; color: ${rim}; margin: 0 0 26px; }
+  .title { font-size: ${titleSize}px; font-weight: 300; letter-spacing: -0.024em; line-height: 1.12; color: ${DAY.ink}; margin: 0; }
   .title span, .sub span, .kicker { white-space: nowrap; }
   .hair { width: 220px; height: 1px; background: ${DAY.rule}; margin: 40px auto 34px; }
   .sub { font-size: 33px; font-weight: 400; line-height: 1.36; color: ${DAY.graphite}; margin: 0; }
   .label { font-size: 17px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; }
 `)}
 <div class="card">
-  <div class="frame"></div>
+  <div class="wash"></div>
   <div class="stack">
-    ${ringSvg({ r: ringR, color: DAY.green })}
+    ${ringSvg({ r: ringR, color: DAY.ink })}
     <div style="width:100%;text-align:center">
-      <p class="ui kicker">${esc(entry.kicker || 'Guided breathing')}</p>
+      <p class="mono kicker">${esc(entry.kicker || 'Guided breathing')}</p>
       <h1 class="display title">${title}</h1>
       <div class="hair"></div>
       <p class="ui sub">${sub}</p>
     </div>
   </div>
-  <div class="ui label" style="position:absolute;left:0;top:${footerY}px;width:${W}px;text-align:center;color:${DAY.ink}">${SITE_LABEL}</div>
+  <div class="mono label" style="position:absolute;left:0;top:${footerY}px;width:${W}px;text-align:center;color:${DAY.ink}">${SITE_LABEL}</div>
   ${signatureStrip({ x: gutter, y: stripY, width: W - gutter * 2, active: entry.theme, base: 7, tall: 13 })}
 </div>`;
 }

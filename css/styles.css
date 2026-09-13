@@ -727,7 +727,29 @@ body:has([data-breathing-app]):not(.render-body):not(:has(.timer-pair)) .site-he
     color: var(--ink);
 }
 
+.nav-cta {
+    order: 2;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0.4rem 1.05rem;
+    margin-left: 0.25rem;
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--well);
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.nav-cta:hover { background: var(--line); text-decoration: none; }
+
+.site-nav { order: 1; }
+
 .nav-toggle {
+    order: 3;
     display: none;
     margin-left: auto;
     align-items: center;
@@ -745,7 +767,9 @@ body:has([data-breathing-app]):not(.render-body):not(:has(.timer-pair)) .site-he
 }
 
 @media (max-width: 640px) {
-    .nav-toggle { display: inline-flex; }
+    .nav-toggle { display: inline-flex; margin-left: 0.5rem; }
+
+    .nav-cta { margin-left: auto; }
 
     .site-nav {
         display: none;
