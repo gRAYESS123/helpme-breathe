@@ -49,10 +49,27 @@ import { PROVIDER_IDS, getProvider, listProviders } from '../api/_lib/providers/
 
 import { paddleProvider } from '../api/_lib/providers/paddle.js';
 import { fastspringProvider } from '../api/_lib/providers/fastspring.js';
-import { getEmailProvider } from '../api/_lib/email/index.js';
+import { EMAIL_PROVIDER_IDS, getEmailProvider, messageForEmailReason } from '../api/_lib/email/index.js';
 import { isAlreadySubscribed } from '../api/_lib/email/brevo.js';
+import {
+  CONFIRM_MAX_AGE_SECONDS,
+  CONFIRM_SUBJECT,
+  buildConfirmEmail,
+  confirm as resendConfirm,
+  isAlreadyAContact,
+  mintConfirmToken,
+  resendProvider,
+  verifyConfirmToken,
+} from '../api/_lib/email/resend.js';
 
-import { validateSubscribe, EMAIL_RE, SUCCESS_MESSAGE } from '../api/subscribe.js';
+import {
+  CONFIRM_PAGES,
+  GET as subscribeGet,
+  POST as subscribePost,
+  validateSubscribe,
+  EMAIL_RE,
+  SUCCESS_MESSAGE,
+} from '../api/subscribe.js';
 import { GET as healthGet } from '../api/health.js';
 
 /* ------------------------------------------------------------------ helpers */
@@ -470,14 +487,51 @@ test('a preview deployment is not production', () => {
 test('provider names fall back to the primaries and ignore case', () => {
   withEnv({ MOR_PROVIDER: undefined, EMAIL_PROVIDER: undefined }, () => {
     assert.equal(providerName(), 'paddle');
-    assert.equal(emailProviderName(), 'brevo');
+    assert.equal(emailProviderName(), 'resend', 'the mailing default since 2026-09-13');
   });
   withEnv({ MOR_PROVIDER: 'FastSpring', EMAIL_PROVIDER: 'MailerLite' }, () => {
     assert.equal(providerName(), 'fastspring');
     assert.equal(emailProviderName(), 'mailerlite');
   });
-  withEnv({ MOR_PROVIDER: 'nonsense' }, () => {
+  withEnv({ EMAIL_PROVIDER: 'Brevo' }, () => {
+    assert.equal(emailProviderName(), 'brevo', 'the older adapters stay reachable');
+  });
+  withEnv({ MOR_PROVIDER: 'nonsense', EMAIL_PROVIDER: 'nonsense' }, () => {
     assert.equal(providerName(), 'paddle', 'an unknown value falls back to the primary');
+    assert.equal(emailProviderName(), 'resend', 'an unknown value falls back to the default');
+  });
+});
+
+test('describeConfig: the default mailing adapter needs a sender and a list, never a template', () => {
+  withEnv(
+    {
+      EMAIL_PROVIDER: undefined,
+      EMAIL_API_KEY: undefined,
+      EMAIL_LIST_ID: undefined,
+      EMAIL_FROM: undefined,
+      EMAIL_DOI_TEMPLATE_ID: undefined,
+      EMAIL_DOI_REDIRECT_URL: undefined,
+    },
+    () => {
+      const report = describeConfig();
+      assert.equal(report.email, 'resend');
+      for (const name of ['EMAIL_API_KEY', 'EMAIL_LIST_ID', 'EMAIL_FROM', 'EMAIL_DOI_REDIRECT_URL', 'SITE_ORIGIN', 'LICENSE_SECRET']) {
+        assert.ok(report.missing.includes(name) || report.configured[name.toLowerCase()], `${name} is required or already set`);
+      }
+      assert.equal(report.missing.includes('EMAIL_DOI_TEMPLATE_ID'), false, 'the template is Brevo-only');
+      assert.equal(report.configured.email_from, false, 'EMAIL_FROM is a known variable');
+    },
+  );
+  withEnv({ EMAIL_PROVIDER: 'brevo', EMAIL_DOI_TEMPLATE_ID: undefined, EMAIL_FROM: undefined }, () => {
+    const report = describeConfig();
+    assert.ok(report.missing.includes('EMAIL_DOI_TEMPLATE_ID'), 'Brevo still needs its template');
+    assert.equal(report.missing.includes('EMAIL_FROM'), false, 'and not the sender');
+  });
+  withEnv({ EMAIL_PROVIDER: 'mailerlite', EMAIL_DOI_TEMPLATE_ID: undefined, EMAIL_FROM: undefined, EMAIL_LIST_ID: undefined }, () => {
+    const report = describeConfig();
+    assert.equal(report.missing.includes('EMAIL_DOI_TEMPLATE_ID'), false);
+    assert.equal(report.missing.includes('EMAIL_FROM'), false);
+    assert.equal(report.missing.includes('EMAIL_LIST_ID'), false, 'MailerLite is unchanged');
   });
 });
 
@@ -531,7 +585,7 @@ test('health: provider and email are null until MOR_PROVIDER / EMAIL_PROVIDER ar
   assert.ok(!Number.isNaN(Date.parse(body.time)));
 
   const serialised = JSON.stringify(body);
-  assert.doesNotMatch(serialised, /paddle|fastspring|brevo|mailerlite/i, 'no merchant of record or email service is named while none is configured');
+  assert.doesNotMatch(serialised, /paddle|fastspring|brevo|mailerlite|resend/i, 'no merchant of record or email service is named while none is configured');
 });
 
 test('health: a provider that is set in the environment is reported by name', async () => {
@@ -548,8 +602,10 @@ test('health: a provider that is set in the environment is reported by name', as
 test('getProvider and getEmailProvider reject unknown names loudly', () => {
   assert.equal(getProvider('paddle').id, 'paddle');
   assert.equal(getProvider('fastspring').id, 'fastspring');
+  assert.equal(getEmailProvider('resend').id, 'resend');
   assert.equal(getEmailProvider('brevo').id, 'brevo');
   assert.equal(getEmailProvider('mailerlite').id, 'mailerlite');
+  assert.deepEqual([...EMAIL_PROVIDER_IDS], ['resend', 'brevo', 'mailerlite']);
   assert.throws(() => getProvider('acme-payments'), /Unknown MOR_PROVIDER/);
   assert.throws(() => getEmailProvider('nope'), /Unknown EMAIL_PROVIDER/);
 });
@@ -684,4 +740,595 @@ test('email adapters refuse to call out when they are not configured', async () 
   );
   assert.equal(result.ok, false);
   assert.equal(result.reason, 'not_configured');
+});
+
+/* ------------------------------------------------------------ resend adapter */
+
+/** Fixtures. Every key-like value carries TESTFIXTURE so push protection lets it through. */
+const RESEND_ENV = Object.freeze({
+  EMAIL_API_KEY: 're_TESTFIXTURE0000',
+  EMAIL_LIST_ID: 'seg_TESTFIXTURE0000',
+  EMAIL_FROM: 'Help Me Breathe <hello@helpmebreath.com>',
+  EMAIL_DOI_REDIRECT_URL: 'https://helpmebreath.com/pro/thanks?confirmed=1',
+  SITE_ORIGIN: 'https://helpmebreath.com',
+  LICENSE_SECRET: SECRET,
+  EMAIL_API_BASE: 'https://mail.test',
+});
+
+const CONTACT = { email: 'a@b.co', technique: 'box', source: 'post-session' };
+const CONTACT_PATH = '/contacts/a%40b.co';
+const NOW = 1_800_000_000;
+
+/** The routes a signup and a confirmation need. */
+const SEGMENT_PATH = `${CONTACT_PATH}/segments/seg_TESTFIXTURE0000`;
+function resendRoutes(overrides = {}) {
+  return {
+    'POST /emails': { status: 200, body: { id: 'e0000000-0000-4000-8000-TESTFIXTURE0' } },
+    [`PATCH ${CONTACT_PATH}`]: { status: 200, body: { object: 'contact', id: 'c0000000-0000-4000-8000-TESTFIXTURE0' } },
+    [`POST ${SEGMENT_PATH}`]: { status: 200, body: { id: 'seg_TESTFIXTURE0000' } },
+    'POST /contacts': { status: 200, body: { object: 'contact', id: 'c0000000-0000-4000-8000-TESTFIXTURE0' } },
+    ...overrides,
+  };
+}
+
+/** Pull the token out of the confirmation email's link. */
+function tokenFromSend(call) {
+  const body = JSON.parse(call.init.body);
+  const match = body.text.match(/https:\/\/helpmebreath\.com\/api\/subscribe\?confirm=(\S+)/);
+  assert.ok(match, 'the text body carries the confirmation link');
+  return decodeURIComponent(match[1]);
+}
+
+test('resend token: mint -> verify round-trips the address, technique, source and time', async () => {
+  const token = await mintConfirmToken({ email: 'A@B.co', technique: 'box', source: 'post-session' }, SECRET, NOW);
+  assert.match(token, /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]{43}$/, 'base64url payload, one dot, a 43-character signature');
+
+  const verified = await verifyConfirmToken(token, SECRET, NOW + 60);
+  assert.equal(verified.ok, true);
+  assert.deepEqual(verified.payload, { e: 'a@b.co', t: 'box', s: 'post-session', iat: NOW });
+
+  const bare = await mintConfirmToken({ email: 'a@b.co' }, SECRET, NOW);
+  const bareVerified = await verifyConfirmToken(bare, SECRET, NOW);
+  assert.deepEqual(bareVerified.payload, { e: 'a@b.co', t: null, s: null, iat: NOW });
+
+  const decoded = JSON.parse(b64urlDecodeToString(token.split('.')[0]));
+  assert.equal(decoded.typ, 'doi', 'a confirmation token can never pass for an entitlement token');
+  const asEntitlement = await verifyToken(token, SECRET);
+  assert.equal(asEntitlement.ok, false);
+});
+
+test('resend token: a tampered signature, the wrong secret, a 49-hour-old token and junk are refused', async () => {
+  const token = await mintConfirmToken(CONTACT, SECRET, NOW);
+  const [head, signature] = token.split('.');
+
+  const flipped = signature[0] === 'A' ? 'B' : 'A';
+  const tampered = await verifyConfirmToken(`${head}.${flipped}${signature.slice(1)}`, SECRET, NOW);
+  assert.deepEqual(tampered, { ok: false, reason: 'confirm_invalid' });
+
+  const otherHead = b64urlEncode(JSON.stringify({ typ: 'doi', e: 'x@y.co', t: null, s: null, iat: NOW }));
+  const swapped = await verifyConfirmToken(`${otherHead}.${signature}`, SECRET, NOW);
+  assert.deepEqual(swapped, { ok: false, reason: 'confirm_invalid' }, 'the payload is covered by the signature');
+
+  const wrongSecret = await verifyConfirmToken(token, OTHER_SECRET, NOW);
+  assert.deepEqual(wrongSecret, { ok: false, reason: 'confirm_invalid' });
+
+  const stale = await verifyConfirmToken(token, SECRET, NOW + 49 * 60 * 60);
+  assert.deepEqual(stale, { ok: false, reason: 'confirm_expired' });
+  const justInTime = await verifyConfirmToken(token, SECRET, NOW + CONFIRM_MAX_AGE_SECONDS);
+  assert.equal(justInTime.ok, true, 'exactly 48 hours is still good');
+
+  const future = await verifyConfirmToken(token, SECRET, NOW - 60 * 60);
+  assert.deepEqual(future, { ok: false, reason: 'confirm_invalid' }, 'a token from an hour in the future is refused');
+
+  for (const junk of ['', 'nodot', '.', 'a.', '.b', 'a.b.c', 'x'.repeat(2000), null, undefined, 42]) {
+    const result = await verifyConfirmToken(junk, SECRET, NOW);
+    assert.equal(result.ok, false, `refused: ${String(junk).slice(0, 20)}`);
+    assert.equal(result.reason, 'confirm_invalid');
+  }
+
+  const entitlementShaped = await signToken({ v: 3, typ: 'ent', sub: 'abc', iat: NOW, exp: NOW + 100, kid: 'k' }, SECRET);
+  const crossed = await verifyConfirmToken(entitlementShaped, SECRET, NOW);
+  assert.deepEqual(crossed, { ok: false, reason: 'confirm_invalid' }, 'an entitlement token is not a confirmation');
+
+  assert.equal((await verifyConfirmToken(token, '', NOW)).ok, false, 'no secret, no verification');
+});
+
+test('resend: the confirmation email has one link, no images and the ignore line', () => {
+  const link = 'https://helpmebreath.com/api/subscribe?confirm=abc.def';
+  const email = buildConfirmEmail(link);
+  assert.equal(email.subject, CONFIRM_SUBJECT);
+  assert.equal(email.subject, 'Confirm your email for Help Me Breathe');
+  assert.equal((email.html.match(/<a /g) || []).length, 1, 'exactly one link');
+  assert.equal(email.html.includes('<img'), false, 'no images, no tracking pixel');
+  assert.ok(email.html.includes(`href="${link}"`));
+  assert.ok(email.text.includes(link));
+  assert.match(email.text, /If you did not ask for this, ignore this email/);
+  assert.match(email.html, /If you did not ask for this, ignore this email/);
+  assert.match(email.text, /48 hours/);
+  assert.doesNotMatch(email.html + email.text + email.subject, /resend/i, 'the mailing service is never named');
+  assert.doesNotMatch(email.html + email.text, /[\u{1F300}-\u{1FAFF}]/u, 'no emoji');
+});
+
+test('resend: a signup sends one confirmation email and stores nothing', async () => {
+  const fetchImpl = stubFetch(resendRoutes());
+  const result = await resendProvider.subscribe(CONTACT, { env: RESEND_ENV, fetchImpl, nowSeconds: NOW });
+  assert.deepEqual(result, { ok: true, status: 200 });
+
+  assert.deepEqual(
+    fetchImpl.calls.map((call) => `${call.method} ${call.path}`),
+    ['POST /emails'],
+    'exactly one request, and it is the email: no contact is created on a stranger\'s say-so',
+  );
+  const call = fetchImpl.calls[0];
+  assert.equal(call.init.headers.Authorization, 'Bearer re_TESTFIXTURE0000');
+  assert.equal(call.url.startsWith('https://mail.test/'), true, 'EMAIL_API_BASE is honoured');
+  assert.equal(call.init.body.includes('re_TESTFIXTURE0000'), false, 'the key is never in a body');
+  assert.ok(call.init.signal, 'every request carries a timeout signal');
+
+  const sent = JSON.parse(call.init.body);
+  assert.equal(sent.from, 'Help Me Breathe <hello@helpmebreath.com>');
+  assert.deepEqual(sent.to, ['a@b.co']);
+  assert.equal(sent.subject, 'Confirm your email for Help Me Breathe');
+  assert.ok(sent.text.includes('https://helpmebreath.com/api/subscribe?confirm='));
+  assert.ok(sent.html.includes('href="https://helpmebreath.com/api/subscribe?confirm='));
+
+  const token = tokenFromSend(call);
+  const verified = await verifyConfirmToken(token, SECRET, NOW);
+  assert.equal(verified.ok, true, 'the link carries a token the same secret verifies');
+  assert.deepEqual(verified.payload, { e: 'a@b.co', t: 'box', s: 'post-session', iat: NOW });
+});
+
+test('resend: a repeat signup costs exactly the same single request, so timing tells nobody who is on the list', async () => {
+  const fetchImpl = stubFetch(resendRoutes());
+  await resendProvider.subscribe(CONTACT, { env: RESEND_ENV, fetchImpl });
+  await resendProvider.subscribe(CONTACT, { env: RESEND_ENV, fetchImpl });
+  assert.deepEqual(
+    fetchImpl.calls.map((call) => `${call.method} ${call.path}`),
+    ['POST /emails', 'POST /emails'],
+  );
+
+  // "Already exists" answers are recognised for the confirmation step's race.
+  assert.equal(isAlreadyAContact(409, {}), true);
+  assert.equal(isAlreadyAContact(422, { message: 'Contact already exists' }), true);
+  assert.equal(isAlreadyAContact(422, { message: 'Invalid email' }), false);
+  assert.equal(isAlreadyAContact(500, { message: 'already exists' }), false);
+});
+
+test('resend: outages are provider_unavailable, a rejected address is invalid_email, a bad key is not_configured', async () => {
+  const down = stubFetch(resendRoutes({ 'POST /emails': { status: 500, body: { name: 'application_error', message: 'An unexpected error occurred.' } } }));
+  assert.deepEqual(await resendProvider.subscribe(CONTACT, { env: RESEND_ENV, fetchImpl: down }), {
+    ok: false,
+    reason: 'provider_unavailable',
+    status: 500,
+  });
+
+  const quota = stubFetch(resendRoutes({ 'POST /emails': { status: 429, body: { name: 'daily_quota_exceeded', message: 'You have exceeded your daily email sending quota.' } } }));
+  assert.equal((await resendProvider.subscribe(CONTACT, { env: RESEND_ENV, fetchImpl: quota })).reason, 'provider_unavailable');
+
+  const offline = async () => {
+    throw new Error('ECONNRESET');
+  };
+  assert.deepEqual(await resendProvider.subscribe(CONTACT, { env: RESEND_ENV, fetchImpl: offline }), {
+    ok: false,
+    reason: 'provider_unavailable',
+  });
+
+  const badAddress = stubFetch(
+    resendRoutes({
+      'POST /emails': {
+        status: 422,
+        body: { name: 'validation_error', message: 'Invalid \`to\` field. The email address needs to follow the \`email@example.com\` format.' },
+      },
+    }),
+  );
+  assert.deepEqual(await resendProvider.subscribe(CONTACT, { env: RESEND_ENV, fetchImpl: badAddress }), {
+    ok: false,
+    reason: 'invalid_email',
+    status: 422,
+  });
+
+  const restrictedKey = stubFetch(resendRoutes({ 'POST /emails': { status: 401, body: { name: 'restricted_api_key', message: 'This API key is restricted to only send emails' } } }));
+  assert.equal(
+    (await resendProvider.subscribe(CONTACT, { env: RESEND_ENV, fetchImpl: restrictedKey })).reason,
+    'not_configured',
+    'a key problem is the owner\'s to fix, and is reported like a missing variable',
+  );
+  const unverifiedDomain = stubFetch(resendRoutes({ 'POST /emails': { status: 403, body: { name: 'validation_error', message: 'The helpmebreath.com domain is not verified.' } } }));
+  assert.equal((await resendProvider.subscribe(CONTACT, { env: RESEND_ENV, fetchImpl: unverifiedDomain })).reason, 'not_configured');
+
+  assert.equal((await resendProvider.subscribe({ email: 'not an address' }, { env: RESEND_ENV, fetchImpl: down })).reason, 'invalid_email');
+  assert.equal(down.calls.length, 1, 'an invalid address never reaches the network');
+});
+
+test('resend: refuses to call out when it is not configured', async () => {
+  for (const patch of [
+    { EMAIL_LIST_ID: '' },
+    { EMAIL_LIST_ID: '0' },
+    { EMAIL_FROM: 'dev-missing-EMAIL_FROM' },
+    { SITE_ORIGIN: 'dev-missing-SITE_ORIGIN' },
+    { LICENSE_SECRET: '' },
+  ]) {
+    const fetchImpl = stubFetch(resendRoutes());
+    const result = await resendProvider.subscribe(CONTACT, { env: { ...RESEND_ENV, ...patch }, fetchImpl });
+    assert.deepEqual(result, { ok: false, reason: 'not_configured' }, JSON.stringify(patch));
+    assert.equal(fetchImpl.calls.length, 0);
+  }
+  assert.deepEqual(resendProvider.requiredEnv, [
+    'EMAIL_API_KEY',
+    'EMAIL_LIST_ID',
+    'EMAIL_FROM',
+    'EMAIL_DOI_REDIRECT_URL',
+    'SITE_ORIGIN',
+    'LICENSE_SECRET',
+  ]);
+});
+
+test('resend: confirm() flips the contact, adds it to the segment, creates it when new, and twice is fine', async () => {
+  const token = await mintConfirmToken(CONTACT, SECRET, NOW);
+  const fetchImpl = stubFetch(resendRoutes());
+
+  const first = await resendConfirm(token, { env: RESEND_ENV, fetchImpl, nowSeconds: NOW + 3600 });
+  assert.equal(first.ok, true);
+  assert.equal(first.who, (await sha256Hex('a@b.co')).slice(0, 12), 'only the hash prefix comes back for the log');
+
+  const second = await resendConfirm(token, { env: RESEND_ENV, fetchImpl, nowSeconds: NOW + 7200 });
+  assert.equal(second.ok, true, 'idempotent');
+
+  assert.deepEqual(
+    fetchImpl.calls.map((call) => `${call.method} ${call.path}`),
+    [`PATCH ${CONTACT_PATH}`, `POST ${SEGMENT_PATH}`, `PATCH ${CONTACT_PATH}`, `POST ${SEGMENT_PATH}`],
+    'flip, then join the segment (PATCH has no segments field); an existing team-wide contact lands on our list',
+  );
+  assert.deepEqual(JSON.parse(fetchImpl.calls[0].init.body), { unsubscribed: false });
+  assert.equal(fetchImpl.calls[1].init.body, undefined, 'the segment call has no body');
+  for (const call of fetchImpl.calls) assert.equal(call.init.headers.Authorization, 'Bearer re_TESTFIXTURE0000');
+
+  // New to the team: the click is the consent, so it is created subscribed, in the segment, in one call.
+  const fresh = stubFetch(resendRoutes({ [`PATCH ${CONTACT_PATH}`]: { status: 404, body: { name: 'not_found', message: 'Contact not found' } } }));
+  const created = await resendConfirm(token, { env: RESEND_ENV, fetchImpl: fresh, nowSeconds: NOW });
+  assert.equal(created.ok, true);
+  assert.deepEqual(fresh.calls.map((call) => `${call.method} ${call.path}`), [`PATCH ${CONTACT_PATH}`, 'POST /contacts']);
+  assert.deepEqual(JSON.parse(fresh.calls[1].init.body), { email: 'a@b.co', unsubscribed: false, segments: [{ id: 'seg_TESTFIXTURE0000' }] });
+
+  // Two confirmations racing: the loser's create says "exists" and it falls back to the flip.
+  const raced = stubFetch(
+    resendRoutes({
+      [`PATCH ${CONTACT_PATH}`]: (() => {
+        let n = 0;
+        return () => (n++ === 0 ? { status: 404, body: {} } : { status: 200, body: { object: 'contact' } });
+      })(),
+      'POST /contacts': { status: 409, body: { name: 'resource_locked', message: 'Contact already exists' } },
+    }),
+  );
+  assert.equal((await resendConfirm(token, { env: RESEND_ENV, fetchImpl: raced, nowSeconds: NOW })).ok, true);
+  assert.deepEqual(
+    raced.calls.map((call) => `${call.method} ${call.path}`),
+    [`PATCH ${CONTACT_PATH}`, 'POST /contacts', `PATCH ${CONTACT_PATH}`, `POST ${SEGMENT_PATH}`],
+  );
+
+  const down = stubFetch(resendRoutes({ [`PATCH ${CONTACT_PATH}`]: { status: 500, body: {} } }));
+  assert.equal((await resendConfirm(token, { env: RESEND_ENV, fetchImpl: down, nowSeconds: NOW })).reason, 'provider_unavailable');
+
+  // inspect() is the read-only half: same verdicts, no network.
+  const quiet = stubFetch(resendRoutes());
+  const look = await resendProvider.inspect(token, { env: RESEND_ENV, fetchImpl: quiet, nowSeconds: NOW });
+  assert.equal(look.ok, true);
+  assert.equal(look.who, first.who);
+  assert.equal((await resendProvider.inspect(token, { env: RESEND_ENV, fetchImpl: quiet, nowSeconds: NOW + 49 * 3600 })).reason, 'confirm_expired');
+  assert.equal(quiet.calls.length, 0, 'inspect never calls out');
+});
+
+test('resend: confirm() refuses a bad or stale token before any network call', async () => {
+  const token = await mintConfirmToken(CONTACT, SECRET, NOW);
+  const fetchImpl = stubFetch(resendRoutes());
+
+  assert.deepEqual(await resendConfirm('garbage', { env: RESEND_ENV, fetchImpl, nowSeconds: NOW }), { ok: false, reason: 'confirm_invalid' });
+  assert.deepEqual(await resendConfirm(token, { env: RESEND_ENV, fetchImpl, nowSeconds: NOW + 49 * 3600 }), { ok: false, reason: 'confirm_expired' });
+  assert.deepEqual(await resendConfirm(token, { env: { ...RESEND_ENV, LICENSE_SECRET: OTHER_SECRET }, fetchImpl, nowSeconds: NOW }), {
+    ok: false,
+    reason: 'confirm_invalid',
+  });
+  assert.equal(fetchImpl.calls.length, 0);
+
+  for (const reason of ['confirm_invalid', 'confirm_expired']) {
+    const sentence = messageForEmailReason(reason);
+    assert.match(sentence, /sign up again/i);
+    assert.doesNotMatch(sentence, /resend|brevo|mailerlite/i, 'provider-neutral');
+  }
+});
+
+/* ------------------------------------------------- GET /api/subscribe?confirm */
+
+const SUBSCRIBE_URL = 'https://helpmebreath.com/api/subscribe';
+
+/** The environment a live Resend deployment would have, pointed at the stub host. */
+const RESEND_PROCESS_ENV = Object.freeze({
+  VERCEL_ENV: 'development',
+  NODE_ENV: 'development',
+  EMAIL_PROVIDER: 'resend',
+  ...RESEND_ENV,
+});
+
+let ipCounter = 0;
+
+/** A GET to the confirmation route from a fresh IP, so the per-IP limiter never bleeds between tests. */
+function confirmRequest(token, options = {}) {
+  ipCounter += 1;
+  const query = token === undefined ? '' : `?confirm=${encodeURIComponent(token)}`;
+  return new Request(`${SUBSCRIBE_URL}${query}`, {
+    method: 'GET',
+    headers: { 'x-real-ip': options.ip || `203.0.113.${ipCounter}`, 'x-forwarded-host': 'helpmebreath.com' },
+  });
+}
+
+/** Run `fn` with the global fetch swapped for a stub; the handler has no deps hook and needs none. */
+async function withFetch(fetchImpl, fn) {
+  const real = globalThis.fetch;
+  globalThis.fetch = fetchImpl;
+  try {
+    return await fn();
+  } finally {
+    globalThis.fetch = real;
+  }
+}
+
+test('GET /api/subscribe?confirm=<valid> shows a Confirm button and writes nothing', async () => {
+  const token = await mintConfirmToken(CONTACT, SECRET, Math.floor(Date.now() / 1000));
+  const fetchImpl = stubFetch(resendRoutes());
+
+  const response = await withEnv(RESEND_PROCESS_ENV, () => withFetch(fetchImpl, () => subscribeGet(confirmRequest(token))));
+
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get('content-type'), /text\/html/);
+  assert.match(response.headers.get('cache-control'), /no-store/);
+  const body = await response.text();
+  assert.match(body, /<form method="post" action="\/api\/subscribe">/);
+  assert.ok(body.includes(`name="confirm" value="${token}"`), 'the button carries the same token back');
+  assert.match(body, /Confirm my email/);
+  assert.doesNotMatch(body, /a@b\.co/, 'the address is never on the page');
+  assert.equal(fetchImpl.calls.length, 0, 'a GET is a look, not a click: a mail gateway fetching the link confirms nobody');
+});
+
+test('POST /api/subscribe with the Confirm form flips the contact and answers 302 to the env redirect', async () => {
+  const token = await mintConfirmToken(CONTACT, SECRET, Math.floor(Date.now() / 1000));
+  const fetchImpl = stubFetch(resendRoutes());
+  const request = new Request(SUBSCRIBE_URL, {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded', 'x-real-ip': '203.0.113.240', 'x-forwarded-host': 'helpmebreath.com' },
+    body: new URLSearchParams({ confirm: token }).toString(),
+  });
+
+  const response = await withEnv(RESEND_PROCESS_ENV, () => withFetch(fetchImpl, () => subscribePost(request)));
+
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get('location'), 'https://helpmebreath.com/pro/thanks?confirmed=1');
+  assert.match(response.headers.get('cache-control'), /no-store/);
+  assert.equal(await response.text(), '');
+  assert.deepEqual(fetchImpl.calls.map((call) => `${call.method} ${call.path}`), [`PATCH ${CONTACT_PATH}`, `POST ${SEGMENT_PATH}`]);
+  assert.deepEqual(JSON.parse(fetchImpl.calls[0].init.body), { unsubscribed: false });
+  assert.equal(fetchImpl.calls[0].url, `https://mail.test${CONTACT_PATH}`);
+
+  // A JSON body carrying { confirm } is the same click.
+  const viaJson = stubFetch(resendRoutes());
+  const jsonRequest = siteRequest({
+    url: SUBSCRIBE_URL,
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-real-ip': '203.0.113.241' },
+    body: JSON.stringify({ confirm: token }),
+  });
+  const second = await withEnv(RESEND_PROCESS_ENV, () => withFetch(viaJson, () => subscribePost(jsonRequest)));
+  assert.equal(second.status, 302);
+
+  // A bad token on the button gets the calm page, never the token back.
+  const bad = stubFetch(resendRoutes());
+  const badRequest = new Request(SUBSCRIBE_URL, {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded', 'x-real-ip': '203.0.113.242', 'x-forwarded-host': 'helpmebreath.com' },
+    body: new URLSearchParams({ confirm: 'eyJ0eXAiOiJkb2kifQ.TESTFIXTUREnotasignature0000000000000000000' }).toString(),
+  });
+  const refused = await withEnv(RESEND_PROCESS_ENV, () => withFetch(bad, () => subscribePost(badRequest)));
+  assert.equal(refused.status, 400);
+  assert.equal((await refused.text()).includes('TESTFIXTUREnotasignature'), false);
+  assert.equal(bad.calls.length, 0);
+});
+
+test('GET /api/subscribe?confirm=<bad> answers a calm page that never echoes the token or names the service', async () => {
+  const bad = 'eyJ0eXAiOiJkb2kifQ.TESTFIXTUREnotasignature0000000000000000000';
+  const fetchImpl = stubFetch(resendRoutes());
+
+  const response = await withEnv(RESEND_PROCESS_ENV, () => withFetch(fetchImpl, () => subscribeGet(confirmRequest(bad))));
+  assert.equal(response.status, CONFIRM_PAGES.confirm_invalid.status);
+  assert.equal(response.status, 400);
+  assert.match(response.headers.get('content-type'), /text\/html/);
+  assert.match(response.headers.get('cache-control'), /no-store/);
+  assert.equal(response.headers.get('x-robots-tag'), 'noindex');
+  const body = await response.text();
+  assert.equal(body.includes(bad), false, 'the token is never echoed');
+  assert.equal(body.includes('TESTFIXTURE'), false);
+  assert.doesNotMatch(body, /resend|brevo|mailerlite/i);
+  assert.match(body, /sign up again/i);
+  assert.equal(fetchImpl.calls.length, 0, 'nothing reaches the mailing service');
+
+  const stale = await mintConfirmToken(CONTACT, SECRET, Math.floor(Date.now() / 1000) - 49 * 3600);
+  const expired = await withEnv(RESEND_PROCESS_ENV, () => withFetch(fetchImpl, () => subscribeGet(confirmRequest(stale))));
+  assert.equal(expired.status, 410);
+  const expiredBody = await expired.text();
+  assert.match(expiredBody, /expired/i);
+  assert.match(expiredBody, /48 hours/);
+  assert.equal(expiredBody.includes(stale), false);
+  assert.equal(expiredBody.includes('a@b.co'), false, 'the address is never echoed');
+
+  const empty = await withEnv(RESEND_PROCESS_ENV, () => withFetch(fetchImpl, () => subscribeGet(confirmRequest(''))));
+  assert.equal(empty.status, 400, 'an empty token is a bad token, not a 405');
+});
+
+test('POST the Confirm form when the mailing service is down keeps the link alive', async () => {
+  const token = await mintConfirmToken(CONTACT, SECRET, Math.floor(Date.now() / 1000));
+  const fetchImpl = stubFetch(resendRoutes({ [`PATCH ${CONTACT_PATH}`]: { status: 503, body: { name: 'service_unavailable' } } }));
+  const request = new Request(SUBSCRIBE_URL, {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded', 'x-real-ip': '203.0.113.243', 'x-forwarded-host': 'helpmebreath.com' },
+    body: new URLSearchParams({ confirm: token }).toString(),
+  });
+  const response = await withEnv(RESEND_PROCESS_ENV, () => withFetch(fetchImpl, () => subscribePost(request)));
+  assert.equal(response.status, 502);
+  const body = await response.text();
+  assert.match(body, /open the link again/i);
+  assert.equal(body.includes(token), false);
+});
+
+test('GET /api/subscribe without ?confirm stays 405, and so does ?confirm for an adapter without confirm()', async () => {
+  const plain = await withEnv(RESEND_PROCESS_ENV, () => subscribeGet(confirmRequest(undefined)));
+  assert.equal(plain.status, 405);
+  assert.equal(plain.headers.get('allow'), 'POST, OPTIONS');
+
+  const token = await mintConfirmToken(CONTACT, SECRET, Math.floor(Date.now() / 1000));
+  const fetchImpl = stubFetch({});
+  const brevo = await withEnv({ ...RESEND_PROCESS_ENV, EMAIL_PROVIDER: 'brevo' }, () =>
+    withFetch(fetchImpl, () => subscribeGet(confirmRequest(token))),
+  );
+  assert.equal(brevo.status, 405, 'that adapter runs its own confirmation flow');
+  assert.equal(fetchImpl.calls.length, 0);
+});
+
+test('GET /api/subscribe?confirm shares the per-IP limiter with the form', async () => {
+  const token = await mintConfirmToken(CONTACT, SECRET, Math.floor(Date.now() / 1000));
+  const fetchImpl = stubFetch(resendRoutes());
+  const ip = '198.51.100.77';
+
+  await withEnv(RESEND_PROCESS_ENV, () =>
+    withFetch(fetchImpl, async () => {
+      for (let i = 0; i < 5; i += 1) {
+        const response = await subscribeGet(confirmRequest(token, { ip }));
+        assert.equal(response.status, 200, `request ${i + 1} is within the limit`);
+      }
+      const sixth = await subscribeGet(confirmRequest(token, { ip }));
+      assert.equal(sixth.status, 429);
+      assert.equal(sixth.headers.get('retry-after') !== null, true);
+      assert.match(sixth.headers.get('content-type'), /text\/html/);
+    }),
+  );
+  assert.equal(fetchImpl.calls.length, 0, 'looking never reaches the mailing service');
+});
+
+test('subscribe: a preview deployment without a real LICENSE_SECRET mints nothing and confirms nobody', async () => {
+  const previewEnv = { ...RESEND_PROCESS_ENV, VERCEL_ENV: 'preview', NODE_ENV: 'production', LICENSE_SECRET: undefined };
+  const fetchImpl = stubFetch(resendRoutes());
+
+  // The form: 503, and no email goes out.
+  const signup = siteRequest({
+    url: SUBSCRIBE_URL,
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-real-ip': '203.0.113.250' },
+    body: JSON.stringify({ email: 'someone@example.com', consent: true }),
+  });
+  const refused = await withEnv(previewEnv, () => withFetch(fetchImpl, () => subscribePost(signup)));
+  assert.equal(refused.status, 503);
+
+  // A token signed with the public placeholder secret: the page says not set up, the button writes nothing.
+  const forged = await mintConfirmToken({ email: 'victim@example.com' }, DEV_DEFAULTS.LICENSE_SECRET, Math.floor(Date.now() / 1000));
+  const look = await withEnv(previewEnv, () => withFetch(fetchImpl, () => subscribeGet(confirmRequest(forged))));
+  assert.equal(look.status, 503);
+  const click = new Request(SUBSCRIBE_URL, {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded', 'x-real-ip': '203.0.113.251', 'x-forwarded-host': 'helpmebreath.com' },
+    body: new URLSearchParams({ confirm: forged }).toString(),
+  });
+  const pressed = await withEnv(previewEnv, () => withFetch(fetchImpl, () => subscribePost(click)));
+  assert.equal(pressed.status, 503);
+  assert.equal(fetchImpl.calls.length, 0, 'zero requests to the mailing service');
+
+  // And the adapter itself refuses the placeholder even when it is passed explicitly.
+  const withDevSecret = { ...RESEND_ENV, LICENSE_SECRET: DEV_DEFAULTS.LICENSE_SECRET };
+  assert.equal((await resendProvider.subscribe(CONTACT, { env: withDevSecret, fetchImpl })).reason, 'not_configured');
+  assert.equal((await resendConfirm(forged, { env: withDevSecret, fetchImpl })).reason, 'not_configured');
+  assert.equal(fetchImpl.calls.length, 0);
+});
+
+test('resend token: the address inside a token is validated like a typed one, and iat must be a number', async () => {
+  const sign = async (payload) => {
+    const head = b64urlEncode(JSON.stringify(payload));
+    return `${head}.${b64urlEncode(await hmacSha256(SECRET, head))}`;
+  };
+  const cases = [
+    { typ: 'doi', e: 'a@b.co/../../emails?x=', t: null, s: null, iat: NOW },
+    { typ: 'doi', e: 'A@B.CO', t: null, s: null, iat: NOW },
+    { typ: 'doi', e: '\u212Aevin@example.com', t: null, s: null, iat: NOW },
+    { typ: 'doi', e: 'a@b.co', t: null, s: null, iat: String(NOW) },
+  ];
+  for (const payload of cases) {
+    const result = await verifyConfirmToken(await sign(payload), SECRET, NOW);
+    assert.deepEqual(result, { ok: false, reason: 'confirm_invalid' }, JSON.stringify(payload));
+  }
+  const good = await verifyConfirmToken(await sign({ typ: 'doi', e: 'a@b.co', t: null, s: null, iat: NOW }), SECRET, NOW);
+  assert.equal(good.ok, true);
+});
+
+test('subscribe: look-alike addresses are refused before case folding', () => {
+  const kelvin = validateSubscribe({ email: '\u212Aevin@example.com', consent: true });
+  assert.equal(kelvin.ok, false, 'the Kelvin sign would fold to a plain k');
+  assert.equal(kelvin.field, 'email');
+  const plain = validateSubscribe({ email: 'Kevin@Example.com', consent: true });
+  assert.equal(plain.ok, true);
+  assert.equal(plain.value.email, 'kevin@example.com');
+});
+
+test('POST /api/subscribe through the default adapter says the same sentence for a new and a repeat address', async () => {
+  const body = JSON.stringify({ email: 'New.Person@Example.com', technique: 'box', source: 'post-session', consent: true });
+  const request = () =>
+    siteRequest({
+      url: SUBSCRIBE_URL,
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-real-ip': '192.0.2.9' },
+      body,
+    });
+
+  const fresh = stubFetch(resendRoutes());
+  const first = await withEnv(RESEND_PROCESS_ENV, () => withFetch(fresh, () => subscribePost(request())));
+  assert.equal(first.status, 200);
+  assert.deepEqual(await first.json(), { ok: true, message: SUCCESS_MESSAGE });
+  assert.deepEqual(fresh.calls.map((call) => `${call.method} ${call.path}`), ['POST /emails']);
+  assert.deepEqual(JSON.parse(fresh.calls[0].init.body).to, ['new.person@example.com'], 'lower-cased before it leaves');
+
+  const repeat = stubFetch(resendRoutes());
+  const second = await withEnv(RESEND_PROCESS_ENV, () => withFetch(repeat, () => subscribePost(request())));
+  assert.equal(second.status, 200);
+  assert.deepEqual(await second.json(), { ok: true, message: SUCCESS_MESSAGE }, 'identical, so list membership never leaks');
+  assert.deepEqual(repeat.calls.map((call) => `${call.method} ${call.path}`), ['POST /emails'], 'and identical work, so timing leaks nothing either');
+
+  const down = stubFetch(resendRoutes({ 'POST /emails': { status: 500, body: {} } }));
+  const third = await withEnv(RESEND_PROCESS_ENV, () => withFetch(down, () => subscribePost(request())));
+  assert.equal(third.status, 502);
+  const failure = await third.json();
+  assert.equal(failure.ok, false);
+  assert.doesNotMatch(failure.error, /resend/i);
+});
+
+/* Last on purpose: the shared sending budget is module state and this test spends it. */
+test('POST /api/subscribe shares one sending budget across everyone', async () => {
+  const fetchImpl = stubFetch(resendRoutes());
+  let accepted = 0;
+  let limited = null;
+  await withEnv(RESEND_PROCESS_ENV, () =>
+    withFetch(fetchImpl, async () => {
+      for (let i = 0; i < 40 && !limited; i += 1) {
+        const request = siteRequest({
+          url: SUBSCRIBE_URL,
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-real-ip': `198.51.100.${100 + i}` },
+          body: JSON.stringify({ email: `person${i}@example.com`, consent: true }),
+        });
+        const response = await subscribePost(request);
+        if (response.status === 200) accepted += 1;
+        else if (response.status === 429) limited = response;
+        else assert.fail(`unexpected ${response.status}`);
+      }
+    }),
+  );
+  assert.ok(limited, 'the budget eventually says no');
+  assert.ok(accepted <= 20, `no more than twenty emails an hour from everyone (sent ${accepted})`);
+  assert.equal(limited.headers.get('retry-after') !== null, true);
+  const sentence = (await limited.json()).error;
+  assert.match(sentence, /try again in an hour/i);
+  assert.equal(fetchImpl.calls.length, accepted, 'a refused request never reaches the mailing service');
 });

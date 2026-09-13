@@ -28,7 +28,9 @@ activation count, no SKU, no `MOR_PRODUCT_*` variable and no waitlist mode.
 | `/api/webhooks/mor` | `POST` | webhook signature | Every merchant-of-record event. |
 | `/api/cron/reconcile` | `GET` | `CRON_SECRET` | Hourly: re-drive failed events, rewrite flagged subscriptions. |
 | `/api/cron/retention` | `GET` | `CRON_SECRET` | Weekly: the eight retention statements. |
-| `/api/subscribe` | `POST` | none (same-origin) | Double opt-in email signup. Unchanged. |
+| `/api/subscribe` | `POST` | none (same-origin) | Double opt-in email signup. |
+| `/api/subscribe?confirm=…` | `GET` | signed token | The confirmation link in the email. Shows a Confirm button; writes nothing. |
+| `/api/subscribe` | `POST` (form) | `confirm=<token>` | The Confirm button. Makes the contact subscribed, then redirects. |
 | `/api/health` | `GET` | none | Which environment variables are set. Booleans and names only. |
 
 ## Files
@@ -36,7 +38,7 @@ activation count, no SKU, no `MOR_PRODUCT_*` variable and no waitlist mode.
 ```
 api/
   me.js                       GET  /api/me
-  subscribe.js                POST /api/subscribe
+  subscribe.js                POST /api/subscribe, GET /api/subscribe?confirm=<token>
   health.js                   GET  /api/health
   account/
     signout.js  export.js  delete.js
@@ -65,7 +67,9 @@ api/
       paddle.js               primary adapter
       fastspring.js           fallback adapter
     email/
-      index.js  brevo.js  mailerlite.js
+      index.js                the mailing seam: adapter contract, reason sentences
+      resend.js               default adapter; runs the double opt-in itself
+      brevo.js  mailerlite.js the alternatives; their dashboards run the double opt-in
 tools/
   keygen.mjs                  prints a 64-character secret, writes nothing
   api.test.mjs  webhook.test.mjs  trialguard.test.mjs
@@ -486,8 +490,7 @@ Answers `{ ok, ran_at, results }`.
 
 ## `POST /api/subscribe`
 
-Unchanged by the accounts work. Double opt-in email signup, proxied so the
-mailing key never reaches a browser.
+Double opt-in email signup, proxied so the mailing key never reaches a browser.
 
 **Request**
 
@@ -511,13 +514,127 @@ validation, 429 for more than 5 a minute from one IP (and 3 an hour to the same
 address, keyed on a hash), 502 when the mailing service is unreachable, 503 when
 it is not configured.
 
-Both adapters create the contact **unconfirmed** and let the provider send the
-confirmation email. Brevo uses `POST /v3/contacts/doubleOptinConfirmation`.
-MailerLite uses `POST /api/subscribers` with `status: "unconfirmed"` — turn
-double opt-in on for the group in the dashboard, because that switch, not this
-code, sends the email.
+Every adapter creates the contact **unconfirmed**. Who sends the confirmation
+email depends on the adapter:
+
+- **Resend (default).** Resend has no double opt-in of its own, so
+  `api/_lib/email/resend.js` runs it: it sends the confirmation email itself
+  and the link in it points back at `GET /api/subscribe?confirm=<token>` below.
+- **Brevo** uses `POST /v3/contacts/doubleOptinConfirmation`, which sends the
+  email from a template (`EMAIL_DOI_TEMPLATE_ID`).
+- **MailerLite** uses `POST /api/subscribers` with `status: "unconfirmed"` —
+  turn double opt-in on for the group in the dashboard, because that switch,
+  not this code, sends the email.
 
 Only a 12-character hash prefix of the address is ever logged.
+
+### The Resend adapter, step by step
+
+Verified against the Resend API reference on 2026-09-13. Base URL
+`https://api.resend.com`, `Authorization: Bearer <EMAIL_API_KEY>` on every call
+(`EMAIL_API_BASE` overrides the base for the test suite).
+
+| Step | Call | Expected | Then |
+|---|---|---|---|
+| 1. Send the confirmation | `POST /emails` `{ from: EMAIL_FROM, to: [email], subject, text, html }` | 200 `{ id }` | Subject "Confirm your email for Help Me Breathe". One link, no images, no tracking, and a line saying to ignore it if you did not ask. |
+
+That is the whole of `subscribe()`. **Nothing is stored** until the person
+presses the button in the email: an address typed into the form by a stranger
+never becomes a contact (it could otherwise be kept without consent, and a
+wordlist could fill the free tier's contact quota), and every signup costs the
+same single request whether or not the address is already on the list, so
+response time tells nobody who is subscribed.
+
+Result mapping: 2xx → `ok`; 5xx, 429 (rate limit or quota) or a network failure
+(including the 8-second timeout) → `provider_unavailable` (502 to the browser);
+a 400/422 whose message names the address → `invalid_email` (400); 401/403 (a
+missing or sending-only key, an unverified domain) → `not_configured` (503, the
+same status a missing variable gets, because it is the owner's to fix); any
+other 4xx → `provider_error` (502). A configuration mistake is never blamed on
+the address.
+
+Contacts are **global to the team** in Resend ("Each email address is treated as
+a single Contact across your team") and Audiences "are deprecated in favor of
+Segments", so `EMAIL_LIST_ID` is a **segment id**. Custom properties are not
+sent: Resend fails the whole call when a property has not been created in the
+dashboard first, and a signup must never fail on a missing property. The
+`technique` and `source` slugs ride in the token and appear in the log line
+next to the hash prefix.
+
+The signing secret must be a real one: `readConfig()` refuses the development
+placeholder from `api/_lib/env.js`, and `api/subscribe.js` refuses to run the
+flow at all on a preview or development deployment that has no `LICENSE_SECRET`
+set — the placeholder is in a public repository, and a token signed with it must
+never confirm anyone.
+
+**The confirmation token** is `base64url(JSON) + "." + base64url(HMAC-SHA256)`
+signed with `LICENSE_SECRET` — the same shape as the entitlement token in
+`api/_lib/crypto.js`, so the same helpers verify it. Payload
+`{ typ: "doi", e, t, s, iat }`: the lower-cased address, technique or `null`,
+source or `null`, unix seconds. The `typ` means a confirmation token can never
+pass for an entitlement token and vice versa. The link is
+`${SITE_ORIGIN}/api/subscribe?confirm=<token>`. `mintConfirmToken()` and
+`verifyConfirmToken()` are exported and tested without the network.
+
+---
+
+## `GET /api/subscribe?confirm=<token>` and the Confirm button
+
+The second half of the double opt-in, for adapters that export `inspect()` and
+`confirm()` (Resend does; Brevo and MailerLite do not, and for them this route
+is a 405 like any other GET). It lives inside `api/subscribe.js` on purpose:
+one serverless function, because the function count matters.
+
+**The GET has no side effects.** Mail gateways fetch every link they deliver
+(Safe Links, Proofpoint, link previews), and a fetch must never count as
+consent. So:
+
+1. The **same per-IP limiter** as the form (5 a minute).
+2. The preview guard: no real `LICENSE_SECRET`, no flow (503 page).
+3. `inspect()` = `verifyConfirmToken()`: shape, constant-time signature check,
+   the address re-validated like a typed one, `iat` a number, then age. Tokens
+   older than **48 hours** are refused. Nothing reaches the mailing service.
+4. A valid token renders a small page with one **Confirm my email** button: a
+   form that POSTs `confirm=<token>` back to `/api/subscribe`.
+
+**The POST from that button** (form-encoded, or a JSON body carrying
+`{ confirm }`) is the click: same limiter, same guard, then `confirm()`:
+
+1. `PATCH /contacts/{email}` `{ unsubscribed: false }` → 200, then
+   `POST /contacts/{email}/segments/{EMAIL_LIST_ID}` (no body) → 200, because
+   PATCH has no `segments` field and a contact that already exists team-wide
+   may not be on our list yet.
+2. A 404 on the PATCH means the address is new: `POST /contacts`
+   `{ email, unsubscribed: false, segments: [{ id }] }` creates it subscribed
+   and in the segment in one call. A create that answers "already exists" (two
+   confirmations racing) falls back to step 1.
+3. Confirming twice within the 48 hours is idempotent.
+
+**Responses**
+
+| Case | Status | Body |
+|---|---|---|
+| GET, valid token | **200** | The Confirm page; the token is in the form's hidden field and nowhere else. |
+| POST, confirmed | **302** | `Location: EMAIL_DOI_REDIRECT_URL` — read from the environment, never from the request. The thanks page shows "Your email address is confirmed". |
+| Signature or payload wrong | 400 | A small plain HTML page: the link is not valid, sign up again. |
+| Older than 48 hours | 410 | The same page, worded for expiry. |
+| Not configured (no real secret, key refused) | 503 | "Email signup is not switched on yet". |
+| Mailing service down (POST only) | 502 | "We could not confirm your address just now" — the link stays valid, so pressing the button again later works. |
+| Too many from one IP | 429 | The same plain page, with `Retry-After`. |
+| No `?confirm` at all | 405 | Unchanged. |
+
+The failure pages are static strings: the token and the address are **never
+echoed**, no service is named, and every response is `no-store` and
+`noindex`. Why a page rather than `?confirmed=0`: the thanks page treats any
+non-empty `confirmed` value as a success, so a redirect would have said the
+wrong thing.
+
+**The sending budget.** Besides the per-IP (5 a minute) and per-address (3 an
+hour) limiters, the form shares one budget of **20 confirmation emails an hour**
+across everyone, checked last so a rejected request never spends it. The free
+tier is 100 emails a day and the same account carries the sign-in emails; a
+wordlist pointed at the form must not be able to spend the day's quota. Beyond
+it the form answers 429 "try again in an hour".
 
 ---
 
@@ -566,7 +683,7 @@ one-to-one. **Required** means "counted in `/api/health`'s `missing`".
 
 | Variable | Required | Notes |
 |---|---|---|
-| `LICENSE_SECRET` | yes | 64 characters from `node tools/keygen.mjs`. Signs every entitlement token. Rotating it signs every subscriber out of offline use until their next page load. |
+| `LICENSE_SECRET` | yes | 64 characters from `node tools/keygen.mjs`. Signs every entitlement token **and the email confirmation links**. Rotating it signs every subscriber out of offline use until their next page load, and voids any confirmation link not yet clicked. |
 | `SUPABASE_URL` | yes | `https://<ref>.supabase.co`. The same value goes into `js/config.js` (public). |
 | `SUPABASE_PUBLISHABLE_KEY` | yes | The publishable (anon) key. Public by design; the server copy is used only to call the auth API. |
 | `SUPABASE_SECRET_KEY` | yes | The secret (service role) key. Server only. Bypasses row level security. Never in the repo, never in a response. |
@@ -589,11 +706,12 @@ one-to-one. **Required** means "counted in `/api/health`'s `missing`".
 | `MOR_API_PASSWORD` | no | The other half of the pair above. |
 | `CRON_SECRET` | yes | 64 characters. The bearer token Vercel's two cron jobs must present. |
 | `ALERT_EMAIL` | yes | Where orphaned webhooks, forged trials and stuck events are reported. |
-| `EMAIL_PROVIDER` | no | `brevo` (default) or `mailerlite`. |
-| `EMAIL_API_KEY` | yes | The mailing service key. `/api/subscribe` is the only thing that ever sees it. |
-| `EMAIL_LIST_ID` | Brevo only | Brevo list id (comma separated for several) or MailerLite group id. |
-| `EMAIL_DOI_TEMPLATE_ID` | Brevo only | Numeric id of the double opt-in template. |
-| `EMAIL_DOI_REDIRECT_URL` | Brevo only | Where a confirmed email subscriber lands: `https://helpmebreath.com/pro/thanks?confirmed=1` (the page then shows an email-confirmed message, not a purchase). |
+| `EMAIL_PROVIDER` | no | `resend` (default), `brevo` or `mailerlite`. An unknown value falls back to `resend`. |
+| `EMAIL_API_KEY` | yes | The mailing service key. `/api/subscribe` is the only thing that ever sees it. Resend: a **full access** key, because the adapter creates contacts as well as sending; a sending-only key answers 401 `restricted_api_key`. |
+| `EMAIL_LIST_ID` | Resend and Brevo | Resend: the **segment id** the confirmed contact is added to. Brevo: list id (comma separated for several). MailerLite: group id (not counted in `missing`, unchanged). |
+| `EMAIL_FROM` | Resend only | The sender of the confirmation email, `Help Me Breathe <hello@helpmebreath.com>`, on a domain verified in Resend. |
+| `EMAIL_DOI_TEMPLATE_ID` | Brevo only | Numeric id of the double opt-in template. Resend sends its own confirmation and ignores this. |
+| `EMAIL_DOI_REDIRECT_URL` | Resend and Brevo | Where a confirmed email subscriber lands: `https://helpmebreath.com/pro/thanks?confirmed=1` (the page then shows an email-confirmed message, not a purchase). |
 | `EMAIL_API_BASE` | no | Test hook. Leave empty in production. |
 | `ALLOWED_ORIGINS` | no | Extra origins allowed to call the same-origin endpoints, comma separated. Normally empty: the API and the site share an origin. |
 
@@ -674,7 +792,54 @@ the endpoints turn into a calm 502 or 503. **Adapters never log a customer
 email, a transaction id or a subscription id**, and a test enforces it.
 
 The email seam works the same way: `api/_lib/email/index.js`, an adapter with
-`id`, `requiredEnv` and `subscribe(contact, ctx)`, then `EMAIL_PROVIDER`.
+`id`, `requiredEnv`, `subscribe(contact, ctx)` and — only when the adapter runs
+the double opt-in itself — `confirm(token, ctx)`, then `EMAIL_PROVIDER`.
+`messageForEmailReason()` turns every reason (`provider_unavailable`,
+`invalid_email`, `not_configured`, `confirm_invalid`, `confirm_expired`) into
+one calm sentence that never names a service.
+
+---
+
+## Setting up the mailing service (owner steps)
+
+The decision of 2026-09-13 is Resend: the free plan is 3,000 emails a month,
+100 a day, 1,000 contacts and 3 domains (resend.com/pricing, read the same day),
+and it doubles as the SMTP relay for the account sign-in emails.
+
+1. **Account.** Sign up at resend.com with the GitHub account. No card.
+2. **Domain.** Domains → Add `helpmebreath.com`. Resend shows DNS records
+   (DKIM and SPF TXT records plus an MX record); add them in **Vercel → the
+   domain → DNS**, then press Verify. Nothing sends until this is green — an
+   unverified domain is a 403 `validation_error`.
+3. **Segment.** Audience → Segments → Create. Copy its id into
+   `EMAIL_LIST_ID`. (Audiences are deprecated in favour of Segments; the
+   adapter uses the segment id.)
+4. **API key.** API Keys → Create. Permission **Full access** (the adapter
+   creates contacts as well as sending). The value is shown once; put it in
+   `EMAIL_API_KEY`. Never paste it into `.env.example` or any file in the repo.
+5. **Sender.** `EMAIL_FROM=Help Me Breathe <hello@helpmebreath.com>` — any
+   mailbox on the verified domain works; it does not need to exist to send.
+6. **Redirect.** `EMAIL_DOI_REDIRECT_URL=https://helpmebreath.com/pro/thanks?confirmed=1`.
+   `SITE_ORIGIN` and `LICENSE_SECRET` are already set for the rest of the API.
+7. **Tracking off.** Domains → the domain → Configuration: open and click
+   tracking are off by default; leave them off. The privacy policy promises no
+   tracking in email.
+8. **Supabase sign-in emails.** Supabase → Authentication → SMTP Settings →
+   enable custom SMTP. Verified against resend.com/docs/send-with-smtp on
+   2026-09-13: host `smtp.resend.com`; port `465` (implicit TLS; `587` with
+   STARTTLS also works); username `resend`; password = a Resend API key — the
+   same key works, or, tidier, a second key with **Sending access** restricted
+   to `helpmebreath.com`; sender = the `EMAIL_FROM` address and name. Supabase
+   adds this one itself; nothing in this repo changes for it.
+9. **Check.** `GET /api/health` shows `email: "resend"` and no `EMAIL_*` in
+   `missing`. Then submit the form on the site with your own address, click
+   the link, and confirm the contact shows `unsubscribed: false` in the
+   Audience page.
+
+Broadcasts (the occasional email the privacy policy describes) are written and
+sent from the Resend dashboard to the segment; Resend adds the unsubscribe link
+and handles the unsubscribe flow itself. The confirmation email is the only
+message this code sends, and its "ignore this" line is its opt-out.
 
 ---
 
@@ -805,6 +970,11 @@ No test touches the network and none needs an environment variable. Every
 endpoint exports a `create…Handler(deps)` factory for exactly this reason, and
 provider adapters take `fetchImpl` on their context. `MOR_API_BASE` and
 `EMAIL_API_BASE` point the adapters at a stub host.
+
+`node tools/api.test.mjs` covers the Resend adapter offline: the token
+round-trip, the three calls of a first signup, the two of a repeat, the
+`confirm()` PATCH, and the `GET ?confirm` route end to end with a stubbed
+`fetch`.
 
 `tools/site-check.mjs` also enforces the rules that belong to this model, each
 under its own rule id: `open-timer-allowlist` / `open-timer-missing`

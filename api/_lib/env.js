@@ -45,6 +45,7 @@ export const KNOWN_VARS = [
   'EMAIL_PROVIDER',
   'EMAIL_API_KEY',
   'EMAIL_LIST_ID',
+  'EMAIL_FROM',
   'EMAIL_DOI_TEMPLATE_ID',
   'EMAIL_DOI_REDIRECT_URL',
   'EMAIL_API_BASE',
@@ -58,7 +59,7 @@ export const DEV_DEFAULTS = Object.freeze({
   LICENSE_SECRET: 'dev-license-secret-not-for-production-'.padEnd(64, '0'),
   MOR_PROVIDER: 'paddle',
   MOR_SANDBOX: 'true',
-  EMAIL_PROVIDER: 'brevo',
+  EMAIL_PROVIDER: 'resend',
   EMAIL_LIST_ID: '0',
   EMAIL_DOI_TEMPLATE_ID: '0',
   EMAIL_DOI_REDIRECT_URL: 'https://helpmebreath.com/pro/thanks?confirmed=1',
@@ -169,12 +170,14 @@ export function providerName() {
 }
 
 /**
- * The email service provider in use.
- * @returns {'brevo'|'mailerlite'}
+ * The email service provider in use. Unknown values fall back to the default,
+ * the same way providerName() does.
+ * @returns {'resend'|'brevo'|'mailerlite'}
  */
 export function emailProviderName() {
   const value = readEnv('EMAIL_PROVIDER', DEV_DEFAULTS.EMAIL_PROVIDER).toLowerCase();
-  return value === 'mailerlite' ? 'mailerlite' : 'brevo';
+  if (value === 'brevo' || value === 'mailerlite') return value;
+  return 'resend';
 }
 
 /**
@@ -227,6 +230,11 @@ export function describeConfig() {
     required.push('MOR_PRICE_MONTHLY_TRIAL', 'MOR_PRICE_YEARLY_TRIAL');
   }
   if (provider === 'fastspring') required.push('MOR_STOREFRONT');
+  // The email adapter's own needs. Resend runs the double opt-in itself, so it
+  // needs a sender and the redirect but no template; Brevo owns the template.
+  // SITE_ORIGIN and LICENSE_SECRET, which the confirmation link also needs, are
+  // already in the list above.
+  if (email === 'resend') required.push('EMAIL_LIST_ID', 'EMAIL_FROM', 'EMAIL_DOI_REDIRECT_URL');
   if (email === 'brevo') required.push('EMAIL_LIST_ID', 'EMAIL_DOI_TEMPLATE_ID', 'EMAIL_DOI_REDIRECT_URL');
   const missing = required.filter((name) => !hasEnv(name));
 
