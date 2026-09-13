@@ -17,7 +17,7 @@
  * explained by anything but the "sign-in does not exist yet" branch.
  */
 
-import test from 'node:test';
+import test, { mock } from 'node:test';
 import assert from 'node:assert/strict';
 
 /* ------------------------------------------------------------ browser stub */
@@ -83,7 +83,17 @@ localStorage.setItem(
   JSON.stringify([completedSession('10', '478'), completedSession('11', 'box'), completedSession('12', '478')]),
 );
 
-// The stubs must exist before the module graph evaluates.
+// The stubs must exist before the module graph evaluates. js/config.js is
+// mocked with SUPABASE blanked, whatever the committed file holds (the owner
+// fills it in for real), so these tests keep describing the unconfigured
+// state. Needs `node --test --experimental-test-module-mocks`, which npm test
+// passes; the real file is read under a query string so it stays a separate
+// module instance and the mock is registered before anything imports the
+// plain specifier.
+const realConfig = await import('../js/config.js?real');
+mock.module('../js/config.js', {
+  namedExports: { ...realConfig, SUPABASE: Object.freeze({ url: '', publishableKey: '' }) },
+});
 const { TIMER_FREE_SESSIONS } = await import('../js/config.js');
 const { completedSessionCount } = await import('../js/storage.js');
 const { configured } = await import('../js/auth.js');
@@ -92,7 +102,7 @@ const ent = await import('../js/entitlements.js');
 /* ------------------------------------------------------------------- tests */
 
 test('premise: sign-in is not configured and the device is at the free-session limit', () => {
-  assert.equal(configured(), false, 'js/config.js SUPABASE must be empty for these tests');
+  assert.equal(configured(), false, 'the mocked js/config.js has SUPABASE blank');
   assert.equal(TIMER_FREE_SESSIONS, 3, 'D1');
   assert.equal(completedSessionCount(), 3);
   assert.equal(ent.signedIn(), false);

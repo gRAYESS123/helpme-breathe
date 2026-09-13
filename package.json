@@ -11,7 +11,7 @@
   "scripts": {
     "check": "node tools/site-check.mjs",
     "sitemap": "node tools/build-sitemap.mjs",
-    "test": "node --test \"tools/*.test.mjs\"",
+    "test": "node --test --experimental-test-module-mocks \"tools/*.test.mjs\"",
     "e2e": "node --test tools/e2e/gate.e2e.mjs"
   }
 }

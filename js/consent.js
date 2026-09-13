@@ -17,9 +17,9 @@
  *       wait_for_update: 500
  *     });
  *     gtag('js', new Date());
- *     gtag('config', 'G-09WY9JD4YM', { anonymize_ip: true, cookie_expires: 63072000 });
+ *     gtag('config', 'G-TYLYLJSFHN', { anonymize_ip: true, cookie_expires: 63072000 });
  *   </script>
- *   <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
+ *   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
  *
  * This module then: replays the stored decision as a `consent update`, renders
  * and wires the banner when no decision has been made, and exposes the state to

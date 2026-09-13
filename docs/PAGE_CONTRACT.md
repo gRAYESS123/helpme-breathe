@@ -151,12 +151,12 @@ one wins.
             'wait_for_update': 500
         });
         gtag('js', new Date());
-        gtag('config', 'G-09WY9JD4YM', {
+        gtag('config', 'G-TYLYLJSFHN', {
             'anonymize_ip': true,
             'cookie_expires': 63072000
         });
     </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-09WY9JD4YM"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
 
     <!-- JSON-LD blocks go here. See section 10. -->
 </head>

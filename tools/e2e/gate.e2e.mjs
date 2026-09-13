@@ -9,7 +9,7 @@
  * a Supabase project, without the network and without changing site code:
  *
  *   - the repo root is served over a small node http server on 127.0.0.1;
- *   - GET /js/config.js is answered with the committed file, SUPABASE.url and
+ *   - GET /js/config.js is answered from a fixture, never from disk: SUPABASE.url and
  *     SUPABASE.publishableKey swapped for TESTFIXTURE values, so js/auth.js
  *     configured() is true ("ARMED" below). "UNCONFIGURED" serves the real
  *     file, which is how the site ships today;
@@ -159,22 +159,26 @@ function startServer() {
 const FIXTURE_URL = 'https://testfixture.supabase.co';
 const FIXTURE_KEY = 'sb_publishable_TESTFIXTURE0000000000000000';
 
-/** js/config.js with SUPABASE filled in. Nothing else in the file changes. */
-function armedConfig(source) {
+/**
+ * js/config.js with the SUPABASE block's two values set to `url` and `key`,
+ * whatever the committed file holds (the owner fills it in for real at some
+ * point; the harness must not depend on that). Nothing else in the file changes.
+ */
+function configWith(source, url, key) {
   const start = source.indexOf('export const SUPABASE = Object.freeze({');
   const end = source.indexOf('});', start);
   if (start < 0 || end < 0) throw new Error('js/config.js: SUPABASE block not found');
   let block = source.slice(start, end);
   let hits = 0;
-  block = block.replace(/(\burl:\s*)''/, (m, p) => {
+  block = block.replace(/(\burl:\s*)'[^']*'/, (m, p) => {
     hits += 1;
-    return `${p}'${FIXTURE_URL}'`;
+    return `${p}'${url}'`;
   });
-  block = block.replace(/(\bpublishableKey:\s*)''/, (m, p) => {
+  block = block.replace(/(\bpublishableKey:\s*)'[^']*'/, (m, p) => {
     hits += 1;
-    return `${p}'${FIXTURE_KEY}'`;
+    return `${p}'${key}'`;
   });
-  if (hits !== 2) throw new Error(`js/config.js: expected to fill url and publishableKey, filled ${hits}`);
+  if (hits !== 2) throw new Error(`js/config.js: expected url and publishableKey in the SUPABASE block, rewrote ${hits}`);
   return source.slice(0, start) + block + source.slice(end);
 }
 
@@ -218,13 +222,15 @@ function proToken(nowMs) {
 
 let realConfig = '';
 let armedConfigText = '';
+let unarmedConfigText = '';
 let browser = null;
 let server = null;
 let origin = '';
 
 before(async () => {
   realConfig = await fs.readFile(path.join(ROOT, 'js', 'config.js'), 'utf8');
-  armedConfigText = armedConfig(realConfig);
+  armedConfigText = configWith(realConfig, FIXTURE_URL, FIXTURE_KEY);
+  unarmedConfigText = configWith(realConfig, '', '');
   ({ server, origin } = await startServer());
   browser = await chromium.launch({ headless: true });
 });
@@ -291,12 +297,14 @@ async function withScenario(options, fn) {
         return;
       }
       requested.push(url.href);
-      if (options.armed && url.pathname === '/js/config.js') {
+      if (url.pathname === '/js/config.js') {
+        // Always served from the fixture, never from disk: ARMED fills the
+        // SUPABASE block in, UNARMED blanks it, whatever the committed file says.
         await route.fulfill({
           status: 200,
           contentType: 'application/javascript; charset=utf-8',
           headers: { 'Cache-Control': 'no-store' },
-          body: armedConfigText,
+          body: options.armed ? armedConfigText : unarmedConfigText,
         });
         return;
       }
@@ -445,14 +453,18 @@ async function assertGateFired(page, label) {
 
 /* ------------------------------------------------------------------- tests */
 
-test('premise: the committed js/config.js is unconfigured and the fixture arms it', () => {
-  assert.match(realConfig, /url:\s*''/, 'SUPABASE.url is empty in the committed file');
-  assert.match(realConfig, /publishableKey:\s*''/, 'SUPABASE.publishableKey is empty in the committed file');
+test('premise: the fixture arms and blanks js/config.js without touching anything else', () => {
   assert.ok(armedConfigText.includes(`url: '${FIXTURE_URL}'`));
   assert.ok(armedConfigText.includes(`publishableKey: '${FIXTURE_KEY}'`));
-  assert.ok(armedConfigText.includes('export const TIMER_FREE_SESSIONS = 3;'), 'D1 is untouched');
-  assert.ok(armedConfigText.includes("clientToken: ''"), 'checkout stays closed');
-  assert.equal(armedConfigText.length - realConfig.length, FIXTURE_URL.length + FIXTURE_KEY.length, 'only the two values changed');
+  assert.ok(unarmedConfigText.includes("url: ''"));
+  assert.ok(unarmedConfigText.includes("publishableKey: ''"));
+  for (const text of [armedConfigText, unarmedConfigText]) {
+    assert.ok(text.includes('export const TIMER_FREE_SESSIONS = 3;'), 'D1 is untouched');
+    assert.ok(text.includes("clientToken: ''"), 'checkout stays closed');
+  }
+  const strip = (t) => t.replace(/(\b(?:url|publishableKey):\s*)'[^']*'/g, "$1''");
+  assert.equal(strip(armedConfigText), strip(unarmedConfigText), 'the two fixtures differ only in the two SUPABASE values');
+  assert.equal(strip(realConfig), strip(unarmedConfigText), 'and only in those values from the committed file');
 });
 
 test('1. ARMED + 3 completed sessions on /timer.html: Begin does not run, the preview card renders', async () => {
@@ -516,13 +528,13 @@ test('3. ARMED + 5 completed sessions on /breathing-exercises-for-panic-attacks.
   );
 });
 
-test('4. UNCONFIGURED (committed config) + 3 completed sessions on /timer.html: Begin runs (mirror of tools/gate.test.mjs)', async () => {
+test('4. UNARMED (SUPABASE blanked) + 3 completed sessions on /timer.html: Begin runs (mirror of tools/gate.test.mjs)', async () => {
   await withScenario(
     { armed: false, storage: { 'hmb.history': JSON.stringify(completedSessions(3)), 'hmb.consent': 'essential' } },
     async (page, ctx) => {
       await openTimerPage(page, '/timer.html');
       const before = await snapshot(page);
-      assert.equal(before.configured, false, 'js/auth.js configured() is false with the committed config');
+      assert.equal(before.configured, false, 'js/auth.js configured() is false with SUPABASE blanked');
       assert.equal(before.freeSessionsUsed, 3, 'at the D1 limit');
       assert.equal(before.signedIn, false);
       assert.equal(before.isPro, false);

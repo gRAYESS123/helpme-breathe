@@ -50,9 +50,9 @@
 /** Supabase project, public values only (design §10.2). */
 export const SUPABASE = Object.freeze({
   /** `https://<ref>.supabase.co` */
-  url: '',
+  url: 'https://mxlfbtlpjwgeaigmcmbd.supabase.co',
   /** The publishable (anon) key. Public by design. */
-  publishableKey: '',
+  publishableKey: 'sb_publishable_XVUyMqPbYiPy2dOhzOAd5g_2jbRisbs',
 });
 
 /** The merchant-of-record overlay checkout, public values only (design §5.5). */
