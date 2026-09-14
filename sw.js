@@ -11,8 +11,11 @@
  * Webfonts are cross-origin: never precached, never intercepted.
  * Changing this file is what triggers the service-worker update.
  */
-const CACHE_NAME = 'hmb-v8-stripe-2026-09-14';
-const OFFLINE_URL = '/offline.html';
+const CACHE_NAME = 'hmb-v9-offline-2026-09-14';
+// The clean URL, never '/offline.html': under cleanUrls Vercel answers the
+// .html path with a 308, and a redirected response cannot be served for a
+// navigation (Chrome fails the request instead of showing the page).
+const OFFLINE_URL = '/offline';
 
 /**
  * Caches this worker must NOT purge on activate. The Pro soundscape pack lives
@@ -31,7 +34,7 @@ const KEEP_CACHES = new Set([CACHE_NAME, AUDIO_CACHE]);
 const PRECACHE_URLS = [
   '/',
   '/timer',
-  '/offline.html',
+  '/offline',
   '/css/styles.css',
   '/js/app.js',
   '/js/stage.js',
