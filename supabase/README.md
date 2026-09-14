@@ -203,5 +203,5 @@ drop table if exists public.checkout_intents, public.webhook_events,
 
 Do **not** run this on a project that has ever had a real subscription; the
 `trial_claims` and `devices` ledgers are the trial lock, and the
-`subscriptions` rows are the only local record of what the merchant of record
-is billing.
+`subscriptions` rows are the only local record of what Stripe (the merchant of
+record) is billing.

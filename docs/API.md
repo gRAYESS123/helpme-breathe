@@ -64,8 +64,9 @@ api/
     dblimit.js                per-user counters in Postgres
     providers/
       index.js                the merchant-of-record seam: adapter contract, plans, prices
-      paddle.js               primary adapter
-      fastspring.js           fallback adapter
+      stripe.js               the production adapter (Stripe Managed Payments, since 2026-09-14)
+      paddle.js               overlay adapter, retired 2026-09-14
+      fastspring.js           fallback adapter, unused
     email/
       index.js                the mailing seam: adapter contract, reason sentences
       resend.js               default adapter; runs the double opt-in itself
@@ -773,7 +774,7 @@ the enforced list; `assertAdapter(adapter)` throws if one is missing.
 
 ```js
 {
-  id: 'paddle',
+  id: 'stripe',
   // checkout
   priceIdFor({ plan, trial }, env),                 // -> string
   async ensureCustomer(email, ctx),                 // -> { id, existed }   (409-tolerant)

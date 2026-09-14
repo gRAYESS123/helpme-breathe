@@ -283,7 +283,7 @@ import { SUPABASE, CHECKOUT, PLANS, TIMER_FREE_SESSIONS, MOR_LEGAL } from '/js/c
 | Export | Shape | Read by |
 |---|---|---|
 | `SUPABASE` | `{ url, publishableKey }` | `js/auth.js` only. |
-| `CHECKOUT` | `{ clientToken, sandbox, previewPriceIds: { monthly, yearly } }` | `js/checkout.js` only. Empty `clientToken` means checkout is closed and every button renders a calm "Checkout is not open yet" card. `previewPriceIds` are used by `/pro` **only** to show a localised total; they never open a checkout. |
+| `CHECKOUT` | `{ clientToken, sandbox, previewPriceIds: { monthly, yearly } }` | `js/checkout.js` only. Empty `clientToken` means checkout is closed and every button renders a calm "Checkout is not open yet" card. `previewPriceIds` are used by `/pro` **only** to show a localised total; they never open a checkout. Since 2026-09-14 the token is Stripe's publishable key and checkout is Stripe's hosted page, which needs nothing from the browser: the token is only the switch that opens checkout, `sandbox` only drives the console warnings (and the retired overlay's environment), and `previewPriceIds` stay empty. |
 | `PLANS` | `{ available, default, trialDays, refundDays, monthly, yearly }` | The whole site, for copy. |
 | `TIMER_FREE_SESSIONS` | `3` | `js/entitlements.js#requireTimer()` **and nowhere else**. |
 | `MOR_LEGAL` | one sentence | Every page that mentions who takes the money. |
@@ -299,9 +299,12 @@ practitioner or therapist plan, now or later; the `practitioner_yearly` value
 that once shipped as a latent option was removed the same day. Everything
 downstream reads `PLANS.available`.
 
-There is no `mode: 'link' | 'paddle' | 'waitlist'`, no hosted payment link, no
-price id for opening a checkout, and no waitlist. The browser never chooses a
-price.
+There is no `mode: 'link' | 'paddle' | 'waitlist'`, no client-built payment
+link, no price id for opening a checkout, and no waitlist. The browser never
+chooses a price. Since 2026-09-14 the server creates a Stripe Checkout Session
+and answers with its URL; `js/checkout.js` navigates there (`mode: 'redirect'`
+in the `checkout_open` event) and the overlay path below is reached only with
+an overlay provider.
 
 ---
 
@@ -483,8 +486,10 @@ What a click does:
 3. `POST /api/trial/eligibility` with `{ plan, device_mirror }` and the Supabase
    bearer token. **The server decides trial-or-not, picks the price, creates the
    transaction** and answers with a transaction id.
-4. The overlay opens with `transactionId` — **never an items array, never a
-   price id** — so nothing in devtools can swap in the trial price.
+4. With Stripe the answer carries `checkout.checkout_url` and the browser
+   navigates to Stripe's hosted page. With an overlay provider the overlay
+   opens with `transactionId` — **never an items array, never a price id** —
+   so nothing in devtools can swap in the trial price either way.
 
 One delegated click handler is installed on `document`, so any page that loads
 this module (every timer page does, via `js/pro/index.js`) gets working buttons.

@@ -31,7 +31,8 @@ commercial-use right. Help Me Breathe is a personal guided-breathing timer.
 | The plan, yearly | $100/year (US list) | The same plan, billed once a year |
 
 Billed in advance and renewing automatically until cancelled; tax is added at
-checkout by the merchant of record. A **3-day trial** requires a card, does not
+checkout by Stripe, the merchant of record (Stripe Managed Payments since
+2026-09-14). A **3-day trial** requires a card, does not
 charge it during the trial, and charges the price shown at checkout when the
 3 days end unless the customer cancels first. Cancelling takes two clicks from
 the account page. **One free trial per person.** 14-day unconditional refund by
@@ -41,8 +42,10 @@ email to contact@helpmebreath.com.
 6-digit code, or a Google account — **no passwords, anywhere**.
 
 There are no tiers, no lifetime unlock, no licence keys, no device activations,
-no domain counts and no waitlist. The merchant of record is not named on the
-site: write "a merchant of record" until the owner has chosen one in writing.
+no domain counts and no waitlist. The merchant of record is **Stripe** (Managed
+Payments, owner decision 2026-09-14) and is named on `/pro`, in the terms and in
+the privacy policy; `MOR_LEGAL` in `js/config.js` is the one sentence every
+page reads.
 
 The US list prices in `PLANS` are **copy only**. What a person is actually
 charged comes from the provider's own price preview and receipt.
@@ -198,10 +201,10 @@ Five exports, nothing secret:
 | Export | What to put in it |
 |---|---|
 | `SUPABASE` | The project URL and the **publishable** (anon) key, from Supabase → Project settings → API. The same two values also go into Vercel as `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. |
-| `CHECKOUT.clientToken` | The merchant of record's **client-side** token (`test_…` or `live_…`), from its dashboard. Public by design. The same value goes into Vercel as `MOR_CLIENT_TOKEN`. An **API key is not public** and belongs only in Vercel. |
-| `CHECKOUT.sandbox` | `true` while the token is a `test_` token. Flip to `false` in the same edit that swaps in the `live_` token — never one without the other. |
-| `CHECKOUT.previewPriceIds` | Optional. The public **no-trial** price ids, used by `/pro` only to show a localised total before checkout. Leave empty and the card shows the US list price with "plus any tax". |
-| `MOR_LEGAL` | The merchant-of-record sentence. One place, every page. Replace "a merchant of record" with the provider's legal name in the same commit that turns checkout on. |
+| `CHECKOUT.clientToken` | Stripe's **publishable** key (`pk_test_…` or `pk_live_…`), from Developers → API keys. Public by design. Checkout is Stripe's hosted page, which needs nothing from the browser, so the value is only the switch that opens checkout (empty = "Checkout is not open yet"). The same value may go into Vercel as `MOR_CLIENT_TOKEN`, optional for Stripe. A **secret key is not public** and belongs only in Vercel. |
+| `CHECKOUT.sandbox` | `true` while the key is a `pk_test_` key. Flip to `false` in the same edit that swaps in the `pk_live_` key — never one without the other (`js/checkout.js` warns in the console when the two disagree). |
+| `CHECKOUT.previewPriceIds` | Leave empty with Stripe: the hosted page shows the localised total itself and the card shows the US list price with "plus any tax". (An overlay provider's public **no-trial** price ids, if a client-side preview is ever wanted again.) |
+| `MOR_LEGAL` | The merchant-of-record sentence. One place, every page. Names Stripe since 2026-09-14. If Stripe ever refuses Managed Payments for the account, this sentence and the legal pages change together (the seller wording is in git history, commit `18bd069`). |
 
 `PLANS` and `TIMER_FREE_SESSIONS` are owner decisions, not configuration to be
 tuned per page: there is one plan with two intervals and no switch for a second

@@ -130,7 +130,7 @@ row that produced it (§6.5).
 |---|---|---|---|---|---|
 | `id` | `uuid` PK | no | `gen_random_uuid()` | Local row id. Not shown to users. | 5 |
 | `user_id` | `uuid` → `auth.users(id)` **set null** | yes | — | The owning account. `null` after account deletion (see `detached_at`) or for a true orphan (see § 8). | 5, 3 |
-| `provider` | `text` | no | `'paddle'` | Merchant-of-record adapter id (`paddle` or `fastspring`). Half of the natural key. | 5 |
+| `provider` | `text` | no | `'paddle'` | Payment adapter id: `stripe` (production since 2026-09-14), `paddle` or `fastspring`. The column default is historical; every row the webhook writes carries the adapter id explicitly. Half of the natural key. | 5 |
 | `provider_subscription_id` | `text` | no | — | The provider's subscription id (`sub_…`). With `provider`, the join key forever once resolved (§6.3). | 5 |
 | `provider_customer_id` | `text` | yes | — | The provider's customer id (`ctm_…`). Second-choice join for a webhook with no usable reservation id. | 5 |
 | `provider_price_id` | `text` | yes | — | The provider price the subscription is on (`pri_…`). Checked against the reservation at `sub.created` — a trial price with no `trial_granted` reservation is cancelled immediately (§6.3). | 5 |
@@ -273,7 +273,7 @@ returning status` — zero rows back means already processed.
 | Column | Type | Null | Default | Meaning | Written by |
 |---|---|---|---|---|---|
 | `provider` | `text` PK part | no | — | Adapter id. | 5 |
-| `event_id` | `text` PK part | no | — | The provider's event id (`ntf_…`, or FastSpring `events[].id`). **The idempotency key.** | 5 |
+| `event_id` | `text` PK part | no | — | The provider's event id (Stripe `evt_…`, Paddle `ntf_…`, or FastSpring `events[].id`). **The idempotency key.** | 5 |
 | `event_type` | `text` | yes | — | Normalised type (`sub.activated`, `txn.completed`, …). | 5 |
 | `occurred_at` | `timestamptz` | yes | — | From the provider. Drives the ordering guard on `subscriptions.last_event_at`. | 5 |
 | `received_at` | `timestamptz` | no | `now()` | First arrival. Drives retention. | 5 |
@@ -446,8 +446,8 @@ leaves billing running is the worst possible outcome:
 5. Null `trial_claims.user_id` and `devices.trial_user_id`; keep the hashes
    until the 24-month ceiling, so the person cannot take a second trial by
    deleting and re-creating the account.
-6. Tell the user that the merchant of record holds its own copy as a separate
-   controller.
+6. Tell the user that the merchant of record (Stripe) holds its own copy as a
+   separate controller.
 
 **Caveat on `profiles.email`.** It is copied once, at creation. If a user
 changes their email in Supabase Auth, the profile copy goes stale and the
