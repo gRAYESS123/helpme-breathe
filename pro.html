@@ -96,9 +96,9 @@
     <!--
       One product, two intervals, nothing else for sale: no lifetime unlock, no
       licence key, no second tier (docs/AGENT_BRIEF.md rule 8). Availability
-      stays PreOrder while checkout runs against the provider sandbox; flip
-      both offers to https://schema.org/InStock in the go-live commit, after
-      the owner's Step 0 answer and the domain approval.
+      was PreOrder while checkout ran against the provider sandbox; both offers
+      became InStock on 2026-09-14 when Stripe Managed Payments went live with
+      live keys (the home page OfferCatalog carries the same two offers).
 
       Deliberately NO paywall markup (no hasPart, no cssSelector, no
       isAccessibleForFree:false) anywhere on the site: the prose is never
@@ -123,7 +123,7 @@
           "name": "Monthly",
           "price": "10.00",
           "priceCurrency": "USD",
-          "availability": "https://schema.org/PreOrder",
+          "availability": "https://schema.org/InStock",
           "priceValidUntil": "2027-09-11",
           "url": "https://helpmebreath.com/pro?plan=monthly",
           "priceSpecification": {
@@ -141,7 +141,7 @@
           "name": "Yearly",
           "price": "100.00",
           "priceCurrency": "USD",
-          "availability": "https://schema.org/PreOrder",
+          "availability": "https://schema.org/InStock",
           "priceValidUntil": "2027-09-11",
           "url": "https://helpmebreath.com/pro?plan=yearly",
           "priceSpecification": {
