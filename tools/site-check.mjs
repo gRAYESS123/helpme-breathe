@@ -260,6 +260,12 @@ function loadVercelJson() {
       WARN('vercel.json', null, 'vercel-json', 'rewrite entry missing string source/destination');
       continue;
     }
+    // Under cleanUrls Vercel serves `blog/x.html` at `/blog/x` and answers a
+    // rewrite whose destination keeps the `.html` with a 404 (seen live on
+    // 2026-09-14 for /4-7-8-breathing-technique). Fail the build for it.
+    if (urlModel.cleanUrls && /\.html?(?:[?#]|$)/i.test(r.destination)) {
+      ERR('vercel.json', null, 'vercel-json', `rewrite ${r.source} -> ${r.destination}: with cleanUrls the destination must be the clean path (no .html), or Vercel answers 404`);
+    }
     const rule = compileRule(r.source, r.destination, 'rewrite', 200, 'vercel.json');
     if (rule) urlModel.rewrites.push(rule);
   }
