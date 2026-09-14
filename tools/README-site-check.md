@@ -161,7 +161,9 @@ keep.
 What it cannot see: URLs assembled at runtime, and the requests third-party scripts
 make on their own once they run. The Supabase project URL comes from `js/config.js` at
 runtime (the policy's `https://*.supabase.co` and `wss://*.supabase.co` are meant to
-cover it, but nothing static proves it). Paddle's overlay, `gtag.js` and
+cover it, but nothing static proves it). The Stripe checkout is a top-level
+navigation to `checkout.stripe.com`, which a CSP does not govern (the Paddle
+origins in the policy serve the retired overlay path). `gtag.js` and
 `adsbygoogle.js` each load further origins after they start: Google's CSP guidance for
 gtag.js lists `https://*.analytics.google.com` and `https://www.googletagmanager.com`
 under `connect-src` and `https://www.googletagmanager.com` under `frame-src`, none of
