@@ -645,7 +645,9 @@ export const stripeProvider = {
 
   /**
    * The env price id for (plan, trial). When no separate trial price is
-   * configured the paid price is used for both — the session carries the trial.
+   * configured the paid price is used for both — the session carries the
+   * trial. A trial variable left over from another provider (a Paddle
+   * `pri_…`) is ignored too, so a stale value can never break a checkout.
    * @param {{plan:string, trial?:boolean}} input
    * @param {Record<string,string>} env
    * @returns {string}
@@ -653,10 +655,12 @@ export const stripeProvider = {
   priceIdFor(input, env) {
     if (input && input.trial) {
       try {
-        return sharedPriceIdFor(input, env);
+        const candidate = sharedPriceIdFor(input, env);
+        if (/^price_/.test(candidate)) return candidate;
       } catch {
-        return sharedPriceIdFor({ plan: input.plan, trial: false }, env);
+        // no trial price configured: fall through to the paid price
       }
+      return sharedPriceIdFor({ plan: input.plan, trial: false }, env);
     }
     return sharedPriceIdFor(input, env);
   },

@@ -150,6 +150,8 @@ test('priceIdFor: the paid price stands in for a missing trial price', () => {
   assert.equal(stripeProvider.priceIdFor({ plan: 'monthly', trial: true }, ENV), ENV.MOR_PRICE_MONTHLY);
   assert.equal(stripeProvider.priceIdFor({ plan: 'yearly', trial: false }, ENV), ENV.MOR_PRICE_YEARLY);
   assert.equal(stripeProvider.priceIdFor({ plan: 'monthly', trial: true }, ENV_WITH_TRIAL_PRICES), ENV_WITH_TRIAL_PRICES.MOR_PRICE_MONTHLY_TRIAL);
+  // A Paddle price left in the trial variable by an earlier configuration is ignored.
+  assert.equal(stripeProvider.priceIdFor({ plan: 'monthly', trial: true }, { ...ENV, MOR_PRICE_MONTHLY_TRIAL: 'pri_TESTFIXTURE_left_over' }), ENV.MOR_PRICE_MONTHLY);
   assert.throws(() => stripeProvider.priceIdFor({ plan: 'monthly', trial: false }, { ...ENV, MOR_PRICE_MONTHLY: '' }), /Missing environment variable MOR_PRICE_MONTHLY/);
 });
 
