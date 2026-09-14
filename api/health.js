@@ -58,6 +58,10 @@ export async function GET(request) {
       {
         ok: report.missing.length === 0,
         provider: hasEnv('MOR_PROVIDER') ? report.provider : null,
+        // Mode flags, never values: is the rail pointed at the sandbox / test
+        // mode, and (Stripe) does it sell as merchant of record.
+        sandbox: report.sandbox,
+        managed_payments: hasEnv('MOR_PROVIDER') ? report.managed_payments : null,
         email: hasEnv('EMAIL_PROVIDER') ? report.email : null,
         env: report.env,
         time: new Date().toISOString(),
