@@ -11,7 +11,7 @@
  * Webfonts are cross-origin: never precached, never intercepted.
  * Changing this file is what triggers the service-worker update.
  */
-const CACHE_NAME = 'hmb-v7-lantern-2026-09-13';
+const CACHE_NAME = 'hmb-v8-stripe-2026-09-14';
 const OFFLINE_URL = '/offline.html';
 
 /**

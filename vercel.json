@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/4-7-8-breathing-technique",
-      "destination": "/blog/4-7-8-breathing-technique.html"
+      "destination": "/blog/4-7-8-breathing-technique"
     },
     {
       "source": "/favicon.ico",
@@ -106,7 +106,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=86400, stale-while-revalidate=604800"
+          "value": "public, max-age=0, must-revalidate"
         }
       ]
     },
@@ -115,7 +115,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=86400, stale-while-revalidate=604800"
+          "value": "public, max-age=0, must-revalidate"
         }
       ]
     },
