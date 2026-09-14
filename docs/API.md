@@ -202,7 +202,7 @@ The free-session counter. No account needed.
 
 ```
 GET  /api/session/count                      read the count for this device
-POST /api/session/count { device_mirror? }   count one completed session
+POST /api/session/count { device_mirror? }   count one STARTED session (since 2026-09-14; a start spends a free session, finished or not)
 ```
 
 Both answer `{ ok: true, device_id, free_sessions_used }` and set
