@@ -642,6 +642,8 @@ it the form answers 429 "try again in an hour".
 
 ## `GET /api/health`
 
+> Since 2026-09-14 the body also carries `sandbox` (true only when `MOR_SANDBOX` is literally `true` — the same reading the webhook's live-flag gate uses) and `managed_payments` (Stripe only: whether it sells as merchant of record; `null` for other providers or while `MOR_PROVIDER` is unset). Modes, never values.
+
 ```json
 {
   "ok": false,

@@ -203,7 +203,7 @@ export function allowedOrigins() {
  * price ids are needed unless TRIAL_ENABLED is literally "false" — that read is
  * for this report only; the product decision is made in api/trial/eligibility.js
  * and nowhere else.
- * @returns {{provider:string, email:string, env:string, configured:Record<string,boolean>, missing:string[]}}
+ * @returns {{provider:string, email:string, env:string, sandbox:boolean, managed_payments:boolean|null, configured:Record<string,boolean>, missing:string[]}}
  */
 export function describeConfig() {
   const provider = providerName();
@@ -244,5 +244,12 @@ export function describeConfig() {
   if (email === 'brevo') required.push('EMAIL_LIST_ID', 'EMAIL_DOI_TEMPLATE_ID', 'EMAIL_DOI_REDIRECT_URL');
   const missing = required.filter((name) => !hasEnv(name));
 
-  return { provider, email, env: envName(), configured, missing };
+  // The MODE, not the values: `sandbox` is what api/webhooks/mor.js gates
+  // live events on (anything but the literal `true` is live), and
+  // `managed_payments` is whether Stripe sells as merchant of record (on unless
+  // literally `false`; null for any other provider).
+  const sandbox = readEnv('MOR_SANDBOX').toLowerCase() === 'true';
+  const managedPayments = provider === 'stripe' ? readEnv('MOR_MANAGED_PAYMENTS').toLowerCase() !== 'false' : null;
+
+  return { provider, email, env: envName(), sandbox, managed_payments: managedPayments, configured, missing };
 }
