@@ -102,16 +102,15 @@ A person in a panic attack never meets an account prompt.
 
 ### The preview state
 
-A timer page past the allowance is **not a wall**. The prose, the
-contraindications, the science and the FAQ stay exactly as they were — and so
-does the circle. When Start finds `requireTimer()` false, `js/app.js` enters
-preview mode, dispatches `hmb:preview` with
-`{ reason: 'signed_out' | 'no_subscription', … }`, and `js/pro/preview.js`:
+A timer page past the allowance is **not a wall** for reading. The prose, the
+contraindications, the science and the FAQ stay exactly as they were. When
+Start finds `requireTimer()` false, `js/app.js` enters preview mode, dispatches
+`hmb:preview` with `{ reason: 'signed_out' | 'no_subscription', … }`, and
+`js/pro/preview.js`:
 
-1. animates **one continuous demonstration cycle** at the technique's real pace,
-   phase word, count and ring included, so the visitor sees what they would get
-   and can follow along by eye. Nothing is timed, counted, recorded, spoken or
-   vibrated;
+1. leaves the disc **still** — nothing is timed, counted, recorded, spoken or
+   vibrated (until 2026-09-14 one demonstration cycle animated; the owner asked
+   for the timer to be plainly behind the plan);
 2. renders **one card** into `[data-slot="post-session"]` — "Create an account to
    keep going", `$10 a month or $100 a year — everything included. 14 days,
    unconditional refund.`, and either the sign-in link or the two checkout
@@ -235,7 +234,7 @@ the provider; entitlement tokens keep working until their `exp`.
 | File | What it does |
 |---|---|
 | `js/pro/index.js` | Entry point. Injects `css/pro.css` once, wires the paywall and capture, initialises the per-instance tools on every `hmb:ready`, imports `js/checkout.js`, and dynamically imports `./soundscapes.js` inside try/catch so a missing audio module can never break a page. |
-| `js/pro/preview.js` | The preview state (§2): one demonstration cycle and one account card, plus `body.timer-preview`. |
+| `js/pro/preview.js` | The preview state (§2): one account card, a still disc, plus `body.timer-preview`. |
 | `js/pro/patterns.js` | "Custom pattern": four sliders, a live plain-words preview, **Run** (free), **Save preset** and **Copy share link** (plan). Presets live at `hmb.presets`. On `/timer` it reads `?p=4-7-8-0&name=…` and applies it, for anyone. |
 | `js/pro/streaks.js` | "Your practice": current and longest streak, total minutes, sessions this week, a 12-week heatmap with an aria-label per day, a per-technique breakdown, CSV export. Free sees the last seven days plus a blurred heatmap. |
 | `js/pro/paywall.js` | The offer card on the third completed session (once ever, flag `hmb.paywall.shown`, dismissible forever) and the inline feature card driven by `hmb:paywall` / `hmb:signin`. **`feature: 'timer'` is deliberately ignored here** — that is `preview.js`'s card, so the post-session slot never carries two cards for one Start. Exports `buildCard()` and `planLine()` so `preview.js` renders the same body and buttons under its own heading. |

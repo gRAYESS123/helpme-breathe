@@ -159,7 +159,8 @@ forgets on reload.
 ```js
 import {
   getSettings, getSavedSettings, saveSettings,
-  appendSession, getHistory, completedSessionCount, clearHistory,
+  appendSession, getHistory, completedSessionCount, startedSessionCount,
+  recordSessionStart, clearHistory,
   getFlag, setFlag,
   setPersistence, HISTORY_LIMIT, DEFAULT_SETTINGS,
 } from '/js/storage.js';
@@ -173,6 +174,8 @@ import {
 | `appendSession(record)` | the stored record, or `null` | Caps history at `HISTORY_LIMIT` (500), oldest evicted. |
 | `getHistory()` | `SessionRecord[]` | Oldest first. Never `null`. |
 | `completedSessionCount()` | `number` | Records with `completed === true`. |
+| `startedSessionCount()` | `number` | Sessions that STARTED on this device (`hmb.sessions_started`), finished or not — what the free allowance counts since 2026-09-14. |
+| `recordSessionStart()` | `number` | Counts one start; the new total. `js/entitlements.js` calls it on `hmb:session-start`. |
 | `clearHistory()` | `void` | |
 | `getFlag(name)` | `true \| false \| string \| null` | `getFlag('ack.wim')` reads `hmb.ack.wim`. |
 | `setFlag(name, value)` | `void` | `null`/`undefined` removes the flag. |
@@ -521,10 +524,9 @@ breathing section still shows the circle. When `js/app.js`'s `start()` finds
 
 This module answers by doing two things:
 
-1. **One continuous demonstration cycle** at the technique's real pace — inhale,
-   hold, exhale — with the phase word, the count and the ring changing exactly as
-   they would in a session. It does not run a timed session, count breaths,
-   record history, play audio or vibrate.
+1. **Nothing moves.** The disc stays still: no timed session, no breaths
+   counted, no history, no audio, no vibration. (Until 2026-09-14 one
+   demonstration cycle animated here.)
 2. **One card** into the instance's `[data-slot="post-session"]`: "Create an
    account to keep going", the plan line, and either a sign-in link or the two
    checkout buttons for a signed-in visitor without a subscription.
