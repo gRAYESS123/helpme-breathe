@@ -33,6 +33,12 @@
  *     created." `settings.allowLogout: false` keeps the buyer on the account
  *     email; `settings.successUrl` must start with https://.
  *
+ * Since 2026-09-14 the server may answer with `checkout.checkout_url` instead:
+ * a hosted checkout page (Stripe Checkout). Then this module simply navigates
+ * there — no script, no overlay, and the page returns to /pro/thanks?rid=…
+ * exactly as the overlay did. Which of the two happens is the server's
+ * decision; nothing on the page changes.
+ *
  * Nothing else in js/ knows a provider exists. This file is the seam on the
  * client, api/_lib/providers/ is the seam on the server, and js/config.js
  * holds the public values.
@@ -181,10 +187,10 @@ async function openOverlay(intent) {
   const Paddle = await loadPaddle();
   if (!paddleInitialised) {
     const token = String(CHECKOUT.clientToken || '');
-    if (CHECKOUT.sandbox && token.startsWith('live_')) {
+    if (CHECKOUT.sandbox && /^(live_|pk_live_)/.test(token)) {
       console.warn('[checkout] a live client token with CHECKOUT.sandbox = true; check js/config.js');
     }
-    if (!CHECKOUT.sandbox && token.startsWith('test_')) {
+    if (!CHECKOUT.sandbox && /^(test_|pk_test_)/.test(token)) {
       console.warn('[checkout] a test client token with CHECKOUT.sandbox = false; check js/config.js');
     }
     if (CHECKOUT.sandbox && Paddle.Environment && typeof Paddle.Environment.set === 'function') {
@@ -425,14 +431,22 @@ async function runSubscribe(plan, options) {
   }
 
   const trial = intent.trial === true;
+  const hostedUrl = typeof intent.checkout.checkout_url === 'string' && /^https:\/\//.test(intent.checkout.checkout_url) ? intent.checkout.checkout_url : '';
   track(EVENTS.TRIAL_ELIGIBILITY_CHECK || 'trial_eligibility_check', {
     eligible: trial,
     reason: Array.isArray(intent.reasons) && intent.reasons.length ? String(intent.reasons[0]) : 'eligible',
     plan,
   });
-  track(EVENTS.CHECKOUT_OPEN, { plan, trial, mode: 'overlay', placement });
+  track(EVENTS.CHECKOUT_OPEN, { plan, trial, mode: hostedUrl ? 'redirect' : 'overlay', placement });
 
   if (!trial) renderNoTrialNote(plan, trigger, target, intent.reasons);
+
+  if (hostedUrl) {
+    // The hosted page is the checkout. The no-trial note above is still on the
+    // page when the visitor comes back with the browser's back button.
+    if (typeof location !== 'undefined' && typeof location.assign === 'function') location.assign(hostedUrl);
+    return { ok: true, mode: 'redirect', plan, trial, reservationId: intent.reservation_id || null };
+  }
 
   try {
     await openOverlay(intent);

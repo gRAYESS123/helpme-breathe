@@ -161,12 +161,14 @@ export function requireEnv(names) {
 }
 
 /**
- * The merchant of record in use. One env var switches the whole payment rail.
- * @returns {'paddle'|'fastspring'}
+ * The payment rail in use. One env var switches the whole rail. `stripe` is
+ * a payment processor, not a merchant of record; the MOR_* names are kept.
+ * @returns {'paddle'|'fastspring'|'stripe'}
  */
 export function providerName() {
   const value = readEnv('MOR_PROVIDER', DEV_DEFAULTS.MOR_PROVIDER).toLowerCase();
-  return value === 'fastspring' ? 'fastspring' : 'paddle';
+  if (value === 'fastspring' || value === 'stripe') return value;
+  return 'paddle';
 }
 
 /**
@@ -226,9 +228,12 @@ export function describeConfig() {
     'ALERT_EMAIL',
     'EMAIL_API_KEY',
   ];
-  if (readEnv('TRIAL_ENABLED').toLowerCase() !== 'false') {
+  // Stripe's trial is a property of the checkout session, not of a second
+  // price, and its hosted page needs no client token.
+  if (readEnv('TRIAL_ENABLED').toLowerCase() !== 'false' && provider !== 'stripe') {
     required.push('MOR_PRICE_MONTHLY_TRIAL', 'MOR_PRICE_YEARLY_TRIAL');
   }
+  if (provider === 'stripe') required.splice(required.indexOf('MOR_CLIENT_TOKEN'), 1);
   if (provider === 'fastspring') required.push('MOR_STOREFRONT');
   // The email adapter's own needs. Resend runs the double opt-in itself, so it
   // needs a sender and the redirect but no template; Brevo owns the template.

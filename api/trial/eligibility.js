@@ -177,14 +177,18 @@ export function createEligibilityHandler(deps = {}) {
       const mirror = typeof data.device_mirror === 'string' ? data.device_mirror.slice(0, 128) : '';
 
       const enabled = trialEnabled(d.readEnv);
+      const provider = d.getProvider(d.providerName());
+      // An adapter whose trial is a property of the session (not a second
+      // price) does not need the _TRIAL variables; when they are set anyway,
+      // they are used.
+      const needsTrialPrices = enabled && provider.separateTrialPrices !== false;
       const env = {
         ...d.requireEnv(REQUIRED_ENV),
-        ...(enabled ? d.requireEnv(TRIAL_ENV) : {}),
+        ...(needsTrialPrices ? d.requireEnv(TRIAL_ENV) : {}),
       };
       for (const name of OPTIONAL_ENV) env[name] = d.readEnv(name);
-      if (!enabled) for (const name of TRIAL_ENV) env[name] = d.readEnv(name);
+      if (!needsTrialPrices) for (const name of TRIAL_ENV) env[name] = d.readEnv(name);
 
-      const provider = d.getProvider(d.providerName());
       const providerCtx = { env, fetchImpl: globalThis.fetch, isProd: d.isProduction(), sub: auth.sub };
 
       const result = await runEligibility({

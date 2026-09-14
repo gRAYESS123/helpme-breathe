@@ -16,7 +16,7 @@
       FIRST script on the page, before the gtag block below and before anything
       else can read location.search.
 
-      The merchant of record returns the buyer here with our reservation id
+      The payment provider returns the buyer here with our reservation id
       (`rid`, an opaque uuid the checkout was created under) and sometimes its
       own transaction reference (`_ptxn`). Neither belongs in a GA4 event, the
       address bar, browser history, the bfcache or the service worker's
@@ -221,8 +221,7 @@
                     <div class="steps-container">
                         <div class="step">
                             <h3>1. Your receipt</h3>
-                            <p>The receipt arrives by email from our merchant of record, the company named as the seller
-                            on your card statement. If it is not in your inbox within a few minutes, check the spam
+                            <p>The receipt arrives by email from Stripe, which processes payments for this site. If it is not in your inbox within a few minutes, check the spam
                             folder before writing to us.</p>
                         </div>
                         <div class="step">

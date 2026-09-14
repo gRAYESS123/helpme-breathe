@@ -532,7 +532,9 @@ export async function applyEvent(event, deps) {
   // It runs on sub.created / sub.trialing, and on any first contact that
   // would insert a trialing row (an out-of-order sub.updated must not slip a
   // trial in ahead of the check).
-  const trialPriced = isTrialPriceId(event.providerPriceId, env);
+  // A trial price, or (for an adapter whose trial is not a separate price)
+  // a subscription that arrives already trialing.
+  const trialPriced = isTrialPriceId(event.providerPriceId, env) || (event.hadTrial === true && event.status === 'trialing');
   const trialContact =
     event.type === 'sub.created' ||
     event.type === 'sub.trialing' ||
@@ -736,7 +738,8 @@ export function createWebhookHandler(deps) {
         const claim = await store.claimEvent(provider.id, event);
         if (claim === 'already_processed') continue;
         try {
-          const result = await applyEvent(event, { store, provider, providerCtx, env, alert, now });
+          const full = typeof provider.enrichEvent === 'function' ? await provider.enrichEvent(event, providerCtx) : event;
+          const result = await applyEvent(full, { store, provider, providerCtx, env, alert, now });
           if (result.action === 'ignored') await store.markIgnored(provider.id, event, result.reason || 'ignored');
           else await store.markProcessed(provider.id, event.id, { error: result.error || null, nowIso: toIso(now()) });
         } catch (error) {
