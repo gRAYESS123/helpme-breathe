@@ -6,8 +6,10 @@
  * MOR_PROVIDER. Nothing outside this folder knows the name of a payment company
  * (docs/private/ACCOUNTS_BILLING_DESIGN.md §10.1; enforced by tools/site-check).
  *
- * The owner is a Lebanon-resident individual with no company, so the rail is
- * always a merchant of record. Paddle is primary, FastSpring is the hedge.
+ * The owner is a Lebanon-resident individual with no company. Paddle (a
+ * merchant of record) was primary and FastSpring the hedge; on 2026-09-14
+ * Paddle's identity verification stalled and the owner switched to Stripe,
+ * which is NOT a merchant of record — see stripe.js for what that changes.
  *
  * ADAPTER CONTRACT v3 (design §10.1)
  * ----------------------------------
@@ -16,8 +18,11 @@
  *   // checkout
  *   priceIdFor({ plan, trial }, env),                        // -> string
  *   async ensureCustomer(email, ctx),                        // -> { id, existed }   (409-tolerant)
- *   async createCheckoutSession({ priceId, customerId, customData }, ctx),
+ *   async createCheckoutSession({ priceId, customerId, customData, trial? }, ctx),
  *                                                            // -> { transactionId, status?, checkoutUrl? }
+ *   async checkoutUrlFor?(transactionId, ctx),               // -> string|null (hosted-page adapters)
+ *   async enrichEvent?(event, ctx),                           // -> event (fill ids a payload lacks)
+ *   separateTrialPrices?: boolean,                           // false = the trial is a session property
  *   async pricePreview({ priceId, countryCode, customerIp }, ctx),
  *                                                            // -> { amount, currency, taxInclusive, formatted }
  *   // webhooks
@@ -50,9 +55,10 @@
 
 import { paddleProvider } from './paddle.js';
 import { fastspringProvider } from './fastspring.js';
+import { stripeProvider } from './stripe.js';
 
 /** Every adapter id, in the order they were adopted. */
-export const PROVIDER_IDS = Object.freeze(['paddle', 'fastspring']);
+export const PROVIDER_IDS = Object.freeze(['paddle', 'fastspring', 'stripe']);
 
 /**
  * Every adapter, keyed by the value of MOR_PROVIDER.
@@ -65,7 +71,7 @@ export const PROVIDER_IDS = Object.freeze(['paddle', 'fastspring']);
  * @returns {Record<string, object>}
  */
 export function listProviders() {
-  return { paddle: paddleProvider, fastspring: fastspringProvider };
+  return { paddle: paddleProvider, fastspring: fastspringProvider, stripe: stripeProvider };
 }
 
 /**
@@ -297,6 +303,7 @@ export const PROVIDER_ENV_OPTIONAL = Object.freeze([
   'MOR_PRICE_MONTHLY',
   'MOR_PRICE_YEARLY_TRIAL',
   'MOR_PRICE_YEARLY',
+  'MOR_MANAGED_PAYMENTS',
   'SITE_ORIGIN',
 ]);
 

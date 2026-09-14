@@ -6,7 +6,7 @@
  *
  * Returns `Content-Disposition: attachment` JSON containing: the `profiles`
  * row, every `subscriptions` row (provider ids included), and a note that the
- * merchant of record holds its own copy as a separate controller. Those two
+ * payment provider holds its own copy as a separate controller. Those two
  * tables are everything an account owns. No hashes, no peppers, no other
  * user's data — every query is keyed on the verified JWT `sub`.
  *
@@ -26,7 +26,7 @@ const limiter = createLimiter({ name: 'account-export', limit: 10, windowMs: 60 
 /** Wording shown to the user. Names no provider: the site never does (AGENT_BRIEF §1). */
 export const CONTROLLER_NOTE =
   'This file holds everything Help Me Breathe stores about your account. ' +
-  'Payments are handled by a merchant of record, which keeps its own copy of your ' +
+  'Payments are processed by a payment provider, which keeps its own copy of your ' +
   'payment and invoice records as a separate data controller; contact it directly ' +
   'for a copy of those. Email contact@helpmebreath.com if anything here looks wrong.';
 

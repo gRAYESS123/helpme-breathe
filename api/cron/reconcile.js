@@ -100,7 +100,8 @@ export async function redriveEvent(row, deps) {
   const claim = await store.claimEvent(provider.id, event);
   if (claim === 'already_processed') return 'skipped';
   try {
-    const result = await applyEvent(event, { store, provider, providerCtx, env, alert, now });
+    const full = typeof provider.enrichEvent === 'function' ? await provider.enrichEvent(event, providerCtx) : event;
+    const result = await applyEvent(full, { store, provider, providerCtx, env, alert, now });
     if (result.action === 'ignored') {
       await store.markIgnored(provider.id, event, result.reason || 'ignored');
       return 'ignored';

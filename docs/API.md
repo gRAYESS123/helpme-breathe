@@ -250,14 +250,16 @@ anything else is discarded and counted as one soft signal.
   "ok": true,
   "device_id": "…", "reservation_id": "…uuid…",
   "trial": true, "plan": "monthly",
-  "checkout": { "provider": "…", "transaction_id": "txn_…" },
+  "checkout": { "provider": "…", "transaction_id": "cs_… or txn_…", "checkout_url": "https://checkout.stripe.com/… or null" },
   "price_preview": { "amount": "10.00", "currency": "USD", "tax_inclusive": true, "formatted": "$10.00" },
   "reasons": []
 }
 ```
 
-There is no `price_id` in the response, by design: the browser opens the overlay
-with `transactionId` and the price was fixed on the server.
+There is no `price_id` in the response, by design: the price was fixed on the
+server. With a hosted-page provider (Stripe) `checkout_url` is the page to
+navigate to and `js/checkout.js` simply goes there; with an overlay provider
+(Paddle) it is `null` and the overlay opens with `transactionId`.
 
 | Status | Body | When |
 |---|---|---|
@@ -691,15 +693,16 @@ one-to-one. **Required** means "counted in `/api/health`'s `missing`".
 | `DEVICE_PEPPER` | yes | 64 characters. HMAC key for the device cookie. Rotating it resets every free-session count and device trial signal. |
 | `TRIAL_ENABLED` | no | `true` offers the 3-day card-required trial; `false` sells a straight subscription. Read only by `api/trial/eligibility.js`. Anything but the literal `true` is off. |
 | `SITE_ORIGIN` | yes | The site's own origin, used to build callback URLs and for the same-origin check. |
-| `MOR_PROVIDER` | no | `paddle` (default) or `fastspring`. One variable switches the whole payment rail. |
-| `MOR_API_KEY` | yes | Paddle: an API key beginning `pdl_live_apikey_` (or `pdl_sdbx_apikey_`). FastSpring: `username:password`. |
+| `MOR_PROVIDER` | no | `stripe`, `paddle` (the code default) or `fastspring`. One variable switches the whole payment rail. With Stripe **Managed Payments** (see `MOR_MANAGED_PAYMENTS`) Stripe is the merchant of record; without it Stripe is a payment processor and the owner is the seller. |
+| `MOR_MANAGED_PAYMENTS` | no | Stripe only. On unless literally `false`: every checkout session carries `managed_payments[enabled]=true` on the `2026-02-25.preview` API version, and Stripe is the seller. If Stripe refuses it for the account the session falls back to a plain checkout with automatic tax (then to none), and the log names the shape used. |
+| `MOR_API_KEY` | yes | Stripe: the secret key (`sk_test_…` / `sk_live_…`), or a restricted key covering Customers, Checkout Sessions, Subscriptions, Invoices, Prices, Tax calculations and the Billing portal. Paddle: an API key beginning `pdl_live_apikey_` (or `pdl_sdbx_apikey_`). FastSpring: `username:password`. |
 | `MOR_API_BASE` | no | Overrides the provider's API base URL. Leave empty in production. |
-| `MOR_WEBHOOK_SECRET` | yes | The signing secret of the webhook notification destination. One per environment: delete the sandbox destination at go-live. |
-| `MOR_CLIENT_TOKEN` | yes | The client-side checkout token (`test_…` or `live_…`). Public by design; the same value goes into `js/config.js`. |
-| `MOR_SANDBOX` | no | Literally `true` on every sandbox deployment, `false` at go-live. Also gates the webhook live-flag check. |
-| `MOR_PRICE_MONTHLY_TRIAL` | unless `TRIAL_ENABLED=false` | The monthly price carrying the 3-day trial period. |
-| `MOR_PRICE_MONTHLY` | yes | The monthly price, no trial. |
-| `MOR_PRICE_YEARLY_TRIAL` | unless `TRIAL_ENABLED=false` | The yearly price carrying the trial. |
+| `MOR_WEBHOOK_SECRET` | yes | Stripe: the endpoint's signing secret (`whsec_…`). Paddle: the notification destination's secret. One per environment: delete the test-mode endpoint at go-live. |
+| `MOR_CLIENT_TOKEN` | Paddle | Stripe: the publishable key (`pk_…`), public by design, not counted in `missing` — the hosted page needs nothing from the browser, so in `js/config.js` it is only the switch that opens checkout. Paddle: the client-side token (`test_…` / `live_…`). |
+| `MOR_SANDBOX` | no | Literally `true` while the keys are test-mode (Stripe) or sandbox (Paddle) keys, `false` at go-live. Also gates the webhook live-flag check (Stripe's `livemode`). |
+| `MOR_PRICE_MONTHLY_TRIAL` | Paddle / FastSpring, unless `TRIAL_ENABLED=false` | The monthly price carrying the 3-day trial period. Not needed for Stripe, where the trial is a property of the checkout session; if set, it is used. |
+| `MOR_PRICE_MONTHLY` | yes | The monthly price (`price_…` for Stripe), no trial. |
+| `MOR_PRICE_YEARLY_TRIAL` | Paddle / FastSpring, unless `TRIAL_ENABLED=false` | The yearly price carrying the trial. Not needed for Stripe. |
 | `MOR_PRICE_YEARLY` | yes | The yearly price, no trial. |
 | `MOR_STOREFRONT` | FastSpring only | The popup storefront URL. |
 | `MOR_API_USERNAME` | no | FastSpring only, and only if you prefer two variables to the `username:password` form of `MOR_API_KEY`. |
@@ -731,10 +734,37 @@ browser needs them: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` and
 
 ## The provider adapter contract
 
-Swapping the merchant of record is a one-file change: write a new adapter next
-to `paddle.js` / `fastspring.js`, add it to `listProviders()`, and set
-`MOR_PROVIDER`. Nothing outside `api/_lib/providers/` names a payment company —
-and `tools/site-check.mjs` fails the build if anything does.
+Swapping the payment rail is a one-file change: write a new adapter next to
+`paddle.js` / `fastspring.js` / `stripe.js`, add it to `listProviders()`, and
+set `MOR_PROVIDER`. Nothing outside `api/_lib/providers/` names a payment
+company — and `tools/site-check.mjs` fails the build if anything does.
+
+**Stripe (`api/_lib/providers/stripe.js`, since 2026-09-14).** Checkout is
+Stripe's hosted page: `createCheckoutSession()` creates a Checkout Session
+(`mode=subscription`, the price, the customer, `client_reference_id` and
+`subscription_data.metadata.rid` = the reservation id, `trial_period_days=3`
+when the server granted a trial, `payment_method_collection=always`,
+`managed_payments[enabled]=true` on the `2026-02-25.preview` version — Stripe as
+merchant of record — falling back to `automatic_tax` and then to no tax if the
+account refuses, each fallback logged) and answers with
+`checkoutUrl`; `POST /api/trial/eligibility` passes it on as
+`checkout.checkout_url`, and `js/checkout.js` navigates there instead of
+opening an overlay. Because the trial is a session property, the adapter sets
+`separateTrialPrices: false` and the `_TRIAL` price variables are optional.
+Webhooks are verified from `Stripe-Signature` (`t.body`, 300 s); the event's
+`livemode` is the live flag. `checkout.session.completed` (subscription mode)
+is a `txn.completed` carrying the ids, the email and the reservation — the
+blueprint's success signal; `customer.subscription.*` map to the `sub.*`
+events (an `updated` event is refined by `previous_attributes`: trialing →
+active is `sub.activated`, a `pause_collection` appearing is `sub.paused`),
+`invoice.paid` / `invoice.payment_failed` to `txn.completed` / `txn.failed`,
+`charge.refunded` / `charge.dispute.created` to `txn.refunded` /
+`txn.chargeback`. A refund or dispute names no subscription, so the adapter's
+optional `enrichEvent()` looks it up through the invoice before `applyEvent`
+runs (the handler and the reconcile cron both call it when present). Pausing
+uses `pause_collection` (invoices voided until `resumes_at`; the paid period
+runs on), cancelling at period end sets `cancel_at_period_end`, and the
+customer portal is Stripe's billing portal (one session per link).
 
 **Adapter contract v3.** `ADAPTER_METHODS` in `api/_lib/providers/index.js` is
 the enforced list; `assertAdapter(adapter)` throws if one is missing.
@@ -745,8 +775,11 @@ the enforced list; `assertAdapter(adapter)` throws if one is missing.
   // checkout
   priceIdFor({ plan, trial }, env),                 // -> string
   async ensureCustomer(email, ctx),                 // -> { id, existed }   (409-tolerant)
-  async createCheckoutSession({ priceId, customerId, customData }, ctx),
+  async createCheckoutSession({ priceId, customerId, customData, trial? }, ctx),
                                                     // -> { transactionId, status?, checkoutUrl? }
+  async checkoutUrlFor?(transactionId, ctx),        // -> string|null   (hosted-page adapters)
+  async enrichEvent?(event, ctx),                    // -> event         (fill ids a payload lacks)
+  separateTrialPrices?: boolean,                    // false = the trial is a session property
   async pricePreview({ priceId, countryCode, customerIp }, ctx),
                                                     // -> { amount, currency, taxInclusive, formatted }
   // webhooks

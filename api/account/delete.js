@@ -3,7 +3,7 @@
  * subscription (design §11.5), in this order and no other:
  *
  *   1. REFUSE while a payment dispute is open or a past_due balance stands.
- *   2. Cancel every live subscription at the merchant of record FIRST and
+ *   2. Cancel every live subscription at the payment provider FIRST and
  *      VERIFY the cancellation came back, before touching Supabase. A deletion
  *      that silently leaves billing running is the worst possible outcome, so
  *      a cancel that does not verify aborts the whole request with nothing
@@ -15,7 +15,7 @@
  *   5. Null trial_claims.user_id and devices.trial_user_id; keep the hashes
  *      until the 24-month ceiling, or deleting an account would reset the
  *      free-trial limit.
- *   6. Tell the user that the merchant of record holds its own copy as a
+ *   6. Tell the user that the payment provider holds its own copy as a
  *      separate controller.
  *
  *   Authorization: Bearer <supabase access token>   (assertLiveUser)
@@ -59,7 +59,7 @@ export const MESSAGES = Object.freeze({
   cancel_failed:
     "We couldn't confirm that your subscription was cancelled, so nothing has been deleted. Try again in a minute, or email contact@helpmebreath.com.",
   done:
-    'Your account has been deleted. Payments are handled by a merchant of record, which keeps its own copy of your ' +
+    'Your account has been deleted. Payments are processed by a payment provider, which keeps its own copy of your ' +
     'payment record as a separate data controller; contact it directly to have that erased too.',
 });
 

@@ -833,6 +833,18 @@ export async function runEligibility(input) {
     alert('ledger_unavailable', { sub, plan, message: error && error.message ? String(error.message) : String(error) });
   }
 
+  // A hosted-page adapter must still be able to hand the same session back;
+  // once it has expired there is nothing to reuse and a new one is minted.
+  let reusedUrl = null;
+  if (reusedIntent && typeof provider.checkoutUrlFor === 'function') {
+    try {
+      reusedUrl = await provider.checkoutUrlFor(reusedIntent.provider_transaction_id, providerCtx);
+    } catch {
+      reusedUrl = null;
+    }
+    if (!reusedUrl) reusedIntent = null;
+  }
+
   if (reusedIntent) {
     const price = await previewPrice(provider, { priceId: reusedIntent.price_id, countryCode }, providerCtx);
     return {
@@ -843,7 +855,7 @@ export async function runEligibility(input) {
         reservation_id: reusedIntent.reservation_id,
         trial: true,
         plan,
-        checkout: { provider: provider.id, transaction_id: reusedIntent.provider_transaction_id },
+        checkout: { provider: provider.id, transaction_id: reusedIntent.provider_transaction_id, checkout_url: reusedUrl },
         price_preview: price,
         reasons: [],
         reused: true,
@@ -903,12 +915,14 @@ export async function runEligibility(input) {
 
   // 10. Provider transaction, with custom_data = { rid, v } and nothing else.
   let transactionId = null;
+  let checkoutUrl = null;
   try {
     const session = await provider.createCheckoutSession(
-      { priceId: finalPriceId, customerId, customData: { rid: reservationId, v: 3 } },
+      { priceId: finalPriceId, customerId, customData: { rid: reservationId, v: 3 }, trial },
       providerCtx,
     );
     transactionId = session && session.transactionId ? String(session.transactionId) : null;
+    checkoutUrl = session && session.checkoutUrl ? String(session.checkoutUrl) : null;
   } catch (error) {
     console.error('[trial] provider transaction failed:', error && error.message);
   }
@@ -942,7 +956,7 @@ export async function runEligibility(input) {
       reservation_id: reservationId,
       trial,
       plan,
-      checkout: { provider: provider.id, transaction_id: transactionId },
+      checkout: { provider: provider.id, transaction_id: transactionId, checkout_url: checkoutUrl },
       price_preview: price,
       reasons: trial ? [] : dedupe(reasons),
     },

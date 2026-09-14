@@ -169,7 +169,7 @@
                         <ul>
                             <li>The timer runs in your browser. Your settings, your session history and your saved patterns stay on your device and are never sent to me.</li>
                             <li>An account holds your <strong>email address, your sign-in identities, the date it was created and your plan</strong> — never your practice. There are <strong>no passwords</strong>.</li>
-                            <li>Payments are handled end to end by a merchant of record. <strong>I never see your card details</strong>, and I do not store them anywhere.</li>
+                            <li>Payments are handled end to end by Stripe as merchant of record. <strong>I never see your card details</strong>, and I do not store them anywhere.</li>
                             <li><strong>One free trial per person.</strong> Checking that uses a one-way hash of your email address and a random identifier in a cookie on this device, and those two things only. <strong>There is no browser fingerprinting.</strong></li>
                             <li>Analytics and advertising cookies are set to <strong>denied</strong> before anything loads, and stay denied unless you choose "Accept all" in the cookie banner.</li>
                             <li>Every record has a retention period with a number on it. Trial records are kept for 24 months, and this page says why.</li>
@@ -183,7 +183,7 @@
 
                     <p>The controller for this site is Georges Rayess, an individual, contactable at <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. There is no data protection officer, because a one-person project does not need one and I would rather not pretend otherwise.</p>
 
-                    <p>Two other parties are controllers in their own right for the parts they handle: the merchant of record that sells the subscription and holds the payment record, and Google, for the analytics and advertising services described below. Two more act as processors on my instructions: the authentication and database service that hosts account records, and the email service that sends sign-in links and receipts. Each is described in the section that covers it.</p>
+                    <p>Two other parties are controllers in their own right for the parts they handle: Stripe, which sells the subscription as merchant of record and holds the payment record, and Google, for the analytics and advertising services described below. Two more act as processors on my instructions: the authentication and database service that hosts account records, and the email service that sends sign-in links and receipts. Each is described in the section that covers it.</p>
                 </section>
 
                 <section id="browser-storage">
@@ -295,13 +295,13 @@
 
                     <p>Account records are held by <strong>Supabase</strong>, an authentication and database service acting as a processor on my instructions, in a data-centre region in the United States (Northern California). Your browser talks to Supabase only to sign you in; everything else about your account is read through this site's own server. The tables that hold your data accept no direct access from a browser at all.</p>
 
-                    <h3>3.5 Subscribing — the merchant of record</h3>
+                    <h3>3.5 Subscribing — Stripe as merchant of record</h3>
 
-                    <p>I do not sell to you directly and I never touch your payment details. The subscription is sold through a <strong>merchant of record</strong>, which is the seller of record for the transaction: the contract of sale is between you and it. It takes the payment, calculates and remits sales tax and VAT, issues the receipt, runs the customer portal, and is the <strong>controller of your payment data in its own right</strong>. It then pays me. The service itself is provided by Georges Rayess.</p>
+                    <p>I do not sell to you directly and I never touch your payment details. The subscription is sold by <strong>Stripe</strong> (Stripe, Inc., and Stripe Payments Europe, Ltd. for customers in Europe) as the <strong>merchant of record</strong>, under its Managed Payments service: the contract of sale is between you and Stripe. It takes the payment, calculates and remits sales tax and VAT, issues the receipt, runs the billing portal and is the <strong>controller of your payment data</strong> — your card details, your billing address and the fraud signals it collects — under its own privacy policy at <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer">stripe.com/privacy</a>.</p>
 
-                    <p>The provider will be named on this page before checkout opens, and its own privacy notice will govern your payment data. The company named as seller on your receipt is the merchant of record for your purchase. Because it holds its own copy of your purchase record as a separate controller, a request to erase the payment record itself goes to it, not to me; section 10 explains how.</p>
+                    <p>Because Stripe holds its own copy of your purchase record as a separate controller, a request to erase the payment record itself goes to Stripe, not to me; section 10 explains how.</p>
 
-                    <p>What reaches me is limited to what section 3.4 lists: your email address, your plan and its dates, the provider's subscription and customer identifiers, the country used for tax, and the amount and currency you were charged. When the provider tells this site about a payment, a renewal, a decline or a cancellation, that message is kept as a record for a limited time — section 9 gives the number — so that a dispute or a missed message can be checked against what actually happened. <strong>I never receive your card number.</strong></p>
+                    <p>What reaches me is limited to what section 3.4 lists: your email address, your plan and its dates, Stripe's subscription and customer identifiers, the country used for tax, and the amount and currency you were charged. When Stripe tells this site about a payment, a renewal, a decline or a cancellation, that message is kept as a record for a limited time — section 9 gives the number — so that a dispute or a missed message can be checked against what actually happened. <strong>I never receive your card number.</strong></p>
 
                     <h3 id="trial-check">3.6 The free-trial check</h3>
 
@@ -315,7 +315,7 @@
 
                     <h3>3.7 Email you receive from the account</h3>
 
-                    <p>Creating an account and running a subscription involves a small number of emails: the sign-in link or code, a confirmation when a trial starts that states the plan, the date the card will be charged and the amount, and a note if a payment fails or the provider changes. These are sent through <strong>our email service provider</strong>, a third-party platform that acts as a processor and sees your address and the message. They are part of the service, not marketing, and cannot be switched off while the account exists. The merchant of record sends receipts and its own trial-ending reminder separately, under its own policy.</p>
+                    <p>Creating an account and running a subscription involves a small number of emails: the sign-in link or code, a confirmation when a trial starts that states the plan, the date the card will be charged and the amount, and a note if a payment fails or the provider changes. These are sent through <strong>our email service provider</strong>, a third-party platform that acts as a processor and sees your address and the message. They are part of the service, not marketing, and cannot be switched off while the account exists. Stripe sends the receipt and the trial-ending reminder separately, under its own policy.</p>
 
                     <p>You can also ask for occasional email — a note when a new technique or guide goes up. It is entirely optional, works on <strong>double opt-in</strong>, and <strong>every email carries an unsubscribe link</strong>, one click, no questions. Only a twelve-character hash prefix of an address ever appears in this site's own logs. Write to <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and the address is removed from the list.</p>
 
@@ -356,7 +356,7 @@
                                 <tr>
                                     <th scope="row">Sign-in session (local storage)</th>
                                     <td>Supabase, in your browser</td>
-                                    <td>Keeps you signed in. Not a cookie; never sent to Google or to the merchant of record.</td>
+                                    <td>Keeps you signed in. Not a cookie; never sent to Google or to Stripe.</td>
                                     <td>Until you sign out</td>
                                 </tr>
                                 <tr>
@@ -393,7 +393,7 @@
                         <li><strong>Performance of a contract</strong> — your account, your subscription and its trial, the payment, the emails the service needs to send, and supporting you while it runs.</li>
                         <li><strong>Legitimate interest</strong> — the one-way hash of your email address in the free-trial ledger, and the random identifier in the <code>__Host-hmb_did</code> cookie together with the small device record it points to. The interest is keeping a card-required free trial to one per person, so that the offer is not drained by repeat sign-ups and can go on being offered to everyone else. The check is deliberately the least a rule like that can be built on — a hash and a random number, with no fingerprinting and no profile — it can only ever withhold the trial offer, never access, and it applies to nobody who has not asked to start a trial or finished a session on the timer. I have written the balancing test down; it is kept on file and you may ask for a copy. You have the right to object, in section 10.</li>
                         <li><strong>Consent</strong> — analytics and advertising cookies, and the optional mailing list, and nothing else. Consent Mode starts at denied. Withdrawable at any time, and withdrawing is as easy as giving it. Nothing the account or the subscription needs in order to work relies on consent, and nothing is refused to you for declining.</li>
-                        <li><strong>Legal obligation</strong> — tax and accounting records, which the merchant of record holds as the seller.</li>
+                        <li><strong>Legal obligation</strong> — tax and accounting records, which Stripe holds as the seller.</li>
                     </ul>
 
                     <p>There is no browser fingerprint, so there is no fingerprint to consent to and no basis claimed for one.</p>
@@ -409,11 +409,11 @@
                         <li><strong>Subscription records</strong> — kept while the subscription exists and while the account does. If you delete the account with a subscription attached, the subscription record is kept but <strong>detached</strong> from you: your account identifier is removed, and only the provider's identifiers, the plan and the dates remain, so that a message from the provider about that subscription can still be matched and a refund or a dispute can still be handled. A detached record is expired seven days after access ends and deleted with the ordinary cleanup.</li>
                         <li><strong>Free-trial records</strong> — the one-way email hash, and the device record behind the <code>__Host-hmb_did</code> cookie, are kept for <strong>24 months from the last activity</strong> on that record, then deleted. The reason is plain: otherwise deleting an account, or clearing a device, would reset the free-trial limit and the rule would mean nothing. Twenty-four months is longer than anyone's patience for repeat trials and short enough to be defensible. Deleting your account removes your account identifier from these records but does not shorten the 24 months.</li>
                         <li><strong>Checkout records</strong> — each checkout you start expires after 30 minutes and is deleted <strong>7 days</strong> after that.</li>
-                        <li><strong>Messages from the merchant of record</strong> — the body of each processed payment message is kept for <strong>30 days</strong> and then blanked; the bare record that it was received is kept for <strong>180 days</strong>. A message that could not be processed keeps its body until it has been, so that a missed payment can be put right.</li>
+                        <li><strong>Messages from Stripe</strong> — the body of each processed payment message is kept for <strong>30 days</strong> and then blanked; the bare record that it was received is kept for <strong>180 days</strong>. A message that could not be processed keeps its body until it has been, so that a missed payment can be put right.</li>
                         <li><strong>The <code>__Host-hmb_did</code> cookie</strong> — 2 years. <strong>The <code>__Host-hmb_ent</code> cookie</strong> — 14 days.</li>
                         <li><strong>Rate-limit counters</strong> keyed on your account or your network — <strong>2 days</strong>.</li>
                         <li><strong>Mailing list entries</strong> — kept until you unsubscribe.</li>
-                        <li><strong>Purchase and tax records</strong> — kept by the merchant of record for as long as its own law requires.</li>
+                        <li><strong>Purchase and tax records</strong> — kept by Stripe, as the seller, for as long as its own law requires.</li>
                         <li><strong>Server logs</strong> — short-lived and operational. <strong>Email correspondence</strong> — kept while it is useful, then deleted.</li>
                     </ul>
                 </section>
@@ -427,20 +427,20 @@
 
                     <h3>8.1 Getting a copy of your account</h3>
 
-                    <p>Your account page has an <strong>Export my data</strong> control that hands you a file containing your account record and every subscription record with the provider's identifiers, and only your own data. It contains no hashes and no secret keys. The merchant of record holds its own copy of the purchase record and provides it separately.</p>
+                    <p>Your account page has an <strong>Export my data</strong> control that hands you a file containing your account record and every subscription record with the provider's identifiers, and only your own data. It contains no hashes and no secret keys. Stripe holds its own copy of the purchase record and provides it separately.</p>
 
                     <h3>8.2 Deleting your account</h3>
 
                     <p>Your account page has a <strong>Delete my account</strong> control. This is what it does, in order, and it does it the same way if you ask by email:</p>
 
                     <ol>
-                        <li>If a subscription is live, it is <strong>cancelled at the merchant of record first</strong>, and the cancellation is confirmed before anything else happens. An account is never deleted with billing left running behind it.</li>
-                        <li>The subscription record is detached, as section 9 describes, and the provider's identifiers are kept so that a later refund or dispute can still be matched.</li>
+                        <li>If a subscription is live, it is <strong>cancelled at Stripe first</strong>, and the cancellation is confirmed before anything else happens. An account is never deleted with billing left running behind it.</li>
+                        <li>The subscription record is detached, as section 9 describes, and Stripe's identifiers are kept so that a later refund or dispute can still be matched.</li>
                         <li>Your account, your sign-in identities and your checkout records are deleted.</li>
                         <li>Your account identifier is removed from the free-trial records; the email hash and the device record run out their 24 months.</li>
                     </ol>
 
-                    <p>Two things it cannot do. It cannot delete an account while a payment dispute is open or a failed payment is outstanding — email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and we will sort it out by hand. And it cannot erase the payment record the <strong>merchant of record holds as a separate controller</strong>; for that, contact the seller named on your receipt directly, under its own privacy notice.</p>
+                    <p>Two things it cannot do. It cannot delete an account while a payment dispute is open or a failed payment is outstanding — email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and we will sort it out by hand. And it cannot erase the payment record <strong>Stripe holds as a separate controller</strong>; for that, contact Stripe directly through <a href="https://support.stripe.com/contact" target="_blank" rel="noopener noreferrer">support.stripe.com</a>, or ask me and I will pass the request on.</p>
 
                     <h3>8.3 Objecting to the trial check</h3>
 
@@ -462,7 +462,7 @@
                 <section id="transfers">
                     <h2>10. International transfers</h2>
 
-                    <p>This is a small site with a global audience, so data crosses borders. Pages are served from a content delivery network with locations worldwide, and this site's own server functions run in that network. Account records are held in the United States, as section 3.4 says. If you are in the EEA, the UK or Switzerland, that is an international transfer of your account record; it is covered by Supabase's data processing addendum, which applies to every Supabase customer on acceptance of its terms and incorporates the European Commission's Standard Contractual Clauses, the UK International Data Transfer Addendum and a Swiss addendum. The merchant of record, the email platform and Google each operate their own international infrastructure and their own transfer safeguards, described in their own policies. The narrow set of account and subscription data reaches <strong>Lebanon</strong>, because that is where I read email and administer the site; Lebanon has not been the subject of a European Commission adequacy decision. Where you are in the EEA, the UK or Switzerland and need a transfer mechanism for that, ask before you buy and I will sign the European Commission's Standard Contractual Clauses and the UK International Data Transfer Addendum. I will not claim to have safeguards in place that have not actually been signed.</p>
+                    <p>This is a small site with a global audience, so data crosses borders. Pages are served from a content delivery network with locations worldwide, and this site's own server functions run in that network. Account records are held in the United States, as section 3.4 says. If you are in the EEA, the UK or Switzerland, that is an international transfer of your account record; it is covered by Supabase's data processing addendum, which applies to every Supabase customer on acceptance of its terms and incorporates the European Commission's Standard Contractual Clauses, the UK International Data Transfer Addendum and a Swiss addendum. Stripe, the email platform and Google each operate their own international infrastructure and their own transfer safeguards, described in their own policies. The narrow set of account and subscription data reaches <strong>Lebanon</strong>, because that is where I read email and administer the site; Lebanon has not been the subject of a European Commission adequacy decision. Where you are in the EEA, the UK or Switzerland and need a transfer mechanism for that, ask before you buy and I will sign the European Commission's Standard Contractual Clauses and the UK International Data Transfer Addendum. I will not claim to have safeguards in place that have not actually been signed.</p>
                 </section>
 
                 <section id="security">

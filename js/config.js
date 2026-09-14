@@ -9,13 +9,20 @@
  *
  *   One plan, everything included. $10 a month or $100 a year (US list
  *   price), billed in advance, renewing automatically until cancelled, tax
- *   added at checkout by the merchant of record. 3-day card-required trial,
- *   one free trial per person. 14-day unconditional refund.
+ *   added at checkout where it applies. 3-day card-required trial, one free
+ *   trial per person. 14-day unconditional refund.
+ *
+ * Payments (since 2026-09-14): Stripe, under its Managed Payments service, as
+ * merchant of record — Stripe is the seller on the receipt, collects tax and
+ * owns refunds and disputes. If Stripe declines Managed Payments for the
+ * account, the server sells as a plain Stripe checkout with automatic tax and
+ * logs it; then the owner is the seller and MOR_LEGAL and the legal pages must
+ * be changed back to say so (docs/private/HANDOVER.md §0.0).
  *
  * Five exports, and only five:
  *
  *   SUPABASE             url + publishable key, read by js/auth.js only
- *   CHECKOUT             client-side token + sandbox flag, read by js/checkout.js only
+ *   CHECKOUT             the checkout-open switch + sandbox flag, read by js/checkout.js only
  *   PLANS                the one plan and its two intervals
  *   TIMER_FREE_SESSIONS  D1 — read in exactly one place, js/entitlements.js#requireTimer
  *   MOR_LEGAL            the merchant-of-record sentence, one place, every page
@@ -34,14 +41,15 @@
  *  1. Supabase → Project settings → API: copy the project URL and the
  *     publishable key into SUPABASE below. Same two values go into Vercel as
  *     SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY.
- *  2. Merchant-of-record dashboard → Developer tools → Authentication →
- *     Client-side tokens. Sandbox tokens start `test_`, live ones `live_`.
- *     Paste it into CHECKOUT.clientToken and into MOR_CLIENT_TOKEN in Vercel.
- *  3. Keep CHECKOUT.sandbox `true` while the token is a `test_` token. Flip it
- *     to `false` in the same edit that swaps in the `live_` token — never one
+ *  2. Stripe dashboard → Developers → API keys: copy the PUBLISHABLE key
+ *     (`pk_test_…` or `pk_live_…`) into CHECKOUT.clientToken. It is public by
+ *     design and is only the switch that opens checkout: the hosted Stripe page
+ *     needs nothing from the browser. Never the secret key (`sk_…`).
+ *  3. Keep CHECKOUT.sandbox `true` while the key is a `pk_test_` key. Flip it
+ *     to `false` in the same edit that swaps in the `pk_live_` key — never one
  *     without the other.
- *  4. Website approval (helpmebreath.com) must have passed at the provider or
- *     the overlay refuses to open; sandbox works meanwhile.
+ *  4. Leave previewPriceIds empty. Client-side price previews belonged to the
+ *     overlay checkout; the hosted page shows the total, with tax, itself.
  *
  * While CHECKOUT.clientToken is empty, every checkout button renders a calm
  * "Checkout is not open yet" card instead of a dead link.
@@ -55,23 +63,23 @@ export const SUPABASE = Object.freeze({
   publishableKey: 'sb_publishable_XVUyMqPbYiPy2dOhzOAd5g_2jbRisbs',
 });
 
-/** The merchant-of-record overlay checkout, public values only (design §5.5). */
+/** The checkout switch, public values only (design §5.5). */
 export const CHECKOUT = Object.freeze({
-  /** Client-side token (`test_…` or `live_…`). Public by design. Empty = checkout closed. */
-  clientToken: 'live_7ccc4b00c41fb043db32cbe3a3a',
+  /** Stripe publishable key (`pk_test_…` or `pk_live_…`). Public by design. Empty = checkout closed. */
+  clientToken: 'pk_test_51UFWrUJITN5qhUboKYU77EQ246ztUZFxXLRMUTRZpAQPn47ZABCKFvq7TmR4nKp558fMidFNtOfeGn1gnrI2k56w00i59eSpdM',
   /**
    * `true` points the overlay at the provider's sandbox. It defaults to `true`
    * because the safer mistake is a live token refusing to open in sandbox, not
    * a test token silently pointed at production. Set `false` at go-live.
    */
-  sandbox: false,
+  sandbox: true,
   /**
    * Optional. The public no-trial price ids (`pri_…`), used by /pro ONLY to
    * show the localized total for the visitor's country before checkout
    * (design §5.6). Never used to open a checkout: the server picks the price.
    * Leave empty and the card shows the US list price with "plus any tax".
    */
-  previewPriceIds: Object.freeze({ monthly: 'pri_01m2cr6sejcqthc7kzmnmf33vq', yearly: 'pri_01m2cr7nzfdmkkxmgk9dk22574' }),
+  previewPriceIds: Object.freeze({ monthly: '', yearly: '' }),
 });
 
 /**
@@ -125,10 +133,9 @@ export const TIMER_FREE_SESSIONS = 3;
 
 /**
  * The merchant-of-record line, kept in one place so one edit changes every
- * page. The provider is not named on the site until the owner has chosen one
- * in writing (docs/AGENT_BRIEF.md §1); replace "a merchant of record" with the
- * provider's legal name in the same commit that turns checkout on.
+ * page. Stripe (Managed Payments) was chosen in writing on 2026-09-14 and is
+ * named.
  */
 export const MOR_LEGAL =
-  'Payments are handled by a merchant of record, who acts as the seller of record for this purchase. ' +
+  'Payments are handled by Stripe as merchant of record, who acts as the seller of record for this purchase. ' +
   'The price you see at checkout includes any VAT or sales tax due in your country.';

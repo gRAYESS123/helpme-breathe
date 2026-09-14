@@ -549,7 +549,7 @@ test('/api/account/export: attachment JSON with only this account\'s data', asyn
   assert.equal(body.subscriptions.length, 1);
   assert.equal(body.subscriptions[0].provider_subscription_id, 'sub_TESTFIXTURE0001', 'provider ids included');
   assert.deepEqual(Object.keys(body).sort(), ['account', 'exported_at', 'note', 'ok', 'profile', 'subscriptions'], 'profile + subscriptions and nothing else');
-  assert.match(body.note, /merchant of record/);
+  assert.match(body.note, /payment provider/);
   assert.ok(!JSON.stringify(body).includes('sub_TESTFIXTURE_OTHER'), 'no other user\'s data');
   const unauth = await GET(new Request('https://helpmebreath.com/api/account/export'));
   assert.equal(unauth.status, 401);
@@ -641,7 +641,7 @@ test('/api/account/delete: cancel-and-verify, detach (not cascade), delete auth 
   assert.equal(body.deleted, true);
   assert.equal(body.subscriptions_cancelled, 1, 'only the live row without a scheduled cancel is cancelled');
   assert.equal(body.subscriptions_detached, 3);
-  assert.match(body.message, /merchant of record/);
+  assert.match(body.message, /payment provider/);
   assert.deepEqual(setCookies(response), ['__Host-hmb_ent=; Path=/; Secure; SameSite=Lax; Max-Age=0']);
 
   assert.deepEqual(state.calls, [

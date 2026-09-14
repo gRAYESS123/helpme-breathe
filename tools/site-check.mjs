@@ -1693,7 +1693,7 @@ const OPEN_TIMER_ALLOWED = new Set([
 ]);
 const OPEN_TIMER_REQUIRED = ['breathing-exercises-anxiety.html', 'breathing-exercises-for-panic-attacks.html'];
 const PROVIDER_SEAM = ['api/_lib/providers/', 'api/_lib/env.js', 'js/config.js', 'js/checkout.js'];
-const PROVIDER_RE = /\b(paddle|fastspring)\b/gi;
+const PROVIDER_RE = /\b(paddle|fastspring|stripe)\b/gi;
 /** Owner decision 2026-09-12: one plan, no practitioner or therapist plan, no switch for one. */
 const SECOND_PLAN_RE = /practitioner_yearly|MOR_PRICE_PRACTITIONER|practitionerPlanOffered|PLAN_MODE/g;
 const COPY_TRUTH_HARD = [
