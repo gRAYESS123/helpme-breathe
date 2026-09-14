@@ -15,9 +15,11 @@
  * Payments (since 2026-09-14): Stripe, under its Managed Payments service, as
  * merchant of record — Stripe is the seller on the receipt, collects tax and
  * owns refunds and disputes. If Stripe declines Managed Payments for the
- * account, the server sells as a plain Stripe checkout with automatic tax and
- * logs it; then the owner is the seller and MOR_LEGAL and the legal pages must
- * be changed back to say so (docs/private/HANDOVER.md §0.0).
+ * account, checkout closes ("Checkout could not start") rather than selling
+ * under a model the legal pages do not describe; the way on is to enable
+ * Managed Payments in Stripe, or to set MOR_MANAGED_PAYMENTS=false in Vercel in
+ * the same change that rewrites MOR_LEGAL and the legal pages to name the
+ * owner as seller (docs/private/HANDOVER.md §0.0).
  *
  * Five exports, and only five:
  *

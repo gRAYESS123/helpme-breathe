@@ -697,7 +697,7 @@ one-to-one. **Required** means "counted in `/api/health`'s `missing`".
 | `TRIAL_ENABLED` | no | `true` offers the 3-day card-required trial; `false` sells a straight subscription. Read only by `api/trial/eligibility.js`. Anything but the literal `true` is off. |
 | `SITE_ORIGIN` | yes | The site's own origin, used to build callback URLs and for the same-origin check. |
 | `MOR_PROVIDER` | no | `stripe`, `paddle` (the code default) or `fastspring`. One variable switches the whole payment rail. With Stripe **Managed Payments** (see `MOR_MANAGED_PAYMENTS`) Stripe is the merchant of record; without it Stripe is a payment processor and the owner is the seller. |
-| `MOR_MANAGED_PAYMENTS` | no | Stripe only. On unless literally `false`: every checkout session carries `managed_payments[enabled]=true` on the `2026-02-25.preview` API version, and Stripe is the seller. If Stripe refuses it for the account the session falls back to a plain checkout with automatic tax (then to none), and the log names the shape used. |
+| `MOR_MANAGED_PAYMENTS` | no | Stripe only. On unless literally `false`: every checkout session carries `managed_payments[enabled]=true` on the `2026-02-25.preview` API version, and Stripe is the seller. If Stripe refuses it for the account the call fails (`502 checkout_unavailable`; log line `managed payments refused`) — nothing is sold under a model the legal pages do not describe. Set it to `false` only together with legal copy that names the owner as seller; then the session is a plain checkout with automatic tax (then none), and the log names the shape used. |
 | `MOR_API_KEY` | yes | Stripe: the secret key (`sk_test_…` / `sk_live_…`), or a restricted key covering Customers, Checkout Sessions, Subscriptions, Invoices, Prices, Tax calculations and the Billing portal. Paddle: an API key beginning `pdl_live_apikey_` (or `pdl_sdbx_apikey_`). FastSpring: `username:password`. |
 | `MOR_API_BASE` | no | Overrides the provider's API base URL. Leave empty in production. |
 | `MOR_WEBHOOK_SECRET` | yes | Stripe: the endpoint's signing secret (`whsec_…`). Paddle: the notification destination's secret. One per environment: delete the test-mode endpoint at go-live. |
@@ -748,8 +748,12 @@ Stripe's hosted page: `createCheckoutSession()` creates a Checkout Session
 `subscription_data.metadata.rid` = the reservation id, `trial_period_days=3`
 when the server granted a trial, `payment_method_collection=always`,
 `managed_payments[enabled]=true` on the `2026-02-25.preview` version — Stripe as
-merchant of record — falling back to `automatic_tax` and then to no tax if the
-account refuses, each fallback logged) and answers with
+merchant of record. If Stripe refuses that for the account the call **fails**
+(`502 checkout_unavailable` to the buyer, a `managed payments refused` line in
+the log): the legal pages name Stripe as the seller, so nothing is sold another
+way until `MOR_MANAGED_PAYMENTS=false` is set together with new legal copy. With
+it off, a plain checkout with `automatic_tax`, then no tax if the account
+refuses that, each step logged) and answers with
 `checkoutUrl`; `POST /api/trial/eligibility` passes it on as
 `checkout.checkout_url`, and `js/checkout.js` navigates there instead of
 opening an overlay. Because the trial is a session property, the adapter sets

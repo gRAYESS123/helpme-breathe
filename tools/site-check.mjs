@@ -269,9 +269,16 @@ function loadVercelJson() {
     const rule = compileRule(r.source, r.destination, 'rewrite', 200, 'vercel.json');
     if (rule) urlModel.rewrites.push(rule);
   }
+  let hostRules = 0;
   for (const r of Array.isArray(cfg.redirects) ? cfg.redirects : []) {
     if (!r || typeof r.source !== 'string' || typeof r.destination !== 'string') {
       WARN('vercel.json', null, 'vercel-json', 'redirect entry missing string source/destination');
+      continue;
+    }
+    // A rule conditioned on the host (www -> apex) canonicalises the origin;
+    // it is not part of the path URL space this model checks.
+    if (Array.isArray(r.has) && r.has.some((h) => h && h.type === 'host')) {
+      hostRules++;
       continue;
     }
     const status = r.statusCode ?? (r.permanent === false ? 307 : 308);
@@ -283,7 +290,7 @@ function loadVercelJson() {
     null,
     'url-model',
     `URL model from vercel.json: cleanUrls=${urlModel.cleanUrls}, trailingSlash=${urlModel.trailingSlash}, ` +
-      `${urlModel.rewrites.length} rewrite(s), ${urlModel.redirects.length} redirect(s)`,
+      `${urlModel.rewrites.length} rewrite(s), ${urlModel.redirects.length} redirect(s), ${hostRules} host-level rule(s)`,
   );
   return true;
 }

@@ -41,6 +41,7 @@
  */
 
 import { kidFor } from './_lib/crypto.js';
+import { authUnavailable } from './_lib/authz.js';
 import {
   ENT_COOKIE,
   TIER_PRO,
@@ -61,6 +62,9 @@ import { clientIp, errorResponse, json, methodNotAllowed, preflight } from './_l
 export const config = { runtime: 'nodejs', maxDuration: 15 };
 
 const METHODS = 'GET, OPTIONS';
+
+/** verifyAccessToken reasons that mean "Supabase did not answer", not "bad token". */
+const AUTH_OUTAGE_REASONS = new Set(['jwks_unavailable', 'auth_unavailable']);
 
 /** Generous: every page load of a signed-in visitor calls this. */
 const limiter = createLimiter({ name: 'me', limit: 120, windowMs: 60 * 1000 });
@@ -131,6 +135,10 @@ export function createMeHandler(deps) {
       const jwt = bearerToken(request);
       if (!jwt) return respond(request, 401, { ok: false, reason: 'unauthenticated' });
       const identity = await verifyAccessToken(jwt);
+      if (identity && !identity.ok && AUTH_OUTAGE_REASONS.has(identity.reason)) {
+        // The key set could not be fetched: our outage, not their sign-out.
+        return authUnavailable(request, { methods: METHODS });
+      }
       if (!identity || !identity.ok || typeof identity.sub !== 'string' || !identity.sub) {
         return respond(request, 401, { ok: false, reason: 'unauthenticated' });
       }
@@ -301,9 +309,14 @@ async function defaultDeps() {
           pepper,
           now: options.now,
           ledger,
+          // Read-only: /api/me reports a device but never mints one. Issuance
+          // stays with the two endpoints that persist a row, or /auth/callback
+          // would race /api/trial/eligibility and the browser could keep the
+          // id the trial was NOT recorded against.
+          readOnly: true,
         });
         return {
-          cookieValue: device.value,
+          cookieValue: device.minted ? null : device.value,
           deviceId: device.deviceId,
           freeSessionsUsed: Number(device.row && device.row.free_sessions_used) || 0,
         };

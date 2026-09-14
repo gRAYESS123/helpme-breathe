@@ -104,7 +104,7 @@ function productionDeps() {
     store: createStore(db),
     provider: getProvider(providerName()),
     providerCtx: { env, fetchImpl: globalThis.fetch, isProd: isProduction() },
-    limiter: (sub) => dblimit(`billing:portal:${sub}`, LIMIT.window, LIMIT.max),
+    limiter: (sub) => dblimit(`billing:portal:${sub}`, LIMIT.window, LIMIT.max, { failOpen: true }),
   };
 }
 

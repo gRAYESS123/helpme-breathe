@@ -134,9 +134,11 @@ export function accessUntilFor(row, now) {
     }
 
     case 'paused':
-      // coalesce(current_period_end, now()) — a pause stops the next charge, it
-      // does not take away days already paid for.
-      return toMs(row.current_period_end) ?? at;
+      // Frozen at the value the last paid period set. Stripe keeps rolling
+      // `current_period_end` forward during a pause (invoices are voided, not
+      // skipped), so re-deriving from it would hand out the whole pause free.
+      // A pause stops the next charge; it neither takes away nor adds days.
+      return toMs(row.access_until) ?? toMs(row.current_period_end) ?? at;
 
     case 'canceled':
       // coalesce(cancel_at, canceled_at)
@@ -500,7 +502,10 @@ export function createStore(db) {
         await db(`subscriptions?user_id=eq.${uuid(userId)}&select=id,provider,provider_subscription_id`, {
           method: 'PATCH',
           prefer: 'return=representation',
-          body: { user_id: null, detached_at: nowIso },
+          // Only the marker: `user_id` is cleared by `on delete set null` when
+          // the auth user goes, so a failed deletion leaves the rows attached
+          // and the whole request retryable.
+          body: { detached_at: nowIso },
         }),
       );
     },

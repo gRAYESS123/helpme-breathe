@@ -95,7 +95,7 @@
       "description": "What Help Me Breathe stores in your browser, what an account holds, how the one-free-trial check works without fingerprinting, and how long each record is kept.",
       "url": "https://helpmebreath.com/legal/privacy-policy",
       "datePublished": "2026-09-09",
-      "dateModified": "2026-09-13",
+      "dateModified": "2026-09-14",
       "inLanguage": "en",
       "author": {
         "@type": "Person",
@@ -153,7 +153,7 @@
             <h1>Privacy Policy</h1>
             <div class="article-meta">
                 <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
-                <p class="article-dates">Last updated <time datetime="2026-09-13">13 September 2026</time>. Published by Georges Rayess, an individual.</p>
+                <p class="article-dates">Last updated <time datetime="2026-09-14">14 September 2026</time> (14 September: the merchant of record is now Stripe). Published by Georges Rayess, an individual.</p>
             </div>
         </header>
 
@@ -231,7 +231,7 @@
                                 </tr>
                                 <tr>
                                     <th scope="row">Device identifier mirror</th>
-                                    <td>A copy of the random identifier from the <code>__Host-hmb_did</code> cookie in section 6, so the count of free sessions survives a browser that clears cookies but not storage. It only works if it matches the server's signature; a made-up one is ignored.</td>
+                                    <td>A copy of the random identifier from the <code>__Host-hmb_did</code> cookie in section 4, so the count of free sessions survives a browser that clears cookies but not storage. It only works if it matches the server's signature; a made-up one is ignored.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -249,7 +249,7 @@
 
                     <p>Like every website, asking for a page means your browser sends a request. The host that serves this site receives your IP address, the page requested, your user-agent string and the referring page, and keeps short-lived operational logs for security and troubleshooting. This is ordinary web hosting, not a profile of you.</p>
 
-                    <p>Pages on this site also load the Newsreader and IBM Plex Sans typefaces from Google Fonts. That request reveals your IP address to Google. When you sign in, and on every page of the site while you hold a signed-in session, your browser loads the Supabase library from the jsDelivr CDN (cdn.jsdelivr.net); that request reveals your IP address to jsDelivr and its hosting networks.</p>
+                    <p>Pages on this site also load the Figtree and DM Mono typefaces from Google Fonts. That request reveals your IP address to Google. When you sign in, and on every page of the site while you hold a signed-in session, your browser loads the Supabase library from the jsDelivr CDN (cdn.jsdelivr.net); that request reveals your IP address to jsDelivr and its hosting networks.</p>
 
                     <h3>3.2 Analytics — Google Analytics 4 with Consent Mode</h3>
 
@@ -299,19 +299,19 @@
 
                     <p>I do not sell to you directly and I never touch your payment details. The subscription is sold by <strong>Stripe</strong> (Stripe, Inc., and Stripe Payments Europe, Ltd. for customers in Europe) as the <strong>merchant of record</strong>, under its Managed Payments service: the contract of sale is between you and Stripe. It takes the payment, calculates and remits sales tax and VAT, issues the receipt, runs the billing portal and is the <strong>controller of your payment data</strong> — your card details, your billing address and the fraud signals it collects — under its own privacy policy at <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer">stripe.com/privacy</a>.</p>
 
-                    <p>Because Stripe holds its own copy of your purchase record as a separate controller, a request to erase the payment record itself goes to Stripe, not to me; section 10 explains how.</p>
+                    <p>Because Stripe holds its own copy of your purchase record as a separate controller, a request to erase the payment record itself goes to Stripe, not to me; section 8.2 explains how.</p>
 
-                    <p>What reaches me is limited to what section 3.4 lists: your email address, your plan and its dates, Stripe's subscription and customer identifiers, the country used for tax, and the amount and currency you were charged. When Stripe tells this site about a payment, a renewal, a decline or a cancellation, that message is kept as a record for a limited time — section 9 gives the number — so that a dispute or a missed message can be checked against what actually happened. <strong>I never receive your card number.</strong></p>
+                    <p>What reaches me is limited to what section 3.4 lists: your email address, your plan and its dates, Stripe's subscription and customer identifiers, the country used for tax, and the amount and currency you were charged. When Stripe tells this site about a payment, a renewal, a decline or a cancellation, that message is kept as a record for a limited time — section 7 gives the number — so that a dispute or a missed message can be checked against what actually happened. <strong>I never receive your card number.</strong></p>
 
                     <h3 id="trial-check">3.6 The free-trial check</h3>
 
                     <p><strong>One free trial per person.</strong> When you start a free trial we check whether this email address has already had one. To do that we store a one-way fingerprint of your email address — we cannot turn it back into an email — and a random identifier in a cookie on your device. We do not do this on any other page, and never for reading the site.</p>
 
-                    <p>In more detail. The email hash is computed on this site's server from the address on your account, using a secret key that never leaves the server, at the moment you ask to start a trial. It is stored in a trial ledger with the date, the outcome of that trial — reserved, started, converted, cancelled, refunded, or charged back — and the provider's identifiers for it. The random identifier is issued by the server, signed so that it cannot be invented, and stored in the <code>__Host-hmb_did</code> cookie described in section 6, with a record of when that device last started a trial and how many times. Someone who has already had a trial, or who has ever held a subscription, is offered a straight subscription instead. <strong>The check can only ever remove the trial offer; it never blocks you from subscribing, and it never blocks you from reading the site.</strong> If our own records are unreachable, the check fails to "no trial", never to "no access".</p>
+                    <p>In more detail. The email hash is computed on this site's server from the address on your account, using a secret key that never leaves the server, at the moment you ask to start a trial. It is stored in a trial ledger with the date, the outcome of that trial — reserved, started, converted, cancelled, refunded, or charged back — and the provider's identifiers for it. The random identifier is issued by the server, signed so that it cannot be invented, and stored in the <code>__Host-hmb_did</code> cookie described in section 4, with a record of when that device last started a trial and how many times. Someone who has already had a trial, or who has ever held a subscription, is offered a straight subscription instead. <strong>The check can only ever remove the trial offer; it never blocks you from subscribing, and it never blocks you from reading the site.</strong> If our own records are unreachable, the check fails to "no trial", never to "no access".</p>
 
                     <p><strong>There is no browser fingerprinting.</strong> Nothing reads your fonts, your screen size, your time zone, your hardware, your canvas, your audio stack, your installed plugins or any other signal your browser gives away, and nothing builds a device profile. The only device signal is the cookie, and a cleared cookie simply looks like a new device. Your IP address is used to rate-limit how often anyone can ask for a trial, and is never used to decide whether you get one.</p>
 
-                    <p>A hash you cannot reverse is still personal data, because I hold the key and could confirm a match if I already had your address. It is <strong>pseudonymised, not anonymous</strong>, and this policy treats it that way: it has a legal basis in section 8 and a retention period in section 9.</p>
+                    <p>A hash you cannot reverse is still personal data, because I hold the key and could confirm a match if I already had your address. It is <strong>pseudonymised, not anonymous</strong>, and this policy treats it that way: it has a legal basis in section 6 and a retention period in section 7.</p>
 
                     <h3>3.7 Email you receive from the account</h3>
 
@@ -391,7 +391,7 @@
 
                     <ul>
                         <li><strong>Performance of a contract</strong> — your account, your subscription and its trial, the payment, the emails the service needs to send, and supporting you while it runs.</li>
-                        <li><strong>Legitimate interest</strong> — the one-way hash of your email address in the free-trial ledger, and the random identifier in the <code>__Host-hmb_did</code> cookie together with the small device record it points to. The interest is keeping a card-required free trial to one per person, so that the offer is not drained by repeat sign-ups and can go on being offered to everyone else. The check is deliberately the least a rule like that can be built on — a hash and a random number, with no fingerprinting and no profile — it can only ever withhold the trial offer, never access, and it applies to nobody who has not asked to start a trial or finished a session on the timer. I have written the balancing test down; it is kept on file and you may ask for a copy. You have the right to object, in section 10.</li>
+                        <li><strong>Legitimate interest</strong> — the one-way hash of your email address in the free-trial ledger, and the random identifier in the <code>__Host-hmb_did</code> cookie together with the small device record it points to. The interest is keeping a card-required free trial to one per person, so that the offer is not drained by repeat sign-ups and can go on being offered to everyone else. The check is deliberately the least a rule like that can be built on — a hash and a random number, with no fingerprinting and no profile — it can only ever withhold the trial offer, never access, and it applies to nobody who has not asked to start a trial or finished a session on the timer. I have written the balancing test down; it is kept on file and you may ask for a copy. You have the right to object, in section 8.3.</li>
                         <li><strong>Consent</strong> — analytics and advertising cookies, and the optional mailing list, and nothing else. Consent Mode starts at denied. Withdrawable at any time, and withdrawing is as easy as giving it. Nothing the account or the subscription needs in order to work relies on consent, and nothing is refused to you for declining.</li>
                         <li><strong>Legal obligation</strong> — tax and accounting records, which Stripe holds as the seller.</li>
                     </ul>
@@ -435,7 +435,7 @@
 
                     <ol>
                         <li>If a subscription is live, it is <strong>cancelled at Stripe first</strong>, and the cancellation is confirmed before anything else happens. An account is never deleted with billing left running behind it.</li>
-                        <li>The subscription record is detached, as section 9 describes, and Stripe's identifiers are kept so that a later refund or dispute can still be matched.</li>
+                        <li>The subscription record is detached, as section 7 describes, and Stripe's identifiers are kept so that a later refund or dispute can still be matched.</li>
                         <li>Your account, your sign-in identities and your checkout records are deleted.</li>
                         <li>Your account identifier is removed from the free-trial records; the email hash and the device record run out their 24 months.</li>
                     </ol>
@@ -468,7 +468,7 @@
                 <section id="security">
                     <h2>11. Security</h2>
 
-                    <p>The site is served over HTTPS. Secrets live in server environment variables, never in the code and never in a browser. There are no passwords to store, because sign-in is an email link, a code or a Google account. Sign-in tokens are checked on the server against the authentication service's published keys on every request that touches an account. The database tables that hold account, subscription and trial records accept no direct access from a browser at all; every read goes through this site's own server, which identifies you from your verified sign-in and never from anything the page claims about itself. Email addresses in the free-trial ledger are stored only as a keyed one-way hash, email addresses in logs only as a short hash prefix, and <strong>no payment data reaches this project at all</strong>. The account record is deliberately small, so a breach of it would expose an email address and a plan, not a practice history and not a card. No system is perfectly secure, and I will not promise that it is.</p>
+                    <p>The site is served over HTTPS. Secrets live in server environment variables, never in the code and never in a browser. There are no passwords to store, because sign-in is an email link, a code or a Google account. Sign-in tokens are checked on the server against the authentication service's published keys on every request that touches an account. The database tables that hold account, subscription and trial records accept no direct access from a browser at all; every read goes through this site's own server, which identifies you from your verified sign-in and never from anything the page claims about itself. Email addresses in the free-trial ledger are stored only as a keyed one-way hash, email addresses in logs only as a short hash prefix (the one exception is the mailing-list confirmation link, which carries your address in signed form and appears in the hosting provider's request logs for as long as it keeps them), and <strong>no payment data reaches this project at all</strong>. The account record is deliberately small, so a breach of it would expose an email address and a plan, not a practice history and not a card. No system is perfectly secure, and I will not promise that it is.</p>
                 </section>
 
                 <section id="changes">

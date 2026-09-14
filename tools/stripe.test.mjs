@@ -12,7 +12,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { bytesToHex, hmacSha256 } from '../api/_lib/crypto.js';
-import { PROVIDER_IDS, assertAdapter, getProvider, listProviders } from '../api/_lib/providers/index.js';
+import { PROVIDER_IDS, assertAdapter, getProvider, listProviders, ProviderError } from '../api/_lib/providers/index.js';
 import {
   API_VERSION,
   CHECKOUT_SESSION_TTL_SECONDS,
@@ -309,6 +309,9 @@ test('parseEvents: refunds and disputes name a charge, never a subscription; unk
   assert.equal(refund.providerSubscriptionId, null);
   assert.equal(refund.providerTransactionId, INV);
   assert.equal(refund.amount, '10.50');
+  assert.equal(refund.fullyRefunded, false, 'without refunded:true it is a partial refund');
+  const full = stripeProvider.parseEvents(JSON.stringify(stripeEvent('charge.refunded', { id: CH, object: 'charge', amount: 1050, amount_refunded: 1050, refunded: true, currency: 'usd', invoice: INV, customer: CUS })), { env: ENV })[0];
+  assert.equal(full.fullyRefunded, true);
 
   const dispute = stripeProvider.parseEvents(JSON.stringify(stripeEvent('charge.dispute.created', { id: 'dp_TESTFIXTURE1', object: 'dispute', amount: 1050, currency: 'usd', charge: CH })), { env: ENV })[0];
   assert.equal(dispute.type, 'txn.chargeback');
@@ -408,30 +411,35 @@ test('createCheckoutSession: Managed Payments by default — Stripe as merchant 
   assert.equal(call.headers['Idempotency-Key'], `hmb-cs-${RID}-managed`);
 });
 
-test('createCheckoutSession: when Stripe refuses Managed Payments the session is a plain checkout with automatic tax, and the log says so', async () => {
-  let attempt = 0;
+test('createCheckoutSession: when Stripe refuses Managed Payments nothing is sold under another model — the call fails and the log says what to do', async () => {
   const fetchImpl = fetchStub({
-    'POST /v1/checkout/sessions': () => {
-      attempt += 1;
-      if (attempt === 1) return new Response(JSON.stringify({ error: { type: 'invalid_request_error', param: 'managed_payments', message: 'Your account is not eligible for Managed Payments.' } }), { status: 400 });
-      return { id: CS, status: 'open', url: 'https://checkout.stripe.com/c/pay/x' };
-    },
+    'POST /v1/checkout/sessions': () => new Response(JSON.stringify({ error: { type: 'invalid_request_error', param: 'managed_payments', message: 'Your account is not eligible for Managed Payments.' } }), { status: 400 }),
   });
-  const warn = console.warn;
-  const warnings = [];
-  console.warn = (...args) => warnings.push(args.join(' '));
+  const err = console.error;
+  const errors = [];
+  console.error = (...args) => errors.push(args.join(' '));
   try {
-    const out = await stripeProvider.createCheckoutSession({ priceId: ENV.MOR_PRICE_MONTHLY, customerId: CUS, customData: { rid: RID, v: 3 }, trial: true }, ctxWith(fetchImpl));
-    assert.equal(out.transactionId, CS);
+    await assert.rejects(
+      () => stripeProvider.createCheckoutSession({ priceId: ENV.MOR_PRICE_MONTHLY, customerId: CUS, customData: { rid: RID, v: 3 }, trial: true }, ctxWith(fetchImpl)),
+      (e) => e instanceof ProviderError && e.reason === 'managed_payments_refused',
+    );
   } finally {
-    console.warn = warn;
+    console.error = err;
   }
-  assert.equal(fetchImpl.calls.length, 2);
-  assert.equal(fetchImpl.calls[1].form['managed_payments[enabled]'], undefined);
-  assert.equal(fetchImpl.calls[1].form['automatic_tax[enabled]'], 'true');
-  assert.equal(fetchImpl.calls[1].headers['Stripe-Version'], API_VERSION);
-  assert.equal(fetchImpl.calls[1].headers['Idempotency-Key'], `hmb-cs-${RID}-tax`);
-  assert.match(warnings.join('\n'), /managed payments refused/);
+  assert.equal(fetchImpl.calls.length, 1, 'no second shape is tried: the legal pages name Stripe as the seller');
+  assert.match(errors.join('\n'), /managed payments refused/);
+  assert.match(errors.join('\n'), /MOR_MANAGED_PAYMENTS=false/);
+  // A version rejection is a refusal too: the account is not on the preview.
+  const fetchVersion = fetchStub({
+    'POST /v1/checkout/sessions': () => new Response(JSON.stringify({ error: { type: 'invalid_request_error', message: 'Invalid Stripe API version: 2026-02-25.preview' } }), { status: 400 }),
+  });
+  console.error = () => {};
+  try {
+    await assert.rejects(() => stripeProvider.createCheckoutSession({ priceId: ENV.MOR_PRICE_MONTHLY, customerId: CUS, customData: { rid: RID, v: 3 }, trial: true }, ctxWith(fetchVersion)), /Managed Payments/);
+  } finally {
+    console.error = err;
+  }
+  assert.equal(fetchVersion.calls.length, 1);
 });
 
 test('createCheckoutSession: a plain account — the trial, the price, the customer and the reservation are fixed server-side', async () => {

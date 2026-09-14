@@ -36,11 +36,31 @@ export const LIMIT = Object.freeze({ window: 3600, max: 10 });
 /** The only pause lengths offered on the cancel screen. */
 export const MONTHS = Object.freeze([1, 3]);
 
-const MONTH_MS = 30.4375 * 24 * 60 * 60 * 1000;
+const HOUR_MS = 60 * 60 * 1000;
 
 /**
- * When the pause ends: `months` after the end of the period already paid for
- * (or after now, when no period end is known).
+ * `months` calendar months later, the day clamped to the target month (31 Jan
+ * + 1 month = 28/29 Feb), so the date lands on the renewal the provider will
+ * actually invoice.
+ * @param {number} ms
+ * @param {number} months
+ * @returns {number}
+ */
+export function addCalendarMonths(ms, months) {
+  const d = new Date(ms);
+  const day = d.getUTCDate();
+  const target = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + months, 1, d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds(), d.getUTCMilliseconds()));
+  const lastDay = new Date(Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0)).getUTCDate();
+  target.setUTCDate(Math.min(day, lastDay));
+  return target.getTime();
+}
+
+/**
+ * When the pause ends: `months` calendar months after the end of the period
+ * already paid for (or after now, when no period end is known), less an hour
+ * so collection resumes just before the renewal that should be paid. An
+ * average 30.4375-day month landed after that invoice in short months and
+ * voided it too — a free extra month.
  * @param {object} row
  * @param {number} months
  * @param {number} nowMs
@@ -48,7 +68,7 @@ const MONTH_MS = 30.4375 * 24 * 60 * 60 * 1000;
  */
 export function resumeAtFor(row, months, nowMs) {
   const base = toMs(row && row.current_period_end) ?? nowMs;
-  return toIso(Math.max(base, nowMs) + months * MONTH_MS);
+  return toIso(addCalendarMonths(Math.max(base, nowMs), months) - HOUR_MS);
 }
 
 /**

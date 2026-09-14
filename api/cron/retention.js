@@ -49,16 +49,16 @@ export function retentionSteps(nowMs) {
     {
       name: 'webhook_payloads_nulled',
       method: 'PATCH',
-      // ONLY processed rows — a failed row keeps its payload for replay.
-      path: `webhook_events?received_at=lt.${iso(30 * DAY_MS)}&payload=not.is.null&status=eq.processed&select=event_id`,
+      // Processed and ignored rows — a failed row keeps its payload for replay.
+      path: `webhook_events?received_at=lt.${iso(30 * DAY_MS)}&payload=not.is.null&status=in.(processed,ignored)&select=event_id`,
       body: { payload: null },
-      sql: "update public.webhook_events set payload = null where received_at < now() - interval '30 days' and payload is not null and status = 'processed'",
+      sql: "update public.webhook_events set payload = null where received_at < now() - interval '30 days' and payload is not null and status in ('processed', 'ignored')",
     },
     {
       name: 'webhook_events_deleted',
       method: 'DELETE',
-      path: `webhook_events?received_at=lt.${iso(180 * DAY_MS)}&status=eq.processed&select=event_id`,
-      sql: "delete from public.webhook_events where received_at < now() - interval '180 days' and status = 'processed'",
+      path: `webhook_events?received_at=lt.${iso(180 * DAY_MS)}&status=in.(processed,ignored)&select=event_id`,
+      sql: "delete from public.webhook_events where received_at < now() - interval '180 days' and status in ('processed', 'ignored')",
     },
     {
       name: 'trial_reservations_expired',

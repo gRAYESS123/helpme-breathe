@@ -475,7 +475,7 @@
 
         function renderCatchingUp() {
             show(
-                'Payment went through. Your account is still catching up.',
+                'Your account is still catching up.',
                 'The payment provider confirms each checkout to us a few seconds to a few minutes later. Refresh this page in a minute, or open your account page; if the plan is still not there, email us and quote the reference below.'
             );
             actions([
@@ -555,7 +555,7 @@
 
         (async () => {
             show(
-                trialDays > 0 ? 'Your trial has started' : 'Your subscription has started',
+                'Finishing your checkout',
                 'Checking your account. This takes a few seconds while the payment provider confirms the checkout.'
             );
 

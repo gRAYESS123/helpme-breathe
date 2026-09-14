@@ -227,7 +227,9 @@ function onSessionComplete(event) {
 
   const technique = detail.technique || '';
   renderCaptureCard(container, { source: 'post-session', technique });
-  setFlag(FLAG_SHOWN, true);
+  // The flag is set when the person acts on the card (dismiss or submit), not
+  // here: a card that rendered below the fold and was never seen must come
+  // back after the next session.
   track(EVENTS.CAPTURE_SHOWN, { technique: technique || 'none', source: 'post-session' });
 }
 

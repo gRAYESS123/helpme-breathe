@@ -229,7 +229,7 @@ function memoryStore(seed = {}) {
       calls.push(['updateOrdered', id, occurredAt]);
       const row = findSub(provider, id);
       if (!row) return [];
-      if (row.last_event_at && !(Date.parse(row.last_event_at) < Date.parse(occurredAt))) return [];
+      if (row.last_event_at && !(Date.parse(row.last_event_at) <= Date.parse(occurredAt))) return []; // lte, as the real store
       Object.assign(row, fields, { last_event_at: occurredAt });
       return [{ ...row }];
     },
@@ -1063,7 +1063,7 @@ test('applyEvent: pause keeps the paid period; resume, scheduled cancel and its 
   await applyEvent(paused, d);
   assert.equal(store.subs[0].status, 'paused');
   assert.equal(store.subs[0].paused_at, iso(33 * DAY));
-  assert.equal(store.subs[0].access_until, iso(33 * DAY), '§6.5: paused -> coalesce(current_period_end, now)');
+  assert.equal(store.subs[0].access_until, iso(35 * DAY), 'paused keeps the access the paid period set (frozen; Stripe rolls current_period_end on during a pause)');
 
   const resumed = parsed('subscription.resumed', subscriptionEntity({ status: 'active', current_billing_period: { starts_at: iso(60 * DAY), ends_at: iso(90 * DAY) } }), { id: 'evt_TESTFIXTURE_r', occurredAt: iso(60 * DAY) });
   await applyEvent(resumed, d);
@@ -1100,6 +1100,23 @@ test('applyEvent: cancel during the trial marks the claim cancelled; a $0 txn is
   assert.equal(store.subs[0].dispute_open, true);
   assert.equal(store.claims[0].outcome, 'chargeback');
   assert.equal(alerts.at(-1).kind, 'chargeback');
+});
+
+test('applyEvent: a full refund ends the subscription and the access with it (refund policy); a partial refund is only noted', async () => {
+  const store = memoryStore({ subscriptions: [{ ...trialingRow(), status: 'active', ever_paid: true, current_period_end: iso(30 * DAY), access_until: iso(30 * DAY + 48 * HOUR) }], claims: [{ email_hash: EMAIL_HASH, outcome: 'converted', provider: PRIMARY, provider_subscription_id: SUB }] });
+  const provider = providerStub();
+  const d = deps(store, provider, []);
+  const partial = normalizeEvent({ id: 'evt_TESTFIXTURE_rp', type: 'txn.refunded', occurredAt: iso(2 * DAY), live: false, providerSubscriptionId: SUB, amount: '2.00', currency: 'USD', fullyRefunded: false });
+  assert.deepEqual(await applyEvent(partial, d), { action: 'noted', reason: 'refund' });
+  assert.equal(store.subs[0].status, 'active', 'a goodwill partial refund changes nothing');
+  assert.deepEqual(provider.calls, []);
+
+  const full = normalizeEvent({ id: 'evt_TESTFIXTURE_rf', type: 'txn.refunded', occurredAt: iso(3 * DAY), live: false, providerSubscriptionId: SUB, amount: '10.00', currency: 'USD', fullyRefunded: true });
+  assert.deepEqual(await applyEvent(full, d), { action: 'updated', reason: 'refund' });
+  assert.deepEqual(provider.calls, [['cancelSubscription', SUB, 'immediately']], 'ended at the provider so nothing is charged again');
+  assert.equal(store.subs[0].status, 'canceled');
+  assert.equal(store.subs[0].access_until, iso(10 * DAY), 'access ends at the time of the refund (the handler clock)');
+  assert.equal(store.claims[0].outcome, 'refunded');
 });
 
 test('applyEvent: a no-trial subscription resolves by email (ladder step 3) and an unknown price id fails loudly', async () => {
@@ -1146,7 +1163,7 @@ test('createWebhookStore builds the conditional ordered UPDATE, the terminal can
   assert.equal(log.at(-1).method, 'PATCH');
   assert.match(log.at(-1).path, /provider=eq\./);
   assert.match(log.at(-1).path, new RegExp(`provider_subscription_id=eq\\.${SUB}`));
-  assert.match(log.at(-1).path, /or=\(last_event_at\.is\.null,last_event_at\.lt\./, 'ordering enforced by the write');
+  assert.match(log.at(-1).path, /or=\(last_event_at\.is\.null,last_event_at\.lte\./, 'ordering enforced by the write; lte because Stripe stamps sibling events with the same second');
   assert.deepEqual(log.at(-1).body, { status: 'active', last_event_at: iso() });
   assert.equal(log.at(-1).prefer, 'return=representation', 'zero rows must be observable');
 
@@ -1196,7 +1213,7 @@ test('createWebhookStore builds the conditional ordered UPDATE, the terminal can
   assert.match(log.at(-1).path, /trial_claims\?email_hash=eq\.\\x00testfixture00&outcome=in\.\(reserved,expired\)/);
   await store.subscriptionsToReconcile(iso(), 50);
   assert.match(log.at(-2).path, /needs_reconcile=is\.true/);
-  assert.match(log.at(-1).path, /status=in\.\(trialing,active\)&access_until=lt\./);
+  assert.match(log.at(-1).path, /status=in\.\(trialing,active,past_due,paused\)&access_until=lt\./, 'a lost dunning-recovery or resume webhook strands past_due and paused rows too');
   await store.orphanSubscriptions();
   assert.match(log.at(-1).path, /user_id=is\.null&detached_at=is\.null/);
 
@@ -1296,14 +1313,24 @@ test('billing/cancel: effective_from is explicit in every branch of §5.9', asyn
   assert.deepEqual(now.provider.calls, [['cancelSubscription', SUB, 'immediately']]);
   assert.equal(now.updates[0][1].status, 'canceled');
 
-  // paused, default: explicit `immediately`; the paid period already ran out so nothing is taken away
-  const paused = billingDeps([{ ...activeRow(), status: 'paused', paused_at: iso(33 * DAY), access_until: iso(33 * DAY) }]);
+  // paused, default: explicit `immediately` at the provider (nothing is being collected),
+  // and the days already paid for are kept: the frozen access_until becomes cancel_at.
+  const paused = billingDeps([{ ...activeRow(), status: 'paused', paused_at: iso(5 * DAY), access_until: iso(35 * DAY) }]);
   response = await createCancelHandler(paused.deps).POST(billingRequest('cancel'));
   body = await response.json();
   assert.equal(body.effective_from, 'immediately');
   assert.equal(body.status, 'canceled');
   assert.deepEqual(paused.provider.calls, [['cancelSubscription', SUB, 'immediately']]);
   assert.match(body.message, /paused subscription has ended/);
+  assert.match(body.message, /keep access until/);
+  assert.equal(paused.updates[0][1].cancel_at, iso(35 * DAY), 'paid days kept');
+  assert.equal(paused.updates[0][1].access_until, iso(35 * DAY));
+  // a paused row whose paid period has already run out ends now
+  const lapsed = billingDeps([{ ...activeRow(), status: 'paused', paused_at: iso(-40 * DAY), access_until: iso(-5 * DAY) }]);
+  response = await createCancelHandler(lapsed.deps).POST(billingRequest('cancel'));
+  body = await response.json();
+  assert.equal(lapsed.updates[0][1].cancel_at, null);
+  assert.doesNotMatch(body.message, /keep access/);
 
   // already scheduled: idempotent, no provider call
   const scheduled = billingDeps([{ ...activeRow(), cancel_at: iso(33 * DAY) }]);
@@ -1321,8 +1348,13 @@ test('billing/cancel: effective_from is explicit in every branch of §5.9', asyn
 });
 
 test('billing/pause: 1 or 3 months, next_billing_period, access to the paid period end (test 15)', async () => {
-  assert.equal(resumeAtFor({ current_period_end: iso(33 * DAY) }, 1, T0), iso(33 * DAY + 30.4375 * DAY));
-  assert.equal(resumeAtFor({}, 3, T0), iso(3 * 30.4375 * DAY));
+  // Calendar months, an hour before the renewal that should be collected:
+  // 2026-10-17T10:00Z + 1 month = 2026-11-17T10:00Z, less an hour.
+  const R1 = '2026-11-17T09:00:00.000Z';
+  assert.equal(resumeAtFor({ current_period_end: iso(33 * DAY) }, 1, T0), R1);
+  assert.equal(resumeAtFor({}, 3, T0), '2026-12-14T09:00:00.000Z');
+  // The day is clamped to the target month: 31 Jan + 1 month = 28 Feb (2027), never 3 Mar.
+  assert.equal(resumeAtFor({ current_period_end: '2027-01-31T00:00:00.000Z' }, 1, T0), '2027-02-27T23:00:00.000Z');
 
   const active = billingDeps([activeRow()]);
   const response = await createPauseHandler(active.deps).POST(billingRequest('pause', { months: 1 }));
@@ -1330,10 +1362,10 @@ test('billing/pause: 1 or 3 months, next_billing_period, access to the paid peri
   const body = await response.json();
   assert.equal(body.effective_from, 'next_billing_period');
   assert.equal(body.effective_at, iso(30 * DAY));
-  assert.equal(body.resume_at, iso(33 * DAY + 30.4375 * DAY));
+  assert.equal(body.resume_at, R1);
   assert.equal(body.access_until, iso(35 * DAY), 'not revoked');
-  assert.deepEqual(active.provider.calls, [['pauseSubscription', SUB, 'next_billing_period', iso(33 * DAY + 30.4375 * DAY)]]);
-  assert.deepEqual(active.updates, [['row-seed', { resume_at: iso(33 * DAY + 30.4375 * DAY) }]]);
+  assert.deepEqual(active.provider.calls, [['pauseSubscription', SUB, 'next_billing_period', R1]]);
+  assert.deepEqual(active.updates, [['row-seed', { resume_at: R1 }]]);
 
   assert.equal((await createPauseHandler(active.deps).POST(billingRequest('pause', { months: 2 }))).status, 400);
   assert.equal((await createPauseHandler(billingDeps([trialingRow()]).deps).POST(billingRequest('pause', { months: 1 }))).status, 409);
@@ -1355,7 +1387,7 @@ test('billing/switch: only monthly -> yearly on an active row, price from env, p
   assert.equal(body.plan, 'yearly');
   assert.equal(body.next_billed_at, iso(365 * DAY));
   assert.deepEqual(active.provider.calls, [['changePlan', SUB, ENV.MOR_PRICE_YEARLY, true]]);
-  assert.deepEqual(active.updates, [['row-seed', { plan: 'yearly', provider_price_id: ENV.MOR_PRICE_YEARLY, needs_reconcile: true }]]);
+  assert.deepEqual(active.updates, [['row-seed', { plan: 'yearly', provider_price_id: ENV.MOR_PRICE_YEARLY, needs_reconcile: true, display_amount: null, display_currency: null, display_tax_inclusive: null }]], 'the old price is not quoted as the next charge');
 
   assert.equal((await createSwitchHandler(active.deps).POST(billingRequest('switch', { plan: 'monthly' }))).status, 400);
   assert.equal((await createSwitchHandler(billingDeps([trialingRow()]).deps).POST(billingRequest('switch', { plan: 'yearly' }))).status, 409);
@@ -1407,7 +1439,7 @@ test('reconcile: rewrites flagged and lapsed rows from getSubscription, re-drive
   assert.equal(rewritten.status, 'active');
   assert.equal(rewritten.current_period_end, iso(63 * DAY));
   assert.equal(rewritten.access_until, iso(63 * DAY + 48 * HOUR));
-  assert.equal(rewritten.last_event_at, iso(40 * DAY));
+  assert.equal(rewritten.last_event_at, iso(20 * DAY), 'stamped with the time of the read, never the subscription creation time the API object carries');
   assert.equal(store.claims[0].outcome, 'converted', 'the ledger side effect of the missed conversion webhook');
   assert.ok(provider.calls.some((c) => c[0] === 'getSubscription' && c[1] === 'sub_01testfixturelapsed0000000'));
   assert.ok(!provider.calls.some((c) => c[1] === 'sub_01testfixturefine000000000'));
