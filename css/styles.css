@@ -766,7 +766,7 @@ body:has([data-breathing-app]):not(.render-body):not(:has(.timer-pair)) .site-he
 }
 
 @media (max-width: 640px) {
-    .nav-toggle { display: inline-flex; margin-left: 0.5rem; }
+    .nav-toggle { display: inline-flex; margin-left: auto; }
 
     /* The toggle carries the auto margin: Menu and Sign in sit together at
        the right, in DOM (tab) order. */
