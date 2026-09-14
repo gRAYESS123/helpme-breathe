@@ -76,6 +76,7 @@ export const OPTIONAL_ENV = Object.freeze([
   'SITE_ORIGIN',
   'MOR_API_USERNAME',
   'MOR_API_PASSWORD',
+  'MOR_MANAGED_PAYMENTS',
 ]);
 
 /**

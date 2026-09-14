@@ -189,8 +189,8 @@
 
             <section class="account-section" data-role="data-section" hidden>
                 <h2>Your data</h2>
-                <p>Export gives you a JSON file with your profile and every subscription record. Payments are processed by Stripe, which keeps its own copy of your payment records as a separate data
-                controller.</p>
+                <p>Export gives you a JSON file with your profile and every subscription record. Payments are handled by Stripe as merchant of record, which keeps its own copy of your payment records as a
+                separate data controller.</p>
 
                 <div class="account-actions">
                     <button type="button" class="btn" data-role="export">Export my data</button>
@@ -204,7 +204,7 @@
                     If a payment dispute is open, or a payment is outstanding, we will ask you to sort that out first.</p>
                     <div class="check-row">
                         <input type="checkbox" id="delete-ack" data-role="delete-ack">
-                        <label for="delete-ack">I understand this deletes my account and cancels any subscription. Stripe keeps its own copy of the payment record as a separate controller.</label>
+                        <label for="delete-ack">I understand this deletes my account and cancels any subscription. Stripe, the merchant of record, keeps its own copy of the payment record as a separate controller.</label>
                     </div>
                     <div class="btn-row">
                         <button type="button" class="btn btn--danger" data-role="delete" disabled>Delete my account</button>

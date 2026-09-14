@@ -169,7 +169,7 @@
                         <ul>
                             <li>The timer runs in your browser. Your settings, your session history and your saved patterns stay on your device and are never sent to me.</li>
                             <li>An account holds your <strong>email address, your sign-in identities, the date it was created and your plan</strong> — never your practice. There are <strong>no passwords</strong>.</li>
-                            <li>Payments are processed by Stripe. <strong>I never see your card details</strong>, and I do not store them anywhere.</li>
+                            <li>Payments are handled end to end by Stripe as merchant of record. <strong>I never see your card details</strong>, and I do not store them anywhere.</li>
                             <li><strong>One free trial per person.</strong> Checking that uses a one-way hash of your email address and a random identifier in a cookie on this device, and those two things only. <strong>There is no browser fingerprinting.</strong></li>
                             <li>Analytics and advertising cookies are set to <strong>denied</strong> before anything loads, and stay denied unless you choose "Accept all" in the cookie banner.</li>
                             <li>Every record has a retention period with a number on it. Trial records are kept for 24 months, and this page says why.</li>
@@ -183,7 +183,7 @@
 
                     <p>The controller for this site is Georges Rayess, an individual, contactable at <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>. There is no data protection officer, because a one-person project does not need one and I would rather not pretend otherwise.</p>
 
-                    <p>Two other parties are controllers in their own right for the parts they handle: Stripe, which processes the payment and holds the payment record, and Google, for the analytics and advertising services described below. Two more act as processors on my instructions: the authentication and database service that hosts account records, and the email service that sends sign-in links and receipts. Each is described in the section that covers it.</p>
+                    <p>Two other parties are controllers in their own right for the parts they handle: Stripe, which sells the subscription as merchant of record and holds the payment record, and Google, for the analytics and advertising services described below. Two more act as processors on my instructions: the authentication and database service that hosts account records, and the email service that sends sign-in links and receipts. Each is described in the section that covers it.</p>
                 </section>
 
                 <section id="browser-storage">
@@ -295,11 +295,11 @@
 
                     <p>Account records are held by <strong>Supabase</strong>, an authentication and database service acting as a processor on my instructions, in a data-centre region in the United States (Northern California). Your browser talks to Supabase only to sign you in; everything else about your account is read through this site's own server. The tables that hold your data accept no direct access from a browser at all.</p>
 
-                    <h3>3.5 Subscribing — the payment processor</h3>
+                    <h3>3.5 Subscribing — Stripe as merchant of record</h3>
 
-                    <p>I am the seller, and I never touch your payment details. Payments are processed by <strong>Stripe</strong> (Stripe, Inc., and Stripe Payments Europe, Ltd. for customers in Europe), which takes the payment, issues the receipt, runs the billing portal and is the <strong>controller of your payment data</strong> — your card details, your billing address and the fraud signals it collects — under its own privacy policy at <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer">stripe.com/privacy</a>.</p>
+                    <p>I do not sell to you directly and I never touch your payment details. The subscription is sold by <strong>Stripe</strong> (Stripe, Inc., and Stripe Payments Europe, Ltd. for customers in Europe) as the <strong>merchant of record</strong>, under its Managed Payments service: the contract of sale is between you and Stripe. It takes the payment, calculates and remits sales tax and VAT, issues the receipt, runs the billing portal and is the <strong>controller of your payment data</strong> — your card details, your billing address and the fraud signals it collects — under its own privacy policy at <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer">stripe.com/privacy</a>.</p>
 
-                    <p>Because Stripe holds its own copy of your payment record as a separate controller, a request to erase the payment record itself goes to Stripe, not to me; section 10 explains how. The tax records tied to a charge are kept for as long as tax law requires.</p>
+                    <p>Because Stripe holds its own copy of your purchase record as a separate controller, a request to erase the payment record itself goes to Stripe, not to me; section 10 explains how.</p>
 
                     <p>What reaches me is limited to what section 3.4 lists: your email address, your plan and its dates, Stripe's subscription and customer identifiers, the country used for tax, and the amount and currency you were charged. When Stripe tells this site about a payment, a renewal, a decline or a cancellation, that message is kept as a record for a limited time — section 9 gives the number — so that a dispute or a missed message can be checked against what actually happened. <strong>I never receive your card number.</strong></p>
 
@@ -393,7 +393,7 @@
                         <li><strong>Performance of a contract</strong> — your account, your subscription and its trial, the payment, the emails the service needs to send, and supporting you while it runs.</li>
                         <li><strong>Legitimate interest</strong> — the one-way hash of your email address in the free-trial ledger, and the random identifier in the <code>__Host-hmb_did</code> cookie together with the small device record it points to. The interest is keeping a card-required free trial to one per person, so that the offer is not drained by repeat sign-ups and can go on being offered to everyone else. The check is deliberately the least a rule like that can be built on — a hash and a random number, with no fingerprinting and no profile — it can only ever withhold the trial offer, never access, and it applies to nobody who has not asked to start a trial or finished a session on the timer. I have written the balancing test down; it is kept on file and you may ask for a copy. You have the right to object, in section 10.</li>
                         <li><strong>Consent</strong> — analytics and advertising cookies, and the optional mailing list, and nothing else. Consent Mode starts at denied. Withdrawable at any time, and withdrawing is as easy as giving it. Nothing the account or the subscription needs in order to work relies on consent, and nothing is refused to you for declining.</li>
-                        <li><strong>Legal obligation</strong> — tax and accounting records, which I must keep as the seller and which Stripe keeps as the payment processor.</li>
+                        <li><strong>Legal obligation</strong> — tax and accounting records, which Stripe holds as the seller.</li>
                     </ul>
 
                     <p>There is no browser fingerprint, so there is no fingerprint to consent to and no basis claimed for one.</p>
@@ -413,7 +413,7 @@
                         <li><strong>The <code>__Host-hmb_did</code> cookie</strong> — 2 years. <strong>The <code>__Host-hmb_ent</code> cookie</strong> — 14 days.</li>
                         <li><strong>Rate-limit counters</strong> keyed on your account or your network — <strong>2 days</strong>.</li>
                         <li><strong>Mailing list entries</strong> — kept until you unsubscribe.</li>
-                        <li><strong>Purchase and tax records</strong> — kept by me and by Stripe for as long as tax law requires.</li>
+                        <li><strong>Purchase and tax records</strong> — kept by Stripe, as the seller, for as long as its own law requires.</li>
                         <li><strong>Server logs</strong> — short-lived and operational. <strong>Email correspondence</strong> — kept while it is useful, then deleted.</li>
                     </ul>
                 </section>

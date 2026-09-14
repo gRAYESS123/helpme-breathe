@@ -5,18 +5,26 @@
  * after Paddle's identity verification stalled; the owner already holds a
  * Stripe account.
  *
- * STRIPE IS NOT A MERCHANT OF RECORD. With Paddle the payment company was the
- * seller: it collected VAT and sales tax everywhere, issued the receipt and
- * owned refunds and chargebacks. With Stripe the site's owner is the seller.
- * Stripe Tax can calculate and collect tax at checkout (every session below
- * asks for it and falls back gracefully when Tax is not switched on), but
- * registering for and filing that tax, refunds and disputes are the owner's.
- * docs/private/PAYOUT_RAILS.md records why Paddle was chosen first.
+ * TWO WAYS OF SELLING, ONE FLAG. With Stripe **Managed Payments** (the
+ * owner's blueprint, 2026-09-14) Stripe is the merchant of record: the seller
+ * on the receipt, collecting VAT and sales tax everywhere, owning refunds and
+ * chargebacks — the model docs/private/ACCOUNTS_BILLING_DESIGN.md was written
+ * for. It is on unless MOR_MANAGED_PAYMENTS is literally `false`, and needs the
+ * `2026-02-25.preview` API version on the checkout call, an eligible product
+ * tax code (tools/stripe-catalog.mjs sets txcd_10103100) and the feature
+ * enabled on the account. If Stripe refuses it (the account is not eligible),
+ * the session is created as a plain Stripe checkout with automatic tax — then
+ * the owner is the seller and Stripe Tax collects; registering and filing tax,
+ * refunds and disputes become the owner's, and the legal copy must say so.
+ * The refusal is logged; nothing is sold silently under the wrong model.
  *
  * Written from Stripe's API reference (api version 2024-06-20 pinned on every
- * call, so responses have a stable shape). Field names relied on:
+ * call except the Managed Payments checkout, so responses have a stable
+ * shape). Field names relied on:
  *
  *   POST /v1/checkout/sessions   `mode=subscription`, `line_items[0][price]`,
+ *                                `managed_payments[enabled]=true` (+ header
+ *                                `Stripe-Version: 2026-02-25.preview`),
  *                                `customer`, `client_reference_id`, `metadata[rid]`,
  *                                `subscription_data[metadata][rid]`,
  *                                `subscription_data[trial_period_days]`,
@@ -76,6 +84,11 @@
  *                                `customer`. No subscription id: enrichEvent()
  *                                looks it up through the invoice.
  *   Dispute object               `id`, `charge`, `amount`, `currency`.
+ *   Checkout Session object      (checkout.session.completed) `id`, `mode`,
+ *                                `subscription`, `customer`, `client_reference_id`,
+ *                                `metadata`, `customer_details.email`, `amount_total`,
+ *                                `currency`, `payment_status` ∈ paid | unpaid |
+ *                                no_payment_required, `total_details.amount_tax`.
  *   Webhooks                     body `{ id (evt_…), type, created, livemode,
  *                                data { object, previous_attributes? } }`.
  *   Signature                    header `Stripe-Signature: t=<unix>,v1=<hex>[,v1=…]`;
@@ -110,6 +123,9 @@ const DEFAULT_SITE_ORIGIN = 'https://helpmebreath.com';
 /** Pinned so every API response has the shape the normalisers below read. */
 export const API_VERSION = '2024-06-20';
 
+/** The version Managed Payments needs on the checkout call (Stripe's blueprint, 2026-09-14). */
+export const MANAGED_PAYMENTS_VERSION = '2026-02-25.preview';
+
 /** Tolerance for the Stripe-Signature timestamp, seconds (design §6.2). */
 export const SIGNATURE_TOLERANCE_SECONDS = 300;
 
@@ -127,6 +143,10 @@ export const PORTAL_SESSION_TTL_SECONDS = 300;
 
 /** Stripe event type -> normalised type. Anything absent is `ignore`. */
 export const EVENT_MAP = Object.freeze({
+  // The blueprint's success signal. A subscription session completing is the
+  // first payment (or the $0 start of a trial); the subscription events that
+  // follow carry the dates. Only `mode=subscription` sessions are ours.
+  'checkout.session.completed': 'txn.completed',
   'customer.subscription.created': 'sub.created',
   // Refined by previous_attributes in refineUpdate(): trialing -> active is
   // sub.activated, a pause_collection appearing is sub.paused, and so on.
@@ -155,6 +175,16 @@ export const STATUS_MAP = Object.freeze({
 });
 
 /* ----------------------------------------------------------- credentials -- */
+
+/**
+ * Managed Payments (Stripe as merchant of record) is on unless the variable is
+ * literally `false`. See the file header for what turning it off means.
+ * @param {Record<string,string>} env
+ * @returns {boolean}
+ */
+export function managedPaymentsEnabled(env) {
+  return String((env && env.MOR_MANAGED_PAYMENTS) || '').trim().toLowerCase() !== 'false';
+}
 
 /**
  * True for a test-mode secret or restricted key.
@@ -238,7 +268,7 @@ export function describePath(path) {
  *
  * @param {{env:Record<string,string>, fetchImpl?:Function}} ctx
  * @param {string} path e.g. `/v1/customers`
- * @param {{method?:string, body?:object, idempotencyKey?:string}} [init]
+ * @param {{method?:string, body?:object, idempotencyKey?:string, version?:string}} [init]
  * @returns {Promise<any>}
  */
 export async function stripeRequest(ctx, path, init = {}) {
@@ -250,7 +280,7 @@ export async function stripeRequest(ctx, path, init = {}) {
   const headers = {
     Authorization: `Bearer ${apiKey}`,
     Accept: 'application/json',
-    'Stripe-Version': API_VERSION,
+    'Stripe-Version': init.version || API_VERSION,
   };
   let body;
   if (init.body !== undefined && method !== 'GET') {
@@ -477,6 +507,47 @@ export function normalizeInvoice(inv, extra = {}) {
 }
 
 /**
+ * A completed Checkout Session in subscription mode: the first payment, or the
+ * $0 start of a trial. It carries the subscription and customer ids, the
+ * reservation id and the email, but no price and no dates — those arrive on
+ * the subscription events, so this is a `txn.completed` and nothing more.
+ * @param {object} session
+ * @param {{type?:string, id?:string, occurredAt?:string, providerEventType?:string, live?:boolean, env?:object}} extra
+ * @returns {object}
+ */
+export function normalizeCheckoutSession(session, extra = {}) {
+  const c = session || {};
+  if (c.mode !== 'subscription') return normalizeEvent({ ...extra, type: 'ignore' });
+  const currency = c.currency ? String(c.currency).toUpperCase() : null;
+  const amount = moneyFromMinor(c.amount_total, currency);
+  const metadata = c.metadata && typeof c.metadata === 'object' ? c.metadata : null;
+  const details = c.customer_details && typeof c.customer_details === 'object' ? c.customer_details : null;
+  const tax = c.total_details && typeof c.total_details === 'object' ? Number(c.total_details.amount_tax || 0) : 0;
+  return normalizeEvent({
+    id: extra.id || null,
+    type: extra.type || 'txn.completed',
+    providerEventType: extra.providerEventType || null,
+    occurredAt: isoOrNull(extra.occurredAt) || isoFromUnix(c.created) || null,
+    live: typeof extra.live === 'boolean' ? extra.live : null,
+    reservationId: reservationIdFrom(metadata) || reservationIdFrom({ rid: c.client_reference_id }),
+    customDataUserIdSeen: Boolean(metadata && metadata.user_id != null),
+    providerSubscriptionId: idOf(c.subscription),
+    providerCustomerId: idOf(c.customer),
+    providerPriceId: null,
+    providerTransactionId: c.id || null,
+    customerEmail: (details && details.email) || c.customer_email || null,
+    status: null,
+    plan: null,
+    hadTrial: null,
+    nextBilledAt: undefined,
+    amount,
+    currency,
+    taxInclusive: amount == null ? null : tax > 0,
+    totalIsZero: amount == null ? null : Number(c.amount_total) === 0 || c.payment_status === 'no_payment_required',
+  });
+}
+
+/**
  * A refunded charge or a dispute. Neither object carries the subscription id;
  * `enrichEvent()` resolves it through the invoice before applyEvent runs.
  * @param {object} obj a charge or a dispute
@@ -614,10 +685,15 @@ export const stripeProvider = {
   /**
    * Create the Checkout Session server-side. The browser is handed the
    * session's URL and nothing else: the price, the customer, the trial and the
-   * reservation id are fixed here (design §5.5). Tax is asked for on every
-   * session; when Stripe Tax is not enabled on the account the session is
-   * created without it and the fact is logged, so checkout never dies on a
-   * dashboard setting.
+   * reservation id are fixed here (design §5.5).
+   *
+   * Three shapes, tried in order and each logged when it is not the first:
+   *   1. Managed Payments — Stripe as merchant of record (the default);
+   *   2. a plain checkout with automatic tax, if Stripe refuses Managed
+   *      Payments for this account (or MOR_MANAGED_PAYMENTS is `false`);
+   *   3. a plain checkout with no tax, if Stripe Tax is not enabled either.
+   * Checkout never dies on a dashboard setting, and never sells silently under
+   * a model the owner did not choose: the warning names which one was used.
    *
    * @param {{priceId:string, customerId?:string|null, customData?:object, trial?:boolean}} input
    * @param {{env:Record<string,string>, fetchImpl?:Function, now?:number}} ctx
@@ -635,7 +711,7 @@ export const stripeProvider = {
     const nowMs = Number.isFinite(ctx && ctx.now) ? ctx.now : Date.now();
     const trial = input.trial === true;
 
-    const body = {
+    const base = {
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
       customer: input.customerId ? String(input.customerId) : undefined,
@@ -649,21 +725,33 @@ export const stripeProvider = {
       success_url: `${origin}/pro/thanks${rid ? `?rid=${encodeURIComponent(rid)}` : ''}`,
       cancel_url: `${origin}/pro?checkout=cancelled`,
       expires_at: Math.floor(nowMs / 1000) + CHECKOUT_SESSION_TTL_SECONDS,
-      automatic_tax: { enabled: true },
-      customer_update: input.customerId ? { address: 'auto', name: 'auto' } : undefined,
     };
+    // Idempotency keys differ per shape: Stripe rejects one key with two bodies.
+    const shapes = [];
+    if (managedPaymentsEnabled(env)) {
+      shapes.push({ name: 'managed', version: MANAGED_PAYMENTS_VERSION, body: { ...base, managed_payments: { enabled: true } }, refused: /managed_payments|managed payments/i });
+    }
+    shapes.push({ name: 'tax', body: { ...base, automatic_tax: { enabled: true }, customer_update: input.customerId ? { address: 'auto', name: 'auto' } : undefined }, refused: /tax/i });
+    shapes.push({ name: 'notax', body: base, refused: null });
 
-    let session;
-    try {
-      session = await stripeRequest(ctx, '/v1/checkout/sessions', { method: 'POST', body, idempotencyKey: rid ? `hmb-cs-${rid}` : undefined });
-    } catch (error) {
-      if (!(error instanceof ProviderError) || error.status !== 400 || !/tax/i.test(String((error.cause && error.cause.message) || ''))) throw error;
-      // Stripe Tax is not switched on for this account: sell without automatic
-      // tax rather than not at all, and say so in the log.
-      console.warn('[stripe] automatic tax refused by the account; session created without it');
-      delete body.automatic_tax;
-      delete body.customer_update;
-      session = await stripeRequest(ctx, '/v1/checkout/sessions', { method: 'POST', body, idempotencyKey: rid ? `hmb-cs-${rid}-notax` : undefined });
+    let session = null;
+    for (let i = 0; i < shapes.length && !session; i += 1) {
+      const shape = shapes[i];
+      try {
+        session = await stripeRequest(ctx, '/v1/checkout/sessions', {
+          method: 'POST',
+          body: shape.body,
+          version: shape.version,
+          idempotencyKey: rid ? `hmb-cs-${rid}-${shape.name}` : undefined,
+        });
+      } catch (error) {
+        const detail = error && error.cause ? `${error.cause.message || ''} ${error.cause.param || ''}` : '';
+        const refused = error instanceof ProviderError && error.status === 400 && shape.refused && shape.refused.test(detail) && shapes[i + 1];
+        if (!refused) throw error;
+        // The account cannot sell this way: the next shape is tried and the log
+        // says which one, because the legal copy depends on the answer.
+        console.warn(`[stripe] ${shape.name === 'managed' ? 'managed payments' : 'automatic tax'} refused by the account; falling back to the ${shapes[i + 1].name} checkout`);
+      }
     }
     if (!session || !session.id) throw new ProviderError('provider_error', { message: 'Stripe POST /v1/checkout/sessions returned no id.' });
     return { transactionId: String(session.id), status: session.status || null, checkoutUrl: session.url || null };
@@ -779,6 +867,7 @@ export const stripeProvider = {
     };
     let event;
     if (type === 'ignore') event = normalizeEvent({ ...extra, type: 'ignore' });
+    else if (providerEventType === 'checkout.session.completed') event = normalizeCheckoutSession(object, extra);
     else if (type.startsWith('sub.')) event = normalizeSubscription(object, extra);
     else if (type === 'txn.completed' || type === 'txn.failed') event = normalizeInvoice(object, extra);
     else event = normalizeChargeEvent(object, extra);

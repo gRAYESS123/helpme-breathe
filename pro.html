@@ -216,7 +216,7 @@
           "name": "Why is the price on the card different from $10?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "$10 a month and $100 a year are the US list prices. Where we are required to collect VAT or sales tax for your country, it is calculated and added at checkout, and the checkout page shows the total before you pay. The card on this page shows the US list price with a note that tax may be added."
+            "text": "$10 a month and $100 a year are the US list prices. Stripe, as merchant of record, works out the total for your country, in your currency, with any VAT or sales tax included, and shows it on the checkout page before you pay. The card on this page shows the US list price with a note that tax is added at checkout."
           }
         },
         {
@@ -224,7 +224,7 @@
           "name": "What if your payment provider disappears?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Payments are processed by Stripe, and payment providers do sometimes close accounts or exit markets. Your plan is honoured for the period you have paid for whatever happens to the provider, and if one has to be replaced you are moved to the replacement at no cost. Email contact@helpmebreath.com with the address you signed in with."
+            "text": "Payments are handled by Stripe as merchant of record, and providers do sometimes close accounts or exit markets. Your plan is honoured for the period you have paid for whatever happens to the provider, and if one has to be replaced you are moved to the replacement at no cost. Email contact@helpmebreath.com with the address you signed in with."
           }
         }
       ]
@@ -331,7 +331,7 @@
                     <a class="checkout-btn" href="/account" data-role="plan-manage" hidden>Manage your plan</a>
                     <p class="plan-manage-note" data-role="plan-manage-note" hidden>You are already subscribed. Your plan, its renewal date and the amount you will be charged are on your account page.</p>
 
-                    <p class="plan-fine">Cancel any time. Cancel later and you keep access until the end of the period you have paid for. Fourteen-day refund, no reason needed. <span data-role="mor-legal">Payments are processed by Stripe; the seller is Georges Rayess. Where VAT or sales tax applies in your country, it is added at checkout and shown before you pay.</span></p>
+                    <p class="plan-fine">Cancel any time. Cancel later and you keep access until the end of the period you have paid for. Fourteen-day refund, no reason needed. <span data-role="mor-legal">Payments are handled by Stripe as merchant of record, who acts as the seller of record for this purchase. The price you see at checkout includes any VAT or sales tax due in your country.</span></p>
 
                     <div data-checkout-slot></div>
                 </div>
@@ -391,14 +391,14 @@
 
                 <section>
                     <h2>What you pay, and who charges it</h2>
-                    <p>$10 a month and $100 a year are the US list prices. Where I am required to collect VAT or sales tax
-                    for your country, it is calculated and added at checkout, and the checkout page shows the total
-                    before you pay. The amount that is actually charged is then shown on your account page, taken
-                    from your receipt rather than typed by us.</p>
+                    <p>$10 a month and $100 a year are the US list prices. Stripe, as merchant of record, works out the
+                    total for your country, in your currency, with any VAT or sales tax included, and shows it on the
+                    checkout page before you pay. The amount that is actually charged is then shown on your account
+                    page, taken from your receipt rather than typed by us.</p>
 
-                    <p>The seller on your receipt is Georges Rayess, the person who runs this site. Payments are
-                    processed by Stripe: the card payment, the receipt and the billing portal are Stripe's, and no card
-                    number, expiry date or security code ever reaches this site. The
+                    <p>The seller on your receipt is Stripe, acting as merchant of record: the contract of sale is
+                    between you and Stripe, and the service is provided by Georges Rayess. No card number, expiry
+                    date or security code ever reaches this site. The
                     <a href="/legal/terms-of-service">terms of service</a> spell out who does what.</p>
                 </section>
 
@@ -459,7 +459,7 @@
                     <h2>The refund promise</h2>
                     <p>Fourteen days, unconditional. Email <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a>
                     within fourteen days of a charge and the money goes back to the card you paid with, with no
-                    reason required and no attempt to talk you out of it. Refunds are issued by me, through Stripe,
+                    reason required and no attempt to talk you out of it. Refunds are issued by Stripe, the merchant of record,
                     that took the payment. A cancelled trial is not a refund: nothing was charged, so there is nothing to give
                     back. The rest of the small print is in the <a href="/legal/refund-policy">refund policy</a> and
                     the <a href="/legal/terms-of-service">terms of service</a>.</p>
@@ -528,7 +528,7 @@
 
                     <div class="faq-item">
                         <h3>What if your payment provider disappears?</h3>
-                        <p>Payments are processed by Stripe, and payment providers do sometimes close accounts or
+                        <p>Payments are handled by Stripe as merchant of record, and providers do sometimes close accounts or
                         exit markets. Your plan is honoured for the period you have paid for whatever happens to the
                         provider, and if one has to be replaced you are moved to the replacement at no cost. Email
                         <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> with the address you

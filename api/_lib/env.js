@@ -38,6 +38,7 @@ export const KNOWN_VARS = [
   'MOR_STOREFRONT',
   'MOR_API_USERNAME',
   'MOR_API_PASSWORD',
+  'MOR_MANAGED_PAYMENTS',
   // jobs and alerts
   'CRON_SECRET',
   'ALERT_EMAIL',

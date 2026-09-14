@@ -12,9 +12,12 @@
  *   added at checkout where it applies. 3-day card-required trial, one free
  *   trial per person. 14-day unconditional refund.
  *
- * Payments (since 2026-09-14): Stripe. Stripe is a payment processor, not a
- * merchant of record — the owner is the seller. The names below (CHECKOUT,
- * MOR_LEGAL) are kept so nothing else on the site moves.
+ * Payments (since 2026-09-14): Stripe, under its Managed Payments service, as
+ * merchant of record — Stripe is the seller on the receipt, collects tax and
+ * owns refunds and disputes. If Stripe declines Managed Payments for the
+ * account, the server sells as a plain Stripe checkout with automatic tax and
+ * logs it; then the owner is the seller and MOR_LEGAL and the legal pages must
+ * be changed back to say so (docs/private/HANDOVER.md §0.0).
  *
  * Five exports, and only five:
  *
@@ -22,7 +25,7 @@
  *   CHECKOUT             the checkout-open switch + sandbox flag, read by js/checkout.js only
  *   PLANS                the one plan and its two intervals
  *   TIMER_FREE_SESSIONS  D1 — read in exactly one place, js/entitlements.js#requireTimer
- *   MOR_LEGAL            the who-sells-and-who-charges sentence, one place, every page
+ *   MOR_LEGAL            the merchant-of-record sentence, one place, every page
  *
  * There is no `mode`, no hosted payment link, no price id and no waitlist any
  * more. The browser never chooses a price: js/checkout.js asks
@@ -129,9 +132,10 @@ export const PLANS = Object.freeze({
 export const TIMER_FREE_SESSIONS = 3;
 
 /**
- * The who-sells-and-who-charges line, kept in one place so one edit changes
- * every page. Stripe was chosen in writing on 2026-09-14 and is named.
+ * The merchant-of-record line, kept in one place so one edit changes every
+ * page. Stripe (Managed Payments) was chosen in writing on 2026-09-14 and is
+ * named.
  */
 export const MOR_LEGAL =
-  'Payments are processed by Stripe; the seller is Georges Rayess. ' +
-  'Where VAT or sales tax applies in your country, it is added at checkout and shown before you pay.';
+  'Payments are handled by Stripe as merchant of record, who acts as the seller of record for this purchase. ' +
+  'The price you see at checkout includes any VAT or sales tax due in your country.';

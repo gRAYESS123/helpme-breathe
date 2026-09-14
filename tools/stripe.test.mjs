@@ -16,8 +16,10 @@ import { PROVIDER_IDS, assertAdapter, getProvider, listProviders } from '../api/
 import {
   API_VERSION,
   CHECKOUT_SESSION_TTL_SECONDS,
+  MANAGED_PAYMENTS_VERSION,
   TRIAL_PERIOD_DAYS,
   encodeForm,
+  managedPaymentsEnabled,
   parseStripeSignature,
   refineUpdate,
   statusFor,
@@ -36,6 +38,8 @@ const ENV = Object.freeze({
   MOR_PRICE_MONTHLY: 'price_TESTFIXTURE_monthly',
   MOR_PRICE_YEARLY: 'price_TESTFIXTURE_yearly',
 });
+/** A plain Stripe account: no Managed Payments, the owner sells. */
+const ENV_PLAIN = Object.freeze({ ...ENV, MOR_MANAGED_PAYMENTS: 'false' });
 const ENV_WITH_TRIAL_PRICES = Object.freeze({
   ...ENV,
   MOR_PRICE_MONTHLY_TRIAL: 'price_TESTFIXTURE_monthly_trial',
@@ -308,12 +312,35 @@ test('parseEvents: refunds and disputes name a charge, never a subscription; unk
   assert.equal(dispute.type, 'txn.chargeback');
   assert.equal(dispute.providerTransactionId, CH);
 
-  const session = stripeProvider.parseEvents(JSON.stringify(stripeEvent('checkout.session.completed', { id: CS, object: 'checkout.session' })), { env: ENV })[0];
-  assert.equal(session.type, 'ignore', 'the subscription events carry everything the session does');
-  assert.equal(session.id, 'evt_TESTFIXTURE00000000000001');
+  const oneOff = stripeProvider.parseEvents(JSON.stringify(stripeEvent('checkout.session.completed', { id: CS, object: 'checkout.session', mode: 'payment' })), { env: ENV })[0];
+  assert.equal(oneOff.type, 'ignore', 'a one-off payment session is not ours');
+  assert.equal(oneOff.id, 'evt_TESTFIXTURE00000000000001');
 
   assert.throws(() => stripeProvider.parseEvents('not json', { env: ENV }), /not JSON/);
   assert.throws(() => stripeProvider.parseEvents(JSON.stringify({ type: 'x' }), { env: ENV }), /no id/);
+});
+
+test('parseEvents: checkout.session.completed is the blueprint\'s success signal — a txn.completed with the ids, the email and the reservation', () => {
+  const paid = stripeProvider.parseEvents(JSON.stringify(stripeEvent('checkout.session.completed', {
+    id: CS, object: 'checkout.session', mode: 'subscription', subscription: SUB, customer: CUS, client_reference_id: RID,
+    customer_details: { email: 'person@example.com' }, amount_total: 1050, currency: 'usd', payment_status: 'paid', total_details: { amount_tax: 50 },
+  })), { env: ENV })[0];
+  assert.equal(paid.type, 'txn.completed');
+  assert.equal(paid.providerSubscriptionId, SUB);
+  assert.equal(paid.providerCustomerId, CUS);
+  assert.equal(paid.providerTransactionId, CS);
+  assert.equal(paid.reservationId, RID, 'client_reference_id carries the reservation when metadata does not');
+  assert.equal(paid.customerEmail, 'person@example.com');
+  assert.equal(paid.amount, '10.50');
+  assert.equal(paid.taxInclusive, true);
+  assert.equal(paid.totalIsZero, false);
+  assert.equal(paid.plan, null, 'the session carries no price; the subscription events carry the plan');
+
+  const trial = stripeProvider.parseEvents(JSON.stringify(stripeEvent('checkout.session.completed', {
+    id: CS, mode: 'subscription', subscription: SUB, customer: CUS, metadata: { rid: RID }, amount_total: 0, currency: 'usd', payment_status: 'no_payment_required',
+  })), { env: ENV })[0];
+  assert.equal(trial.totalIsZero, true, 'the $0 start of a trial is noted, never counted as money');
+  assert.equal(trial.reservationId, RID);
 });
 
 /* ========================================================== enrichEvent ==== */
@@ -363,9 +390,51 @@ test('ensureCustomer: the lookup is the dedupe, then a create', async () => {
   await assert.rejects(() => stripeProvider.ensureCustomer('', ctxWith(fresh)), /email is required/);
 });
 
-test('createCheckoutSession: the trial, the price, the customer and the reservation are fixed server-side', async () => {
+test('createCheckoutSession: Managed Payments by default — Stripe as merchant of record, on the preview version', async () => {
   const fetchImpl = fetchStub({ 'POST /v1/checkout/sessions': { id: CS, status: 'open', url: 'https://checkout.stripe.com/c/pay/TESTFIXTURE' } });
+  assert.equal(managedPaymentsEnabled(ENV), true, 'on unless literally false');
+  assert.equal(managedPaymentsEnabled(ENV_PLAIN), false);
   const out = await stripeProvider.createCheckoutSession({ priceId: ENV.MOR_PRICE_MONTHLY, customerId: CUS, customData: { rid: RID, v: 3 }, trial: true }, ctxWith(fetchImpl));
+  assert.equal(out.transactionId, CS);
+  const call = fetchImpl.calls[0];
+  assert.equal(call.form['managed_payments[enabled]'], 'true');
+  assert.equal(call.headers['Stripe-Version'], MANAGED_PAYMENTS_VERSION, 'the blueprint\'s version header on this call only');
+  assert.equal(call.form['automatic_tax[enabled]'], undefined, 'the merchant of record collects tax; the seller does not ask for it');
+  assert.equal(call.form['customer_update[address]'], undefined);
+  assert.equal(call.form['subscription_data[trial_period_days]'], String(TRIAL_PERIOD_DAYS));
+  assert.equal(call.form['subscription_data[metadata][rid]'], RID);
+  assert.equal(call.headers['Idempotency-Key'], `hmb-cs-${RID}-managed`);
+});
+
+test('createCheckoutSession: when Stripe refuses Managed Payments the session is a plain checkout with automatic tax, and the log says so', async () => {
+  let attempt = 0;
+  const fetchImpl = fetchStub({
+    'POST /v1/checkout/sessions': () => {
+      attempt += 1;
+      if (attempt === 1) return new Response(JSON.stringify({ error: { type: 'invalid_request_error', param: 'managed_payments', message: 'Your account is not eligible for Managed Payments.' } }), { status: 400 });
+      return { id: CS, status: 'open', url: 'https://checkout.stripe.com/c/pay/x' };
+    },
+  });
+  const warn = console.warn;
+  const warnings = [];
+  console.warn = (...args) => warnings.push(args.join(' '));
+  try {
+    const out = await stripeProvider.createCheckoutSession({ priceId: ENV.MOR_PRICE_MONTHLY, customerId: CUS, customData: { rid: RID, v: 3 }, trial: true }, ctxWith(fetchImpl));
+    assert.equal(out.transactionId, CS);
+  } finally {
+    console.warn = warn;
+  }
+  assert.equal(fetchImpl.calls.length, 2);
+  assert.equal(fetchImpl.calls[1].form['managed_payments[enabled]'], undefined);
+  assert.equal(fetchImpl.calls[1].form['automatic_tax[enabled]'], 'true');
+  assert.equal(fetchImpl.calls[1].headers['Stripe-Version'], API_VERSION);
+  assert.equal(fetchImpl.calls[1].headers['Idempotency-Key'], `hmb-cs-${RID}-tax`);
+  assert.match(warnings.join('\n'), /managed payments refused/);
+});
+
+test('createCheckoutSession: a plain account — the trial, the price, the customer and the reservation are fixed server-side', async () => {
+  const fetchImpl = fetchStub({ 'POST /v1/checkout/sessions': { id: CS, status: 'open', url: 'https://checkout.stripe.com/c/pay/TESTFIXTURE' } });
+  const out = await stripeProvider.createCheckoutSession({ priceId: ENV.MOR_PRICE_MONTHLY, customerId: CUS, customData: { rid: RID, v: 3 }, trial: true }, ctxWith(fetchImpl, ENV_PLAIN));
   assert.deepEqual(out, { transactionId: CS, status: 'open', checkoutUrl: 'https://checkout.stripe.com/c/pay/TESTFIXTURE' });
   const form = fetchImpl.calls[0].form;
   assert.equal(form.mode, 'subscription');
@@ -382,16 +451,17 @@ test('createCheckoutSession: the trial, the price, the customer and the reservat
   assert.equal(form['automatic_tax[enabled]'], 'true');
   assert.equal(form['customer_update[address]'], 'auto');
   assert.equal(Number(form.expires_at), unix() + CHECKOUT_SESSION_TTL_SECONDS);
-  assert.equal(fetchImpl.calls[0].headers['Idempotency-Key'], `hmb-cs-${RID}`);
+  assert.equal(fetchImpl.calls[0].headers['Idempotency-Key'], `hmb-cs-${RID}-tax`);
+  assert.equal(fetchImpl.calls[0].form['managed_payments[enabled]'], undefined);
   assert.ok(!('price_id' in form) && !('items' in form), 'nothing Paddle-shaped leaks into a Stripe call');
 
   const noTrial = fetchStub({ 'POST /v1/checkout/sessions': { id: CS, status: 'open', url: 'https://checkout.stripe.com/c/pay/x' } });
-  await stripeProvider.createCheckoutSession({ priceId: ENV.MOR_PRICE_YEARLY, customerId: CUS, customData: { rid: RID, v: 3 }, trial: false }, ctxWith(noTrial));
+  await stripeProvider.createCheckoutSession({ priceId: ENV.MOR_PRICE_YEARLY, customerId: CUS, customData: { rid: RID, v: 3 }, trial: false }, ctxWith(noTrial, ENV_PLAIN));
   assert.equal(noTrial.calls[0].form['subscription_data[trial_period_days]'], undefined, 'no trial, no trial days');
   assert.equal(noTrial.calls[0].form['subscription_data[metadata][rid]'], RID);
 });
 
-test('createCheckoutSession: when Stripe Tax is not enabled the session is created without it', async () => {
+test('createCheckoutSession: on a plain account, when Stripe Tax is not enabled the session is created without it', async () => {
   let attempt = 0;
   const fetchImpl = fetchStub({
     'POST /v1/checkout/sessions': () => {
@@ -404,7 +474,7 @@ test('createCheckoutSession: when Stripe Tax is not enabled the session is creat
   const warnings = [];
   console.warn = (...args) => warnings.push(args.join(' '));
   try {
-    const out = await stripeProvider.createCheckoutSession({ priceId: ENV.MOR_PRICE_MONTHLY, customerId: CUS, customData: { rid: RID, v: 3 }, trial: true }, ctxWith(fetchImpl));
+    const out = await stripeProvider.createCheckoutSession({ priceId: ENV.MOR_PRICE_MONTHLY, customerId: CUS, customData: { rid: RID, v: 3 }, trial: true }, ctxWith(fetchImpl, ENV_PLAIN));
     assert.equal(out.transactionId, CS);
   } finally {
     console.warn = warn;
@@ -412,11 +482,12 @@ test('createCheckoutSession: when Stripe Tax is not enabled the session is creat
   assert.equal(fetchImpl.calls.length, 2);
   assert.equal(fetchImpl.calls[1].form['automatic_tax[enabled]'], undefined);
   assert.equal(fetchImpl.calls[1].form['customer_update[address]'], undefined);
+  assert.equal(fetchImpl.calls[1].headers['Idempotency-Key'], `hmb-cs-${RID}-notax`);
   assert.match(warnings.join('\n'), /automatic tax refused/);
 
   // Any other 400 is the caller's problem, not something to retry around.
   const other = fetchStub({ 'POST /v1/checkout/sessions': () => new Response(JSON.stringify({ error: { message: 'No such price' } }), { status: 400 }) });
-  await assert.rejects(() => stripeProvider.createCheckoutSession({ priceId: 'price_nope', customerId: CUS, customData: { rid: RID } }, ctxWith(other)), /400/);
+  await assert.rejects(() => stripeProvider.createCheckoutSession({ priceId: 'price_nope', customerId: CUS, customData: { rid: RID } }, ctxWith(other, ENV_PLAIN)), /400/);
   assert.equal(other.calls.length, 1);
 });
 
