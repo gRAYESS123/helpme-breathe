@@ -274,7 +274,7 @@ export const DEFAULT_TECHNIQUE = '478';
 export const THEME_CLASSES = TECHNIQUE_ORDER.map((k) => TECHNIQUES[k].theme);
 
 /** Every CSS circle class this module can put on the breathing circle. */
-export const CIRCLE_CLASSES = TECHNIQUE_ORDER.map((k) => TECHNIQUES[k].circleClass);
+export const CIRCLE_CLASSES = [...TECHNIQUE_ORDER.map((k) => TECHNIQUES[k].circleClass), 'custom-pace'];
 
 /**
  * Look a technique up by key.
