@@ -14,6 +14,12 @@
   ],
   "redirects": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.helpmebreath.com" }],
+      "destination": "https://helpmebreath.com/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "www.helpmebreath.com" }],
       "destination": "https://helpmebreath.com/:path*",
