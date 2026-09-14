@@ -79,7 +79,6 @@
     --stage-sand: var(--sand);
     --stage-rose: var(--rose);
     --track: rgba(15, 27, 30, 0.1);      /* the gauge's rail                  */
-    --chip-on: var(--pat);
     --on-chip: #FFFFFF;
     --disc-ink: #0F1B1E;                 /* the phase word, on every orb      */
     --stage-h: 100vh;                    /* where the stage's ground ends;    */
@@ -728,7 +727,7 @@ body:has([data-breathing-app]):not(.render-body):not(:has(.timer-pair)) .site-he
 }
 
 .nav-cta {
-    order: 2;
+    order: 3;
     flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
@@ -749,7 +748,7 @@ body:has([data-breathing-app]):not(.render-body):not(:has(.timer-pair)) .site-he
 .site-nav { order: 1; }
 
 .nav-toggle {
-    order: 3;
+    order: 2;
     display: none;
     margin-left: auto;
     align-items: center;
@@ -1420,8 +1419,23 @@ body.session-active #cookieConsent { display: none; }
     100% { transform: translate(-50%, -50%) scale(0.72); }
 }
 
-/* Custom patterns (js/pro/patterns.js) get the same simple in-out shape. */
-.breathing-circle:not([class*="technique-"]) { animation-name: breathe-coherent; animation-duration: 10s; }
+/* Custom patterns (js/pro/patterns.js, ?p= links): no fixed keyframe can
+   know the user's proportions, so the engine paces the disc phase by phase —
+   data-phase and --phase-duration on the app root, and --disc-scale as the
+   target (1 on an inhale, 1.08 on a top-up, 0.72 on an exhale; a hold keeps
+   the last one). js/app.js pins the transform inline while paused. */
+.breathing-circle.custom-pace {
+    animation: none;
+    transform: translate(-50%, -50%) scale(var(--disc-scale, 0.72));
+    transition: transform var(--phase-duration, 1s) cubic-bezier(.42, 0, .30, 1);
+}
+[data-breathing-app][data-phase="inhale"] .breathing-circle.custom-pace,
+[data-breathing-app][data-phase="topup"] .breathing-circle.custom-pace {
+    transition-timing-function: cubic-bezier(.33, 0, .20, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+    .breathing-circle.custom-pace { transition: none; }
+}
 
 /* ------------------------------------------------------- the read-outs --- */
 
@@ -1596,7 +1610,10 @@ body.session-active #cookieConsent { display: none; }
 
 .technique-btn.active,
 .technique-btn.active:hover {
-    background: var(--chip-on);
+    /* var(--pat) here, on the chip: a --chip-on alias declared on :root
+       resolved against :root's --pat (the registered initial, the coherence
+       rose) and never followed the selected pattern. */
+    background: var(--pat);
     color: var(--on-chip);
     font-weight: 600;
 }
@@ -1620,7 +1637,7 @@ body.session-active #cookieConsent { display: none; }
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    min-height: 36px;
+    min-height: 44px;
     padding: 0.4rem 0.9rem;
     font-family: var(--sans);
     font-size: var(--fs-micro);

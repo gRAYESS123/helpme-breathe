@@ -266,6 +266,12 @@
 
         .legal-links a:hover { color: var(--ink); text-decoration: underline; }
 
+        /* This page carries no menu button, so on a phone the link row goes
+           and the header keeps the lockup and the Sign in pill, one row high. */
+        @media (max-width: 780px) {
+            .site-nav { display: none; }
+        }
+
         @media (max-width: 420px) {
             .wordmark { display: none; }
         }

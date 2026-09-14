@@ -357,6 +357,12 @@ export function initPreview() {
   wired = true;
   document.addEventListener('hmb:preview', onPreview);
   document.addEventListener('hmb:session-start', onSessionStart);
+  // A chip tap or a pattern change mid-demo: stop demonstrating the old
+  // pattern on a disc the engine has just reset.
+  document.addEventListener('hmb:technique-change', (event) => {
+    const detail = (event && event.detail) || {};
+    cancelDemonstration(detail.root || null);
+  });
   onChange(() => {
     if (isPro()) clearPreview(null);
   });

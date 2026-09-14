@@ -421,6 +421,10 @@ export function createBreathingApp(rootEl, options = {}) {
     else if (kind === 'exhale') ringLevel = RING_EMPTY;
     rootEl.style.setProperty('--ring-from', String(from));
     rootEl.style.setProperty('--ring-to', String(ringLevel));
+    // The custom-paced disc's target for this phase; a hold keeps the last one.
+    if (kind === 'inhale') rootEl.style.setProperty('--disc-scale', '1');
+    else if (kind === 'topup') rootEl.style.setProperty('--disc-scale', '1.08');
+    else if (kind === 'exhale') rootEl.style.setProperty('--disc-scale', '0.72');
     if (!el.circle) return;
     for (const cls of phaseClasses) el.circle.classList.remove(cls);
     phaseClasses = String((phase && phase.class) || '')
@@ -436,7 +440,9 @@ export function createBreathingApp(rootEl, options = {}) {
     rootEl.style.removeProperty('--phase-duration');
     rootEl.style.removeProperty('--ring-from');
     rootEl.style.removeProperty('--ring-to');
+    rootEl.style.removeProperty('--disc-scale');
     delete rootEl.dataset.paused;
+    if (el.circle) el.circle.style.transform = '';
     ringLevel = RING_EMPTY;
     if (!el.circle) return;
     for (const cls of phaseClasses) el.circle.classList.remove(cls);
@@ -842,8 +848,14 @@ export function createBreathingApp(rootEl, options = {}) {
     state.sessionAnchor = t;
     delete rootEl.dataset.paused;
     if (el.circle) {
+      // A custom-paced disc was frozen inline by pause(); let it move again.
+      el.circle.style.transform = '';
+      // `.active` flips animation-play-state back to running, so the keyframes
+      // carry on from exactly where the pause froze them — in step with the
+      // engine's phase pointer. Restarting them here (as a technique swap
+      // does) snapped the orb back to the start of the inhale for the rest
+      // of the session.
       el.circle.classList.add('active');
-      restartCircleAnimation();
     }
     const phase = currentPhase();
     setText(el.breathingText, phase ? phase.text : '');
@@ -869,7 +881,13 @@ export function createBreathingApp(rootEl, options = {}) {
     stopTicker();
     // The ring gauge reads this to freeze its sweep alongside the disc.
     rootEl.dataset.paused = '';
-    if (el.circle) el.circle.classList.remove('active');
+    if (el.circle) {
+      if (el.circle.classList.contains('custom-pace')) {
+        // A transition cannot be paused: pin the disc where it is.
+        el.circle.style.transform = getComputedStyle(el.circle).transform;
+      }
+      el.circle.classList.remove('active');
+    }
     setText(el.breathingText, 'Paused — press Begin to continue');
     announce('Paused');
     syncButtons();
@@ -989,6 +1007,7 @@ export function createBreathingApp(rootEl, options = {}) {
     state.phaseIndex = 0;
 
     applyTheme();
+    syncThemeColor(key);
     applyCircleClass();
     renderTechniqueCopy();
     renderTechniqueButtons();
@@ -1018,6 +1037,11 @@ export function createBreathingApp(rootEl, options = {}) {
     state.custom = {
       ...base,
       key: 'custom',
+      // Its own disc: the engine paces it phase by phase (data-phase and
+      // --disc-scale on the root), because a fixed keyframe cannot know the
+      // user's proportions. The base technique's keyframe was scaled onto it
+      // before, so the orb contradicted the pattern it was pacing.
+      circleClass: 'custom-pace',
       slug: '',
       name: meta.name || 'Custom pattern',
       shortName: meta.name || 'Custom',
@@ -1321,6 +1345,18 @@ export function getApp(rootEl) {
   return found ? found.api : null;
 }
 
+/**
+ * The light-scheme theme-color meta follows the stage: Deep Sleep paints the
+ * dusk band from the top of the page, and the browser chrome should match it
+ * (the installed app's shortcut opens straight into that state).
+ * @param {string} key
+ */
+function syncThemeColor(key) {
+  if (typeof document === 'undefined') return;
+  const meta = document.querySelector('meta[name="theme-color"]:not([media])');
+  if (meta) meta.setAttribute('content', key === '478' ? '#1F2745' : '#F4F6F5');
+}
+
 function focusedInstance() {
   if (!instances.length) return null;
   const active = document.activeElement;
@@ -1328,7 +1364,14 @@ function focusedInstance() {
     const owner = instances.find((i) => i.root.contains(active));
     if (owner) return owner;
   }
-  return instances[0];
+  // Nothing in a timer has focus. The shortcuts still work while the timer is
+  // on screen (press Space to begin), but not once the reader has scrolled
+  // down into the article: there Space must page down, S must type, and a
+  // digit must not start a session out of view (WCAG 2.1.4).
+  if (active && active !== document.body) return null;
+  const rect = instances[0].root.getBoundingClientRect();
+  const visible = rect.bottom > 0 && rect.top < window.innerHeight;
+  return visible ? instances[0] : null;
 }
 
 function onGlobalKeydown(event) {
@@ -1400,6 +1443,15 @@ function wireSiteNav() {
     const open = toggle.getAttribute('aria-expanded') !== 'true';
     toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     nav.classList.toggle('is-open', open);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    const toggle = document.querySelector('[data-action="toggle-nav"][aria-expanded="true"]');
+    if (!toggle) return;
+    const nav = document.getElementById(toggle.getAttribute('aria-controls') || 'site-nav');
+    toggle.setAttribute('aria-expanded', 'false');
+    if (nav) nav.classList.remove('is-open');
+    toggle.focus();
   });
 }
 
