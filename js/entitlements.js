@@ -55,7 +55,7 @@
  */
 
 import { TIMER_FREE_SESSIONS } from './config.js';
-import { completedSessionCount, getFlag, setFlag } from './storage.js';
+import { completedSessionCount, getFlag, recordSessionStart, setFlag, startedSessionCount } from './storage.js';
 import { track, EVENTS } from './analytics.js';
 import { configured as authConfigured } from './auth.js';
 
@@ -453,22 +453,25 @@ export async function refresh(options = {}) {
 /* ------------------------------------------------------ free-session count */
 
 /**
- * The D1 counter. Server-authoritative when a figure has been received (from
- * /api/me or the session beacon); the local history count otherwise. Soft on
- * purpose: clearing storage resets it, and the alternative is a wall on a
- * breathing timer.
+ * The D1 counter: sessions STARTED on this device. The larger of the server's
+ * figure (from /api/me, the start beacon, or the read on load) and the local
+ * count — whichever remembers more. Counting only completed sessions let a
+ * visitor run the timer forever by stopping early; a start is what spends a
+ * free session now. Still soft on purpose: clearing every trace resets it,
+ * and the alternative is a wall on a breathing timer.
  */
 function freeSessionsUsed() {
-  const server = snapshot && Number(snapshot.free_sessions_used);
-  if (snapshot && Number.isFinite(server) && snapshot.free_sessions_used !== null) return server;
-  return completedSessionCount();
+  const local = Math.max(startedSessionCount(), completedSessionCount());
+  const server = snapshot ? Number(snapshot.free_sessions_used) : NaN;
+  if (snapshot && Number.isFinite(server) && snapshot.free_sessions_used !== null) return Math.max(server, local);
+  return local;
 }
 
 /**
- * POST the free-session beacon for one completed session. Called from the
- * `hmb:session-complete` listener below; exported so the engine may call it
- * explicitly instead. Either way, one completion counts once. Skipped
- * entirely while sign-in is not configured: the gate is inert then, and
+ * POST the free-session beacon for one STARTED session. Called from the
+ * `hmb:session-start` listener below; exported so the engine may call it
+ * explicitly instead. Either way, one start counts once. Skipped entirely
+ * while sign-in is not configured: the gate is inert then, and
  * /api/session/count has nothing to count against.
  * @returns {Promise<number|null>} the server's count, or null
  */
@@ -506,12 +509,37 @@ export async function recordFreeSession() {
   }
 }
 
-function onSessionComplete(event) {
-  const detail = (event && event.detail) || {};
-  if (detail.completed !== true) return;
+/**
+ * A session started: spend one free session, locally and on the server. The
+ * crisis pages never count (they run for anyone, forever) and a subscriber
+ * has nothing to count against.
+ */
+function onSessionStart() {
   if (isPro()) return;
   if (hasDocument && document.body && openTimerPage()) return;
+  recordSessionStart();
   recordFreeSession();
+}
+
+/**
+ * Read the device's server-side count once per page load for a signed-out
+ * visitor, so the allowance survives a cleared localStorage while the device
+ * cookie lives. A read never writes on the server; a failure changes nothing.
+ */
+function primeFreeSessionCount() {
+  if (!authConfigured() || !hasWindow || typeof fetch !== 'function' || !isOnline()) return;
+  if (snapshot && snapshot.user) return; // signed in: /api/me carries the count
+  fetch(COUNT_ENDPOINT, { method: 'GET', headers: { Accept: 'application/json' }, credentials: 'same-origin', cache: 'no-store' })
+    .then((response) => (response.ok ? response.json() : null))
+    .then((data) => {
+      if (!data || data.ok !== true) return;
+      if (typeof data.device_id === 'string') writeDeviceMirror(data.device_id);
+      const count = Number(data.free_sessions_used);
+      if (!Number.isFinite(count)) return;
+      const known = snapshot ? Number(snapshot.free_sessions_used) : NaN;
+      writeSnapshot({ ...(snapshot || {}), free_sessions_used: Number.isFinite(known) ? Math.max(known, count) : count });
+    })
+    .catch(() => {});
 }
 
 /* --------------------------------------------------------------- public API */
@@ -758,13 +786,14 @@ if (hasWindow) {
 
   if (hasDocument) {
     document.addEventListener('hmb:auth', onAuthEvent);
-    document.addEventListener('hmb:session-complete', onSessionComplete);
+    document.addEventListener('hmb:session-start', onSessionStart);
   }
 
   // Load the auth module in the background; it decides whether a refresh is
   // due. A page that never loads js/auth.js keeps the cached token, unchanged.
   const boot = () => {
     loadAuth();
+    primeFreeSessionCount();
   };
   if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(boot, { timeout: 2500 });
   else window.setTimeout(boot, 300);

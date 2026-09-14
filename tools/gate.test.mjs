@@ -138,11 +138,12 @@ test('crisis page (data-open-timer) passes, with or without a value', () => {
   assert.deepEqual(dispatched, []);
 });
 
-test('auth unconfigured: the hmb:session-complete listener does not beacon either', async () => {
+test('auth unconfigured: the hmb:session-start listener does not beacon either', async () => {
   fetchCalls.length = 0;
-  const listeners = documentListeners.get('hmb:session-complete') || [];
-  assert.equal(listeners.length, 1, 'js/entitlements.js registers exactly one completion listener');
-  listeners[0]({ detail: { completed: true, technique: '478', seconds: 600, breaths: 30 } });
+  assert.equal((documentListeners.get('hmb:session-complete') || []).length, 0, 'a completion no longer counts; a start does');
+  const listeners = documentListeners.get('hmb:session-start') || [];
+  assert.equal(listeners.length, 1, 'js/entitlements.js registers exactly one session-start listener');
+  listeners[0]({ detail: { technique: '478' } });
   await new Promise((resolve) => setImmediate(resolve));
   assert.equal(fetchCalls.length, 0, 'POST /api/session/count was never sent');
 });

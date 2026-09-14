@@ -11,6 +11,7 @@
  * Contract (see docs/MODULE_API.md):
  *   getSettings(), saveSettings(patch),
  *   appendSession(record), getHistory(), completedSessionCount(),
+ *   startedSessionCount(), recordSessionStart(),
  *   getFlag(name), setFlag(name, value),
  *   clearHistory(), setPersistence(enabled)
  */
@@ -18,6 +19,8 @@
 const NS = 'hmb.';
 const KEY_SETTINGS = NS + 'settings';
 const KEY_HISTORY = NS + 'history';
+/** Sessions STARTED on this device: the free allowance counts these. */
+const KEY_STARTED = NS + 'sessions_started';
 
 /** Oldest entries are evicted once history passes this length. */
 export const HISTORY_LIMIT = 500;
@@ -189,6 +192,28 @@ export function appendSession(record) {
 export function completedSessionCount() {
   let n = 0;
   for (const record of getHistory()) if (record.completed === true) n++;
+  return n;
+}
+
+/**
+ * How many sessions have been STARTED on this device — a Begin that ran,
+ * finished or not. The free allowance counts starts, so stopping early or
+ * closing the tab spends one too; counting only completions let anyone run
+ * the timer forever by never finishing a session.
+ * @returns {number}
+ */
+export function startedSessionCount() {
+  const n = Number(readJson(KEY_STARTED, 0));
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+}
+
+/**
+ * Count one started session.
+ * @returns {number} the new count
+ */
+export function recordSessionStart() {
+  const n = startedSessionCount() + 1;
+  writeJson(KEY_STARTED, n);
   return n;
 }
 
