@@ -680,13 +680,14 @@ test('retention: eight steps, payload nulling restricted to processed rows', () 
   assert.equal(nulling.name, 'webhook_payloads_nulled');
   assert.equal(nulling.method, 'PATCH');
   assert.deepEqual(nulling.body, { payload: null });
-  assert.match(nulling.path, /status=eq\.processed/, 'ONLY processed rows');
+  assert.match(nulling.path, /status=in\.\(processed,ignored\)/, 'processed and ignored rows; failed rows keep their payload for replay');
+  assert.doesNotMatch(nulling.path, /failed/);
   assert.match(nulling.path, /payload=not\.is\.null/);
   assert.match(nulling.path, new RegExp(`received_at=lt\\.${encodeURIComponent(iso(NOW - 30 * DAY)).replace(/[.+]/g, '\\$&')}`));
 
   const deleting = steps[1];
   assert.equal(deleting.method, 'DELETE');
-  assert.match(deleting.path, /status=eq\.processed/, 'failed and ignored rows are never deleted');
+  assert.match(deleting.path, /status=in\.\(processed,ignored\)/, 'failed rows are never deleted; ignored ones carry payloads and go on the same schedule');
 
   assert.match(steps[2].path, /outcome=eq\.reserved&reserved_until=lt\./);
   assert.deepEqual(steps[2].body, { outcome: 'expired' });
@@ -753,7 +754,7 @@ test('createStore: PostgREST paths are keyed on the uuid and refuse anything els
   await store.unlinkTrialLedger(USER);
   assert.equal(seen[0][1], `subscriptions?user_id=eq.${USER}&select=*&order=created_at.asc`);
   assert.equal(seen[1][0], 'PATCH');
-  assert.deepEqual(seen[1][2], { user_id: null, detached_at: iso(NOW) });
+  assert.deepEqual(seen[1][2], { detached_at: iso(NOW) }, 'only the marker: the foreign key clears user_id when the auth user is deleted');
   assert.equal(seen[1][3], 'return=representation');
   assert.equal(seen[2][1], `trial_claims?user_id=eq.${USER}`);
   assert.equal(seen[3][1], `devices?trial_user_id=eq.${USER}`);

@@ -48,6 +48,7 @@ import {
   methodNotAllowed,
   preflight,
   readJsonBody,
+  resolveSameOrigin,
 } from './_lib/respond.js';
 
 export const config = { runtime: 'nodejs', maxDuration: 15 };
@@ -356,6 +357,11 @@ export async function POST(request) {
       return completeConfirmation(request, token);
     }
 
+    // The JSON signup is a browser call from this site only. (The form branch
+    // above stays outside the check: a top-level form navigation does not
+    // carry an Origin header in every browser, and its signed token is the gate.)
+    if (!resolveSameOrigin(request)) return respond(403, { ok: false, error: 'cross_origin' });
+
     const rate = limiter.check(clientIp(request));
     if (!rate.ok) {
       return respond(
@@ -389,8 +395,8 @@ export async function POST(request) {
         {
           ok: false,
           error:
-            'A confirmation email has already gone to that address. Check your inbox and spam folder, ' +
-            'and try again in an hour if it has not arrived.',
+            'We have already tried to send a confirmation email to that address recently. Check your inbox ' +
+            'and spam folder, and try again in an hour if it has not arrived.',
         },
         rateLimitHeaders(perAddress, { includeRetryAfter: true }),
       );

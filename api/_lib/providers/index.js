@@ -277,6 +277,7 @@ export function normalizeEvent(partial) {
     currency: p.currency ? String(p.currency).toUpperCase() : null,
     taxInclusive: typeof p.taxInclusive === 'boolean' ? p.taxInclusive : null,
     totalIsZero: typeof p.totalIsZero === 'boolean' ? p.totalIsZero : null,
+    fullyRefunded: typeof p.fullyRefunded === 'boolean' ? p.fullyRefunded : null,
     customDataUserIdSeen: Boolean(p.customDataUserIdSeen),
     // The provider's own delivery for THIS event, exactly as parsed, so that
     // webhook_events.payload can be fed back through parseEvents() to re-drive

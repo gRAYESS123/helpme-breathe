@@ -66,7 +66,7 @@ let paddleInitialised = false;
  * one checkout. `promise` is stored rather than the resolved value, because the
  * second click usually arrives while the first is still opening.
  */
-let lastCall = { plan: null, at: 0, promise: null };
+let lastCall = { plan: null, at: 0, promise: null, pending: false };
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -324,13 +324,13 @@ function renderUnavailableCard(plan, trigger, target, reason) {
  * rather than a trial (§5.4). Rendered under the button so it is there when
  * the overlay closes. "One free trial per person" — those exact words.
  */
-function renderNoTrialNote(plan, trigger, target, reasons) {
+function renderNoTrialNote(plan, trigger, target, reasons, continueUrl) {
   const list = Array.isArray(reasons) ? reasons : [];
-  if (list.includes('trial_disabled')) return; // trials are simply off; nothing to explain
+  if (list.includes('trial_disabled')) return null; // trials are simply off; nothing to explain
   const container = cardContainer(trigger, target);
-  if (!container) return;
+  if (!container) return null;
   const def = PLANS[plan] || PLANS[PLANS.default];
-  renderCard(container, {
+  const card = renderCard(container, {
     kind: 'no-trial',
     heading: 'A straight subscription this time',
     lines: [
@@ -338,6 +338,20 @@ function renderNoTrialNote(plan, trigger, target, reasons) {
       { before: "If that's not right, email ", email: SUPPORT_EMAIL, after: '.' },
     ],
   });
+  if (continueUrl && card) {
+    // The hosted page asks for money today, so the explanation comes first
+    // and the way on is a deliberate second click, never an automatic jump.
+    const p = document.createElement('p');
+    const a = document.createElement('a');
+    a.className = 'btn';
+    a.href = continueUrl;
+    a.rel = 'noopener';
+    a.setAttribute('data-checkout-continue', plan);
+    a.textContent = `Continue to checkout — $${def.price} ${def.per}`;
+    p.appendChild(a);
+    card.appendChild(p);
+  }
+  return card;
 }
 
 /* ---------------------------------------------------------------- sign-in */
@@ -378,13 +392,27 @@ export function subscribe(plan, options = {}) {
   // click can reach subscribe() twice. Collapse repeats of the same plan so the
   // visitor sees one checkout and analytics sees one event.
   const now = Date.now();
-  if (lastCall.plan === key && lastCall.promise && now - lastCall.at < DEDUPE_MS) {
+  // ...and a click while the server is still building the session is the
+  // same checkout too, however long that takes: one reservation, one session.
+  if (lastCall.plan === key && lastCall.promise && (lastCall.pending || now - lastCall.at < DEDUPE_MS)) {
     return lastCall.promise;
   }
   lastCall.plan = key;
   lastCall.at = now;
+  lastCall.pending = true;
 
-  const promise = runSubscribe(key, options);
+  const trigger = options && options.trigger && typeof options.trigger === 'object' ? options.trigger : null;
+  if (trigger && 'disabled' in trigger) {
+    trigger.disabled = true;
+    trigger.setAttribute('aria-busy', 'true');
+  }
+  const promise = runSubscribe(key, options).finally(() => {
+    lastCall.pending = false;
+    if (trigger && 'disabled' in trigger) {
+      trigger.disabled = false;
+      trigger.removeAttribute('aria-busy');
+    }
+  });
   lastCall.promise = promise;
   return promise;
 }
@@ -431,19 +459,39 @@ async function runSubscribe(plan, options) {
   }
 
   const trial = intent.trial === true;
+  const reasons = Array.isArray(intent.reasons) ? intent.reasons.map(String) : [];
   const hostedUrl = typeof intent.checkout.checkout_url === 'string' && /^https:\/\//.test(intent.checkout.checkout_url) ? intent.checkout.checkout_url : '';
   track(EVENTS.TRIAL_ELIGIBILITY_CHECK || 'trial_eligibility_check', {
     eligible: trial,
-    reason: Array.isArray(intent.reasons) && intent.reasons.length ? String(intent.reasons[0]) : 'eligible',
+    reason: reasons.length ? reasons[0] : 'eligible',
     plan,
   });
+
+  // The server could not CHECK the trial (its ledger or limiter, not the
+  // buyer's history). The page promised three free days; selling a full-price
+  // plan instead would break that promise, so this is a retry, not a sale.
+  if (!trial && (reasons.includes('rate_limited') || reasons.includes('ledger_unavailable'))) {
+    track(EVENTS.CHECKOUT_OPEN, { plan, trial: false, mode: 'retry', placement });
+    return renderUnavailableCard(plan, trigger, target, reasons[0]);
+  }
+
   track(EVENTS.CHECKOUT_OPEN, { plan, trial, mode: hostedUrl ? 'redirect' : 'overlay', placement });
 
-  if (!trial) renderNoTrialNote(plan, trigger, target, intent.reasons);
+  // A denied trial: the page swaps its promise for the straight offer (pro.html
+  // listens), and the hosted page — which asks for money today — is reached
+  // by a second, explicit click under the explanation, never automatically.
+  const explain = !trial && !reasons.includes('trial_disabled');
+  if (!trial && typeof document !== 'undefined' && typeof CustomEvent === 'function') {
+    document.dispatchEvent(new CustomEvent('hmb:trial-denied', { detail: { plan, reasons } }));
+  }
+  if (explain && hostedUrl) {
+    renderNoTrialNote(plan, trigger, target, reasons, hostedUrl);
+    return { ok: true, mode: 'confirm', plan, trial, reservationId: intent.reservation_id || null };
+  }
+  if (explain) renderNoTrialNote(plan, trigger, target, reasons);
 
   if (hostedUrl) {
-    // The hosted page is the checkout. The no-trial note above is still on the
-    // page when the visitor comes back with the browser's back button.
+    // The hosted page is the checkout.
     if (typeof location !== 'undefined' && typeof location.assign === 'function') location.assign(hostedUrl);
     return { ok: true, mode: 'redirect', plan, trial, reservationId: intent.reservation_id || null };
   }

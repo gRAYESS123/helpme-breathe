@@ -643,6 +643,17 @@
             if (status === 'trialing') {
                 const ends = fmtDate(ent.trial_ends_at);
                 const amount = charge || 'the price shown to you at checkout';
+                if (ent.cancel_at) {
+                    // Cancelled during the trial: it runs out and nothing is charged.
+                    setStatus('Trial', `Your free trial ends on ${fmtDate(ent.cancel_at) || ends || 'its last day'} and your card will not be charged.`, 'ok');
+                    planBody('');
+                    showPlanLine(false);
+                    const keep = button('Keep my subscription', 'btn btn--quiet');
+                    keep.addEventListener('click', () => openPortal('overview', keep));
+                    actions.append(manageButton('Manage billing', 'overview'), keep);
+                    planNote('Cancelled. The trial simply runs out; nothing is charged.');
+                    return;
+                }
                 setStatus(
                     'Trial',
                     `Your free trial ends on ${ends || 'its last day'}. On that day the card you gave is charged `
@@ -705,7 +716,7 @@
                 planBody('');
                 showPlanLine(false);
                 actions.append(manageButton('Manage billing', 'overview'), cancelButton());
-                planNote('Resume whenever you want from the billing portal.');
+                planNote('To resume before then, email contact@helpmebreath.com and it is switched back on the same day.');
                 return;
             }
 
@@ -834,14 +845,18 @@
 
             let effect = 'Your subscription ends and nothing further is charged.';
             if (status === 'trialing') {
-                effect = 'You keep the remaining trial days and are never charged.';
+                effect = 'You keep the remaining trial days and are never charged. "End it now instead" ends the trial today.';
             } else if (status === 'active') {
                 const until = fmtDate(ent.current_period_end) || fmtDate(ent.access_until);
                 effect = until
                     ? `You keep access until ${until}. Nothing further is charged.`
                     : 'You keep access to the end of the period you have paid for. Nothing further is charged.';
+                effect += ' "End it now instead" ends access today; the rest of the period you have paid for is not refunded.';
             } else if (status === 'paused') {
-                effect = 'Your subscription ends now; nothing was being charged.';
+                const until = fmtDate(ent.access_until);
+                effect = until
+                    ? `Your subscription ends now; nothing was being charged. You keep access until ${until}, the end of the period you paid for.`
+                    : 'Your subscription ends now; nothing was being charged.';
             } else if (status === 'past_due') {
                 effect = 'Your subscription ends and nothing further is charged. The outstanding payment still stands.';
             }

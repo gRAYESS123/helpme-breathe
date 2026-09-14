@@ -41,6 +41,7 @@ import {
   toIso,
 } from '../_lib/entitlement.js';
 import { isProduction, providerName, readEnv, requireEnv } from '../_lib/env.js';
+import { authUnavailable } from '../_lib/authz.js';
 import { getProvider } from '../_lib/providers/index.js';
 import { createLimiter, rateLimitHeaders } from '../_lib/ratelimit.js';
 import { clientIp, errorResponse, json, methodNotAllowed, preflight } from '../_lib/respond.js';
@@ -107,6 +108,9 @@ export function createDeleteHandler(deps) {
       const jwt = bearerToken(request);
       if (!jwt) return respond(request, 401, { ok: false, reason: 'unauthenticated' });
       const identity = await assertLiveUser(jwt);
+      if (identity && !identity.ok && (identity.reason === 'auth_unavailable' || identity.reason === 'jwks_unavailable')) {
+        return authUnavailable(request, { methods: METHODS });
+      }
       if (!identity || !identity.ok || typeof identity.sub !== 'string' || !identity.sub) {
         return respond(request, 401, { ok: false, reason: 'unauthenticated' });
       }

@@ -50,6 +50,12 @@ export async function POST(request) {
  * @param {Request} request
  * @returns {Promise<Response>}
  */
+/** Uptime monitors default to HEAD; answer it with GET's status and headers. */
+export async function HEAD(request) {
+  const response = await GET(request);
+  return new Response(null, { status: response.status, headers: response.headers });
+}
+
 export async function GET(request) {
   try {
     const report = describeConfig();

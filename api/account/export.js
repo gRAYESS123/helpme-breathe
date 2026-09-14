@@ -14,6 +14,7 @@
  */
 
 import { bearerToken, createStore, toIso } from '../_lib/entitlement.js';
+import { authUnavailable } from '../_lib/authz.js';
 import { createLimiter, rateLimitHeaders } from '../_lib/ratelimit.js';
 import { clientIp, errorResponse, json, methodNotAllowed, preflight } from '../_lib/respond.js';
 
@@ -68,6 +69,9 @@ export function createExportHandler(deps) {
       const jwt = bearerToken(request);
       if (!jwt) return json(401, { ok: false, reason: 'unauthenticated' }, { request, methods: METHODS });
       const identity = await assertLiveUser(jwt);
+      if (identity && !identity.ok && (identity.reason === 'auth_unavailable' || identity.reason === 'jwks_unavailable')) {
+        return authUnavailable(request, { methods: METHODS });
+      }
       if (!identity || !identity.ok || typeof identity.sub !== 'string' || !identity.sub) {
         return json(401, { ok: false, reason: 'unauthenticated' }, { request, methods: METHODS });
       }

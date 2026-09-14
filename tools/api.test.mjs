@@ -1113,6 +1113,7 @@ test('POST /api/subscribe with the Confirm form flips the contact and answers 30
   const jsonRequest = siteRequest({
     url: SUBSCRIBE_URL,
     method: 'POST',
+    origin: 'https://helpmebreath.com',
     headers: { 'content-type': 'application/json', 'x-real-ip': '203.0.113.241' },
     body: JSON.stringify({ confirm: token }),
   });
@@ -1219,6 +1220,7 @@ test('subscribe: a preview deployment without a real LICENSE_SECRET mints nothin
   const signup = siteRequest({
     url: SUBSCRIBE_URL,
     method: 'POST',
+    origin: 'https://helpmebreath.com',
     headers: { 'content-type': 'application/json', 'x-real-ip': '203.0.113.250' },
     body: JSON.stringify({ email: 'someone@example.com', consent: true }),
   });
@@ -1279,6 +1281,7 @@ test('POST /api/subscribe through the default adapter says the same sentence for
     siteRequest({
       url: SUBSCRIBE_URL,
       method: 'POST',
+      origin: 'https://helpmebreath.com',
       headers: { 'content-type': 'application/json', 'x-real-ip': '192.0.2.9' },
       body,
     });
@@ -1315,6 +1318,7 @@ test('POST /api/subscribe shares one sending budget across everyone', async () =
         const request = siteRequest({
           url: SUBSCRIBE_URL,
           method: 'POST',
+          origin: 'https://helpmebreath.com',
           headers: { 'content-type': 'application/json', 'x-real-ip': `198.51.100.${100 + i}` },
           body: JSON.stringify({ email: `person${i}@example.com`, consent: true }),
         });
@@ -1331,4 +1335,26 @@ test('POST /api/subscribe shares one sending budget across everyone', async () =
   const sentence = (await limited.json()).error;
   assert.match(sentence, /try again in an hour/i);
   assert.equal(fetchImpl.calls.length, accepted, 'a refused request never reaches the mailing service');
+});
+
+test('POST /api/subscribe (JSON) from a foreign origin is refused before any work, like every other state-changing POST', async () => {
+  const fetchImpl = stubFetch(resendRoutes());
+  const foreign = siteRequest({
+    url: SUBSCRIBE_URL,
+    method: 'POST',
+    origin: 'https://evil.example',
+    headers: { 'content-type': 'text/plain', 'x-real-ip': '192.0.2.77' },
+    body: JSON.stringify({ email: 'victim@example.com', consent: true }),
+  });
+  const response = await withEnv(RESEND_PROCESS_ENV, () => withFetch(fetchImpl, () => subscribePost(foreign)));
+  assert.equal(response.status, 403);
+  assert.deepEqual(await response.json(), { ok: false, error: 'cross_origin' });
+  assert.equal(fetchImpl.calls.length, 0, 'no email is sent for a cross-site request');
+  // No Origin header at all (a non-browser client) is refused the same way.
+  const bare = new Request(SUBSCRIBE_URL, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-real-ip': '192.0.2.78', 'x-forwarded-host': 'helpmebreath.com' },
+    body: JSON.stringify({ email: 'victim@example.com', consent: true }),
+  });
+  assert.equal((await withEnv(RESEND_PROCESS_ENV, () => withFetch(fetchImpl, () => subscribePost(bare)))).status, 403);
 });

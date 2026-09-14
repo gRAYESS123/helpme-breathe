@@ -575,6 +575,9 @@ export function normalizeChargeEvent(obj, extra) {
     currency,
     taxInclusive: null,
     totalIsZero: amount == null ? null : Number(minor) === 0,
+    // `charge.refunded` fires for partial refunds too; only a full refund ends
+    // the subscription (the refund policy's promise).
+    fullyRefunded: extra.type === 'txn.refunded' ? o.refunded === true : null,
   });
 }
 
@@ -680,8 +683,11 @@ export const stripeProvider = {
     const found = await stripeRequest(ctx, `/v1/customers?email=${encodeURIComponent(address)}&limit=1`);
     const rows = found && Array.isArray(found.data) ? found.data : [];
     const hit = rows.find((c) => c && c.id && !c.deleted);
-    if (hit) return { id: String(hit.id), existed: true };
-    const created = await stripeRequest(ctx, '/v1/customers', { method: 'POST', body: { email: address } });
+    // A customer this flow created for this same account (an abandoned
+    // checkout) is not evidence that the email was a customer before it.
+    const sub = ctx && ctx.sub ? String(ctx.sub) : '';
+    if (hit) return { id: String(hit.id), existed: !(sub && hit.metadata && hit.metadata.hmb_sub === sub) };
+    const created = await stripeRequest(ctx, '/v1/customers', { method: 'POST', body: { email: address, metadata: sub ? { hmb_sub: sub } : undefined } });
     if (!created || !created.id) throw new ProviderError('provider_error', { message: 'Stripe POST /v1/customers returned no id.' });
     return { id: String(created.id), existed: false };
   },
@@ -691,12 +697,14 @@ export const stripeProvider = {
    * session's URL and nothing else: the price, the customer, the trial and the
    * reservation id are fixed here (design §5.5).
    *
-   * Three shapes, tried in order and each logged when it is not the first:
-   *   1. Managed Payments — Stripe as merchant of record (the default);
-   *   2. a plain checkout with automatic tax, if Stripe refuses Managed
-   *      Payments for this account (or MOR_MANAGED_PAYMENTS is `false`);
+   * Shapes, tried in order:
+   *   1. Managed Payments — Stripe as merchant of record (the default). If
+   *      Stripe refuses it the call FAILS (checkout unavailable): the legal
+   *      pages name Stripe as the seller, so nothing may be sold another way
+   *      until MOR_MANAGED_PAYMENTS=false is set together with new copy;
+   *   2. with MOR_MANAGED_PAYMENTS=false, a plain checkout with automatic tax;
    *   3. a plain checkout with no tax, if Stripe Tax is not enabled either.
-   * Checkout never dies on a dashboard setting, and never sells silently under
+   * A tax setting never closes checkout, and nothing is ever sold silently under
    * a model the owner did not choose: the warning names which one was used.
    *
    * @param {{priceId:string, customerId?:string|null, customData?:object, trial?:boolean}} input
@@ -750,11 +758,24 @@ export const stripeProvider = {
         });
       } catch (error) {
         const detail = error && error.cause ? `${error.cause.message || ''} ${error.cause.param || ''}` : '';
-        const refused = error instanceof ProviderError && error.status === 400 && shape.refused && shape.refused.test(detail) && shapes[i + 1];
+        const isRefusal = error instanceof ProviderError && error.status === 400;
+        if (shape.name === 'managed') {
+          // Managed Payments is the configured model and every legal page says
+          // Stripe is the seller. Selling any other way would contradict them,
+          // so there is no fallback: the buyer sees "checkout unavailable" and
+          // the log says what to do. MOR_MANAGED_PAYMENTS=false is the only
+          // route to a plain checkout, taken together with the legal copy.
+          if (isRefusal) {
+            console.error(`[stripe] managed payments refused by the account (${detail.trim() || 'no detail'}); refusing to sell under a different model. Enable Managed Payments in Stripe, or set MOR_MANAGED_PAYMENTS=false and change the legal copy to name the owner as seller.`);
+            throw new ProviderError('managed_payments_refused', { status: error.status, message: 'Stripe refused Managed Payments for this account; checkout is closed rather than sold under a different model.', cause: error.cause });
+          }
+          throw error;
+        }
+        const refused = isRefusal && shape.refused && shape.refused.test(detail) && shapes[i + 1];
         if (!refused) throw error;
-        // The account cannot sell this way: the next shape is tried and the log
-        // says which one, because the legal copy depends on the answer.
-        console.warn(`[stripe] ${shape.name === 'managed' ? 'managed payments' : 'automatic tax'} refused by the account; falling back to the ${shapes[i + 1].name} checkout`);
+        // The account cannot collect tax this way: the next shape is tried and
+        // the log says so, because the price shown at checkout changes.
+        console.warn(`[stripe] automatic tax refused by the account; falling back to the ${shapes[i + 1].name} checkout`);
       }
     }
     if (!session || !session.id) throw new ProviderError('provider_error', { message: 'Stripe POST /v1/checkout/sessions returned no id.' });

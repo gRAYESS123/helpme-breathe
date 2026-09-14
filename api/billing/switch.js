@@ -109,14 +109,18 @@ export function createSwitchHandler(deps) {
 
       // Optimistic local view; the webhook (or the reconcile cron, via the
       // flag) writes the authoritative period dates.
-      await updateSubscription(row.id, { plan: targetPlan, provider_price_id: priceId, needs_reconcile: true });
+      // The display amount belonged to the old price; until the next invoice
+      // is paid the page says "the price shown to you at checkout".
+      await updateSubscription(row.id, { plan: targetPlan, provider_price_id: priceId, needs_reconcile: true, display_amount: null, display_currency: null, display_tax_inclusive: null });
 
       const nextBilledAt = (result && (result.nextBilledAt || result.currentPeriodEnd)) || toIso(toMs(row.next_billed_at)) || null;
       return json(200, {
         ok: true,
         plan: targetPlan,
         next_billed_at: nextBilledAt,
-        message: 'You are now on the annual plan. The difference for the rest of this period is charged now; the next full charge is on your renewal date.',
+        // Stripe's `create_prorations` adds the credit for the unused part of
+        // this period to the NEXT invoice; nothing is invoiced today.
+        message: 'You are now on the annual plan. Nothing is charged today: the unused part of this period is credited, and the annual charge is taken on your renewal date.',
       }, { request, methods: METHODS });
     } catch (error) {
       return errorResponse(error, request, { methods: METHODS, label: 'billing-switch' });

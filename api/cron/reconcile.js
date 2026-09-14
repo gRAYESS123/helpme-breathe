@@ -60,7 +60,10 @@ export async function reconcileSubscription(row, deps) {
   const before = { status: row.status, had_trial: row.had_trial === true, ever_paid: row.ever_paid === true };
   const fields = patchForEvent(state, row, { nowMs });
   fields.needs_reconcile = false;
-  fields.last_event_at = state.occurredAt || toIso(nowMs);
+  // The time of this read, never `state.occurredAt`: an API read carries the
+  // subscription's creation time, which would rewind the ordering guard and
+  // let a re-driven stale event overwrite this authoritative state.
+  fields.last_event_at = toIso(nowMs);
   const subscriptionId = String(row.provider_subscription_id);
   await store.updateByKey(row.provider, subscriptionId, fields);
   // The §6.6 ledger side effects the missing webhook would have written.

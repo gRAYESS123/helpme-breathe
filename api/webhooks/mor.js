@@ -220,12 +220,19 @@ export function createWebhookStore(db) {
       return rows[0] || null;
     },
 
-    /** The conditional, ordered UPDATE of §6.3. Zero rows = stale or racing. */
+    /**
+     * The conditional, ordered UPDATE of §6.3. Zero rows = stale or racing.
+     * `lte`, not `lt`: Stripe stamps every event of one billing action with
+     * the same whole-second `created` (checkout.session.completed,
+     * customer.subscription.created and invoice.paid share it), so siblings
+     * apply in delivery order while genuinely older events are still refused.
+     * Replays of one event are stopped earlier, by event id.
+     */
     async updateOrdered(provider, subscriptionId, fields, occurredAt) {
       const at = enc(occurredAt);
       return patch(
         `subscriptions?provider=eq.${enc(provider)}&provider_subscription_id=eq.${enc(subscriptionId)}` +
-          `&or=(last_event_at.is.null,last_event_at.lt.${at})&select=*`,
+          `&or=(last_event_at.is.null,last_event_at.lte.${at})&select=*`,
         { ...fields, last_event_at: occurredAt },
       );
     },
@@ -249,7 +256,9 @@ export function createWebhookStore(db) {
 
     async subscriptionsToReconcile(nowIso, limit = 50) {
       const flagged = list(await db(`subscriptions?needs_reconcile=is.true&order=updated_at.asc&limit=${limit}&select=*`));
-      const lapsed = list(await db(`subscriptions?status=in.(trialing,active)&access_until=lt.${enc(nowIso)}&order=access_until.asc&limit=${limit}&select=*`));
+      // past_due and paused can strand too (a lost dunning-recovery or resume
+      // webhook), so they are re-read as well.
+      const lapsed = list(await db(`subscriptions?status=in.(trialing,active,past_due,paused)&access_until=lt.${enc(nowIso)}&order=access_until.asc&limit=${limit}&select=*`));
       const seen = new Set();
       const out = [];
       for (const row of [...flagged, ...lapsed]) {
@@ -645,7 +654,20 @@ export async function applyEvent(event, deps) {
     result = { action: 'noted' };
   } else if (event.type === 'txn.refunded') {
     await store.setTrialOutcome(providerId, subscriptionId, 'refunded', ['reserved', 'started', 'converted']);
-    result = { action: 'noted', reason: 'refund' };
+    if (event.fullyRefunded === true && existing.status !== 'canceled') {
+      // The refund policy promises that a refund ends the subscription and the
+      // access with it. A partial (goodwill) refund changes nothing.
+      try {
+        await provider.cancelSubscription(subscriptionId, { effectiveFrom: 'immediately' }, providerCtx);
+      } catch (error) {
+        alert('refund_cancel_failed', { reason: error && error.message ? error.message : String(error) });
+        await store.flagReconcile(providerId, subscriptionId);
+      }
+      await store.cancelTerminal(providerId, subscriptionId, { canceled_at: nowIso, cancel_at: null, access_until: nowIso, last_event_at: occurredAt });
+      result = { action: 'updated', reason: 'refund' };
+    } else {
+      result = { action: 'noted', reason: 'refund' };
+    }
   } else if (event.type === 'txn.chargeback') {
     await store.updateByKey(providerId, subscriptionId, { dispute_open: true });
     await store.setTrialOutcome(providerId, subscriptionId, 'chargeback', ['reserved', 'started', 'converted', 'cancelled', 'refunded']);

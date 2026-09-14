@@ -147,10 +147,15 @@ export function createCancelHandler(deps) {
       let cancelAt;
       let accessUntil;
       if (effectiveFrom === 'immediately') {
-        patch = { status: 'canceled', canceled_at: nowIso, cancel_at: null };
+        // A paused row ends at the provider now (nothing is being collected),
+        // but the days already paid for are kept: its access_until was frozen
+        // at the last paid period end, and that date becomes cancel_at.
+        const frozen = toMs(row.access_until);
+        const keepUntil = row.status === 'paused' && when !== 'now' && frozen != null && frozen > at ? toIso(frozen) : null;
+        patch = { status: 'canceled', canceled_at: nowIso, cancel_at: keepUntil };
         accessUntil = toIso(accessUntilFor({ ...row, ...patch }, at));
         patch.access_until = accessUntil;
-        cancelAt = nowIso;
+        cancelAt = keepUntil || nowIso;
       } else {
         const sc = result && result.scheduledChange;
         cancelAt =
@@ -168,7 +173,9 @@ export function createCancelHandler(deps) {
       const message =
         effectiveFrom === 'immediately'
           ? row.status === 'paused' && when !== 'now'
-            ? 'Your paused subscription has ended. Nothing more will be charged.'
+            ? cancelAt !== nowIso
+              ? `Your paused subscription has ended. Nothing more will be charged, and you keep access until ${cancelAt}.`
+              : 'Your paused subscription has ended. Nothing more will be charged.'
             : 'Your subscription has ended. Nothing more will be charged.'
           : row.status === 'trialing'
             ? `Your trial will end on ${cancelAt || 'its last day'} and your card will not be charged.`
@@ -195,7 +202,9 @@ function productionDeps() {
       db(`subscriptions?id=eq.${encodeURIComponent(rowId)}`, { method: 'PATCH', body: patch, prefer: 'return=minimal' }),
     provider: getProvider(providerName()),
     providerCtx: { env, fetchImpl: globalThis.fetch, isProd: isProduction() },
-    limiter: (sub) => dblimit(`billing:cancel:${sub}`, LIMIT.window, LIMIT.max),
+    // Fail open: a subscriber who cannot cancel keeps being billed, which is
+    // worse than a burst of cancel calls while the limiter is down.
+    limiter: (sub) => dblimit(`billing:cancel:${sub}`, LIMIT.window, LIMIT.max, { failOpen: true }),
   };
 }
 

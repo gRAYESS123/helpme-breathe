@@ -281,6 +281,9 @@ export function deviceCookieHeader(value) {
 export function ipBucket(ip) {
   const text = String(ip == null ? '' : ip).trim();
   if (!text || text === 'unknown') return 'unknown';
+  // An IPv4-mapped address (::ffff:203.0.113.42) is an IPv4 client.
+  const mapped = /^\[?::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\]?$/i.exec(text);
+  if (mapped) return ipBucket(mapped[1]);
   if (text.includes(':')) {
     const groups = expandIpv6(text);
     if (!groups) return 'unknown';
@@ -752,7 +755,9 @@ export async function runEligibility(input) {
     // 2. Rate limits, in Postgres. The user bucket is bumped first so a caller
     // refused on their own budget does not also consume their network's.
     const userOk = await dblimit(`trial:${sub}`, 3600, 6);
-    const ipOk = userOk === false ? true : await dblimit(`trial:ip:${ipBucket(ip)}`, 3600, 20);
+    // 60 an hour per network: carrier-grade NAT and campus egress put many
+    // real people behind one /24, and a refused bucket downgrades the offer.
+    const ipOk = userOk === false ? true : await dblimit(`trial:ip:${ipBucket(ip)}`, 3600, 60);
     const rateLimited = userOk === false || ipOk === false;
 
     // 3. Device.

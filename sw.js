@@ -151,7 +151,9 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() =>
           caches
-            .match(request)
+            // ignoreSearch: the installed app starts at /?source=pwa and its
+            // shortcuts at /timer?t=…; the cached shell must answer them.
+            .match(request, { ignoreSearch: true })
             .then((cached) => cached || caches.match(OFFLINE_URL))
             .then((cached) => cached || Response.error())
         )
@@ -159,7 +161,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Same-origin assets: stale-while-revalidate.
+  // Same-origin assets. Scripts and styles are network-first: the origin
+  // answers a conditional request with a 304, so a deploy reaches the very
+  // next page load and the cache is only the offline fallback — no hand-bumped
+  // version can be forgotten. Images and audio stay stale-while-revalidate.
   event.respondWith(
     caches.match(request).then((cached) => {
       const networkFetch = fetch(request)
@@ -170,7 +175,8 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(() => cached);
+        .catch(() => cached || Response.error());
+      if (request.destination === 'script' || request.destination === 'style') return networkFetch;
       return cached || networkFetch;
     })
   );
