@@ -488,6 +488,22 @@ test('1. ARMED + 3 completed sessions on /timer.html: Begin does not run, the pr
   );
 });
 
+test('1b. ARMED + 3 STARTED sessions (none completed) on /timer.html: Begin does not run — stopping early spends a session too', async () => {
+  await withScenario(
+    { armed: true, storage: { 'hmb.sessions_started': '3', 'hmb.consent': 'essential' } },
+    async (page, ctx) => {
+      await openTimerPage(page, '/timer.html');
+      const before = await snapshot(page);
+      assert.equal(before.freeSessionsUsed, 3, 'started sessions count, finished or not');
+      await pressBegin(page);
+      await assertGateFired(page, 'scenario 1b');
+      const s = await snapshot(page);
+      assert.equal(s.rootPhase, null, 'scenario 1b: nothing animates once the allowance is spent');
+      assert.deepEqual(ctx.errors, [], 'no uncaught page errors');
+    },
+  );
+});
+
 test('2. ARMED + 2 completed sessions on /timer.html: Begin runs', async () => {
   await withScenario(
     { armed: true, storage: { 'hmb.history': JSON.stringify(completedSessions(2)), 'hmb.consent': 'essential' } },

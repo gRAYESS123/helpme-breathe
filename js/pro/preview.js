@@ -12,11 +12,9 @@
  *
  * This module answers by doing two things:
  *
- *   1. It animates ONE continuous demonstration cycle at the technique's real
- *      pace — inhale, hold, exhale — with the phase word, the count and the
- *      ring changing exactly as they would in a session, so the visitor sees
- *      what they would get and can follow along by eye. It does not run a
- *      timed session, count breaths, record history, play audio or vibrate.
+ *   1. It leaves the disc still. (Until 2026-09-14 it animated one
+ *      demonstration cycle; the owner asked for the timer to be plainly
+ *      behind the plan, so nothing moves once the allowance is spent.)
  *
  *   2. It renders one card into the instance's `[data-slot="post-session"]`:
  *
@@ -329,10 +327,8 @@ function onPreview(event) {
 
   if (document.body) document.body.classList.add(PREVIEW_CLASS);
 
-  // One real demonstration cycle, unless the engine says it is animating it.
-  if (detail.demo !== 'engine') runDemonstration(root, resolvePhases(detail));
-
-  if (asksBlocked()) return; // a quiet page shows the demonstration only
+  // Nothing animates: the timer is part of the plan, and the card says so.
+  if (asksBlocked()) return; // a quiet page asks nothing (the crisis pages never reach here)
 
   const container = root.querySelector('[data-slot="post-session"]');
   const card = renderPreviewCard(container, { reason: detail.reason, technique: detail.technique });

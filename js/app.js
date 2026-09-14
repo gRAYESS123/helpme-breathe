@@ -762,7 +762,7 @@ export function createBreathingApp(rootEl, options = {}) {
   /**
    * Preview mode (design section 8.2): nothing runs, nothing is counted, no
    * audio, no vibration. Dispatch `hmb:preview` so js/pro/preview.js can show
-   * one real cycle and the card; the page stays fully readable.
+   * the account card; the disc stays still and the page stays fully readable.
    */
   function enterPreview() {
     const reason = signedIn() ? 'no_subscription' : 'signed_out';
@@ -791,7 +791,9 @@ export function createBreathingApp(rootEl, options = {}) {
     // data-open-timer and pass straight through; a
     // subscriber passes; a device inside its free sessions passes. Otherwise
     // the engine enters the preview state instead of running: js/pro/preview.js
-    // animates one demonstration cycle and renders the account card.
+    // renders the account card and nothing animates. A session counts against
+    // the allowance the moment it STARTS (js/entitlements.js listens for
+    // hmb:session-start), finished or not.
     if (!requireTimer({ technique: state.key })) {
       enterPreview();
       return;
