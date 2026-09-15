@@ -919,11 +919,12 @@ export async function runEligibility(input) {
   }
 
   // 10. Provider transaction, with custom_data = { rid, v } and nothing else.
+  //     `plan` only names the plan on the return URL (/pro/thanks?plan=…).
   let transactionId = null;
   let checkoutUrl = null;
   try {
     const session = await provider.createCheckoutSession(
-      { priceId: finalPriceId, customerId, customData: { rid: reservationId, v: 3 }, trial },
+      { priceId: finalPriceId, customerId, customData: { rid: reservationId, v: 3 }, trial, plan },
       providerCtx,
     );
     transactionId = session && session.transactionId ? String(session.transactionId) : null;

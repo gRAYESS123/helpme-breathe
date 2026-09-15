@@ -83,6 +83,9 @@
             'analytics_storage': 'denied',
             'wait_for_update': 500
         });
+        // With advertising storage denied, ad click identifiers are redacted from what
+        // the browser sends (Consent Mode v2).
+        gtag('set', 'ads_data_redaction', true);
         gtag('js', new Date());
         gtag('config', 'G-TYLYLJSFHN', {
             'anonymize_ip': true,
@@ -91,6 +94,9 @@
             // never reach Google in `dl`, whatever the address bar holds.
             'page_location': window.location.origin + window.location.pathname
         });
+        // Google Ads: conversion measurement rides on the same Google tag and the
+        // same Consent Mode gates. The Purchase conversion itself fires only on /pro/thanks.
+        gtag('config', 'AW-18182683015');
     </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
 
@@ -340,6 +346,52 @@
             yearly: Number(PLANS.yearly && PLANS.yearly.price) || 100,
         };
         const trialDays = PLANS.trialDays !== undefined ? Number(PLANS.trialDays) || 0 : 3;
+
+        /*
+         * Google Ads (2026-09-15). The checkout that brought the buyer here is
+         * reported to Google Ads as the "Purchase" conversion, once per
+         * reservation: the plan's list price when the return URL named the
+         * plan (1.0 otherwise, the action's default), the currency, and the
+         * reservation id as transaction_id so a reload or a second visit is
+         * deduplicated on Google's side as well as here. The rid is an opaque
+         * uuid, never an identity. With a 3-day card trial this is the trial
+         * start, not the first charge (docs/private/KNOWN_GAPS.md). Consent
+         * Mode governs it: with advertising storage denied Google receives a
+         * cookieless, unattributed count and nothing more.
+         */
+        const ADS_SEND_TO = 'AW-18182683015/HePwCKi-7PgcEIfzlt5D';
+        const ADS_SEEN_KEY = 'hmb.ads.reported';
+
+        function reportAdsConversion() {
+            if (!rid || typeof window.gtag !== 'function') return false;
+            let seen = [];
+            try {
+                const raw = window.localStorage.getItem(ADS_SEEN_KEY);
+                seen = raw ? JSON.parse(raw) : [];
+                if (!Array.isArray(seen)) seen = [];
+            } catch {
+                seen = [];
+            }
+            if (seen.includes(rid)) return false;
+            const value = hintedPlan ? LIST[hintedPlan] : 1.0;
+            try {
+                window.gtag('event', 'conversion', {
+                    send_to: ADS_SEND_TO,
+                    value: value,
+                    currency: 'USD',
+                    transaction_id: rid,
+                });
+            } catch {
+                return false;
+            }
+            try {
+                window.localStorage.setItem(ADS_SEEN_KEY, JSON.stringify(seen.concat(rid).slice(-10)));
+            } catch {
+                /* storage unavailable: Google's transaction_id still deduplicates */
+            }
+            return true;
+        }
+        reportAdsConversion();
 
         const POLL_MS = 2000;
         const POLL_FOR_MS = 30000;

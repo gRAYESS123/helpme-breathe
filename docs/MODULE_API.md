@@ -226,6 +226,18 @@ replayed on load.
 must be pushed by the inline head script *before* `gtag('config', …)`. Copy that
 block from `docs/PAGE_CONTRACT.md` verbatim onto every page.
 
+**Google Ads (2026-09-15).** The same head block configures `AW-18182683015`
+after GA4, and sets `ads_data_redaction` so a denied `ad_storage` also strips ad
+click identifiers from Google's requests. The only conversion event is the
+Purchase conversion in `/pro/thanks`: `gtag('event', 'conversion', { send_to:
+'AW-18182683015/HePwCKi-7PgcEIfzlt5D', value, currency: 'USD', transaction_id:
+rid })`, fired once per reservation id (remembered in
+`localStorage['hmb.ads.reported']`; Google deduplicates on `transaction_id` too),
+with `value` = the plan's list price when the return URL carried `plan=` and
+`1.0` otherwise. It is not routed through `track()`: Consent Mode, not the
+analytics gate, governs it, so a declined visitor yields a cookieless,
+unattributed count. Nothing personal is ever a parameter.
+
 ---
 
 ## `js/analytics.js`
