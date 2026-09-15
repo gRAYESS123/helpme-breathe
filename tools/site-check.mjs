@@ -1725,6 +1725,46 @@ const NO_ACCOUNT_ALLOW = [
   /no account,? (no client record|no database)/i,
 ];
 
+/**
+ * google-tag / ads-conversion (2026-09-15): every page that carries the GA4
+ * config must carry the Google Ads config and the ads_data_redaction flag in
+ * the same head block (docs/PAGE_CONTRACT.md §1), and the Purchase conversion
+ * label may appear on /pro/thanks and nowhere else.
+ */
+const GA_ID = 'G-TYLYLJSFHN';
+const ADS_ID = 'AW-18182683015';
+const ADS_CONVERSION_LABEL = 'AW-18182683015/HePwCKi-7PgcEIfzlt5D';
+const ADS_CONVERSION_PAGE = 'pro/thanks.html';
+
+function checkGoogleTag() {
+  for (const page of [...pages.values()].sort((a, b) => a.file.localeCompare(b.file))) {
+    const raw = readText(page.file);
+    if (raw == null) continue;
+    const lineOf = makeLineLookup(raw);
+    const gaAt = raw.indexOf(`gtag('config', '${GA_ID}'`);
+    const adsAt = raw.indexOf(`gtag('config', '${ADS_ID}'`);
+    if (gaAt >= 0 && adsAt < 0) {
+      ERR(page.file, lineOf(gaAt), 'google-tag', `configures ${GA_ID} without ${ADS_ID}; the head block in docs/PAGE_CONTRACT.md carries both`);
+    }
+    if (adsAt >= 0 && gaAt < 0) {
+      ERR(page.file, lineOf(adsAt), 'google-tag', `configures ${ADS_ID} without ${GA_ID}`);
+    }
+    if (gaAt >= 0 && !raw.includes("gtag('set', 'ads_data_redaction', true)")) {
+      ERR(page.file, lineOf(gaAt), 'google-tag', "the head block must set ads_data_redaction before gtag('config', …)");
+    }
+    if (gaAt >= 0 && adsAt >= 0 && adsAt < gaAt) {
+      ERR(page.file, lineOf(adsAt), 'google-tag', `${ADS_ID} must be configured after ${GA_ID}, as the contract block does`);
+    }
+    const labelAt = raw.indexOf(ADS_CONVERSION_LABEL);
+    if (labelAt >= 0 && page.file !== ADS_CONVERSION_PAGE) {
+      ERR(page.file, lineOf(labelAt), 'ads-conversion', `the Purchase conversion fires on ${ADS_CONVERSION_PAGE} only`);
+    }
+    if (page.file === ADS_CONVERSION_PAGE && labelAt < 0) {
+      ERR(page.file, null, 'ads-conversion', `must report the Purchase conversion (${ADS_CONVERSION_LABEL})`);
+    }
+  }
+}
+
 function checkAccountsModel() {
   // 1. data-open-timer
   for (const page of pages.values()) {
@@ -2641,6 +2681,7 @@ try {
 }
 try {
   checkAccountsModel();
+  checkGoogleTag();
 } catch (e) {
   ERR(null, null, 'internal-error', `accounts-model check failed: ${e.message}`);
 }

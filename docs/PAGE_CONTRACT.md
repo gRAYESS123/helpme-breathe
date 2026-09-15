@@ -87,7 +87,10 @@ Then `node tools/site-check.mjs` and fix every ERROR naming your file.
 Replace the `{{…}}` values. Everything else is verbatim, **including the order
 of the consent script** — the denied defaults must be pushed before
 `gtag('config', …)`, and ES modules are deferred, so this cannot move into
-`js/consent.js`. The dark `theme-color` must come **first**: the first matching
+`js/consent.js`. The Google Ads config (`AW-18182683015`, added 2026-09-15) is part of
+the block; the Purchase conversion event lives only in `/pro/thanks` (see
+`docs/MODULE_API.md` § Google Ads). `tools/site-check.mjs` rule `google-tag` fails the
+build when a page carries one id without the other. The dark `theme-color` must come **first**: the first matching
 one wins.
 
 ```html
@@ -150,11 +153,17 @@ one wins.
             'analytics_storage': 'denied',
             'wait_for_update': 500
         });
+        // With advertising storage denied, ad click identifiers are redacted from what
+        // the browser sends (Consent Mode v2).
+        gtag('set', 'ads_data_redaction', true);
         gtag('js', new Date());
         gtag('config', 'G-TYLYLJSFHN', {
             'anonymize_ip': true,
             'cookie_expires': 63072000
         });
+        // Google Ads: conversion measurement rides on the same Google tag and the
+        // same Consent Mode gates. The Purchase conversion itself fires only on /pro/thanks.
+        gtag('config', 'AW-18182683015');
     </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
 

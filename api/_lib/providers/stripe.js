@@ -707,7 +707,9 @@ export const stripeProvider = {
    * A tax setting never closes checkout, and nothing is ever sold silently under
    * a model the owner did not choose: the warning names which one was used.
    *
-   * @param {{priceId:string, customerId?:string|null, customData?:object, trial?:boolean}} input
+   * @param {{priceId:string, customerId?:string|null, customData?:object, trial?:boolean, plan?:string}} input
+   *   `plan` ('monthly' | 'yearly') only decorates the success URL so /pro/thanks can
+   *   show the plan and value it before the webhook lands; it is not sent to Stripe.
    * @param {{env:Record<string,string>, fetchImpl?:Function, now?:number}} ctx
    * @returns {Promise<{transactionId:string, status:string|null, checkoutUrl:string|null}>}
    */
@@ -722,6 +724,8 @@ export const stripeProvider = {
     for (const [key, value] of Object.entries(custom)) if (value != null) metadata[key] = String(value);
     const nowMs = Number.isFinite(ctx && ctx.now) ? ctx.now : Date.now();
     const trial = input.trial === true;
+    const plan = input.plan === 'monthly' || input.plan === 'yearly' ? input.plan : null;
+    const thanksQuery = [rid ? `rid=${encodeURIComponent(rid)}` : '', plan ? `plan=${plan}` : ''].filter(Boolean).join('&');
 
     const base = {
       mode: 'subscription',
@@ -734,7 +738,7 @@ export const stripeProvider = {
         trial_period_days: trial ? TRIAL_PERIOD_DAYS : undefined,
       },
       payment_method_collection: 'always',
-      success_url: `${origin}/pro/thanks${rid ? `?rid=${encodeURIComponent(rid)}` : ''}`,
+      success_url: `${origin}/pro/thanks${thanksQuery ? `?${thanksQuery}` : ''}`,
       cancel_url: `${origin}/pro?checkout=cancelled`,
       expires_at: Math.floor(nowMs / 1000) + CHECKOUT_SESSION_TTL_SECONDS,
     };

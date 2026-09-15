@@ -18,7 +18,7 @@
  *   // checkout
  *   priceIdFor({ plan, trial }, env),                        // -> string
  *   async ensureCustomer(email, ctx),                        // -> { id, existed }   (409-tolerant)
- *   async createCheckoutSession({ priceId, customerId, customData, trial? }, ctx),
+ *   async createCheckoutSession({ priceId, customerId, customData, trial?, plan? }, ctx),
  *                                                            // -> { transactionId, status?, checkoutUrl? }
  *   async checkoutUrlFor?(transactionId, ctx),               // -> string|null (hosted-page adapters)
  *   async enrichEvent?(event, ctx),                           // -> event (fill ids a payload lacks)

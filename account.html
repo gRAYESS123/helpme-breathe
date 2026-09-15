@@ -50,12 +50,18 @@
             'analytics_storage': 'denied',
             'wait_for_update': 500
         });
+        // With advertising storage denied, ad click identifiers are redacted from what
+        // the browser sends (Consent Mode v2).
+        gtag('set', 'ads_data_redaction', true);
         gtag('js', new Date());
         gtag('config', 'G-TYLYLJSFHN', {
             'anonymize_ip': true,
             'cookie_expires': 63072000,
             'page_location': window.location.origin + window.location.pathname
         });
+        // Google Ads: conversion measurement rides on the same Google tag and the
+        // same Consent Mode gates. The Purchase conversion itself fires only on /pro/thanks.
+        gtag('config', 'AW-18182683015');
     </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
 </head>

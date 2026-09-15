@@ -468,6 +468,14 @@ test('createCheckoutSession: a plain account — the trial, the price, the custo
   const noTrial = fetchStub({ 'POST /v1/checkout/sessions': { id: CS, status: 'open', url: 'https://checkout.stripe.com/c/pay/x' } });
   await stripeProvider.createCheckoutSession({ priceId: ENV.MOR_PRICE_YEARLY, customerId: CUS, customData: { rid: RID, v: 3 }, trial: false }, ctxWith(noTrial, ENV_PLAIN));
   assert.equal(noTrial.calls[0].form['subscription_data[trial_period_days]'], undefined, 'no trial, no trial days');
+
+  const named = fetchStub({ 'POST /v1/checkout/sessions': { id: CS, status: 'open', url: 'https://checkout.stripe.com/c/pay/x' } });
+  await stripeProvider.createCheckoutSession({ priceId: ENV.MOR_PRICE_YEARLY, customerId: CUS, customData: { rid: RID, v: 3 }, trial: true, plan: 'yearly' }, ctxWith(named, ENV_PLAIN));
+  assert.equal(named.calls[0].form.success_url, `https://helpmebreath.com/pro/thanks?rid=${RID}&plan=yearly`, 'the plan name rides the return URL for /pro/thanks');
+  assert.equal(named.calls[0].form['metadata[plan]'], undefined, 'the plan is not sent to Stripe as metadata');
+  const odd = fetchStub({ 'POST /v1/checkout/sessions': { id: CS, status: 'open', url: 'https://checkout.stripe.com/c/pay/x' } });
+  await stripeProvider.createCheckoutSession({ priceId: ENV.MOR_PRICE_YEARLY, customerId: CUS, customData: { rid: RID, v: 3 }, trial: true, plan: 'lifetime' }, ctxWith(odd, ENV_PLAIN));
+  assert.equal(odd.calls[0].form.success_url, `https://helpmebreath.com/pro/thanks?rid=${RID}`, 'an unknown plan name is dropped, not forwarded');
   assert.equal(noTrial.calls[0].form['subscription_data[metadata][rid]'], RID);
 });
 

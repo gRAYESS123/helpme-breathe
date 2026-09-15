@@ -94,6 +94,8 @@ brand. Each finding names its rule id, and every one of these is an ERROR:
 | `copy-truth` | "free forever", "always free", "no sign-up", and an unqualified "no account" in page text, `<title>`, `<meta content>` or JSON-LD. A short allowlist keeps the sentences that are still true ("the first three sessions need no account"). |
 | `paywall-markup` | `isAccessibleForFree: false`, or `hasPart` + `cssSelector` paywall markup, in JSON-LD. Only the interactive timer is gated, never the prose. |
 | `clay-on-timer` | `var(--clay)` in any `.css` rule whose selector is scoped to `.breathing-section`, `[data-slot="post-session"]`, `.post-session-card` or `.paywall-card`. The commerce accent belongs on `/pro`; the timer is not for sale (`docs/BRAND.md` §1 and §8). |
+| `google-tag` | A page configures `G-TYLYLJSFHN` without `AW-18182683015` (or the other way round), misses `gtag('set', 'ads_data_redaction', true)`, or configures the Ads id before GA4. The head block in `docs/PAGE_CONTRACT.md` §1 is verbatim. |
+| `ads-conversion` | The Purchase conversion label `AW-18182683015/HePwCKi-7PgcEIfzlt5D` appears on any page other than `pro/thanks.html`, or is missing from it. One conversion, one page. |
 
 ## CSP origins (`csp-origins`)
 

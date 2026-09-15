@@ -58,11 +58,17 @@
             'analytics_storage': 'denied',
             'wait_for_update': 500
         });
+        // With advertising storage denied, ad click identifiers are redacted from what
+        // the browser sends (Consent Mode v2).
+        gtag('set', 'ads_data_redaction', true);
         gtag('js', new Date());
         gtag('config', 'G-TYLYLJSFHN', {
             'anonymize_ip': true,
             'cookie_expires': 63072000
         });
+        // Google Ads: conversion measurement rides on the same Google tag and the
+        // same Consent Mode gates. The Purchase conversion itself fires only on /pro/thanks.
+        gtag('config', 'AW-18182683015');
     </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
 
@@ -153,7 +159,7 @@
             <h1>Privacy Policy</h1>
             <div class="article-meta">
                 <p class="article-byline"><strong>Georges Rayess</strong> <span class="article-role">— writes and maintains Help Me Breathe. Not a clinician.</span></p>
-                <p class="article-dates">Last updated <time datetime="2026-09-14">14 September 2026</time> (14 September: the merchant of record is now Stripe). Published by Georges Rayess, an individual.</p>
+                <p class="article-dates">Last updated <time datetime="2026-09-15">15 September 2026</time> (15 September: Google Ads conversion measurement, section 3.2a; 14 September: the merchant of record is now Stripe). Published by Georges Rayess, an individual.</p>
             </div>
         </header>
 
@@ -258,6 +264,12 @@
                     <p>If you choose <strong>"Essential only"</strong> in the cookie banner, or ignore it, they stay denied. No analytics cookie is written. If you choose <strong>"Accept all"</strong>, analytics is enabled and Google Analytics records page views, the technique you selected, whether a session started or completed, whether a sign-in or checkout was started, and similar interaction events. IP anonymisation is on. <strong>Events never carry an email address, an account identifier, a device identifier, a token or a payment identifier.</strong> Payments, renewals, declines and refunds are never reported to Google Analytics at all; they are facts I read from my own records.</p>
 
                     <p>Google puts it this way: <q>Your web browser automatically sends certain information to Google. This includes the URL of the page you're visiting and your IP address.</q> Those sentences are from <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">Google's page on how it uses information from sites that use its services</a>. You can change your decision at any time by clearing this site's storage, which brings the banner back.</p>
+
+                    <h3>3.2a Advertising measurement — Google Ads conversions</h3>
+
+                    <p>From 15 September 2026 I advertise the timer on Google Ads. To learn whether an ad led to a subscription, the same Google tag reports one thing to Google Ads: that a checkout completed on this site, together with the plan's list price and the random checkout reference shown on the receipt page. That reference is a random identifier, not your identity, and it cannot be turned into one. <strong>Nothing else is reported: no email address, no user identifier, no card detail, no name.</strong></p>
+
+                    <p>Whether that report can be tied to the ad you clicked depends on the cookie banner. If you chose <strong>"Accept all"</strong>, Google's advertising cookies (the <code>_gcl_</code> family, listed in section 4) remember the click for up to 90 days so the conversion can be attributed to it. If you chose <strong>"Essential only"</strong>, or never answered, no advertising cookie is written, the click identifier is redacted from what your browser sends, and Google receives only an unattributed, cookieless count. This measurement is not used to build an advertising profile of you, it does not change what you see on this site, and I do not share your data with Google for cross-context behavioural advertising.</p>
 
                     <h3>3.3 Advertising — Google AdSense on content pages only</h3>
 
@@ -366,6 +378,12 @@
                                     <td>Up to 2 years</td>
                                 </tr>
                                 <tr>
+                                    <th scope="row">Google Ads (<code>_gcl_au</code>, <code>_gcl_aw</code>)</th>
+                                    <td>Google</td>
+                                    <td>Advertising measurement: remembering that you arrived from a Google ad so a later subscription can be attributed to it (section 3.2a). <strong>Only after you choose "Accept all".</strong> If you declined, no click is remembered and the count Google receives is unattributed.</td>
+                                    <td>Up to 90 days</td>
+                                </tr>
+                                <tr>
                                     <th scope="row">Google AdSense</th>
                                     <td>Google</td>
                                     <td>Advertising, on content pages only, to serve and cap ads. <strong>Only after you choose "Accept all".</strong> If you declined, non-personalised ads are requested instead.</td>
@@ -375,7 +393,7 @@
                         </table>
                     </div>
 
-                    <p>The two first-party cookies are strictly necessary for the free-session count, the subscription and the trial rule, so they are not covered by the banner. Choosing "Essential only" means neither Google cookie is set, and the timer behaves identically. Nothing on this site is degraded, delayed or nagged because you declined.</p>
+                    <p>The two first-party cookies are strictly necessary for the free-session count, the subscription and the trial rule, so they are not covered by the banner. Choosing "Essential only" means no Google cookie is set, and the timer behaves identically. Nothing on this site is degraded, delayed or nagged because you declined.</p>
                 </section>
 
                 <section id="affiliates">

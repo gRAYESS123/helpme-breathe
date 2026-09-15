@@ -490,6 +490,7 @@ test('eligibility: clean first-timer -> trial, reservation, intent, transaction,
   assert.deepEqual(Object.keys(txnCall.customData).sort(), ['rid', 'v']);
   assert.equal(txnCall.customData.rid, body.reservation_id);
   assert.equal(txnCall.customData.v, 3);
+  assert.equal(txnCall.plan, 'monthly', 'the plan name is passed beside custom_data so the return URL can carry it');
 
   // The intent is the authoritative record.
   assert.equal(ledger.state.intents.length, 1);
