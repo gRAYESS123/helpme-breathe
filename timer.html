@@ -120,7 +120,7 @@
     </script>
 
 </head>
-<body class="theme-478 article-page technique-page">
+<body class="theme-coherent article-page technique-page timer-hub">
     <a class="skip-link" href="#main">Skip to main content</a>
 
     <!-- ============ PERSISTENT SITE HEADER ============ -->
@@ -144,24 +144,27 @@
     </header>
 
     <div class="container">
-        <header class="article-header">
-            <nav aria-label="Breadcrumb">
-                <ol class="breadcrumb">
-                    <li><a href="/">Home</a></li>
-                    <li>Breathing timers</li>
-                </ol>
-            </nav>
-            <h1>Breathing Timer</h1>
-            <p class="subtitle">Seven paced patterns in one timer. Pick one, set a length, follow the circle. Three sessions free, works offline.</p>
+        <header class="article-header timer-header">
+            <h1 class="timer-h1">Breathing timer</h1>
         </header>
 
         <main id="main">
-            <section class="breathing-section" data-breathing-app aria-labelledby="timer-heading">
+            <section class="breathing-section" data-breathing-app data-technique="coherent" aria-labelledby="timer-heading">
+                <h3 class="sr-only" id="technique-picker-heading">Choose a technique</h3>
+                <div class="technique-buttons" data-role="technique-buttons" role="group" aria-labelledby="technique-picker-heading">
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="478" aria-pressed="false">Deep Sleep</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false">Focus &amp; Grounding</button>
+                    <button class="technique-btn active" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="true">Heart Coherence</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="false">Cyclic Sighing</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false">Extended Exhale</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false">Quick Calm</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="wim" aria-pressed="false">Energizing Breath</button>
+                </div>
                 <div class="app-bar">
                     <div class="technique-head">
-                        <p class="technique-eyebrow" data-role="technique-eyebrow"></p>
-                        <h2 id="timer-heading" data-role="technique-title">Deep Sleep</h2>
-                        <p class="pattern-line" data-role="pattern-line"></p>
+                        <p class="technique-eyebrow" data-role="technique-eyebrow">Coherence</p>
+                        <h2 id="timer-heading" data-role="technique-title">Heart Coherence</h2>
+                        <p class="pattern-line" data-role="pattern-line">In 5 · Out 5</p>
                     </div>
                     <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
@@ -199,7 +202,7 @@
                         <circle class="ring-live" cx="160" cy="160" r="150"/>
                         <circle class="ring-bridge" cx="160" cy="160" r="150"/>
                     </svg>
-                    <div class="breathing-circle technique-478" data-role="circle">
+                    <div class="breathing-circle technique-coherent" data-role="circle">
                         <span class="circle-notch" aria-hidden="true"></span>
                     </div>
                     <div class="circle-text-container">
@@ -257,16 +260,6 @@
 
                 <div data-slot="post-session"></div>
 
-                <h3 class="sr-only" id="technique-picker-heading">Choose a technique</h3>
-                <div class="technique-buttons" data-role="technique-buttons" role="group" aria-labelledby="technique-picker-heading">
-                    <button class="technique-btn active" type="button" data-action="select-technique" data-technique="478" aria-pressed="true">Deep Sleep</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false">Focus &amp; Grounding</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="false">Heart Coherence</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="false">Cyclic Sighing</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false">Extended Exhale</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false">Quick Calm</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="wim" aria-pressed="false">Energizing Breath</button>
-                </div>
 
                 <!-- SLOT: Pro tools (custom pattern, your practice, soundscapes, night mode) -->
                 <div class="tools-row" data-slot="tools"></div>
@@ -280,8 +273,8 @@
                 <section>
                     <h2>What this timer does</h2>
                     <p class="lead">It counts your breath so you do not have to. The circle grows while you breathe in, holds while you hold, and shrinks while you breathe out. A soft tone marks each change if you want one, and your phone can buzz instead if you would rather keep the sound off.</p>
-                    <p>Two dotted rings sit around the circle. The outer one marks a full inhale, the inner one marks a full exhale, and the live circle travels between them, so you can see how far through the breath you are without reading anything. The small gap at the top of the ring closes while you hold and opens again when the hold ends.</p>
-                    <p>Your first three sessions run with nothing to sign in to. After that the timer is part of <a href="/pro">one plan</a>: an account, three days free with a card on file, then $10 a month or $100 a year, cancel any time, with a fourteen-day refund. The only thing the site keeps on its own side before you subscribe is a count of completed sessions against a random first-party cookie, so it knows when the three are used; your settings and your session history are kept in your own browser and are not uploaded. If you close the tab and come back tomorrow, the timer opens on the pattern and the length you used last. The pages for <a href="/breathing-exercises-anxiety">anxious moments</a> and <a href="/breathing-exercises-for-panic-attacks">panic attacks</a> are outside all of this: they run the full timer for anyone, with nothing to sign in to and nothing to buy.</p>
+                    <p>A thin ring runs around the circle with a small gap at the top. It fills while you breathe in and drains while you breathe out, so you can see how far through the breath you are without reading anything; during a hold the gap closes and the ring waits, then opens again when the hold ends.</p>
+                    <p>Your first three sessions run with nothing to sign in to. After that the timer is part of <a href="/pro">one plan</a>: an account, three days free with a card on file, then $10 a month or $100 a year, cancel any time, with a fourteen-day refund. The only thing the site keeps on its own side before you subscribe is a count of started sessions against a random first-party cookie, so it knows when the three are used; your settings and your session history are kept in your own browser and are not uploaded. If you close the tab and come back tomorrow, the timer opens on the pattern and the length you used last. The pages for <a href="/breathing-exercises-anxiety">anxious moments</a> and <a href="/breathing-exercises-for-panic-attacks">panic attacks</a> are outside all of this: they run the full timer for anyone, with nothing to sign in to and nothing to buy.</p>
                     <p>You can also add it to your home screen from your browser menu. After the first visit the page works with no connection at all, which matters more than it sounds: the moments you most want a paced breath are often the moments you are on a train, on a plane, or standing outside somewhere with one bar of signal.</p>
                 </section>
 
@@ -289,19 +282,19 @@
                     <h2>How to use it</h2>
                     <div class="steps-container">
                         <div class="step">
-                            <h3>1. Sit or lie down</h3>
+                            <h3>Sit or lie down</h3>
                             <p>Somewhere you can stay still for a few minutes. Not while driving, cycling, or in water. If you feel light-headed at any point, stop and breathe normally.</p>
                         </div>
                         <div class="step">
-                            <h3>2. Pick a pattern</h3>
-                            <p>Use the buttons under the circle, or the guide below if you are not sure. You can change pattern any time; the timer resets when you do.</p>
+                            <h3>Pick a pattern</h3>
+                            <p>Use the pattern buttons above the circle, or the guide below if you are not sure. You can change pattern any time; the timer resets when you do.</p>
                         </div>
                         <div class="step">
-                            <h3>3. Set a length</h3>
+                            <h3>Set a length</h3>
                             <p>The settings button opens sound, vibration and session length. Three to five minutes is a good first session. Unlimited runs until you press Stop.</p>
                         </div>
                         <div class="step">
-                            <h3>4. Follow the circle</h3>
+                            <h3>Follow the circle</h3>
                             <p>Press Begin and match the circle. Press <kbd>Space</kbd> to pause and resume, <kbd>S</kbd> to stop, and <kbd>1</kbd> to <kbd>7</kbd> to jump between patterns without touching the mouse.</p>
                         </div>
                     </div>
