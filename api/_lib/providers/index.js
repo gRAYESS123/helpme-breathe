@@ -22,6 +22,7 @@
  *                                                            // -> { transactionId, status?, checkoutUrl? }
  *   async checkoutUrlFor?(transactionId, ctx),               // -> string|null (hosted-page adapters)
  *   async enrichEvent?(event, ctx),                           // -> event (fill ids a payload lacks)
+ *   async verifyCredentials?(ctx),                            // -> { ok, reason?, message?, live? }
  *   separateTrialPrices?: boolean,                           // false = the trial is a session property
  *   async pricePreview({ priceId, countryCode, customerIp }, ctx),
  *                                                            // -> { amount, currency, taxInclusive, formatted }
