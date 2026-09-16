@@ -1,11 +1,10 @@
 /**
  * js/pro/night.js — the manual night/day override.
  *
- * The night token set in css/styles.css is honoured for EVERY visitor through
- * `@media (prefers-color-scheme: dark)`, paid or not. What this module sells is
- * the switch: it puts `night` or `day` on `<body>` so a choice made here beats
- * the device preference in both directions, and it holds that choice in this
- * browser under the `hmb.night` flag. While a session is running it also asks
+ * The site is daylight for every visitor, whatever the device asks for (the
+ * OS dark preference stopped dimming the page on 2026-09-16). What this module
+ * sells is the switch: it puts `night` or `day` on `<body>` and holds that
+ * choice in this browser under the `hmb.night` flag. While a session is running it also asks
  * for a Screen Wake Lock so the phone does not sleep mid-practice, and releases
  * it the moment the session ends.
  *
