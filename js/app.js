@@ -512,10 +512,19 @@ export function createBreathingApp(rootEl, options = {}) {
 
   function renderTechniqueButtons() {
     const buttons = rootEl.querySelectorAll('[data-action="select-technique"][data-technique]');
+    let active = null;
     for (const button of buttons) {
       const isActive = button.getAttribute('data-technique') === state.key;
       button.classList.toggle('active', isActive);
       button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      if (isActive) active = button;
+    }
+    // On a phone the chips scroll sideways: bring the chosen one into the
+    // row (horizontally only, so the page itself never jumps).
+    const row = active && active.parentElement;
+    if (row && row.scrollWidth > row.clientWidth + 1) {
+      const target = active.offsetLeft - (row.clientWidth - active.offsetWidth) / 2;
+      row.scrollLeft = Math.max(0, target);
     }
   }
 
@@ -691,14 +700,6 @@ export function createBreathingApp(rootEl, options = {}) {
      never rendered during a session, and never on a `data-no-asks` page. */
   let nightHintArmed = false;
 
-  function prefersDark() {
-    return (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-    );
-  }
-
   function armNightHint() {
     const hour = new Date().getHours();
     const body = document.body;
@@ -708,9 +709,6 @@ export function createBreathingApp(rootEl, options = {}) {
       body.dataset.noAsks !== 'true' &&
       !body.classList.contains('night') &&
       !body.classList.contains('day') &&
-      // The page already follows the device. Offering to "dim the page" to
-      // someone looking at a dark page sells them what they can see they have.
-      !prefersDark() &&
       storage.getFlag('night-hint-dismissed') !== true;
   }
 

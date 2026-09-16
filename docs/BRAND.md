@@ -80,10 +80,8 @@ re-interpretation by an agent.
 | `--sand` / `--rose` | `#2B2A22` / `#33262A` |
 | `--ok` / `--warn` / `--bad` | `#6FCB9B` / `#E5B96A` / `#F09A8E` |
 
-Night is honoured for **every** visitor: `@media (prefers-color-scheme: dark)`
-redefines the tokens on `body:not(.day)`, so an explicit `body.day` opts back
-out. `body.night` — set by the Pro night toggle in `js/pro/night.js` —
-redefines them again after the media query, so a manual choice always wins.
+Night is a choice, never a device default: the OS dark preference does not change the page (owner decision 2026-09-16). `body.night` — set by the Pro night toggle in `js/pro/night.js` —
+redefines every token for the dimmed room; `body.day` is the explicit way back.
 
 ### The stage
 

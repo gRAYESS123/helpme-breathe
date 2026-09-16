@@ -370,9 +370,9 @@ function onSessionStart(event) {
  * crisis pages, and while sign-in is not configured.
  */
 function allowanceCopy(a) {
-  if (a.used <= 0) return `${a.total} free sessions on this device, then the plan.`;
-  if (a.left <= 0) return `All ${a.total} free sessions on this device used.`;
-  if (a.left === 1) return `${a.used} of ${a.total} free sessions used. One left.`;
+  if (a.used <= 0) return `${a.total} free sessions on this device.`;
+  if (a.left <= 0) return `All ${a.total} free sessions used.`;
+  if (a.left === 1) return `${a.used} of ${a.total} free sessions used, one left.`;
   return `${a.used} of ${a.total} free sessions used.`;
 }
 

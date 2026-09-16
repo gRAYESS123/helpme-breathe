@@ -4,7 +4,7 @@
 
    Reading order
      1  :root — the page (day), the stage, the seven patterns, type, motion
-     2  @media (prefers-color-scheme: dark) — night, guarded by :not(.day)
+     2  (retired) — the OS dark preference no longer changes the page
      3  body.night — the manual night override (wins over the media query)
      4  Pattern scopes — body.theme-* and per-root data-technique
      5  Base, type scale, links, focus, layout shells
@@ -131,57 +131,12 @@
 }
 
 /* ==========================================================================
-   2 — NIGHT BY PREFERENCE
-   Honoured for every visitor. `body.day` opts back out; `body.night` (section 3)
-   opts in manually and wins because it comes later at equal specificity.
+   2 — NIGHT BY PREFERENCE: none. The site is daylight for every visitor
+   whatever the device asks for (owner, 2026-09-16: a near-black room under an
+   OS dark setting looked wrong for every pattern but sleep). Night is a
+   choice, made with the toggle in js/pro/night.js (section 3), and Deep
+   Sleep dims its own room to dusk (section 4).
    ========================================================================== */
-
-@media (prefers-color-scheme: dark) {
-    body:not(.day) {
-        --ground: #0F1620;
-        --surface: #182430;
-        --well: #1F2D3A;
-        --ink: #EEF2F0;
-        --muted: #9DB0B3;
-        --line: #24343A;
-        --link: #8FD3C4;
-        --action: #EEF2F0;
-        --on-action: #0F1620;
-        --sand: #2B2A22;
-        --rose: #33262A;
-        --ok: #6FCB9B;
-        --warn: #E5B96A;
-        --bad: #F09A8E;
-        --lift: 0 1px 2px rgba(0, 0, 0, 0.3), 0 14px 34px -22px rgba(0, 0, 0, 0.8);
-        --lift-high: 0 2px 4px rgba(0, 0, 0, 0.35), 0 24px 48px -24px rgba(0, 0, 0, 0.9);
-
-        /* At night every stage is the dimmed room, whatever the pattern. */
-        --stage-bg: #0F1620;
-        --stage-ink: #EEF2F0;
-        --stage-muted: #9DB0B3;
-        --stage-surface: #182430;
-        --stage-well: rgba(238, 242, 240, 0.08);
-        --stage-line: #24343A;
-        --stage-link: #8FD3C4;
-        --stage-action: #EEF2F0;
-        --stage-on-action: #0F1620;
-        --stage-sand: #2B2A22;
-        --stage-rose: #33262A;
-        --track: rgba(238, 242, 240, 0.14);
-        --on-chip: #0F1B1E;
-
-        /* The pattern's working colour lightens to its orb tint. */
-        --pat-478: #C3C9E6;
-        --pat-box: #D6C7D7;
-        --pat-coherent: #E3CACC;
-        --pat-sigh: #C6DCDE;
-        --pat-extended: #E4D6BC;
-        --pat-triangle: #C9D5E2;
-        --pat-wim: #E8CCBB;
-
-        color-scheme: dark;
-    }
-}
 
 /* ==========================================================================
    3 — NIGHT, CHOSEN. js/pro/night.js sets body.night / body.day.
@@ -312,31 +267,7 @@ body.theme-478,
     --on-chip: var(--page-on-chip);
 }
 
-/* At night the room is already dim: the patterns keep their washes, low. */
-@media (prefers-color-scheme: dark) {
-    body:not(.day),
-    body:not(.day)[class*="theme-"],
-    body:not(.day) [data-breathing-app][data-technique="478"] {
-        --page-stage-well: rgba(238, 242, 240, 0.08);
-        --page-track: rgba(238, 242, 240, 0.14);
-        --page-on-chip: #0F1B1E;
-        --stage-bg: #0F1620;
-        --stage-ink: #EEF2F0;
-        --stage-muted: #9DB0B3;
-        --stage-surface: #182430;
-        --stage-well: rgba(238, 242, 240, 0.08);
-        --stage-line: #24343A;
-        --stage-link: #8FD3C4;
-        --stage-action: #EEF2F0;
-        --stage-on-action: #0F1620;
-        --stage-sand: #2B2A22;
-        --stage-rose: #33262A;
-        --w1: color-mix(in srgb, var(--pat) 22%, #0F1620);
-        --w2: color-mix(in srgb, var(--pat) 12%, #0F1620);
-        --w3: color-mix(in srgb, var(--pat) 17%, #0F1620);
-    }
-}
-
+/* At night, chosen, the room is already dim: the patterns keep their washes, low. */
 body.night,
 body.night[class*="theme-"],
 body.night [data-breathing-app][data-technique="478"] {
@@ -386,7 +317,7 @@ body.night [data-breathing-app][data-technique="478"] {
 }
 
 html {
-    color-scheme: light dark;
+    color-scheme: light;
     -webkit-text-size-adjust: 100%;
 }
 
@@ -2468,9 +2399,28 @@ body.session-active .night-hint { display: none; }
 }
 
 @media (max-width: 640px) {
+    .timer-hub .timer-header { padding-top: 0.9rem; }
     .timer-hub .app-bar { padding: 0 2.75rem; }
     .timer-hub [data-role="technique-title"] { font-size: 1.6rem; }
-    .timer-hub .technique-buttons { margin-bottom: 1.25rem; }
+    /* The chip row scrolls; its right edge fades so the rest is implied. */
+    .timer-hub .technique-buttons {
+        margin-bottom: 1.1rem;
+        gap: 0.4rem;
+        -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 3rem), transparent);
+        mask-image: linear-gradient(90deg, #000 calc(100% - 3rem), transparent);
+    }
+    .timer-hub .technique-btn { padding: 0.45rem 0.85rem; }
+    .timer-hub .breathing-text { font-size: 0.9375rem; min-height: 2.4em; margin-bottom: 0.75rem; }
+    .timer-hub .free-count { font-size: var(--fs-micro); }
+    /* Four tools as a two-by-two grid, not a ragged centred wrap. */
+    .timer-hub .tools-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.15rem 0.5rem;
+        justify-items: center;
+        margin-top: 1.4rem;
+    }
+    .timer-hub .tools-row:empty { display: none; }
 }
 
 /* ==========================================================================
