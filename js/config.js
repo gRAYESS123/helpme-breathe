@@ -68,13 +68,13 @@ export const SUPABASE = Object.freeze({
 /** The checkout switch, public values only (design §5.5). */
 export const CHECKOUT = Object.freeze({
   /** Stripe publishable key (`pk_test_…` or `pk_live_…`). Public by design. Empty = checkout closed. */
-  clientToken: 'pk_test_51UFWrUJITN5qhUboKYU77EQ246ztUZFxXLRMUTRZpAQPn47ZABCKFvq7TmR4nKp558fMidFNtOfeGn1gnrI2k56w00i59eSpdM',
+  clientToken: 'pk_live_51UFWr0J6c2LFKWEORqXjazRy91SHtFCem595lKOiKRrLuQ1ALZsbnNIsq6uNrpGSlgfRp3fcTm1mZ9U2MYOIZfs600oUJpCO4k',
   /**
    * `true` points the overlay at the provider's sandbox. It defaults to `true`
    * because the safer mistake is a live token refusing to open in sandbox, not
    * a test token silently pointed at production. Set `false` at go-live.
    */
-  sandbox: true,
+  sandbox: false,
   /**
    * Optional. The public no-trial price ids (`pri_…`), used by /pro ONLY to
    * show the localized total for the visitor's country before checkout
