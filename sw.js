@@ -11,7 +11,7 @@
  * Webfonts are cross-origin: never precached, never intercepted.
  * Changing this file is what triggers the service-worker update.
  */
-const CACHE_NAME = 'hmb-v9-offline-2026-09-14';
+const CACHE_NAME = 'hmb-v10-landing-2026-09-16';
 // The clean URL, never '/offline.html': under cleanUrls Vercel answers the
 // .html path with a 308, and a redirected response cannot be served for a
 // navigation (Chrome fails the request instead of showing the page).

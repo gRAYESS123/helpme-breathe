@@ -81,7 +81,7 @@
                 <a href="/timer">Timer</a>
                 <a href="/guides">Guides</a>
                 <a href="/science">Science</a>
-                <a href="/pro">Pro</a>
+                <a href="/pro">Pricing</a>
             </nav>
             <a class="nav-cta" href="/signin">Sign in</a>
         </div>
@@ -95,8 +95,13 @@
                     <li>Your account</li>
                 </ol>
             </nav>
-            <h1>Your account</h1>
-            <p class="lead">Your plan, what is charged and when, and everything we hold about you.</p>
+            <div class="profile-head">
+                <div>
+                    <h1>Your account</h1>
+                    <p class="lead">Your plan, your practice, and everything we hold about you.</p>
+                </div>
+                <p class="profile-email" data-role="header-email"></p>
+            </div>
         </header>
 
         <main id="main">
@@ -116,113 +121,141 @@
                 <p>We could not load the latest details; what you see may be a few hours old.</p>
             </div>
 
-            <section class="account-section" data-role="account-section" hidden>
-                <h2>Your account</h2>
-                <dl class="account-dl">
-                    <dt>Email</dt>
-                    <dd data-role="field-email"></dd>
-                    <dt data-role="label-method" hidden>Signed in with</dt>
-                    <dd data-role="field-method" hidden></dd>
-                    <dt data-role="label-created" hidden>Member since</dt>
-                    <dd data-role="field-created" hidden></dd>
-                </dl>
-                <p class="auth-note">An account is for one person or one household.</p>
-                <div class="account-actions">
-                    <button type="button" class="btn btn--quiet" data-role="signout">Sign out</button>
-                </div>
-                <p class="account-error" data-role="account-error" aria-live="polite"></p>
-            </section>
+            <div class="profile-grid">
+                <div class="profile-main">
+                    <section class="account-section" data-role="plan-section" hidden>
+                        <h2>Your plan</h2>
 
-            <section class="account-section" data-role="plan-section" hidden>
-                <h2>Your plan</h2>
+                        <div class="account-banner account-banner--bad" data-role="past-due-banner" hidden>
+                            <p data-role="past-due-text"></p>
+                        </div>
 
-                <div class="account-banner account-banner--bad" data-role="past-due-banner" hidden>
-                    <p data-role="past-due-text"></p>
-                </div>
+                        <p class="status-line" data-role="status-line">
+                            <span class="status-word" data-role="status-word"></span>
+                            <span data-role="status-detail"></span>
+                        </p>
 
-                <p class="status-line" data-role="status-line">
-                    <span class="status-word" data-role="status-word"></span>
-                    <span data-role="status-detail"></span>
-                </p>
+                        <p data-role="plan-body" hidden></p>
+                        <p data-role="plan-line" hidden></p>
 
-                <p data-role="plan-body" hidden></p>
-                <p data-role="plan-line" hidden></p>
+                        <div class="account-actions" data-role="plan-actions"></div>
+                        <div data-checkout-slot data-role="checkout-slot"></div>
 
-                <div class="account-actions" data-role="plan-actions"></div>
-                <div data-checkout-slot data-role="checkout-slot"></div>
+                        <p class="auth-note" data-role="plan-note" hidden></p>
+                        <p class="auth-note" data-role="two-subs-note" hidden>If you believe you have two subscriptions, email
+                        <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and we'll refund one.</p>
 
-                <p class="auth-note" data-role="plan-note" hidden></p>
-                <p class="auth-note" data-role="two-subs-note" hidden>If you believe you have two subscriptions, email
-                <a href="mailto:contact@helpmebreath.com">contact@helpmebreath.com</a> and we'll refund one.</p>
+                        <p class="account-ok" data-role="plan-ok" aria-live="polite"></p>
+                        <p class="account-error" data-role="plan-error" aria-live="polite"></p>
 
-                <p class="account-ok" data-role="plan-ok" aria-live="polite"></p>
-                <p class="account-error" data-role="plan-error" aria-live="polite"></p>
-
-                <div class="cancel-screen" data-role="cancel-screen" role="group" aria-labelledby="cancel-heading" hidden>
-                    <h3 id="cancel-heading">Cancel your subscription</h3>
-                    <ul class="cancel-options">
-                        <li class="cancel-option" data-role="option-pause" hidden>
-                            <h3>Pause instead</h3>
-                            <p>Nothing is charged while paused. Access carries on to the end of the period you have already paid for.</p>
+                        <div class="cancel-screen" data-role="cancel-screen" role="group" aria-labelledby="cancel-heading" hidden>
+                            <h3 id="cancel-heading">Cancel your subscription</h3>
+                            <ul class="cancel-options">
+                                <li class="cancel-option" data-role="option-pause" hidden>
+                                    <h3>Pause instead</h3>
+                                    <p>Nothing is charged while paused. Access carries on to the end of the period you have already paid for.</p>
+                                    <div class="btn-row">
+                                        <button type="button" class="btn" data-role="pause-1">Pause 1 month</button>
+                                        <button type="button" class="btn" data-role="pause-3">Pause 3 months</button>
+                                    </div>
+                                </li>
+                                <li class="cancel-option" data-role="option-switch" hidden>
+                                    <h3>Switch to yearly</h3>
+                                    <p data-role="switch-copy"></p>
+                                    <div class="btn-row">
+                                        <button type="button" class="btn" data-role="switch-yearly">Switch to yearly</button>
+                                    </div>
+                                </li>
+                                <li class="cancel-option cancel-option--final">
+                                    <h3>Cancel my subscription</h3>
+                                    <p class="cancel-effect" data-role="cancel-effect"></p>
+                                    <div class="btn-row">
+                                        <button type="button" class="btn btn--danger" data-role="cancel-confirm">Cancel my subscription</button>
+                                    </div>
+                                    <div class="btn-row">
+                                        <button type="button" class="btn btn--quiet" data-role="cancel-now" hidden>End it now instead</button>
+                                    </div>
+                                </li>
+                            </ul>
                             <div class="btn-row">
-                                <button type="button" class="btn" data-role="pause-1">Pause 1 month</button>
-                                <button type="button" class="btn" data-role="pause-3">Pause 3 months</button>
+                                <button type="button" class="btn btn--quiet" data-role="cancel-close">Close this</button>
                             </div>
-                        </li>
-                        <li class="cancel-option" data-role="option-switch" hidden>
-                            <h3>Switch to yearly</h3>
-                            <p data-role="switch-copy"></p>
+                        </div>
+                    </section>
+
+                    <section class="account-section" data-role="practice-section" hidden>
+                        <h2>Your practice</h2>
+                        <div class="practice-stats" data-role="practice-stats" hidden>
+                            <div class="practice-stat"><b data-role="stat-streak">0</b><span data-role="stat-streak-label">day streak</span></div>
+                            <div class="practice-stat"><b data-role="stat-week">0</b><span>minutes this week</span></div>
+                            <div class="practice-stat"><b data-role="stat-sessions">0</b><span data-role="stat-sessions-label">sessions</span></div>
+                        </div>
+                        <p class="practice-empty" data-role="practice-empty" hidden>No sessions on this device yet. Your history fills in as you practise.</p>
+                        <p class="auth-note" data-role="practice-note">Session history lives in this browser, not on our servers. The full picture, a heatmap and a CSV export are under “Your practice” on any timer.</p>
+                        <div class="account-actions">
+                            <a class="btn btn--commerce" href="/timer">Open a timer</a>
+                        </div>
+                    </section>
+
+                    <section class="account-section" data-role="data-section" hidden>
+                        <h2>Your data</h2>
+                        <p>Export gives you a JSON file with your profile and every subscription record. Payments are handled by Stripe as merchant of record, which keeps its own copy of your payment records as a
+                        separate data controller.</p>
+
+                        <div class="account-actions">
+                            <button type="button" class="btn" data-role="export">Export my data</button>
+                        </div>
+                        <p class="account-ok" data-role="data-ok" aria-live="polite"></p>
+                        <p class="account-error" data-role="data-error" aria-live="polite"></p>
+
+                        <div class="danger-zone">
+                            <h3>Delete my account</h3>
+                            <p>This cannot be undone. Any live subscription is cancelled first, and the account is removed.
+                            If a payment dispute is open, or a payment is outstanding, we will ask you to sort that out first.</p>
+                            <div class="check-row">
+                                <input type="checkbox" id="delete-ack" data-role="delete-ack">
+                                <label for="delete-ack">I understand this deletes my account and cancels any subscription. Stripe, the merchant of record, keeps its own copy of the payment record as a separate controller.</label>
+                            </div>
                             <div class="btn-row">
-                                <button type="button" class="btn" data-role="switch-yearly">Switch to yearly</button>
+                                <button type="button" class="btn btn--danger" data-role="delete" disabled>Delete my account</button>
                             </div>
-                        </li>
-                        <li class="cancel-option cancel-option--final">
-                            <h3>Cancel my subscription</h3>
-                            <p class="cancel-effect" data-role="cancel-effect"></p>
-                            <div class="btn-row">
-                                <button type="button" class="btn btn--danger" data-role="cancel-confirm">Cancel my subscription</button>
-                            </div>
-                            <div class="btn-row">
-                                <button type="button" class="btn btn--quiet" data-role="cancel-now" hidden>End it now instead</button>
-                            </div>
-                        </li>
-                    </ul>
-                    <div class="btn-row">
-                        <button type="button" class="btn btn--quiet" data-role="cancel-close">Close this</button>
-                    </div>
+                            <p class="account-error" data-role="delete-error" aria-live="polite"></p>
+                        </div>
+                    </section>
                 </div>
-            </section>
 
-            <section class="account-section" data-role="data-section" hidden>
-                <h2>Your data</h2>
-                <p>Export gives you a JSON file with your profile and every subscription record. Payments are handled by Stripe as merchant of record, which keeps its own copy of your payment records as a
-                separate data controller.</p>
+                <aside class="profile-side" aria-label="Account details and links">
+                    <section class="account-section" data-role="account-section" hidden>
+                        <h2>Signed in</h2>
+                        <dl class="account-dl">
+                            <dt>Email</dt>
+                            <dd data-role="field-email"></dd>
+                            <dt data-role="label-method" hidden>Signed in with</dt>
+                            <dd data-role="field-method" hidden></dd>
+                            <dt data-role="label-created" hidden>Member since</dt>
+                            <dd data-role="field-created" hidden></dd>
+                        </dl>
+                        <p class="auth-note">An account is for one person or one household. The plan follows the email address to every device you sign in on.</p>
+                        <div class="account-actions">
+                            <button type="button" class="btn btn--quiet" data-role="signout">Sign out</button>
+                        </div>
+                        <p class="account-error" data-role="account-error" aria-live="polite"></p>
+                    </section>
 
-                <div class="account-actions">
-                    <button type="button" class="btn" data-role="export">Export my data</button>
-                </div>
-                <p class="account-ok" data-role="data-ok" aria-live="polite"></p>
-                <p class="account-error" data-role="data-error" aria-live="polite"></p>
-
-                <div class="danger-zone">
-                    <h3>Delete my account</h3>
-                    <p>This cannot be undone. Any live subscription is cancelled first, and the account is removed.
-                    If a payment dispute is open, or a payment is outstanding, we will ask you to sort that out first.</p>
-                    <div class="check-row">
-                        <input type="checkbox" id="delete-ack" data-role="delete-ack">
-                        <label for="delete-ack">I understand this deletes my account and cancels any subscription. Stripe, the merchant of record, keeps its own copy of the payment record as a separate controller.</label>
-                    </div>
-                    <div class="btn-row">
-                        <button type="button" class="btn btn--danger" data-role="delete" disabled>Delete my account</button>
-                    </div>
-                    <p class="account-error" data-role="delete-error" aria-live="polite"></p>
-                </div>
-            </section>
-
-            <div class="account-footer-actions" data-role="footer-actions" hidden>
-                <a class="btn btn--quiet" href="/timer">Open a timer</a>
-                <a class="btn btn--quiet" href="mailto:contact@helpmebreath.com">Email us about your account</a>
+                    <section class="account-section" data-role="links-section" hidden>
+                        <h2>Where next</h2>
+                        <ul class="quick-links">
+                            <li><a href="/timer">Breathing timer</a></li>
+                            <li><a href="/guides">Guides by situation</a></li>
+                            <li><a href="/pro">What the plan includes</a></li>
+                            <li><a href="/legal/refund-policy">Refund policy</a></li>
+                            <li><a href="mailto:contact@helpmebreath.com">Email us about your account</a></li>
+                        </ul>
+                    </section>
+                </aside>
             </div>
+
+            <div class="account-footer-actions" data-role="footer-actions" hidden></div>
         </main>
 
         <footer class="footer">
@@ -259,7 +292,7 @@
                 <nav class="footer-nav" aria-label="About and products">
                     <p class="footer-heading">The site</p>
                     <a href="/about">About</a>
-                    <a href="/pro">Pro</a>
+                    <a href="/pro">Pricing</a>
                 </nav>
             </div>
 
@@ -314,6 +347,8 @@
         import { subscribe } from '/js/checkout.js';
         import { track, EVENTS } from '/js/analytics.js';
         import { PLANS } from '/js/config.js';
+        import { getHistory } from '/js/storage.js';
+        import { summarise } from '/js/pro/streaks.js';
 
         const NEXT = '/account';
         const CANCEL_TRACKED_KEY = 'hmb.account.canceled-seen';
@@ -560,6 +595,7 @@
         function renderAccount() {
             const account = (me && me.user) || {};
             setText('field-email', account.email || 'not known');
+            setText('header-email', account.email || '');
 
             const method = METHOD_WORDS[lastSignInMethod()] || '';
             show(el('label-method'), !!method);
@@ -989,7 +1025,36 @@
 
         function renderData() {
             show(el('data-section'), true);
-            show(el('footer-actions'), true);
+            show(el('links-section'), true);
+        }
+
+        /* ------------------------------------------------ practice section --- */
+
+        /**
+         * The three figures every subscriber asks about, from the history this
+         * browser keeps (js/storage.js). Nothing here touches the network; the
+         * full breakdown lives under "Your practice" on a timer page.
+         */
+        function renderPractice() {
+            let summary = null;
+            try {
+                summary = summarise(getHistory());
+            } catch {
+                summary = null;
+            }
+            const section = el('practice-section');
+            if (!summary || !section) return;
+            const any = summary.sessions > 0;
+            show(el('practice-stats'), any);
+            show(el('practice-empty'), !any);
+            if (any) {
+                setText('stat-streak', String(summary.currentStreak));
+                setText('stat-streak-label', summary.currentStreak === 1 ? 'day streak' : 'day streak');
+                setText('stat-week', String(summary.weekMinutes));
+                setText('stat-sessions', String(summary.sessions));
+                setText('stat-sessions-label', summary.sessions === 1 ? 'session' : 'sessions');
+            }
+            show(section, true);
         }
 
         /* --------------------------------------------------------- render --- */
@@ -997,6 +1062,7 @@
         function render() {
             renderAccount();
             renderPlan();
+            renderPractice();
             renderData();
             show(el('plan-section'), true);
             show(el('loading'), false);

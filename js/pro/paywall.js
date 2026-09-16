@@ -32,7 +32,7 @@
 import { completedSessionCount, getFlag, setFlag } from '../storage.js';
 import { track, EVENTS } from '../analytics.js';
 import { PLANS } from '../config.js';
-import { isPro, signedIn, getLicenseInfo } from '../entitlements.js';
+import { isPro, signedIn, getLicenseInfo, freeAllowance } from '../entitlements.js';
 
 const FLAG_SHOWN = 'paywall.shown';
 const OFFER_SESSION = 3;
@@ -176,11 +176,12 @@ export function buildCard({ heading, body, feature, ask, dismissLabel, onDismiss
 
 /* ------------------------------------------------------------- offer card */
 
-function onSessionComplete(event) {
+function onSessionEnd(event) {
   flushPending(event);
 
-  const detail = event.detail || {};
-  if (detail.completed !== true) return;
+  // Any end of a session, finished or stopped: the allowance counts starts,
+  // so the offer must too, or someone who stops early three times is refused
+  // on the fourth Begin without ever having seen this.
   if (asksBlocked()) return;
   // Someone who already paid must never be sold to again. The flag is left
   // alone so the offer is still there if they ever drop back to free.
@@ -190,8 +191,11 @@ function onSessionComplete(event) {
   // returns above before the flag is set; with strict equality the count then
   // passes three and the offer could never appear again, on any page, ever. The
   // FLAG_SHOWN guard above already keeps it to one showing.
-  if (completedSessionCount() < OFFER_SESSION) return;
+  const allowance = freeAllowance();
+  const used = allowance ? allowance.used : completedSessionCount();
+  if (used < OFFER_SESSION) return;
 
+  const detail = event.detail || {};
   const root = detail.root;
   const container = root && root.querySelector ? root.querySelector('[data-slot="post-session"]') : null;
   if (!container) return;
@@ -199,7 +203,7 @@ function onSessionComplete(event) {
   const card = buildCard({
     heading: 'Three sessions in',
     body:
-      'You have practised three times. If this is becoming a habit, one plan unlocks everything: your own patterns and saved presets, ' +
+      'That was the third free session on this device. If this is becoming a habit, one plan keeps the timer running and unlocks everything: your own patterns and saved presets, ' +
       'your streak and 12-week heatmap, ambient soundscapes, night mode, and no ads anywhere on the site.',
     feature: null,
     dismissLabel: 'No thanks, hide this',
@@ -310,8 +314,8 @@ function onPaywallRequest(event) {
 export function initPaywall() {
   if (wired || typeof document === 'undefined') return;
   wired = true;
-  document.addEventListener('hmb:session-complete', onSessionComplete);
-  document.addEventListener('hmb:session-stop', flushPending);
+  document.addEventListener('hmb:session-complete', onSessionEnd);
+  document.addEventListener('hmb:session-stop', onSessionEnd);
   document.addEventListener('hmb:paywall', onPaywallRequest);
   document.addEventListener('hmb:signin', onPaywallRequest);
 }

@@ -245,11 +245,126 @@
 }
 
 /* --------------------------------------------------------------------------
-   The account page
+   The account page: a profile. Identity and quick links in a narrow column,
+   the plan, the practice and the data in the wide one.
    -------------------------------------------------------------------------- */
 .account-page main {
-    max-width: 44rem;
+    max-width: 62rem;
     margin: 0 auto;
+}
+
+.account-page .article-header { max-width: 62rem; }
+
+.profile-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    margin: 0 0 1.5rem;
+}
+
+.profile-head .lead { margin: 0; }
+
+.profile-email {
+    font-family: var(--mono);
+    font-size: var(--fs-small);
+    color: var(--ink);
+    overflow-wrap: anywhere;
+}
+
+.profile-email:empty { display: none; }
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 19rem;
+    gap: 1.25rem 1.5rem;
+    align-items: start;
+}
+
+.profile-main,
+.profile-side { display: grid; gap: 1.25rem; min-width: 0; }
+
+.profile-side { position: sticky; top: 1.25rem; }
+
+.profile-side .account-section,
+.profile-main .account-section { margin: 0; }
+
+/* The side column is narrow: label above value, so an email never breaks mid-word. */
+.profile-side .account-dl { grid-template-columns: 1fr; gap: 0.1rem 0; }
+.profile-side .account-dl dd { margin-bottom: 0.55rem; }
+
+/* Three figures from the history kept in this browser. */
+.practice-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+    margin: 0.25rem 0 1rem;
+}
+
+.practice-stat {
+    padding: 0.85rem 1rem 0.8rem;
+    background: var(--well);
+    border-radius: var(--radius);
+}
+
+.practice-stat b {
+    display: block;
+    font-family: var(--mono);
+    font-weight: 500;
+    font-size: 1.75rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+}
+
+.practice-stat span {
+    display: block;
+    margin-top: 0.3rem;
+    font-family: var(--ui);
+    font-size: var(--fs-small);
+    color: var(--graphite);
+}
+
+.practice-empty { color: var(--graphite); }
+
+.practice-empty[hidden] { display: none; }
+
+/* Where next: a short list of the pages a signed-in person actually uses. */
+.quick-links {
+    list-style: none;
+    margin: 0.25rem 0 0;
+    padding: 0;
+}
+
+.quick-links li + li { border-top: 1px solid var(--rule); }
+
+.quick-links a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: var(--hit);
+    padding: 0.55rem 0;
+    font-family: var(--ui);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.quick-links a::after {
+    content: '\2192';
+    font-family: var(--mono);
+    color: var(--graphite);
+}
+
+.quick-links a:hover { color: var(--link); text-decoration: none; }
+
+@media (max-width: 800px) {
+    .profile-grid { grid-template-columns: 1fr; }
+    .profile-side { position: static; }
 }
 
 .account-section {
@@ -490,6 +605,7 @@
 }
 
 @media (max-width: 30rem) {
+    .practice-stat b { font-size: 1.4rem; }
     .account-dl { grid-template-columns: 1fr; gap: 0.1rem 0; }
     .account-dl dd { margin-bottom: 0.5rem; }
     .auth-card,

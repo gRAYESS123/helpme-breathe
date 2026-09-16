@@ -35,7 +35,7 @@
 
 import { getTechnique, cycleSeconds } from '../techniques.js';
 import { PLANS } from '../config.js';
-import { isPro, signedIn, status, onChange, getLicenseInfo } from '../entitlements.js';
+import { isPro, signedIn, status, onChange, getLicenseInfo, freeAllowance } from '../entitlements.js';
 import { track, EVENTS } from '../analytics.js';
 import { buildCard, planLine } from './paywall.js';
 
@@ -225,9 +225,9 @@ function cancelDemonstration(root) {
 
 /* ------------------------------------------------------------------ card */
 
-function signInHref() {
+function signInHref(intent = 'none') {
   const next = `${location.pathname}${location.search}`;
-  const params = new URLSearchParams({ next, intent: 'none' });
+  const params = new URLSearchParams({ next, intent });
   return `${SIGNIN_PATH}?${params.toString()}`;
 }
 
@@ -265,11 +265,24 @@ export function renderPreviewCard(container, options = {}) {
     const actions = document.createElement('div');
     actions.className = 'paywall-actions';
 
+    // The way on is one chain: sign in, then Stripe, then back here. The
+    // subscribe intent rides on the sign-in link so /auth/callback opens
+    // checkout itself (design §4.4) instead of dropping the person back on
+    // this card to press a second button.
+    const start = document.createElement('a');
+    start.className = 'paywall-buy';
+    start.href = signInHref('subscribe:monthly');
+    start.setAttribute('data-preview-action', 'subscribe');
+    start.textContent = `Start the ${PLANS.trialDays}-day free trial`;
+    start.addEventListener('click', () => {
+      track(EVENTS.PAYWALL_CLICK, { feature: 'timer', target: 'signin-subscribe' });
+    });
+
     const signin = document.createElement('a');
-    signin.className = 'paywall-buy';
+    signin.className = 'pro-btn';
     signin.href = signInHref();
     signin.setAttribute('data-preview-action', 'signin');
-    signin.textContent = 'Create account or sign in';
+    signin.textContent = 'I already have an account';
     signin.addEventListener('click', () => {
       track(EVENTS.PAYWALL_CLICK, { feature: 'timer', target: 'signin' });
     });
@@ -282,11 +295,11 @@ export function renderPreviewCard(container, options = {}) {
       track(EVENTS.PAYWALL_CLICK, { feature: 'timer', target: 'pro-page' });
     });
 
-    actions.append(signin, more);
+    actions.append(start, signin, more);
 
     const note = document.createElement('p');
     note.className = 'form-note';
-    note.textContent = 'Sign-in is an email link or a Google account. No password. One free trial per person.';
+    note.textContent = `Sign in with an email link or a Google account, no password, then add a card on the checkout page. Nothing is charged for ${PLANS.trialDays} days. One free trial per person.`;
 
     card.append(h, body, price, actions, note);
   } else {
@@ -348,11 +361,85 @@ function onSessionStart(event) {
 }
 
 /** Register the document-level listeners. Safe to call more than once. */
+/* ------------------------------------------------------- the free count */
+
+/**
+ * One quiet line under the controls: how much of the free allowance this
+ * device has used. It is the same number the gate reads, so the fourth Begin
+ * is never the first anyone hears of a limit. Absent for subscribers, on the
+ * crisis pages, and while sign-in is not configured.
+ */
+function allowanceCopy(a) {
+  if (a.used <= 0) return `${a.total} free sessions on this device, then the plan.`;
+  if (a.left <= 0) return `All ${a.total} free sessions on this device used.`;
+  if (a.left === 1) return `${a.used} of ${a.total} free sessions used. One left.`;
+  return `${a.used} of ${a.total} free sessions used.`;
+}
+
+function renderCount(root) {
+  if (!root || typeof root.querySelector !== 'function') return;
+  const controls = root.querySelector('.controls');
+  if (!controls) return;
+  let node = root.querySelector('[data-role="free-count"]');
+  const a = freeAllowance();
+  if (!a) {
+    if (node) node.remove();
+    return;
+  }
+  if (!node) {
+    node = document.createElement('p');
+    node.className = 'free-count';
+    node.setAttribute('data-role', 'free-count');
+    node.setAttribute('aria-live', 'polite');
+    controls.insertAdjacentElement('afterend', node);
+  }
+  const text = allowanceCopy(a);
+  if (node.textContent !== text) node.textContent = text;
+}
+
+/**
+ * A button marked `data-free-cta` (the home page's "Try the timer, free")
+ * says how many free sessions are left once some are spent. Its shipped
+ * label is kept for the first visit and for anyone the count does not apply to.
+ */
+function renderFreeCtas() {
+  const a = freeAllowance();
+  for (const el of document.querySelectorAll('[data-free-cta]')) {
+    if (!el.dataset.freeCtaLabel) el.dataset.freeCtaLabel = el.textContent.trim();
+    let text = el.dataset.freeCtaLabel;
+    if (a && a.used > 0) {
+      if (a.left <= 0) text = 'Open the timer';
+      else text = `Try the timer, ${a.left} free ${a.left === 1 ? 'session' : 'sessions'} left`;
+    }
+    if (el.textContent !== text) el.textContent = text;
+  }
+}
+
+function renderAllowance() {
+  for (const root of document.querySelectorAll('[data-breathing-app]')) renderCount(root);
+  renderFreeCtas();
+}
+
 export function initPreview() {
   if (wired || typeof document === 'undefined') return;
   wired = true;
   document.addEventListener('hmb:preview', onPreview);
   document.addEventListener('hmb:session-start', onSessionStart);
+  document.addEventListener('hmb:ready', (event) => {
+    const detail = (event && event.detail) || {};
+    renderCount(detail.root || null);
+  });
+  // The count moves after entitlements.js has spent the session, so re-read
+  // once the current listeners have all run.
+  document.addEventListener('hmb:session-start', () => window.setTimeout(renderAllowance, 0));
+  document.addEventListener('hmb:allowance', renderAllowance);
+  document.addEventListener('hmb:auth', renderAllowance);
+  onChange(renderAllowance);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderAllowance, { once: true });
+  } else {
+    renderAllowance();
+  }
   // A chip tap or a pattern change mid-demo: stop demonstrating the old
   // pattern on a disc the engine has just reset.
   document.addEventListener('hmb:technique-change', (event) => {
