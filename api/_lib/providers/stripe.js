@@ -643,10 +643,41 @@ function formatMoney(amount, currency) {
   }
 }
 
+/**
+ * Does Stripe actually accept MOR_API_KEY? `/api/health` reports only that the
+ * variable is *set*, which is what let a publishable key sit there looking
+ * configured while every call came back 403 secret_key_required and checkout
+ * answered "Checkout could not start" (2026-09-16).
+ *
+ * GET /v1/balance is the cheapest authenticated call Stripe offers and touches
+ * no customer data. Returns a verdict rather than throwing, because the caller
+ * is a report endpoint. The message is passed through only for `unauthorized`,
+ * where it names the remedy, and is capped; no key material is ever echoed.
+ *
+ * @param {{env:Record<string,string>, fetchImpl?:Function}} ctx
+ * @returns {Promise<{ok:boolean, reason?:string, message?:string, live?:boolean}>}
+ */
+export async function verifyCredentials(ctx) {
+  try {
+    await stripeRequest(ctx, '/v1/balance');
+    return { ok: true, live: credentialsAreLive(ctx && ctx.env) };
+  } catch (error) {
+    const reason = (error && error.reason) || 'provider_unavailable';
+    const out = { ok: false, reason };
+    if (reason === 'unauthorized' && error && error.message) {
+      out.message = String(error.message).slice(0, 200);
+    }
+    return out;
+  }
+}
+
 /* --------------------------------------------------------------- adapter -- */
 
 export const stripeProvider = {
   id: 'stripe',
+
+  /** Optional contract-v3 hook: is MOR_API_KEY a key Stripe accepts? */
+  verifyCredentials,
 
   /**
    * The trial is a property of the Checkout Session (`trial_period_days`), not

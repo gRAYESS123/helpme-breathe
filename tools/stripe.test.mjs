@@ -597,6 +597,33 @@ test('createPortalSession: one link per flow, the overview standing in for a flo
   for (const call of fetchImpl.calls) assert.equal(call.form.return_url, 'https://helpmebreath.com/account');
 });
 
+test('verifyCredentials: answers a verdict instead of throwing, and names a publishable key', async () => {
+  const good = fetchStub({ 'GET /v1/balance': () => new Response(JSON.stringify({ object: 'balance' }), { status: 200 }) });
+  const okVerdict = await stripeProvider.verifyCredentials(ctxWith(good, ENV));
+  assert.equal(okVerdict.ok, true, 'a key Stripe accepts reports ok');
+  assert.equal(good.calls.length, 1, 'exactly one probe call');
+
+  const never = async () => { throw new Error('must not reach the network with a pk_ key'); };
+  const pk = await stripeProvider.verifyCredentials(
+    ctxWith(never, { ...ENV, MOR_API_KEY: 'pk_live_TESTFIXTURE_not_a_real_key' }),
+  );
+  assert.equal(pk.ok, false);
+  assert.equal(pk.reason, 'unauthorized');
+  assert.match(pk.message, /publishable/i, 'the verdict carries the remedy');
+
+  const rejected = fetchStub({
+    'GET /v1/balance': () => new Response(JSON.stringify({ error: { code: 'secret_key_required' } }), { status: 403 }),
+  });
+  const bad = await stripeProvider.verifyCredentials(ctxWith(rejected, ENV));
+  assert.equal(bad.ok, false, 'a key Stripe rejects is a verdict, not a throw');
+
+  const down = async () => { throw new Error('ECONNRESET'); };
+  const outage = await stripeProvider.verifyCredentials(ctxWith(down, ENV));
+  assert.equal(outage.ok, false);
+  assert.equal(outage.reason, 'provider_unavailable');
+  assert.equal(outage.message, undefined, 'only an unauthorized verdict passes a message through');
+});
+
 test('stripeRequest: a publishable key in MOR_API_KEY is refused before the call, naming the fix', async () => {
   // The live outage of 2026-09-16: MOR_API_KEY held the publishable key, so
   // /api/health said mor_api_key true, Stripe answered 403 secret_key_required,

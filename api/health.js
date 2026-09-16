@@ -23,8 +23,11 @@
  * accepted the owner in writing. The `missing` list is unaffected.
  */
 
-import { describeConfig, hasEnv } from './_lib/env.js';
+import { describeConfig, hasEnv, isProduction, providerName, readEnv } from './_lib/env.js';
 import { errorResponse, json, methodNotAllowed, preflight } from './_lib/respond.js';
+import { getProvider } from './_lib/providers/index.js';
+import { bearerToken } from './_lib/authz.js';
+import { timingSafeEqual } from './_lib/crypto.js';
 
 export const config = { runtime: 'nodejs', maxDuration: 10 };
 
@@ -56,13 +59,55 @@ export async function HEAD(request) {
   return new Response(null, { status: response.status, headers: response.headers });
 }
 
+
+/**
+ * Opt-in credential probe: `GET /api/health?probe=credentials` with
+ * `Authorization: Bearer <CRON_SECRET>`.
+ *
+ * The plain report says only whether MOR_API_KEY is *set*. That is what let a
+ * Stripe publishable key sit there looking healthy while checkout was dead
+ * (2026-09-16). This asks the provider whether it accepts the key.
+ *
+ * Gated on CRON_SECRET because it makes an outbound provider call, and opt-in
+ * so the ordinary health check stays free and instant. Returns a verdict only:
+ * no key, no customer data, no provider ids.
+ *
+ * @param {Request} request
+ * @returns {Promise<{checked:boolean, ok?:boolean, reason?:string, message?:string, live?:boolean}>}
+ */
+async function probeCredentials(request) {
+  const secret = readEnv('CRON_SECRET');
+  const presented = bearerToken(request);
+  if (!secret || !presented || !timingSafeEqual(presented, secret)) {
+    return { checked: false, reason: 'unauthorized' };
+  }
+  let provider;
+  try {
+    provider = getProvider(providerName());
+  } catch {
+    return { checked: false, reason: 'no_provider' };
+  }
+  if (!provider || typeof provider.verifyCredentials !== 'function') {
+    return { checked: false, reason: 'unsupported' };
+  }
+  const verdict = await provider.verifyCredentials({
+    env: process.env,
+    fetchImpl: globalThis.fetch,
+    isProd: isProduction(),
+  });
+  return { checked: true, ...verdict };
+}
+
 export async function GET(request) {
   try {
     const report = describeConfig();
+    const wantsProbe = new URL(request.url).searchParams.get('probe') === 'credentials';
+    const provider_auth = wantsProbe ? await probeCredentials(request) : undefined;
     return json(
       200,
       {
         ok: report.missing.length === 0,
+        ...(provider_auth ? { provider_auth } : {}),
         provider: hasEnv('MOR_PROVIDER') ? report.provider : null,
         // Mode flags, never values: is the rail pointed at the sandbox / test
         // mode, and (Stripe) does it sell as merchant of record.
