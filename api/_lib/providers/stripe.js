@@ -276,6 +276,17 @@ export async function stripeRequest(ctx, path, init = {}) {
   const env = (ctx && ctx.env) || {};
   const apiKey = String(env.MOR_API_KEY || '').trim();
   if (!apiKey) throw new ProviderError('unauthorized', { status: 401, message: 'MOR_API_KEY is not set.' });
+  // A publishable key here is the one mistake that looks configured and is not:
+  // /api/health reports mor_api_key true, and Stripe answers every call with
+  // 403 secret_key_required, which surfaced as a bare 502 on /api/trial/eligibility.
+  // Fail with the actual remedy instead. The publishable key belongs in
+  // js/config.js CHECKOUT.clientToken; the secret key belongs in MOR_API_KEY.
+  if (/^pk_/i.test(apiKey)) {
+    throw new ProviderError('unauthorized', {
+      status: 401,
+      message: 'MOR_API_KEY is a Stripe publishable key (pk_…). It must be the secret key (sk_…). The publishable key belongs in js/config.js CHECKOUT.clientToken.',
+    });
+  }
   const method = (init.method || 'GET').toUpperCase();
   const headers = {
     Authorization: `Bearer ${apiKey}`,

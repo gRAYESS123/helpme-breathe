@@ -78,7 +78,12 @@
         // With advertising storage denied, ad click identifiers are redacted from what
         // the browser sends (Consent Mode v2).
         gtag('set', 'ads_data_redaction', true);
-        gtag('set', 'url_passthrough', true);
+        // Ad traffic only: keep the click id alive across same-site navigation when
+        // ad_storage is denied. Gated on the query string so organic visitors never
+        // get a _gl= parameter stapled to every internal link.
+        if (/[?&](gclid|gbraid|wbraid|_gl)=/.test(location.search)) {
+            gtag('set', 'url_passthrough', true);
+        }
         gtag('js', new Date());
         gtag('config', 'G-TYLYLJSFHN', {
             'anonymize_ip': true,

@@ -597,6 +597,20 @@ test('createPortalSession: one link per flow, the overview standing in for a flo
   for (const call of fetchImpl.calls) assert.equal(call.form.return_url, 'https://helpmebreath.com/account');
 });
 
+test('stripeRequest: a publishable key in MOR_API_KEY is refused before the call, naming the fix', async () => {
+  // The live outage of 2026-09-16: MOR_API_KEY held the publishable key, so
+  // /api/health said mor_api_key true, Stripe answered 403 secret_key_required,
+  // and /api/trial/eligibility surfaced a bare 502 with "Checkout could not start".
+  const never = async () => { throw new Error('the adapter must not reach the network with a pk_ key'); };
+  for (const key of ['pk_live_TESTFIXTURE_not_a_real_key', 'pk_test_TESTFIXTURE_not_a_real_key']) {
+    await assert.rejects(
+      () => stripeProvider.getSubscription(SUB, ctxWith(never, { ...ENV, MOR_API_KEY: key })),
+      (e) => e.reason === 'unauthorized' && /publishable/i.test(e.message) && /CHECKOUT\.clientToken/.test(e.message),
+      `a ${key.slice(0, 7)} key must be refused with the remedy in the message`,
+    );
+  }
+});
+
 test('stripeRequest: a missing key, an outage and a Stripe error each become a calm ProviderError', async () => {
   await assert.rejects(() => stripeProvider.getSubscription(SUB, ctxWith(fetchStub({}), { ...ENV, MOR_API_KEY: '' })), (e) => e.reason === 'unauthorized');
   const down = async () => { throw new Error('ECONNRESET'); };
