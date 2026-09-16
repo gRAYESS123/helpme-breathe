@@ -1006,9 +1006,11 @@ body.session-active #cookieConsent { display: none; }
     will-change: transform;
 }
 
-.breathing-section > .air > i:nth-child(1) { left: -12vw; top: -22vmin; --c: var(--w1); }
-.breathing-section > .air > i:nth-child(2) { right: -16vw; top: 26vmin; --c: var(--w2); animation-duration: 64s; animation-delay: -22s; }
-.breathing-section > .air > i:nth-child(3) { left: 30vw; top: 8vmin; width: 64vmin; height: 64vmin; --c: var(--w3); animation-duration: 58s; animation-delay: -40s; }
+/* Placed from the centre, so the colour gathers around the orb rather than
+   at the page edges, whatever the viewport. */
+.breathing-section > .air > i:nth-child(1) { left: calc(50% - 76vmin); top: -14vmin; --c: var(--w1); }
+.breathing-section > .air > i:nth-child(2) { right: calc(50% - 78vmin); top: 20vmin; --c: var(--w2); animation-duration: 64s; animation-delay: -22s; }
+.breathing-section > .air > i:nth-child(3) { left: calc(50% - 30vmin); top: 36vmin; width: 60vmin; height: 60vmin; --c: var(--w3); animation-duration: 58s; animation-delay: -40s; }
 
 @keyframes hmb-drift {
     from { transform: translate(0, 0) scale(1); }
@@ -1665,15 +1667,15 @@ body.session-active #cookieConsent { display: none; }
     font-size: var(--fs-small);
     font-weight: 500;
     color: var(--muted);
-    background: var(--well);
+    background: transparent;
     border: 0;
     border-radius: var(--radius-pill);
     cursor: pointer;
 }
 
-.tools-row .tool-btn:hover { color: var(--ink); }
+.tools-row .tool-btn:hover { color: var(--ink); background: var(--well); }
 
-.tools-row .tool-btn.is-on { color: var(--ink); font-weight: 600; }
+.tools-row .tool-btn.is-on { color: var(--ink); background: var(--well); font-weight: 600; }
 
 /* ------------------------------------------------- safety acknowledgement */
 
@@ -2409,6 +2411,66 @@ body.session-active .night-hint { display: none; }
     .hero-orb span { animation: none; }
     .hero-orb span:nth-child(2) { opacity: 0; }
     .hero-orb span:nth-child(1) { opacity: 1; }
+}
+
+/* ---------------------------------------------------- the timer hub ---- */
+
+/* /timer is one composed stage, not an article with a widget in it: a small
+   heading, the pattern choice first, the chosen pattern's name as the only
+   display line, the orb, then the controls and the quieter tools. */
+.timer-hub .timer-header {
+    max-width: none;
+    padding: 1.25rem 0 0;
+    text-align: center;
+}
+
+.timer-hub .timer-h1 {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.timer-hub .breathing-section { margin-top: 0.75rem; padding-top: 0.25rem; }
+
+.timer-hub .technique-buttons { margin-top: 0; margin-bottom: 2rem; }
+
+.timer-hub .app-bar {
+    max-width: 40rem;
+    justify-content: center;
+    padding: 0 3rem;
+}
+
+.timer-hub .technique-head { justify-items: center; text-align: center; }
+
+.timer-hub .technique-eyebrow { display: none; }
+
+.timer-hub [data-role="technique-title"] {
+    font-size: 2.125rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-wrap: balance;
+}
+
+.timer-hub .pattern-line { margin-top: 0.4rem; }
+
+.timer-hub .settings-btn { position: absolute; right: 0; top: 0.15rem; }
+
+.timer-hub .tools-row {
+    max-width: 40rem;
+    margin: 1.75rem auto 0;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+    .timer-hub .app-bar { padding: 0 2.75rem; }
+    .timer-hub [data-role="technique-title"] { font-size: 1.6rem; }
+    .timer-hub .technique-buttons { margin-bottom: 1.25rem; }
 }
 
 /* ==========================================================================

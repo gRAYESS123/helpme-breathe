@@ -120,7 +120,7 @@
     </script>
 
 </head>
-<body class="theme-coherent article-page technique-page">
+<body class="theme-coherent article-page technique-page timer-hub">
     <a class="skip-link" href="#main">Skip to main content</a>
 
     <!-- ============ PERSISTENT SITE HEADER ============ -->
@@ -144,19 +144,22 @@
     </header>
 
     <div class="container">
-        <header class="article-header">
-            <nav aria-label="Breadcrumb">
-                <ol class="breadcrumb">
-                    <li><a href="/">Home</a></li>
-                    <li>Breathing timers</li>
-                </ol>
-            </nav>
-            <h1>Breathing Timer</h1>
-            <p class="subtitle">Seven paced patterns in one timer. Pick one, set a length, follow the circle.</p>
+        <header class="article-header timer-header">
+            <h1 class="timer-h1">Breathing timer</h1>
         </header>
 
         <main id="main">
             <section class="breathing-section" data-breathing-app data-technique="coherent" aria-labelledby="timer-heading">
+                <h3 class="sr-only" id="technique-picker-heading">Choose a technique</h3>
+                <div class="technique-buttons" data-role="technique-buttons" role="group" aria-labelledby="technique-picker-heading">
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="478" aria-pressed="false">Deep Sleep</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false">Focus &amp; Grounding</button>
+                    <button class="technique-btn active" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="true">Heart Coherence</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="false">Cyclic Sighing</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false">Extended Exhale</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false">Quick Calm</button>
+                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="wim" aria-pressed="false">Energizing Breath</button>
+                </div>
                 <div class="app-bar">
                     <div class="technique-head">
                         <p class="technique-eyebrow" data-role="technique-eyebrow">Coherence</p>
@@ -257,16 +260,6 @@
 
                 <div data-slot="post-session"></div>
 
-                <h3 class="sr-only" id="technique-picker-heading">Choose a technique</h3>
-                <div class="technique-buttons" data-role="technique-buttons" role="group" aria-labelledby="technique-picker-heading">
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="478" aria-pressed="false">Deep Sleep</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false">Focus &amp; Grounding</button>
-                    <button class="technique-btn active" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="true">Heart Coherence</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="false">Cyclic Sighing</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false">Extended Exhale</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false">Quick Calm</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="wim" aria-pressed="false">Energizing Breath</button>
-                </div>
 
                 <!-- SLOT: Pro tools (custom pattern, your practice, soundscapes, night mode) -->
                 <div class="tools-row" data-slot="tools"></div>
@@ -294,7 +287,7 @@
                         </div>
                         <div class="step">
                             <h3>Pick a pattern</h3>
-                            <p>Use the buttons under the circle, or the guide below if you are not sure. You can change pattern any time; the timer resets when you do.</p>
+                            <p>Use the pattern buttons above the circle, or the guide below if you are not sure. You can change pattern any time; the timer resets when you do.</p>
                         </div>
                         <div class="step">
                             <h3>Set a length</h3>
