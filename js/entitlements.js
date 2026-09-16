@@ -168,6 +168,21 @@ function readSnapshot() {
 function writeSnapshot(value) {
   snapshot = value && typeof value === 'object' ? value : null;
   writeItem(SNAPSHOT_KEY, snapshot ? JSON.stringify(snapshot) : null);
+  announceAllowance();
+}
+
+/**
+ * The free-session count may have moved (a start, a server read, a fresh
+ * /api/me). Anything drawing the allowance re-reads `freeAllowance()` on this;
+ * it carries no data of its own.
+ */
+function announceAllowance() {
+  if (!hasDocument || typeof CustomEvent !== 'function') return;
+  try {
+    document.dispatchEvent(new CustomEvent('hmb:allowance'));
+  } catch {
+    /* a page without CustomEvent simply re-reads on the next paint */
+  }
 }
 
 /* ----------------------------------------------------------------- token */
@@ -518,6 +533,7 @@ function onSessionStart() {
   if (isPro()) return;
   if (hasDocument && document.body && openTimerPage()) return;
   recordSessionStart();
+  announceAllowance();
   recordFreeSession();
 }
 
@@ -634,8 +650,25 @@ function openTimerPage() {
 }
 
 /**
- * The single gate js/app.js calls on Start (design §8.1). This is the ONE place
- * TIMER_FREE_SESSIONS (D1) is read.
+ * The free allowance as the interface may show it: `{ used, total, left }`,
+ * or null when there is nothing to count down — sign-in not configured, a
+ * subscriber, a crisis page. Reads TIMER_FREE_SESSIONS beside requireTimer()
+ * so the count on screen and the gate can never disagree; nothing outside
+ * this module branches on the number. Re-read on `hmb:allowance`.
+ * @returns {{used:number, total:number, left:number}|null}
+ */
+export function freeAllowance() {
+  if (!hasDocument) return null;
+  if (openTimerPage()) return null;
+  if (!authConfigured()) return null;
+  if (isPro()) return null;
+  const used = freeSessionsUsed();
+  return { used, total: TIMER_FREE_SESSIONS, left: Math.max(0, TIMER_FREE_SESSIONS - used) };
+}
+
+/**
+ * The single gate js/app.js calls on Start (design §8.1). This and
+ * freeAllowance() above are the only places TIMER_FREE_SESSIONS (D1) is read.
  *
  * When it returns false the engine enters preview mode and dispatches
  * `hmb:preview` with `{ reason }`, where reason is `'signed_out'` when this

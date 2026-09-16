@@ -35,7 +35,7 @@
 
 import { getTechnique, cycleSeconds } from '../techniques.js';
 import { PLANS } from '../config.js';
-import { isPro, signedIn, status, onChange, getLicenseInfo } from '../entitlements.js';
+import { isPro, signedIn, status, onChange, getLicenseInfo, freeAllowance } from '../entitlements.js';
 import { track, EVENTS } from '../analytics.js';
 import { buildCard, planLine } from './paywall.js';
 
@@ -361,11 +361,85 @@ function onSessionStart(event) {
 }
 
 /** Register the document-level listeners. Safe to call more than once. */
+/* ------------------------------------------------------- the free count */
+
+/**
+ * One quiet line under the controls: how much of the free allowance this
+ * device has used. It is the same number the gate reads, so the fourth Begin
+ * is never the first anyone hears of a limit. Absent for subscribers, on the
+ * crisis pages, and while sign-in is not configured.
+ */
+function allowanceCopy(a) {
+  if (a.used <= 0) return `${a.total} free sessions on this device, then the plan.`;
+  if (a.left <= 0) return `All ${a.total} free sessions on this device used.`;
+  if (a.left === 1) return `${a.used} of ${a.total} free sessions used. One left.`;
+  return `${a.used} of ${a.total} free sessions used.`;
+}
+
+function renderCount(root) {
+  if (!root || typeof root.querySelector !== 'function') return;
+  const controls = root.querySelector('.controls');
+  if (!controls) return;
+  let node = root.querySelector('[data-role="free-count"]');
+  const a = freeAllowance();
+  if (!a) {
+    if (node) node.remove();
+    return;
+  }
+  if (!node) {
+    node = document.createElement('p');
+    node.className = 'free-count';
+    node.setAttribute('data-role', 'free-count');
+    node.setAttribute('aria-live', 'polite');
+    controls.insertAdjacentElement('afterend', node);
+  }
+  const text = allowanceCopy(a);
+  if (node.textContent !== text) node.textContent = text;
+}
+
+/**
+ * A button marked `data-free-cta` (the home page's "Try the timer, free")
+ * says how many free sessions are left once some are spent. Its shipped
+ * label is kept for the first visit and for anyone the count does not apply to.
+ */
+function renderFreeCtas() {
+  const a = freeAllowance();
+  for (const el of document.querySelectorAll('[data-free-cta]')) {
+    if (!el.dataset.freeCtaLabel) el.dataset.freeCtaLabel = el.textContent.trim();
+    let text = el.dataset.freeCtaLabel;
+    if (a && a.used > 0) {
+      if (a.left <= 0) text = 'Open the timer';
+      else text = `Try the timer, ${a.left} free ${a.left === 1 ? 'session' : 'sessions'} left`;
+    }
+    if (el.textContent !== text) el.textContent = text;
+  }
+}
+
+function renderAllowance() {
+  for (const root of document.querySelectorAll('[data-breathing-app]')) renderCount(root);
+  renderFreeCtas();
+}
+
 export function initPreview() {
   if (wired || typeof document === 'undefined') return;
   wired = true;
   document.addEventListener('hmb:preview', onPreview);
   document.addEventListener('hmb:session-start', onSessionStart);
+  document.addEventListener('hmb:ready', (event) => {
+    const detail = (event && event.detail) || {};
+    renderCount(detail.root || null);
+  });
+  // The count moves after entitlements.js has spent the session, so re-read
+  // once the current listeners have all run.
+  document.addEventListener('hmb:session-start', () => window.setTimeout(renderAllowance, 0));
+  document.addEventListener('hmb:allowance', renderAllowance);
+  document.addEventListener('hmb:auth', renderAllowance);
+  onChange(renderAllowance);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderAllowance, { once: true });
+  } else {
+    renderAllowance();
+  }
   // A chip tap or a pattern change mid-demo: stop demonstrating the old
   // pattern on a disc the engine has just reset.
   document.addEventListener('hmb:technique-change', (event) => {

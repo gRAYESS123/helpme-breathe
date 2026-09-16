@@ -127,9 +127,10 @@ export const PLANS = Object.freeze({
 });
 
 /**
- * D1 — how many completed sessions a device may run before the timer asks for
- * an account. Owner decision 2026-09-11: 3. Read in exactly one place,
- * js/entitlements.js#requireTimer(). Never branch on it anywhere else.
+ * D1 — how many started sessions a device may run before the timer asks for
+ * an account. Owner decision 2026-09-11: 3. Read only in js/entitlements.js
+ * (requireTimer() gates on it, freeAllowance() shows it). Never branch on it
+ * anywhere else.
  */
 export const TIMER_FREE_SESSIONS = 3;
 

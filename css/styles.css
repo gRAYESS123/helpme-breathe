@@ -1530,6 +1530,16 @@ body.session-active #cookieConsent { display: none; }
     margin: 1.5rem 0 0;
 }
 
+/* The free allowance, one line under the controls (js/pro/preview.js). */
+.free-count {
+    margin: 0.85rem 0 0;
+    font-family: var(--mono);
+    font-size: var(--fs-small);
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    text-align: center;
+}
+
 .control-btn {
     min-height: 52px;
     padding: 0.7rem 1.5rem;
