@@ -34,7 +34,7 @@ import {
 } from './techniques.js';
 import * as storage from './storage.js';
 import { track, EVENTS } from './analytics.js';
-import { requireTimer, signedIn } from './entitlements.js';
+import { requireTimer, signedIn, onChange as onEntitlementChange } from './entitlements.js';
 
 /* ========================================================================== *
  * Audio — one AudioContext for the whole page, shared by every instance.
@@ -1457,6 +1457,52 @@ function wireSiteNav() {
   });
 }
 
+/**
+ * The header's account pill. Every page ships it as "Sign in" → /signin so
+ * a signed-out visitor sees the right thing with no script at all; once
+ * js/entitlements.js knows a session exists, the same pill reads "Account"
+ * and points at /account. It re-renders on every auth change (this tab via
+ * `hmb:auth`, another tab via the storage event that entitlements.js relays
+ * through onChange), so signing out on /account flips it back everywhere.
+ * Nothing here touches the breathing engine.
+ */
+function wireAccountNav() {
+  const pills = document.querySelectorAll('.nav-cta');
+  if (!pills.length) return;
+  const render = () => {
+    let inSession = false;
+    try {
+      inSession = !!signedIn();
+    } catch {
+      inSession = false;
+    }
+    const here = window.location.pathname.replace(/\/$/, '') || '/';
+    for (const pill of pills) {
+      if (!pill.dataset.signedOutLabel) pill.dataset.signedOutLabel = pill.textContent.trim() || 'Sign in';
+      if (!pill.dataset.signedOutHref) pill.dataset.signedOutHref = pill.getAttribute('href') || '/signin';
+      if (inSession) {
+        pill.textContent = 'Account';
+        pill.setAttribute('href', '/account');
+        pill.classList.add('is-account');
+        if (here === '/account') pill.setAttribute('aria-current', 'page');
+        else pill.removeAttribute('aria-current');
+      } else {
+        pill.textContent = pill.dataset.signedOutLabel;
+        pill.setAttribute('href', pill.dataset.signedOutHref);
+        pill.classList.remove('is-account');
+        pill.removeAttribute('aria-current');
+      }
+    }
+  };
+  render();
+  document.addEventListener('hmb:auth', render);
+  try {
+    onEntitlementChange(render);
+  } catch {
+    /* the pill still renders once from the cached state */
+  }
+}
+
 function wireInstallTracking() {
   window.addEventListener('beforeinstallprompt', () => {
     track(EVENTS.PWA_INSTALL, { stage: 'available' });
@@ -1490,6 +1536,7 @@ function initAll() {
 if (typeof document !== 'undefined') {
   document.addEventListener('keydown', onGlobalKeydown);
   wireSiteNav();
+  wireAccountNav();
   wireInstallTracking();
   registerServiceWorker();
 

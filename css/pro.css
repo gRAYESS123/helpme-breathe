@@ -556,6 +556,47 @@ body.night .ad-slot {
 
 .plan-card .checkout-btn { font-size: 1rem; min-height: 52px; }
 
+/* What the button does, in three lines under it, so the sign-in step is
+   never a surprise. Numbered in mono; the first line changes once signed in. */
+.plan-steps {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    counter-reset: plan-step;
+}
+
+.plan-steps[hidden] { display: none; }
+
+.plan-steps li {
+    counter-increment: plan-step;
+    display: grid;
+    grid-template-columns: 1.6rem 1fr;
+    gap: 0 0.5rem;
+    padding: 0.55rem 0;
+    border-top: 1px solid var(--rule);
+    font-size: var(--fs-small);
+    line-height: 1.5;
+}
+
+.plan-steps li::before {
+    content: counter(plan-step);
+    grid-row: 1 / span 2;
+    font-family: var(--mono);
+    font-size: var(--fs-small);
+    color: var(--graphite);
+    padding-top: 0.05rem;
+}
+
+.plan-steps strong {
+    font-family: var(--ui);
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.plan-steps span { color: var(--graphite); }
+
+.plan-steps[data-signed-in="true"] li:first-child::before { content: '\2713'; color: var(--ok); }
+
 .plan-fine {
     margin: 0.85rem 0 0;
     font-size: var(--fs-micro);

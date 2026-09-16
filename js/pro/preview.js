@@ -225,9 +225,9 @@ function cancelDemonstration(root) {
 
 /* ------------------------------------------------------------------ card */
 
-function signInHref() {
+function signInHref(intent = 'none') {
   const next = `${location.pathname}${location.search}`;
-  const params = new URLSearchParams({ next, intent: 'none' });
+  const params = new URLSearchParams({ next, intent });
   return `${SIGNIN_PATH}?${params.toString()}`;
 }
 
@@ -265,11 +265,24 @@ export function renderPreviewCard(container, options = {}) {
     const actions = document.createElement('div');
     actions.className = 'paywall-actions';
 
+    // The way on is one chain: sign in, then Stripe, then back here. The
+    // subscribe intent rides on the sign-in link so /auth/callback opens
+    // checkout itself (design §4.4) instead of dropping the person back on
+    // this card to press a second button.
+    const start = document.createElement('a');
+    start.className = 'paywall-buy';
+    start.href = signInHref('subscribe:monthly');
+    start.setAttribute('data-preview-action', 'subscribe');
+    start.textContent = `Start the ${PLANS.trialDays}-day free trial`;
+    start.addEventListener('click', () => {
+      track(EVENTS.PAYWALL_CLICK, { feature: 'timer', target: 'signin-subscribe' });
+    });
+
     const signin = document.createElement('a');
-    signin.className = 'paywall-buy';
+    signin.className = 'pro-btn';
     signin.href = signInHref();
     signin.setAttribute('data-preview-action', 'signin');
-    signin.textContent = 'Create account or sign in';
+    signin.textContent = 'I already have an account';
     signin.addEventListener('click', () => {
       track(EVENTS.PAYWALL_CLICK, { feature: 'timer', target: 'signin' });
     });
@@ -282,11 +295,11 @@ export function renderPreviewCard(container, options = {}) {
       track(EVENTS.PAYWALL_CLICK, { feature: 'timer', target: 'pro-page' });
     });
 
-    actions.append(signin, more);
+    actions.append(start, signin, more);
 
     const note = document.createElement('p');
     note.className = 'form-note';
-    note.textContent = 'Sign-in is an email link or a Google account. No password. One free trial per person.';
+    note.textContent = `Sign in with an email link or a Google account, no password, then add a card on the checkout page. Nothing is charged for ${PLANS.trialDays} days. One free trial per person.`;
 
     card.append(h, body, price, actions, note);
   } else {

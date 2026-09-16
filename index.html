@@ -225,7 +225,7 @@
     }
     </script>
 </head>
-<body class="theme-coherent">
+<body class="theme-coherent landing-page" data-no-ads="true">
     <!-- Accessibility: skip straight to the breathing tool -->
     <a class="skip-link" href="#main">Skip to main content</a>
 
@@ -243,237 +243,221 @@
                 <a href="/timer">Timer</a>
                 <a href="/guides">Guides</a>
                 <a href="/science">Science</a>
-                <a href="/pro">Pro</a>
+                <a href="/pro">Pricing</a>
             </nav>
             <a class="nav-cta" href="/signin">Sign in</a>
         </div>
     </header>
 
     <div class="container">
-        <header class="hero">
-            <h1>Guided breathing exercises for sleep, stress and focus</h1>
-            <p class="subtitle">Seven paced patterns with audio and vibration cues: 4-7-8, box breathing, cyclic sighing and more. Pick one, press Begin, follow the circle.</p>
-        </header>
+        <section class="landing-hero" aria-labelledby="home-heading">
+            <header class="hero">
+                <p class="eyebrow">A guided breathing timer</p>
+                <h1 id="home-heading">Guided breathing exercises for sleep, stress and focus</h1>
+                <p class="subtitle">Seven paced patterns with audio and vibration cues: 4-7-8, box breathing, cyclic sighing and more. Pick one, press Begin, follow the circle.</p>
+                <div class="hero-actions">
+                    <a class="cta-button" href="/timer">Try the timer, free</a>
+                    <a class="cta-soft" href="/pro">See the plan</a>
+                </div>
+                <p class="hero-proof">Three sessions free · Works offline · No app to install</p>
+            </header>
 
-        <!--
-          The whole timer UI sits inside one app root, so the engine can find
-          every [data-role] with a single scoped query. See docs/PAGE_CONTRACT.md.
-        -->
-        <main class="main-content" id="main" data-breathing-app data-technique="coherent">
-            <section class="breathing-section" aria-labelledby="breathing-tool-heading">
-                <div class="app-bar">
-                    <div class="technique-head">
-                        <p class="technique-eyebrow" data-role="technique-eyebrow">Coherence</p>
-                        <h2 id="breathing-tool-heading" data-role="technique-title">Heart Coherence</h2>
-                        <p class="pattern-line" data-role="pattern-line">In 5 · Out 5</p>
+            <!-- Decorative: the orb breathing at the coherence pace, 5 in, 5 out. -->
+            <div class="hero-stage" aria-hidden="true">
+                <div class="air"><i></i><i></i><i></i></div>
+                <svg class="hero-gauge" viewBox="0 0 320 320" focusable="false">
+                    <circle class="hero-rail" cx="160" cy="160" r="150"/>
+                    <circle class="hero-arc" cx="160" cy="160" r="150"/>
+                </svg>
+                <div class="hero-orb"><span>Breathe in</span><span>Breathe out</span></div>
+            </div>
+        </section>
+
+        <main id="main">
+            <section class="landing-section" aria-labelledby="how-heading">
+                <div class="section-head">
+                    <h2 id="how-heading">How it works</h2>
+                    <p>Nothing to learn and nothing to set up. The timer counts, cues and keeps time; you breathe.</p>
+                </div>
+                <ol class="steps">
+                    <li>
+                        <strong>Pick a pattern</strong>
+                        <p>Deep Sleep for the evening, Focus &amp; Grounding before work, Cyclic Sighing when the day gets on top of you.</p>
+                    </li>
+                    <li>
+                        <strong>Follow the circle</strong>
+                        <p>It grows on the in-breath and shrinks on the out-breath, with a soft tone and a pulse at each change, so your eyes can close.</p>
+                    </li>
+                    <li>
+                        <strong>Three sessions free, then one plan</strong>
+                        <p>Try it three times with nothing to sign up to. Keep going for $10 a month or $100 a year, three days free first.</p>
+                    </li>
+                </ol>
+            </section>
+
+            <section class="landing-section" aria-labelledby="patterns-heading">
+                <div class="section-head">
+                    <h2 id="patterns-heading">Seven patterns, one timer</h2>
+                    <p>Each one has its own page with the counts, what it is for, and who should leave it alone. <a href="/timer">Open the timer</a> to run any of them.</p>
+                </div>
+                <div class="pattern-grid">
+                    <a class="pattern-card" href="/4-7-8-breathing">
+                        <span class="eyebrow">Before sleep</span>
+                        <strong>Deep Sleep, 4-7-8</strong>
+                        <span class="pattern-counts">In 4 · Hold 7 · Out 8</span>
+                        <p>A slow in-breath, a long hold, a longer out-breath. The one people reach for at bedtime.</p>
+                    </a>
+                    <a class="pattern-card" href="/box-breathing">
+                        <span class="eyebrow">Focus</span>
+                        <strong>Focus &amp; Grounding, box</strong>
+                        <span class="pattern-counts">In 4 · Hold 4 · Out 4 · Hold 4</span>
+                        <p>Four equal counts. Steady, square and easy to keep going through a hard hour.</p>
+                    </a>
+                    <a class="pattern-card" href="/heart-coherence-breathing">
+                        <span class="eyebrow">Everyday calm</span>
+                        <strong>Heart Coherence</strong>
+                        <span class="pattern-counts">In 5 · Out 5</span>
+                        <p>Six breaths a minute, no holds. The pace most of the heart rate variability research uses.</p>
+                    </a>
+                    <a class="pattern-card" href="/cyclic-sighing">
+                        <span class="eyebrow">Stress</span>
+                        <strong>Cyclic Sighing</strong>
+                        <span class="pattern-counts">In 2 · In 1 · Out 6</span>
+                        <p>A double in-breath and a long sigh out. The pattern behind the clearest trial we have.</p>
+                    </a>
+                    <a class="pattern-card" href="/extended-exhale-breathing">
+                        <span class="eyebrow">Anxious moments</span>
+                        <strong>Extended Exhale</strong>
+                        <span class="pattern-counts">In 4 · Out 6</span>
+                        <p>The out-breath runs longer than the in-breath, and nothing is held. The gentlest place to start.</p>
+                    </a>
+                    <a class="pattern-card" href="/triangle-breathing">
+                        <span class="eyebrow">A quick reset</span>
+                        <strong>Quick Calm, triangle</strong>
+                        <span class="pattern-counts">In 3 · Hold 3 · Out 3</span>
+                        <p>Three counts each way. Short enough for the minute before a call.</p>
+                    </a>
+                    <a class="pattern-card" href="/energizing-breath">
+                        <span class="eyebrow">Mornings</span>
+                        <strong>Energizing Breath</strong>
+                        <span class="pattern-counts">In 2 · Out 1</span>
+                        <p>Fast and rhythmic, for waking up rather than winding down. Read the safety note first.</p>
+                    </a>
+                    <a class="pattern-card pattern-card--own" href="/pro">
+                        <span class="eyebrow">With the plan</span>
+                        <strong>Your own pattern</strong>
+                        <span class="pattern-counts">Four sliders · A name · A link</span>
+                        <p>Set your own counts, save it as a preset, and share a link that opens anyone's timer already set to it.</p>
+                    </a>
+                </div>
+            </section>
+
+            <section class="landing-section" aria-labelledby="pathways-heading">
+                <div class="section-head">
+                    <h2 id="pathways-heading">Start from where you are</h2>
+                    <p>Three short guides for the three reasons people come here, each with the patterns to try and the ones to skip.</p>
+                </div>
+                <nav class="pathways" aria-label="Guides by situation">
+                    <a class="pathway" href="/breathing-exercises-for-sleep">
+                        <span class="pathway-label">Before sleep</span>
+                        <strong>Slow the evening down</strong>
+                        <span>Which patterns help you fall asleep, in what order to try them, and the one to leave alone late at night.</span>
+                    </a>
+                    <a class="pathway" href="/breathing-exercises-anxiety">
+                        <span class="pathway-label">Anxious moments</span>
+                        <strong>Something steady to hold on to</strong>
+                        <span>Two patterns without breath-holds, a plain account of what they can and cannot do, and where to turn if it is more than anxiety.</span>
+                    </a>
+                    <a class="pathway" href="/breathing-exercises-for-focus">
+                        <span class="pathway-label">Focus and work</span>
+                        <strong>Three minutes before the hard thing</strong>
+                        <span>Short, steady patterns for the start of a task, between meetings, or before something you have been dreading.</span>
+                    </a>
+                </nav>
+            </section>
+
+            <section class="landing-section" aria-labelledby="evidence-heading">
+                <div class="section-head">
+                    <h2 id="evidence-heading">What the evidence says</h2>
+                    <a href="/science">Read the research, with its limits</a>
+                </div>
+                <div class="evidence">
+                    <blockquote>
+                        <p>Five minutes a day of breathwork, especially exhale-focused cyclic sighing, improved mood and lowered breathing rate more than the same five minutes of mindfulness meditation over one month.</p>
+                        <cite>Balban and colleagues, Cell Reports Medicine, 2023. One remote randomised trial of 108 people.</cite>
+                    </blockquote>
+                    <div class="evidence-text">
+                        <p>Slow breathing does measurable things while you do it: heart rate variability rises, blood pressure eases a little, and the nervous system leans towards rest. Some of that carries over between sessions when the practice is daily; how far it carries is still an open question, because few trials follow people for long.</p>
+                        <p>None of this is medical care. The <a href="/science">science page</a> walks through the studies one by one, says what each can and cannot show, and the <a href="/about">about page</a> says who wrote it and why.</p>
                     </div>
-                    <button class="settings-btn" type="button" data-role="settings-btn" data-action="toggle-settings" aria-label="Open settings" aria-expanded="false">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false">
-                            <circle cx="12" cy="12" r="3.2"/>
-                            <path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
-                        </svg>
-                    </button>
+                </div>
+            </section>
+
+            <section class="plan-band" aria-labelledby="plan-heading">
+                <div>
+                    <h2 id="plan-heading">Everything, one plan.</h2>
+                    <p>Your first three sessions are free. After that, one plan covers the timer and the tools around the practice: your own patterns and saved presets, streaks and a twelve-week history, ambient soundscapes, night mode, no ads anywhere, and offline use. Three days free first, with a card on file.</p>
+                </div>
+                <div class="plan-band-price">
+                    <span class="price-figure">$10</span>
+                    <span class="price-period">a month, or $100 a year with two months free</span>
+                    <a class="checkout-btn" href="/pro">See the plan</a>
+                    <p class="plan-note">Three days free with a card on file. One free trial per person. Cancel any time.</p>
+                </div>
+            </section>
+
+            <!--
+              Visible counterparts for the FAQPage structured data in <head>. Google's
+              structured-data policy requires the answers to appear on the page, and
+              the safety answer is the site's contraindication block in short form:
+              each technique page repeats it in full for its own pattern.
+            -->
+            <section class="prose home-faq" aria-labelledby="home-faq-heading">
+                <h2 id="home-faq-heading">Before you start, and common questions</h2>
+
+                <div class="callout callout--caution">
+                    <h3>Who should be careful</h3>
+                    <p>Patterns that hold the breath or speed it up are not right for everyone. Ask a clinician first if
+                    you are pregnant, or if you live with a heart condition, uncontrolled high blood pressure, epilepsy or
+                    another seizure disorder, asthma, COPD or another respiratory condition, glaucoma, or if you have had
+                    surgery recently. If you live with panic attacks, breath-holds can reproduce sensations you would
+                    rather not invite; the patterns without holds, extended exhale, cyclic sighing and heart coherence,
+                    are the safer starting point. Practise sitting or lying down, never while driving, cycling or in
+                    water. Stop if you feel dizzy, tingly, short of breath or simply unwell. This site is not medical care
+                    and does not replace it; the full wording is in the
+                    <a href="/legal/medical-disclaimer">medical disclaimer</a>.</p>
                 </div>
 
-                <div class="settings-panel" data-role="settings-panel">
-                    <div class="setting-item">
-                        <span class="setting-label" id="label-sound">Sound</span>
-                        <div class="toggle-switch active" data-role="sound-toggle" role="button" tabindex="0" aria-pressed="true" aria-labelledby="label-sound"></div>
-                    </div>
-                    <div class="setting-item">
-                        <span class="setting-label" id="label-vibration">Vibration</span>
-                        <div class="toggle-switch active" data-role="vibration-toggle" role="button" tabindex="0" aria-pressed="true" aria-labelledby="label-vibration"></div>
-                    </div>
-                    <div class="setting-item">
-                        <label class="setting-label" for="session-duration">Session length</label>
-                        <select id="session-duration" class="duration-select" data-role="duration-select">
-                            <option value="180">3 minutes</option>
-                            <option value="300">5 minutes</option>
-                            <option value="600" selected>10 minutes</option>
-                            <option value="900">15 minutes</option>
-                            <option value="1200">20 minutes</option>
-                            <option value="-1">Unlimited</option>
-                        </select>
-                    </div>
+                <div class="faq-item">
+                    <h3>What is the 4-7-8 breathing pattern?</h3>
+                    <p>Breathe in through your nose for four seconds, hold for seven, then breathe out through your mouth
+                    for eight. The timer counts it for you and can play a soft tone at each change. The seven-second hold
+                    is the part to shorten or skip if it feels like a struggle.</p>
                 </div>
 
-                <div class="breathing-container">
-                    <svg class="breathing-guides" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
-                        <circle class="ring-track" cx="160" cy="160" r="150"/>
-                        <circle class="ring-live" cx="160" cy="160" r="150"/>
-                        <circle class="ring-bridge" cx="160" cy="160" r="150"/>
-                    </svg>
-                    <div class="breathing-circle technique-coherent" data-role="circle">
-                        <span class="circle-notch" aria-hidden="true"></span>
-                    </div>
-                    <div class="circle-text-container">
-                        <span class="phase-word" data-role="circle-text">Ready</span>
-                        <span class="phase-count" data-role="phase-count"></span>
-                    </div>
+                <div class="faq-item">
+                    <h3>How does box breathing work?</h3>
+                    <p>Four equal counts: breathe in for four seconds, hold for four, breathe out for four, then stay
+                    empty for four. It repeats for as long as your session lasts.</p>
                 </div>
 
-                <p class="breathing-text" data-role="breathing-text">Press Begin to start your practice</p>
-
-                <div class="session-info" data-role="session-info" style="display: none;">
-                    <div class="session-progress">
-                        <div class="session-progress-fill" data-role="session-progress-fill"></div>
-                    </div>
-                    <div class="session-time-remaining" data-role="session-time-remaining"></div>
+                <div class="faq-item">
+                    <h3>Do I need an account, and does it cost anything?</h3>
+                    <p>Not for your first three sessions. They run with nothing to sign in to, and your settings and
+                    session history stay in your own browser. After three sessions the timer is part of one plan, $10 a
+                    month or $100 a year, which starts with a three-day free trial and needs an account and a card. The
+                    plan also covers the tools around the practice: your own patterns, saved presets, streaks,
+                    soundscapes, night mode and no ads. The pages for anxious moments and panic attacks are outside all
+                    of this and run the full timer for anyone.</p>
                 </div>
 
-                <div class="progress-bar">
-                    <div class="progress-fill" data-role="progress-fill"></div>
-                    <div class="progress-time" data-role="progress-time"></div>
+                <div class="faq-item">
+                    <h3>Is this safe for everyone?</h3>
+                    <p>No. Read the caution above before you choose a pattern with a hold or with fast breathing. If you
+                    are unsure, start with extended exhale or cyclic sighing, neither of which holds the breath.</p>
                 </div>
-
-                <div class="timer" data-role="timer">00:00</div>
-
-                <div class="session-stats" data-role="stats" style="display: none;">
-                    <div class="stat-item">
-                        <span class="stat-value" data-role="breath-count">0</span>
-                        <span class="stat-label">Breaths</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value" data-role="avg-breath">0s</span>
-                        <span class="stat-label">Avg. breath</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value" data-role="session-progress">0%</span>
-                        <span class="stat-label">Progress</span>
-                    </div>
-                </div>
-
-                <div class="controls">
-                    <button class="control-btn" type="button" data-role="start" data-action="start">Begin Practice</button>
-                    <button class="control-btn" type="button" data-role="pause" data-action="pause" disabled>Pause</button>
-                    <button class="control-btn" type="button" data-role="stop" data-action="stop" disabled>Stop</button>
-                </div>
-
-                <div class="safety-ack" data-role="safety-ack" hidden>
-                    <h3>Read this before you start this pattern</h3>
-                    <div data-role="safety-ack-body"></div>
-                    <div class="safety-ack-actions">
-                        <button class="control-btn" type="button" data-action="safety-ack-confirm">I understand, begin</button>
-                        <button class="control-btn" type="button" data-action="safety-ack-cancel">Not now</button>
-                    </div>
-                </div>
-
-                <!-- Post-session cards (offer, email capture) render here. -->
-                <div data-slot="post-session"></div>
-
-                <h3 class="sr-only" id="technique-picker-heading">Choose a technique</h3>
-                <div class="technique-buttons" data-role="technique-buttons" role="group" aria-labelledby="technique-picker-heading">
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="478" aria-pressed="false" aria-describedby="desc-478">Deep Sleep</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="box" aria-pressed="false" aria-describedby="desc-box">Focus &amp; Grounding</button>
-                    <button class="technique-btn active" type="button" data-action="select-technique" data-technique="coherent" aria-pressed="true" aria-describedby="desc-coherent">Heart Coherence</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="sigh" aria-pressed="false" aria-describedby="desc-sigh">Cyclic Sighing</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="extended" aria-pressed="false" aria-describedby="desc-extended">Extended Exhale</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="triangle" aria-pressed="false" aria-describedby="desc-triangle">Quick Calm</button>
-                    <button class="technique-btn" type="button" data-action="select-technique" data-technique="wim" aria-pressed="false" aria-describedby="desc-wim">Energizing Breath</button>
-                </div>
-
-                <div id="desc-478" class="sr-only">4-7-8: in for four, hold seven, out for eight</div>
-                <div id="desc-box" class="sr-only">Box breathing: four equal counts in, hold, out, hold</div>
-                <div id="desc-coherent" class="sr-only">Coherence: five seconds in, five seconds out</div>
-                <div id="desc-sigh" class="sr-only">Cyclic sighing: a double inhale then a long exhale</div>
-                <div id="desc-extended" class="sr-only">Extended exhale: four seconds in, six seconds out</div>
-                <div id="desc-triangle" class="sr-only">Triangle: three counts in, hold, out</div>
-                <div id="desc-wim" class="sr-only">Energizing breath: fast rhythmic breathing, read the safety note first</div>
-
-                <!-- Pro modules inject their buttons here. Empty = zero height. -->
-                <div class="tools-row" data-slot="tools"></div>
-
-                <div class="technique-info" data-role="technique-info"></div>
-
-                <p class="live-region" data-role="live-region" aria-live="polite" aria-atomic="true"></p>
             </section>
         </main>
-
-        <nav class="pathways" aria-label="Guides by situation">
-            <a class="pathway" href="/breathing-exercises-for-sleep">
-                <span class="pathway-label">Before sleep</span>
-                <strong>Slow the evening down</strong>
-                <span>Which patterns help you fall asleep, in what order to try them, and the one to leave alone late at night.</span>
-            </a>
-            <a class="pathway" href="/breathing-exercises-anxiety">
-                <span class="pathway-label">Anxious moments</span>
-                <strong>Something steady to hold on to</strong>
-                <span>Two patterns without breath-holds, a plain account of what they can and cannot do, and where to turn if it is more than anxiety.</span>
-            </a>
-            <a class="pathway" href="/breathing-exercises-for-focus">
-                <span class="pathway-label">Focus and work</span>
-                <strong>Three minutes before the hard thing</strong>
-                <span>Short, steady patterns for the start of a task, between meetings, or before something you have been dreading.</span>
-            </a>
-        </nav>
-
-        <section class="plan-band" aria-labelledby="plan-heading">
-            <div>
-                <h2 id="plan-heading">Everything, one plan.</h2>
-                <p>Your first three sessions are free. After that, one plan covers the timer and the tools around the practice: your own patterns and saved presets, streaks and a twelve-week history, ambient soundscapes, night mode, no ads anywhere, and offline use. Three days free first, with a card on file.</p>
-            </div>
-            <div class="plan-band-price">
-                <span class="price-figure">$10</span>
-                <span class="price-period">a month, or $100 a year with two months free</span>
-                <a class="checkout-btn" href="/pro">See what is included</a>
-                <p class="plan-note">Three days free with a card on file. One free trial per person. Cancel any time.</p>
-            </div>
-        </section>
-
-        <!--
-          Visible counterparts for the FAQPage structured data in <head>. Google's
-          structured-data policy requires the answers to appear on the page, and
-          the safety answer is also the homepage's contraindication block: this
-          page opens on 4-7-8, which holds the breath for seven seconds, and the
-          selector offers box, triangle and the energizing breath as well. The
-          engine additionally renders the selected technique's own cautions into
-          [data-role="technique-info"], so the wording follows the pattern in use.
-        -->
-        <section class="prose home-faq" aria-labelledby="home-faq-heading">
-            <h2 id="home-faq-heading">Before you start, and common questions</h2>
-
-            <div class="callout callout--caution">
-                <h3>Who should be careful</h3>
-                <p>Patterns that hold the breath or speed it up are not right for everyone. Ask a clinician first if
-                you are pregnant, or if you live with a heart condition, uncontrolled high blood pressure, epilepsy or
-                another seizure disorder, asthma, COPD or another respiratory condition, glaucoma, or if you have had
-                surgery recently. If you live with panic attacks, breath-holds can reproduce sensations you would
-                rather not invite; the patterns without holds, extended exhale, cyclic sighing and heart coherence,
-                are the safer starting point. Practise sitting or lying down, never while driving, cycling or in
-                water. Stop if you feel dizzy, tingly, short of breath or simply unwell. This site is not medical care
-                and does not replace it; the full wording is in the
-                <a href="/legal/medical-disclaimer">medical disclaimer</a>.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>What is the 4-7-8 breathing pattern?</h3>
-                <p>Breathe in through your nose for four seconds, hold for seven, then breathe out through your mouth
-                for eight. The timer counts it for you and can play a soft tone at each change. The seven-second hold
-                is the part to shorten or skip if it feels like a struggle.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>How does box breathing work?</h3>
-                <p>Four equal counts: breathe in for four seconds, hold for four, breathe out for four, then stay
-                empty for four. It repeats for as long as your session lasts.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>Do I need an account, and does it cost anything?</h3>
-                <p>Not for your first three sessions. They run with nothing to sign in to, and your settings and
-                session history stay in your own browser. After three sessions the timer is part of one plan, $10 a
-                month or $100 a year, which starts with a three-day free trial and needs an account and a card. The
-                plan also covers the tools around the practice: your own patterns, saved presets, streaks,
-                soundscapes, night mode and no ads. The pages for anxious moments and panic attacks are outside all
-                of this and run the full timer for anyone.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>Is this safe for everyone?</h3>
-                <p>No. Read the caution above before you choose a pattern with a hold or with fast breathing. If you
-                are unsure, start with extended exhale or cyclic sighing, neither of which holds the breath.</p>
-            </div>
-        </section>
 
         <footer class="footer">
             <div class="footer-cols">
@@ -509,7 +493,7 @@
                 <nav class="footer-nav" aria-label="About and products">
                     <p class="footer-heading">The site</p>
                     <a href="/about">About</a>
-                    <a href="/pro">Pro</a>
+                    <a href="/pro">Pricing</a>
                     <a href="/account">Your account</a>
                 </nav>
             </div>
@@ -526,9 +510,6 @@
         </footer>
     </div>
 
-    <div class="keyboard-hint" data-role="keyboard-hint">
-        Press <kbd>Space</kbd> to start or pause • <kbd>S</kbd> to stop • <kbd>1</kbd>–<kbd>7</kbd> to switch technique
-    </div>
 
     <script type="module" src="/js/consent.js"></script>
     <script type="module" src="/js/app.js"></script>

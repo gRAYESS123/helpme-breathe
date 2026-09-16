@@ -292,7 +292,7 @@
                 <a href="/timer">Timer</a>
                 <a href="/guides">Guides</a>
                 <a href="/science">Science</a>
-                <a href="/pro" aria-current="page">Pro</a>
+                <a href="/pro" aria-current="page">Pricing</a>
             </nav>
             <a class="nav-cta" href="/signin">Sign in</a>
         </div>
@@ -328,11 +328,15 @@
                         <span class="price-period" data-role="plan-period">a month, billed monthly. US list price, plus any tax due in your country, shown at checkout.</span>
                     </p>
 
-                    <p class="plan-trial" data-role="plan-trial"><strong>3 days free, then $10 a month.</strong> We ask for a card now. You are not charged during the trial. On day 3 the card is charged automatically unless you cancel, and cancelling takes two clicks from your account page at any time during the trial. One free trial per person.</p>
-
                     <p class="plan-notice" data-role="trial-denied" hidden><strong>One free trial per person.</strong> You've had the free trial before, so this is a straight subscription: the price above, cancel any time, 14-day refund. If that's not right, email <a href="mailto:contact@helpmebreath.com?subject=Free%20trial">contact@helpmebreath.com</a>.</p>
 
                     <button class="checkout-btn" type="button" data-action="checkout" data-plan="monthly" data-role="plan-cta" data-placement="plan-card">Start the free trial</button>
+
+                    <ol class="plan-steps" data-role="plan-steps" aria-label="What happens when you start">
+                        <li data-role="step-signin"><strong data-role="step-signin-title">Sign in first</strong><span data-role="step-signin-body">An email link or a Google account. No password to make.</span></li>
+                        <li><strong>Add a card on Stripe's page</strong><span>Nothing is charged today. The total for your country, tax included, is shown before you confirm.</span></li>
+                        <li><strong>Three days free, then the plan</strong><span data-role="step-then">On day 3 the card is charged $10 a month unless you cancel first, in two clicks from your account. One free trial per person.</span></li>
+                    </ol>
 
                     <a class="checkout-btn" href="/account" data-role="plan-manage" hidden>Manage your plan</a>
                     <p class="plan-manage-note" data-role="plan-manage-note" hidden>You are already subscribed. Your plan, its renewal date and the amount you will be charged are on your account page.</p>
@@ -668,6 +672,7 @@
         let plan = 'monthly';
         let trialDenied = false;
         let subscribed = false;
+        let signedInEmail = '';
 
         /* ------------------------------------------------------------ copy */
 
@@ -732,8 +737,33 @@
 
         /* ---------------------------------------------------------- render */
 
+        function renderSteps(copy) {
+            const steps = document.querySelector('[data-role="plan-steps"]');
+            if (!steps) return;
+            steps.hidden = subscribed;
+            const then = document.querySelector('[data-role="step-then"]');
+            if (then) {
+                then.textContent = trialDenied
+                    ? `The card is charged ${copy.then} today, and the subscription starts now.`
+                    : `On day ${trialDays} the card is charged ${copy.then} unless you cancel first, in two clicks from your account. One free trial per person.`;
+            }
+            const title = document.querySelector('[data-role="step-signin-title"]');
+            const body = document.querySelector('[data-role="step-signin-body"]');
+            if (!title || !body) return;
+            if (signedInEmail) {
+                title.textContent = 'You are signed in';
+                body.textContent = `As ${signedInEmail}. The plan follows this address to every device.`;
+                steps.setAttribute('data-signed-in', 'true');
+            } else {
+                title.textContent = 'Sign in first';
+                body.textContent = 'An email link or a Google account. No password to make.';
+                steps.removeAttribute('data-signed-in');
+            }
+        }
+
         function render() {
             const copy = copyFor(plan);
+            renderSteps(copy);
             for (const b of buttons) {
                 const on = b.getAttribute('data-interval') === plan;
                 b.classList.toggle('is-active', on);
@@ -809,8 +839,11 @@
                 const ent = await import('/js/entitlements.js');
                 const update = () => {
                     subscribed = typeof ent.isPro === 'function' && ent.isPro() === true;
+                    const acct = typeof ent.account === 'function' ? ent.account() : null;
+                    signedInEmail = acct && acct.email ? String(acct.email) : (acct ? 'your account' : '');
                     render();
                 };
+                document.addEventListener('hmb:auth', update);
                 update();
                 if (typeof ent.onChange === 'function') ent.onChange(update);
             } catch {
