@@ -17,6 +17,7 @@
  *       wait_for_update: 500
  *     });
  *     gtag('set', 'ads_data_redaction', true);
+ *     gtag('set', 'url_passthrough', true);
  *     gtag('js', new Date());
  *     gtag('config', 'G-TYLYLJSFHN', { anonymize_ip: true, cookie_expires: 63072000 });
  *     gtag('config', 'AW-18182683015');   // Google Ads, same gates; conversion only on /pro/thanks
