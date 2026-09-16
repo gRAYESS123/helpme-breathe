@@ -1727,7 +1727,8 @@ const NO_ACCOUNT_ALLOW = [
 
 /**
  * google-tag / ads-conversion (2026-09-15): every page that carries the GA4
- * config must carry the Google Ads config and the ads_data_redaction flag in
+ * config must carry the Google Ads config, the ads_data_redaction flag and the
+ * url_passthrough flag in
  * the same head block (docs/PAGE_CONTRACT.md §1), and the Purchase conversion
  * label may appear on /pro/thanks and nowhere else.
  */
@@ -1751,6 +1752,9 @@ function checkGoogleTag() {
     }
     if (gaAt >= 0 && !raw.includes("gtag('set', 'ads_data_redaction', true)")) {
       ERR(page.file, lineOf(gaAt), 'google-tag', "the head block must set ads_data_redaction before gtag('config', …)");
+    }
+    if (gaAt >= 0 && !raw.includes("gtag('set', 'url_passthrough', true)")) {
+      ERR(page.file, lineOf(gaAt), 'google-tag', "the head block must set url_passthrough before gtag('config', …); without it a paid click is unattributed whenever ad_storage is denied");
     }
     if (gaAt >= 0 && adsAt >= 0 && adsAt < gaAt) {
       ERR(page.file, lineOf(adsAt), 'google-tag', `${ADS_ID} must be configured after ${GA_ID}, as the contract block does`);

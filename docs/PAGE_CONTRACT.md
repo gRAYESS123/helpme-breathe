@@ -156,6 +156,9 @@ one wins.
         // With advertising storage denied, ad click identifiers are redacted from what
         // the browser sends (Consent Mode v2).
         gtag('set', 'ads_data_redaction', true);
+        // ...and ad click identifiers are appended to same-site navigations instead,
+        // so a paid click survives the sign-in and checkout chain without a cookie.
+        gtag('set', 'url_passthrough', true);
         gtag('js', new Date());
         gtag('config', 'G-TYLYLJSFHN', {
             'anonymize_ip': true,
