@@ -440,7 +440,13 @@ body {
    runs, the band is one screen tall). The header, the page title and the
    timer all sit on it, and read their colours from the stage tokens. */
 body:has([data-breathing-app]):not(.render-body):not(:has(.timer-pair)) {
-    background: linear-gradient(var(--stage-bg), var(--stage-bg)) top / 100% var(--stage-h) no-repeat var(--ground);
+    /* The stage's ground, then a short fade into the page so a dusk room
+       (Deep Sleep, night) ends softly rather than on a hard line. In daylight
+       both colours are the same and nothing is visible. */
+    background:
+        linear-gradient(var(--stage-bg), var(--stage-bg)) top / 100% var(--stage-h) no-repeat,
+        linear-gradient(var(--stage-bg), transparent) 0 var(--stage-h) / 100% 9rem no-repeat,
+        var(--ground);
 }
 
 body:has([data-breathing-app]):not(.render-body):not(:has(.timer-pair)) :is(.site-header, .hero, .article-header, .jump-to-timer, .crisis-block),
@@ -1021,6 +1027,7 @@ body.session-active #cookieConsent { display: none; }
     align-items: flex-start;
     gap: 1rem;
     min-height: var(--hit);
+    max-width: var(--measure);   /* the same column as the page title above it */
     margin: 0 auto 0.25rem;
     text-align: left;
 }
@@ -1651,23 +1658,22 @@ body.session-active #cookieConsent { display: none; }
 .tools-row .tool-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    min-height: 44px;
-    padding: 0.4rem 0.9rem;
+    gap: 0.4rem;
+    min-height: 40px;
+    padding: 0.4rem 0.95rem;
     font-family: var(--sans);
-    font-size: var(--fs-micro);
+    font-size: var(--fs-small);
     font-weight: 500;
-    letter-spacing: 0.02em;
     color: var(--muted);
-    background: transparent;
+    background: var(--well);
     border: 0;
     border-radius: var(--radius-pill);
     cursor: pointer;
 }
 
-.tools-row .tool-btn:hover { color: var(--ink); background: var(--well); }
+.tools-row .tool-btn:hover { color: var(--ink); }
 
-.tools-row .tool-btn.is-on { color: var(--ink); background: var(--well); font-weight: 600; }
+.tools-row .tool-btn.is-on { color: var(--ink); font-weight: 600; }
 
 /* ------------------------------------------------- safety acknowledgement */
 
