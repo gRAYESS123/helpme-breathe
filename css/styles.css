@@ -317,6 +317,12 @@ body.night [data-breathing-app][data-technique="478"] {
 }
 
 html {
+    /* Nothing may make the page wider than the screen. `body { overflow-x }`
+       alone is not enough on iOS Safari, which ignores it and lets the whole
+       page drag sideways; `clip` on the root clips without turning the root
+       into a scroll container. The washes (100vw) are the usual suspect. */
+    overflow-x: hidden;
+    overflow-x: clip;
     color-scheme: light;
     -webkit-text-size-adjust: 100%;
 }
@@ -358,6 +364,7 @@ body {
     background: var(--ground);
     min-height: 100vh;
     overflow-x: hidden;
+    overflow-x: clip;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     transition: --stage-bg var(--dur-slow) var(--ease-ui), --stage-ink var(--dur-slow) var(--ease-ui),
@@ -3098,6 +3105,7 @@ body[data-tier="pro"] .ad-slot { display: none; }
     /* Three equal thirds, so Begin, Pause and Stop sit on one row. */
     .controls { flex-wrap: nowrap; gap: 0.5rem; }
 
+    .controls { flex-wrap: nowrap; }
     .controls .control-btn { flex: 1 1 0; min-width: 0; padding-inline: 0.5rem; }
 
     .control-btn[data-role="start"] { padding-inline: 0.5rem; flex: 1.6 1 0; }

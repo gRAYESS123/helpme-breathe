@@ -522,10 +522,15 @@ export function createBreathingApp(rootEl, options = {}) {
     // On a phone the chips scroll sideways: bring the chosen one into the
     // row (horizontally only, so the page itself never jumps).
     const row = active && active.parentElement;
-    if (row && row.scrollWidth > row.clientWidth + 1) {
+    if (!row) return;
+    const centre = () => {
+      if (row.scrollWidth <= row.clientWidth + 1) return;
       const target = active.offsetLeft - (row.clientWidth - active.offsetWidth) / 2;
       row.scrollLeft = Math.max(0, target);
-    }
+    };
+    centre();
+    // Fonts and the stage may still be settling on first paint; once more after.
+    if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(centre);
   }
 
   function syncButtons() {
