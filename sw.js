@@ -8,10 +8,11 @@
  *   - /api/* and cross-origin : never intercepted, never cached
  *
  * Bump CACHE_NAME on every deploy that changes CSS, JS or the app shell.
- * Webfonts are cross-origin: never precached, never intercepted.
+ * Webfonts are same-origin since the audit of 2026-09-17 self-hosted them,
+ * so the two latin files are part of the shell and work offline.
  * Changing this file is what triggers the service-worker update.
  */
-const CACHE_NAME = 'hmb-v10-landing-2026-09-16';
+const CACHE_NAME = 'hmb-v11-selfhost-fonts-2026-09-17';
 // The clean URL, never '/offline.html': under cleanUrls Vercel answers the
 // .html path with a 308, and a redirected response cannot be served for a
 // navigation (Chrome fails the request instead of showing the page).
@@ -36,6 +37,10 @@ const PRECACHE_URLS = [
   '/timer',
   '/offline',
   '/css/styles.css',
+  // The two latin faces. The latin-ext files are only fetched for accented
+  // text, which this site does not ship, so they stay out of the shell.
+  '/fonts/figtree-latin.woff2',
+  '/fonts/dm-mono-400-latin.woff2',
   '/js/app.js',
   '/js/stage.js',
   '/js/techniques.js',
@@ -71,7 +76,13 @@ async function precache() {
   await Promise.allSettled(
     PRECACHE_URLS.map(async (url) => {
       try {
-        const response = await fetch(new Request(url, { cache: 'reload' }));
+        // No { cache: 'reload' } here. Forcing a network fetch for all 34
+        // entries made install re-download the whole shell while the first
+        // paint was still settling (audit C1, 2026-09-17); letting the HTTP
+        // cache answer turns most of those into a revalidation or nothing at
+        // all. CACHE_NAME is bumped on every shell change, which is what makes
+        // a new deploy propagate -- not this flag.
+        const response = await fetch(url);
         if (response && response.ok) await cache.put(url, response);
       } catch (error) {
         // A missing or unreachable entry must never block installation.

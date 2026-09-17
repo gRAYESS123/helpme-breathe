@@ -37,14 +37,51 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#F4F6F5">
 
-    <!-- PERFORMANCE -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- PERFORMANCE
+         Fonts are self-hosted (audit C1, 2026-09-17): the faces live at the top
+         of /css/styles.css and the files under /fonts/. That removes two
+         preconnects and a two-hop cross-origin chain (fonts.googleapis.com ->
+         fonts.gstatic.com) from the critical path. The HTTP cache has been
+         partitioned per top-level site since 2020, so that chain was never warm
+         for a first-time visitor.
+
+         The faces are deliberately NOT preloaded: the LCP element on every page
+         is a text block, font-display:swap paints it in the fallback at once,
+         and a high-priority font preload measurably delayed the stylesheet on a
+         narrow connection (+780ms LCP when tried on 2026-09-17). Let the
+         stylesheet discover them. -->
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"></noscript>
+    <!-- The module graph, started in parallel (audit C1, 2026-09-17).
+         <script type="module"> discovers imports one layer at a time, so the
+         graph arrived in four serialised waves spanning 430ms to 2840ms -- about
+         2.4s of round trips that never overlapped. These hints let the parser
+         begin all of them at once. Generated from the real static-import graph;
+         dynamic import() targets (checkout.js, pro/soundscapes.js) are left out
+         so they stay lazy.
+
+         fetchpriority="low" is load-bearing: at default priority these 16
+         requests competed with /css/styles.css for bandwidth and pushed first
+         paint out by ~780ms on a 1.6Mbps link. Low priority keeps the
+         parallelism without letting it outrank the render-blocking CSS. -->
+    <link rel="modulepreload" href="/js/consent.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/app.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/stage.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/pro/index.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/ads.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/techniques.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/storage.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/analytics.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/entitlements.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/pro/paywall.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/pro/preview.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/pro/capture.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/pro/patterns.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/pro/streaks.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/pro/night.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/config.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/auth.js" fetchpriority="low">
 
     <!--
       Google Consent Mode v2 — copy verbatim, do not reorder. The DENIED
@@ -79,7 +116,47 @@
         // same Consent Mode gates. The Purchase conversion itself fires only on /pro/thanks.
         gtag('config', 'AW-18182683015');
     </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
+    <!--
+      The tag itself is fetched late, on purpose (audit C1, 2026-09-17). The two
+      Google containers are 386 KB of the 525 KB first load -- 146 KB of which
+      never executes -- and as a head-async pair they competed for bandwidth and
+      main thread while the first paint was still settling.
+
+      Nothing above this point moves: the consent defaults and both gtag('config')
+      calls have already queued into dataLayer, and gtag.js replays that queue in
+      order whenever it arrives. Consent Mode is unaffected.
+
+      It loads at the first of: the main thread going idle after load, the
+      visitor's first interaction, or a 2.5s ceiling -- so a real session is
+      still measured and the Purchase conversion on /pro/thanks, which fires
+      many seconds later, is never at risk. A visitor who leaves inside ~2.5s
+      may go unrecorded; that is the trade for the paint. Revert by restoring
+      the one-line async tag if the campaign data matters more.
+    -->
+    <script>
+        (function () {
+            var loaded = false;
+            function loadTag() {
+                if (loaded) return;
+                loaded = true;
+                var s = document.createElement('script');
+                s.async = true;
+                s.src = 'https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN';
+                document.head.appendChild(s);
+            }
+            ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach(function (evt) {
+                window.addEventListener(evt, loadTag, { once: true, passive: true });
+            });
+            function schedule() {
+                window.setTimeout(loadTag, 2500);
+                if (typeof window.requestIdleCallback === 'function') {
+                    window.requestIdleCallback(loadTag, { timeout: 2500 });
+                }
+            }
+            if (document.readyState === 'complete') schedule();
+            else window.addEventListener('load', schedule);
+        })();
+    </script>
 
     <!-- BreadcrumbList: required on every page. -->
     <script type="application/ld+json">
@@ -166,6 +243,93 @@
     }
     </script>
 
+    <!-- Authorship and page entity (audit C4, 2026-09-17) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "MedicalWebPage",
+          "@id": "https://helpmebreath.com/triangle-breathing#page",
+          "url": "https://helpmebreath.com/triangle-breathing",
+          "name": "Triangle Breathing Timer — Free 3-3-3 Guided Exercise",
+          "headline": "Triangle Breathing Timer — Free 3-3-3 Guided Exercise",
+          "description": "A free guided triangle breathing timer: three counts in, three held, three out, paced with sound and vibration cues — plus how to teach it in a classroom.",
+          "image": "https://helpmebreath.com/images/og/triangle-breathing.jpg",
+          "inLanguage": "en",
+          "datePublished": "2026-09-09",
+          "dateModified": "2026-09-13",
+          "lastReviewed": "2026-09-13",
+          "medicalAudience": {
+            "@type": "MedicalAudience",
+            "audienceType": "Patient"
+          },
+          "about": {
+            "@type": "MedicalTherapy",
+            "name": "Triangle breathing"
+          },
+          "author": {
+            "@id": "https://helpmebreath.com/about#georges-rayess"
+          },
+          "publisher": {
+            "@id": "https://helpmebreath.com/#organization"
+          },
+          "isPartOf": {
+            "@id": "https://helpmebreath.com/#website"
+          },
+          "mainEntityOfPage": "https://helpmebreath.com/triangle-breathing"
+        },
+        {
+          "@type": "Person",
+          "@id": "https://helpmebreath.com/about#georges-rayess",
+          "name": "Georges Rayess",
+          "url": "https://helpmebreath.com/about",
+          "email": "contact@helpmebreath.com",
+          "description": "Georges Rayess builds, writes and maintains Help Me Breathe on his own. He is not a clinician and holds no medical qualification; the site is a breathing timer and a set of plain-language pages checked against primary literature, not medical care.",
+          "worksFor": {
+            "@id": "https://helpmebreath.com/#organization"
+          },
+          "knowsAbout": [
+            "Breathing exercises",
+            "Slow breathing",
+            "Heart rate variability"
+          ]
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://helpmebreath.com/#organization",
+          "name": "Help Me Breathe",
+          "url": "https://helpmebreath.com/",
+          "description": "A guided breathing timer with seven patterns, published by one individual. Three sessions free, then one plan. An account holds an email address and a plan, never a record of anyone's practice.",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://helpmebreath.com/images/logo.png"
+          },
+          "founder": {
+            "@id": "https://helpmebreath.com/about#georges-rayess"
+          },
+          "publishingPrinciples": "https://helpmebreath.com/legal/medical-disclaimer",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "contact@helpmebreath.com",
+            "contactType": "customer service",
+            "availableLanguage": "English"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://helpmebreath.com/#website",
+          "url": "https://helpmebreath.com/",
+          "name": "Help Me Breathe",
+          "description": "Guided breathing timer with seven patterns. Three sessions free, then one plan.",
+          "publisher": {
+            "@id": "https://helpmebreath.com/#organization"
+          },
+          "inLanguage": "en-US"
+        }
+      ]
+    }
+    </script>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",

@@ -36,10 +36,10 @@
       Caption and sub are written with textContent, so anything in the query
       string is inert text — never markup.
 
-      Third-party requests: Google Fonts only (Newsreader + IBM Plex Sans).
-      No analytics, no consent script,
-      no ads, no Pro modules. Keep it that way; a capture surface that phones
-      home would put a tracker inside every clip we publish.
+      Third-party requests: none at all, since the typefaces were self-hosted on
+      2026-09-17. No analytics, no consent script, no ads, no Pro modules. Keep
+      it that way; a capture surface that phones home would put a tracker inside
+      every clip we publish.
     -->
     <meta name="robots" content="noindex, nofollow">
     <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -52,12 +52,36 @@
 
     <meta name="theme-color" content="#F4F6F5">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Render-blocking on purpose: a capture must not start before Figtree and
+         DM Mono are ready, or the clip comes out in a system face. Since the
+         faces were self-hosted (audit C1, 2026-09-17) they arrive inside this
+         stylesheet, from the same local server that serves this page -- so a
+         render no longer depends on reaching fonts.googleapis.com at all.
+         render.html reports the typeface that actually painted in
+         data-render-font; check it if a capture looks wrong. -->
     <link rel="stylesheet" href="/css/styles.css">
-    <!-- Render-blocking on purpose: a capture must not start before Newsreader
-         and IBM Plex Sans are ready, or the clip comes out in a system face. -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap">
+
+    <!-- The module graph, started in parallel (audit C1, 2026-09-17).
+         <script type="module"> discovers imports one layer at a time, so the
+         graph arrived in four serialised waves spanning 430ms to 2840ms -- about
+         2.4s of round trips that never overlapped. These hints let the parser
+         begin all of them at once. Generated from the real static-import graph;
+         dynamic import() targets (checkout.js, pro/soundscapes.js) are left out
+         so they stay lazy.
+
+         fetchpriority="low" is load-bearing: at default priority these 16
+         requests competed with /css/styles.css for bandwidth and pushed first
+         paint out by ~780ms on a 1.6Mbps link. Low priority keeps the
+         parallelism without letting it outrank the render-blocking CSS. -->
+    <link rel="modulepreload" href="/js/app.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/stage.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/techniques.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/storage.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/analytics.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/entitlements.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/consent.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/config.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/auth.js" fetchpriority="low">
 
     <style>
         /* ------------------------------------------------------------------
