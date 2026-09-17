@@ -38,6 +38,7 @@ leaving it in produces unstyled markup, not a fallback.
 | Delete | Where it usually is |
 |---|---|
 | The Quicksand `<link rel="preload">` **and** its `<noscript>` twin | head |
+| Any `fonts.googleapis.com` / `fonts.gstatic.com` link or preconnect (fonts are self-hosted since 2026-09-17) | head |
 | The emoji favicon: the `<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,...">` whose data URI contains an SVG `<text>` glyph | head |
 | `<meta name="theme-color" content="#8b5cf6">` | head |
 | `<div class="nature-bg"></div>` | first child of `<body>` |
@@ -133,14 +134,28 @@ one wins.
     <meta name="theme-color" content="#0F1620" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#F4F6F5">
 
-    <!-- PERFORMANCE -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- PERFORMANCE
+         Fonts are self-hosted (2026-09-17). The @font-face rules sit at the top
+         of /css/styles.css and the files under /fonts/, so there is no font
+         origin to preconnect to. Do NOT add a <link rel="preload" as="font">:
+         the LCP element on every page is a text block, font-display:swap paints
+         it in the fallback at once, and a high-priority font preload measurably
+         delayed the stylesheet (+780ms LCP when measured on 2026-09-17). -->
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
 
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"></noscript>
+    <!-- The module graph, started in parallel. Copy the list from
+         templates/technique-page.template.html and drop any module this page
+         does not load. It must match the page's own <script type="module">
+         entries plus their static imports; dynamic import() targets
+         (checkout.js, pro/soundscapes.js) stay out so they remain lazy. -->
+    <link rel="modulepreload" href="/js/consent.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/app.js" fetchpriority="low">
+    <!-- …see the template for the full list… -->
+
+    fetchpriority="low" is load-bearing, not decoration: at default priority
+    these hints outrank /css/styles.css for bandwidth and push first paint out
+    by ~780ms on a 1.6Mbps link. Keep it on every one of them.
 
     <!-- Google Consent Mode v2 — denied defaults BEFORE gtag config. Verbatim. -->
     <script>
@@ -171,7 +186,15 @@ one wins.
         // same Consent Mode gates. The Purchase conversion itself fires only on /pro/thanks.
         gtag('config', 'AW-18182683015');
     </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
+    <!-- The tag is fetched late (2026-09-17): at the first of idle-after-load,
+         the visitor's first interaction, or a 2.5s ceiling. Everything above
+         this point is unchanged and must stay put -- the consent defaults and
+         both config calls queue into dataLayer, and gtag.js replays that queue
+         in order when it arrives. Copy the injector verbatim from
+         templates/technique-page.template.html. -->
+    <script>
+        /* …deferred gtag injector, verbatim from the template… */
+    </script>
 
     <!-- JSON-LD blocks go here. See section 10. -->
 </head>

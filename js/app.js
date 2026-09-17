@@ -1426,10 +1426,21 @@ function registerServiceWorker() {
   const host = window.location.hostname;
   const secure = window.location.protocol === 'https:' || host === 'localhost' || host === '127.0.0.1';
   if (!secure) return;
+  // Register after load AND after the main thread goes idle. On load alone the
+  // install step precaches the shell while the first paint is still settling,
+  // which cost ~200-400ms of blocking time (audit C1, 2026-09-17). Offline is a
+  // product feature, so the worker stays -- it just stops racing the render.
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {
-      /* the site works fine without it */
-    });
+    const start = () => {
+      navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {
+        /* the site works fine without it */
+      });
+    };
+    if (typeof window.requestIdleCallback === 'function') {
+      window.requestIdleCallback(start, { timeout: 3000 });
+    } else {
+      window.setTimeout(start, 1000);
+    }
   });
 }
 

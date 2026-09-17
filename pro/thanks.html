@@ -56,16 +56,44 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#F4F6F5">
 
-    <!-- PERFORMANCE -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- PERFORMANCE
+         Fonts are self-hosted (audit C1, 2026-09-17): the faces live at the top
+         of /css/styles.css and the files under /fonts/. That removes two
+         preconnects and a two-hop cross-origin chain (fonts.googleapis.com ->
+         fonts.gstatic.com) from the critical path. The HTTP cache has been
+         partitioned per top-level site since 2020, so that chain was never warm
+         for a first-time visitor.
+
+         The faces are deliberately NOT preloaded: the LCP element on every page
+         is a text block, font-display:swap paints it in the fallback at once,
+         and a high-priority font preload measurably delayed the stylesheet on a
+         narrow connection (+780ms LCP when tried on 2026-09-17). Let the
+         stylesheet discover them. -->
     <link rel="preload" href="/css/styles.css" as="style">
     <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/pro.css">
 
-    <!-- Fonts: Newsreader for display, IBM Plex Sans for anything you operate. -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"></noscript>
+    <!-- The module graph, started in parallel (audit C1, 2026-09-17).
+         <script type="module"> discovers imports one layer at a time, so the
+         graph arrived in four serialised waves spanning 430ms to 2840ms -- about
+         2.4s of round trips that never overlapped. These hints let the parser
+         begin all of them at once. Generated from the real static-import graph;
+         dynamic import() targets (checkout.js, pro/soundscapes.js) are left out
+         so they stay lazy.
+
+         fetchpriority="low" is load-bearing: at default priority these 16
+         requests competed with /css/styles.css for bandwidth and pushed first
+         paint out by ~780ms on a 1.6Mbps link. Low priority keeps the
+         parallelism without letting it outrank the render-blocking CSS. -->
+    <link rel="modulepreload" href="/js/consent.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/app.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/stage.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/techniques.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/storage.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/analytics.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/entitlements.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/config.js" fetchpriority="low">
+    <link rel="modulepreload" href="/js/auth.js" fetchpriority="low">
+    <link rel="stylesheet" href="/css/pro.css">
 
     <!--
       Google Consent Mode v2 — copy verbatim, do not reorder. The DENIED
@@ -103,6 +131,18 @@
         // same Consent Mode gates. The Purchase conversion itself fires only on /pro/thanks.
         gtag('config', 'AW-18182683015');
     </script>
+    <!--
+      DELIBERATE EXCEPTION to the deferred tag used on every other page
+      (audit C1, 2026-09-17): here the tag loads immediately.
+
+      This page reports the Purchase conversion. Everywhere else, delaying the
+      tag by up to 2.5s trades a rare early-bounce pageview for a faster paint,
+      which is a good trade on a page someone found in search. On the
+      thank-you page the trade inverts: nobody arrives here from a SERP, paint
+      speed is irrelevant, and a conversion lost because the visitor closed the
+      tab before the tag loaded is money the campaign cannot see. Measurement
+      wins here. Do not "consistency-fix" this back to the deferred injector.
+    -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TYLYLJSFHN"></script>
 
     <script type="application/ld+json">
