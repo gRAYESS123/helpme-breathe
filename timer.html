@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
-    <title>Breathing Timer — Choose Your Technique</title>
+    <title>Breathing Timer — Box, 4-7-8 &amp; More, Three Sessions Free</title>
     <meta name="description" content="A breathing timer with seven paced patterns. Pick a technique, set a length, and follow the circle. Three sessions free, then one plan. Works offline.">
 
     <link rel="canonical" href="https://helpmebreath.com/timer">
@@ -14,7 +14,7 @@
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Breathing Timer — Choose Your Technique">
+    <meta property="og:title" content="Breathing Timer — Box, 4-7-8 &amp; More, Three Sessions Free">
     <meta property="og:description" content="Seven paced breathing patterns in one timer. Pick one, set a length, follow the circle. Three sessions free, then one plan.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpmebreath.com/timer">
@@ -23,7 +23,7 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Breathing Timer — Choose Your Technique">
+    <meta name="twitter:title" content="Breathing Timer — Box, 4-7-8 &amp; More, Three Sessions Free">
     <meta name="twitter:description" content="Seven paced breathing patterns in one timer. Three sessions free, then one plan.">
     <meta name="twitter:image" content="https://helpmebreath.com/images/og/timer.jpg">
 
@@ -177,26 +177,184 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "CollectionPage",
-      "@id": "https://helpmebreath.com/timer#page",
-      "url": "https://helpmebreath.com/timer",
-      "name": "Breathing Timer — Choose Your Technique",
-      "description": "A breathing timer with seven paced patterns, and a short guide to choosing between them. Three sessions free, then one plan.",
-      "inLanguage": "en-US",
-      "isPartOf": { "@id": "https://helpmebreath.com/#website" },
-      "mainEntity": {
-        "@type": "ItemList",
-        "name": "Breathing patterns",
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "4-7-8 breathing", "url": "https://helpmebreath.com/4-7-8-breathing" },
-          { "@type": "ListItem", "position": 2, "name": "Box breathing", "url": "https://helpmebreath.com/box-breathing" },
-          { "@type": "ListItem", "position": 3, "name": "Heart coherence breathing", "url": "https://helpmebreath.com/heart-coherence-breathing" },
-          { "@type": "ListItem", "position": 4, "name": "Cyclic sighing", "url": "https://helpmebreath.com/cyclic-sighing" },
-          { "@type": "ListItem", "position": 5, "name": "Extended exhale breathing", "url": "https://helpmebreath.com/extended-exhale-breathing" },
-          { "@type": "ListItem", "position": 6, "name": "Triangle breathing", "url": "https://helpmebreath.com/triangle-breathing" },
-          { "@type": "ListItem", "position": 7, "name": "Energizing breath", "url": "https://helpmebreath.com/energizing-breath" }
-        ]
-      }
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": "https://helpmebreath.com/timer#page",
+          "url": "https://helpmebreath.com/timer",
+          "name": "Breathing Timer — Box, 4-7-8 & More, Three Sessions Free",
+          "description": "A breathing timer with seven paced patterns, and a short guide to choosing between them. Three sessions free, then one plan.",
+          "inLanguage": "en-US",
+          "isPartOf": {
+            "@id": "https://helpmebreath.com/#website"
+          },
+          "mainEntity": {
+            "@id": "https://helpmebreath.com/#webapp"
+          },
+          "hasPart": {
+            "@type": "ItemList",
+            "name": "Breathing patterns",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "4-7-8 breathing",
+                "url": "https://helpmebreath.com/4-7-8-breathing"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Box breathing",
+                "url": "https://helpmebreath.com/box-breathing"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Heart coherence breathing",
+                "url": "https://helpmebreath.com/heart-coherence-breathing"
+              },
+              {
+                "@type": "ListItem",
+                "position": 4,
+                "name": "Cyclic sighing",
+                "url": "https://helpmebreath.com/cyclic-sighing"
+              },
+              {
+                "@type": "ListItem",
+                "position": 5,
+                "name": "Extended exhale breathing",
+                "url": "https://helpmebreath.com/extended-exhale-breathing"
+              },
+              {
+                "@type": "ListItem",
+                "position": 6,
+                "name": "Triangle breathing",
+                "url": "https://helpmebreath.com/triangle-breathing"
+              },
+              {
+                "@type": "ListItem",
+                "position": 7,
+                "name": "Energizing breath",
+                "url": "https://helpmebreath.com/energizing-breath"
+              }
+            ]
+          }
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "https://helpmebreath.com/#webapp",
+          "name": "Help Me Breathe",
+          "description": "A guided breathing timer with seven patterns, audio and vibration cues, saved settings and offline use. The first three sessions are free; after that one plan covers the timer and the tools around the practice.",
+          "url": "https://helpmebreath.com/timer",
+          "applicationCategory": "HealthApplication",
+          "operatingSystem": "Web Browser",
+          "browserRequirements": "Requires JavaScript",
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Help Me Breathe plan",
+            "url": "https://helpmebreath.com/pro",
+            "itemListElement": [
+              {
+                "@type": "Offer",
+                "name": "Help Me Breathe — monthly",
+                "description": "Everything included: custom patterns and saved presets, streaks and history export, ambient soundscapes, night mode, no ads and offline use. Three-day free trial.",
+                "price": "10.00",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock",
+                "url": "https://helpmebreath.com/pro",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": "10.00",
+                  "priceCurrency": "USD",
+                  "billingDuration": 1,
+                  "billingIncrement": 1,
+                  "unitCode": "MON"
+                }
+              },
+              {
+                "@type": "Offer",
+                "name": "Help Me Breathe — yearly",
+                "description": "The same plan, billed once a year. Two months free against the monthly price.",
+                "price": "100.00",
+                "priceCurrency": "USD",
+                "availability": "https://schema.org/InStock",
+                "url": "https://helpmebreath.com/pro",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": "100.00",
+                  "priceCurrency": "USD",
+                  "billingDuration": 1,
+                  "billingIncrement": 1,
+                  "unitCode": "ANN"
+                }
+              }
+            ]
+          },
+          "featureList": [
+            "4-7-8 breathing timer",
+            "Box breathing timer",
+            "Heart coherence breathing timer",
+            "Cyclic sighing timer",
+            "Extended exhale timer",
+            "Triangle breathing timer",
+            "Energizing breath timer",
+            "Audio and vibration cues",
+            "Saved settings and session history",
+            "Offline use"
+          ],
+          "publisher": {
+            "@id": "https://helpmebreath.com/#organization"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://helpmebreath.com/#website",
+          "url": "https://helpmebreath.com/",
+          "name": "Help Me Breathe",
+          "description": "Guided breathing timer with seven patterns. Three sessions free, then one plan.",
+          "publisher": {
+            "@id": "https://helpmebreath.com/#organization"
+          },
+          "inLanguage": "en-US"
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://helpmebreath.com/#organization",
+          "name": "Help Me Breathe",
+          "url": "https://helpmebreath.com/",
+          "description": "A guided breathing timer with seven patterns, published by one individual. Three sessions free, then one plan. An account holds an email address and a plan, never a record of anyone's practice.",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://helpmebreath.com/images/logo.png"
+          },
+          "founder": {
+            "@id": "https://helpmebreath.com/about#georges-rayess"
+          },
+          "publishingPrinciples": "https://helpmebreath.com/legal/medical-disclaimer",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "contact@helpmebreath.com",
+            "contactType": "customer service",
+            "availableLanguage": "English"
+          }
+        },
+        {
+          "@type": "Person",
+          "@id": "https://helpmebreath.com/about#georges-rayess",
+          "name": "Georges Rayess",
+          "url": "https://helpmebreath.com/about",
+          "email": "contact@helpmebreath.com",
+          "description": "Georges Rayess builds, writes and maintains Help Me Breathe on his own. He is not a clinician and holds no medical qualification; the site is a breathing timer and a set of plain-language pages checked against primary literature, not medical care.",
+          "worksFor": {
+            "@id": "https://helpmebreath.com/#organization"
+          },
+          "knowsAbout": [
+            "Breathing exercises",
+            "Slow breathing",
+            "Heart rate variability"
+          ]
+        }
+      ]
     }
     </script>
 
@@ -413,7 +571,10 @@
                         <a class="link-card" href="/breathing-exercises-for-focus"><strong>Focus and work</strong><span>Short patterns for between tasks, without making you sleepy.</span></a>
                         <a class="link-card" href="/box-breathing-vs-4-7-8"><strong>Box vs 4-7-8</strong><span>The two most-searched patterns, compared honestly and side by side.</span></a>
                         <a class="link-card" href="/science"><strong>What the research says</strong><span>What the evidence actually supports, and where it is thin.</span></a>
+                        <a class="link-card" href="/breathing-exercises-for-high-blood-pressure"><strong>Blood pressure</strong><span>What slow-breathing research does and does not show, and why it never replaces treatment.</span></a>
+                        <a class="link-card" href="/breathing-apps-compared"><strong>Apps compared</strong><span>What breathing apps cost, what each free tier does, and when a plain pacer is enough.</span></a>
                     </div>
+                    <p>Every guide on the site, in one list, is in the <a href="/guides">guides index</a>.</p>
                 </section>
 
                 <section>
@@ -447,7 +608,6 @@
                     <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
                     <a href="/breathing-exercises-for-focus">For focus</a>
                     <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
-                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
                 </nav>
 
                 <nav class="footer-nav" aria-label="Compare and research">

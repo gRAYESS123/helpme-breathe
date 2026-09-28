@@ -1,0 +1,47 @@
+# Help Me Breathe
+
+> A guided breathing timer with seven paced patterns, plus plain-language pages
+> on each technique. The first three sessions are free; after that one plan,
+> $10 a month or $100 a year. Written and maintained by one person, Georges
+> Rayess, who is not a clinician. Claims are checked against the primary
+> literature, quoted rather than paraphrased, and published next to the
+> limitations of the study they came from.
+
+Editorial stance: this site does not claim that breathing exercises treat any
+condition. Where the evidence is one small trial, the page says so and gives the
+sample size. Where there is no evidence, the page says there is none.
+
+## Breathing techniques (one page and one working timer each)
+
+- [Cyclic sighing](https://helpmebreath.com/cyclic-sighing): Double nasal inhale, long mouth exhale. The pattern from the Balban et al. 2023 Stanford trial (Cell Reports Medicine, PMID 36630953, NCT05304000).
+- [4-7-8 breathing](https://helpmebreath.com/4-7-8-breathing): In 4, hold 7, out 8, a counted pattern popularised by Dr Andrew Weil. Canonical page for this technique.
+- [Box breathing](https://helpmebreath.com/box-breathing): Four equal counts of four, including a hold at empty.
+- [Heart coherence breathing](https://helpmebreath.com/heart-coherence-breathing): Six breaths a minute, no holds; the pace used in most HRV research.
+- [Extended exhale breathing](https://helpmebreath.com/extended-exhale-breathing): In 4, out 6, nothing held. The gentlest starting pattern.
+- [Triangle breathing](https://helpmebreath.com/triangle-breathing): Three counts of three. Used in classrooms and counselling rooms.
+- [Energizing breath](https://helpmebreath.com/energizing-breath): Faster and rhythmic, for waking up. Carries a safety warning.
+
+## Comparisons
+
+- [Box breathing vs 4-7-8](https://helpmebreath.com/box-breathing-vs-4-7-8): Which to pick, with a difference table.
+- [Breathing apps compared](https://helpmebreath.com/breathing-apps-compared): What breathing apps cost, what each free tier does, and when a plain pacer is enough. Prices checked 13 September 2026.
+
+## By situation
+
+- [Breathing exercises for anxiety](https://helpmebreath.com/breathing-exercises-anxiety)
+- [Breathing exercises for panic attacks](https://helpmebreath.com/breathing-exercises-for-panic-attacks)
+- [Breathing exercises for sleep](https://helpmebreath.com/breathing-exercises-for-sleep)
+- [Breathing exercises for focus](https://helpmebreath.com/breathing-exercises-for-focus)
+- [Breathing exercises for high blood pressure](https://helpmebreath.com/breathing-exercises-for-high-blood-pressure)
+
+## Evidence and provenance
+
+- [The science](https://helpmebreath.com/science): Every study the site relies on, what each can and cannot show, with links to the open-access full texts.
+- [About and editorial policy](https://helpmebreath.com/about): Who writes this, what is not reviewed by a clinician, and how the site earns money.
+- [Medical disclaimer](https://helpmebreath.com/legal/medical-disclaimer)
+
+## Optional
+
+- [Timer](https://helpmebreath.com/timer): The app itself. Three sessions free, then one plan at $10/month or $100/year.
+- [Guides](https://helpmebreath.com/guides): Index of every guide on the site.
+- [Pricing](https://helpmebreath.com/pro)
