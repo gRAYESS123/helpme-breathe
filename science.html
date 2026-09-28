@@ -191,17 +191,10 @@
       "datePublished": "2026-09-09",
       "dateModified": "2026-09-09",
       "author": {
-        "@type": "Person",
-        "name": "Georges Rayess",
-        "url": "https://helpmebreath.com/about"
+        "@id": "https://helpmebreath.com/about#georges-rayess"
       },
       "publisher": {
-        "@type": "Organization",
-        "name": "Help Me Breathe",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://helpmebreath.com/images/logo.png"
-        }
+        "@id": "https://helpmebreath.com/#organization"
       },
       "mainEntityOfPage": {
         "@type": "WebPage",
@@ -215,6 +208,64 @@
         "Garg P, Mendiratta A, Banga A, et al. (2023). Effect of breathing exercises on blood pressure and heart rate: a systematic review and meta-analysis. International Journal of Cardiology: Cardiovascular Risk and Prevention, 20:200232.",
         "Fincham GW, Strauss C, Montero-Marin J, Cavanagh K (2023). Effect of breathwork on stress and mental health: a meta-analysis of randomised-controlled trials. Scientific Reports, 13:432.",
         "Vierra J, Boonla O, Prasertsri P (2022). Effects of sleep deprivation and 4-7-8 breathing control on heart rate variability, blood pressure, blood glucose, and endothelial function in healthy young adults. Physiological Reports, 10(13):e15389."
+      ],
+      "isPartOf": {
+        "@id": "https://helpmebreath.com/#website"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://helpmebreath.com/about#georges-rayess",
+          "name": "Georges Rayess",
+          "url": "https://helpmebreath.com/about",
+          "email": "contact@helpmebreath.com",
+          "description": "Georges Rayess builds, writes and maintains Help Me Breathe on his own. He is not a clinician and holds no medical qualification; the site is a breathing timer and a set of plain-language pages checked against primary literature, not medical care.",
+          "worksFor": {
+            "@id": "https://helpmebreath.com/#organization"
+          },
+          "knowsAbout": [
+            "Breathing exercises",
+            "Slow breathing",
+            "Heart rate variability"
+          ]
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://helpmebreath.com/#organization",
+          "name": "Help Me Breathe",
+          "url": "https://helpmebreath.com/",
+          "description": "A guided breathing timer with seven patterns, published by one individual. Three sessions free, then one plan. An account holds an email address and a plan, never a record of anyone's practice.",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://helpmebreath.com/images/logo.png"
+          },
+          "founder": {
+            "@id": "https://helpmebreath.com/about#georges-rayess"
+          },
+          "publishingPrinciples": "https://helpmebreath.com/legal/medical-disclaimer",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "contact@helpmebreath.com",
+            "contactType": "customer service",
+            "availableLanguage": "English"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://helpmebreath.com/#website",
+          "url": "https://helpmebreath.com/",
+          "name": "Help Me Breathe",
+          "description": "Guided breathing timer with seven patterns. Three sessions free, then one plan.",
+          "publisher": {
+            "@id": "https://helpmebreath.com/#organization"
+          },
+          "inLanguage": "en-US"
+        }
       ]
     }
     </script>
@@ -416,7 +467,7 @@
 
                     <p>A seven-point drop in systolic pressure would be clinically meaningful if it held up. Here is why we are not going to tell you it does. The review's own quality assessment is blunt: <q>All 15 studies which were included in the review have an unclear or high risk of bias.</q> Heterogeneity between the trials was very high — around 90% for the systolic result — which means the individual studies disagreed with each other a great deal, and the pooled number papers over that disagreement rather than resolving it.</p>
 
-                    <p>So: a promising signal, from a body of work that is not yet good enough to act on alone. If you have high blood pressure, slow breathing is a reasonable thing to add on top of what your clinician has prescribed. It is not a reason to change or stop anything. Please read the <a href="/legal/medical-disclaimer">medical disclaimer</a> before you treat anything on this site as advice.</p>
+                    <p>So: a promising signal, from a body of work that is not yet good enough to act on alone. If you have high blood pressure, slow breathing is a reasonable thing to add on top of what your clinician has prescribed. It is not a reason to change or stop anything. Please read the <a href="/legal/medical-disclaimer">medical disclaimer</a> before you treat anything on this site as advice. The practical side, which patterns people use and how to fit them around treatment, is on the page about <a href="/breathing-exercises-for-high-blood-pressure">breathing exercises and blood pressure</a>.</p>
                 </section>
 
                 <section id="anxiety">
@@ -683,7 +734,6 @@
                     <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
                     <a href="/breathing-exercises-for-focus">For focus</a>
                     <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
-                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
                 </nav>
 
                 <nav class="footer-nav" aria-label="Compare and research">

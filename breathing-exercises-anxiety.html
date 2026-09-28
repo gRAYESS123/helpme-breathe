@@ -191,22 +191,73 @@
       "dateModified": "2026-09-09",
       "inLanguage": "en",
       "author": {
-        "@type": "Person",
-        "name": "Georges Rayess",
-        "url": "https://helpmebreath.com/about"
+        "@id": "https://helpmebreath.com/about#georges-rayess"
       },
       "publisher": {
-        "@type": "Organization",
-        "name": "Help Me Breathe",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://helpmebreath.com/images/logo.png"
-        }
+        "@id": "https://helpmebreath.com/#organization"
       },
       "mainEntityOfPage": {
         "@type": "WebPage",
         "@id": "https://helpmebreath.com/breathing-exercises-anxiety"
+      },
+      "isPartOf": {
+        "@id": "https://helpmebreath.com/#website"
       }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://helpmebreath.com/about#georges-rayess",
+          "name": "Georges Rayess",
+          "url": "https://helpmebreath.com/about",
+          "email": "contact@helpmebreath.com",
+          "description": "Georges Rayess builds, writes and maintains Help Me Breathe on his own. He is not a clinician and holds no medical qualification; the site is a breathing timer and a set of plain-language pages checked against primary literature, not medical care.",
+          "worksFor": {
+            "@id": "https://helpmebreath.com/#organization"
+          },
+          "knowsAbout": [
+            "Breathing exercises",
+            "Slow breathing",
+            "Heart rate variability"
+          ]
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://helpmebreath.com/#organization",
+          "name": "Help Me Breathe",
+          "url": "https://helpmebreath.com/",
+          "description": "A guided breathing timer with seven patterns, published by one individual. Three sessions free, then one plan. An account holds an email address and a plan, never a record of anyone's practice.",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://helpmebreath.com/images/logo.png"
+          },
+          "founder": {
+            "@id": "https://helpmebreath.com/about#georges-rayess"
+          },
+          "publishingPrinciples": "https://helpmebreath.com/legal/medical-disclaimer",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "contact@helpmebreath.com",
+            "contactType": "customer service",
+            "availableLanguage": "English"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://helpmebreath.com/#website",
+          "url": "https://helpmebreath.com/",
+          "name": "Help Me Breathe",
+          "description": "Guided breathing timer with seven patterns. Three sessions free, then one plan.",
+          "publisher": {
+            "@id": "https://helpmebreath.com/#organization"
+          },
+          "inLanguage": "en-US"
+        }
+      ]
     }
     </script>
 
@@ -627,7 +678,6 @@
                     <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
                     <a href="/breathing-exercises-for-focus">For focus</a>
                     <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
-                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
                 </nav>
 
                 <nav class="footer-nav" aria-label="Compare and research">

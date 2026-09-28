@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="rodvq_LyE0tG92O9_JlZOaT0UZSCUo5OOP7N0V1Yyus">
 
-    <title>Free Guided Breathing Timer — 4-7-8, Box &amp; Coherence</title>
+    <title>Help Me Breathe: Guided Breathing for Sleep, Stress &amp; Focus</title>
     <meta name="description" content="A guided breathing timer with seven patterns: 4-7-8, box breathing, coherence, cyclic sighing and more. Audio cues, works offline. Three sessions free.">
 
     <link rel="canonical" href="https://helpmebreath.com/">
@@ -14,7 +14,7 @@
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Free Guided Breathing Timer — 4-7-8, Box &amp; Coherence">
+    <meta property="og:title" content="Help Me Breathe: Guided Breathing for Sleep, Stress &amp; Focus">
     <meta property="og:description" content="Seven guided breathing patterns with audio and vibration cues. Works offline. Three sessions free, then one plan at $10 a month.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://helpmebreath.com/">
@@ -23,7 +23,7 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Free Guided Breathing Timer">
+    <meta name="twitter:title" content="Help Me Breathe: Guided Breathing">
     <meta name="twitter:description" content="Seven guided breathing patterns with audio cues. Works offline. Three sessions free, then one plan at $10 a month.">
     <meta name="twitter:image" content="https://helpmebreath.com/images/twitter-breathing-timer.jpg">
 
@@ -169,7 +169,22 @@
           "url": "https://helpmebreath.com/",
           "name": "Help Me Breathe",
           "description": "Guided breathing timer with seven patterns. Three sessions free, then one plan.",
-          "publisher": { "@id": "https://helpmebreath.com/#organization" },
+          "publisher": {
+            "@id": "https://helpmebreath.com/#organization"
+          },
+          "inLanguage": "en-US"
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://helpmebreath.com/#page",
+          "url": "https://helpmebreath.com/",
+          "name": "Help Me Breathe: Guided Breathing for Sleep, Stress & Focus",
+          "isPartOf": {
+            "@id": "https://helpmebreath.com/#website"
+          },
+          "about": {
+            "@id": "https://helpmebreath.com/#webapp"
+          },
           "inLanguage": "en-US"
         },
         {
@@ -177,86 +192,45 @@
           "@id": "https://helpmebreath.com/#organization",
           "name": "Help Me Breathe",
           "url": "https://helpmebreath.com/",
+          "description": "A guided breathing timer with seven patterns, published by one individual. Three sessions free, then one plan. An account holds an email address and a plan, never a record of anyone's practice.",
           "logo": {
             "@type": "ImageObject",
             "url": "https://helpmebreath.com/images/logo.png"
           },
+          "founder": {
+            "@id": "https://helpmebreath.com/about#georges-rayess"
+          },
+          "publishingPrinciples": "https://helpmebreath.com/legal/medical-disclaimer",
           "contactPoint": {
             "@type": "ContactPoint",
             "email": "contact@helpmebreath.com",
-            "contactType": "customer service"
+            "contactType": "customer service",
+            "availableLanguage": "English"
           }
+        },
+        {
+          "@type": "Person",
+          "@id": "https://helpmebreath.com/about#georges-rayess",
+          "name": "Georges Rayess",
+          "url": "https://helpmebreath.com/about",
+          "email": "contact@helpmebreath.com",
+          "description": "Georges Rayess builds, writes and maintains Help Me Breathe on his own. He is not a clinician and holds no medical qualification; the site is a breathing timer and a set of plain-language pages checked against primary literature, not medical care.",
+          "worksFor": {
+            "@id": "https://helpmebreath.com/#organization"
+          },
+          "knowsAbout": [
+            "Breathing exercises",
+            "Slow breathing",
+            "Heart rate variability"
+          ]
         },
         {
           "@type": "WebApplication",
           "@id": "https://helpmebreath.com/#webapp",
           "name": "Help Me Breathe",
-          "description": "A guided breathing timer with seven patterns, audio and vibration cues, saved settings and offline use. The first three sessions are free; after that one plan covers the timer and the tools around the practice.",
-          "url": "https://helpmebreath.com/",
+          "url": "https://helpmebreath.com/timer",
           "applicationCategory": "HealthApplication",
-          "operatingSystem": "Web Browser",
-          "browserRequirements": "Requires JavaScript",
-          "isAccessibleForFree": true,
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock",
-            "url": "https://helpmebreath.com/"
-          },
-          "hasOfferCatalog": {
-            "@type": "OfferCatalog",
-            "name": "Help Me Breathe plan",
-            "url": "https://helpmebreath.com/pro",
-            "itemListElement": [
-              {
-                "@type": "Offer",
-                "name": "Help Me Breathe — monthly",
-                "description": "Everything included: custom patterns and saved presets, streaks and history export, ambient soundscapes, night mode, no ads and offline use. Three-day free trial.",
-                "price": "10.00",
-                "priceCurrency": "USD",
-                "availability": "https://schema.org/InStock",
-                "url": "https://helpmebreath.com/pro",
-                "priceSpecification": {
-                  "@type": "UnitPriceSpecification",
-                  "price": "10.00",
-                  "priceCurrency": "USD",
-                  "billingDuration": 1,
-                  "billingIncrement": 1,
-                  "unitCode": "MON"
-                }
-              },
-              {
-                "@type": "Offer",
-                "name": "Help Me Breathe — yearly",
-                "description": "The same plan, billed once a year. Two months free against the monthly price.",
-                "price": "100.00",
-                "priceCurrency": "USD",
-                "availability": "https://schema.org/InStock",
-                "url": "https://helpmebreath.com/pro",
-                "priceSpecification": {
-                  "@type": "UnitPriceSpecification",
-                  "price": "100.00",
-                  "priceCurrency": "USD",
-                  "billingDuration": 1,
-                  "billingIncrement": 1,
-                  "unitCode": "ANN"
-                }
-              }
-            ]
-          },
-          "featureList": [
-            "4-7-8 breathing timer",
-            "Box breathing timer",
-            "Heart coherence breathing timer",
-            "Cyclic sighing timer",
-            "Extended exhale timer",
-            "Triangle breathing timer",
-            "Energizing breath timer",
-            "Audio and vibration cues",
-            "Saved settings and session history",
-            "Offline use"
-          ]
+          "operatingSystem": "Web Browser"
         }
       ]
     }
@@ -333,7 +307,7 @@
             <header class="hero">
                 <p class="eyebrow">A guided breathing timer</p>
                 <h1 id="home-heading">Guided breathing exercises for sleep, stress and focus</h1>
-                <p class="subtitle">Seven paced patterns with audio and vibration cues: 4-7-8, box breathing, cyclic sighing and more. Pick one, press Begin, follow the circle.</p>
+                <p class="subtitle">Seven paced patterns with audio and vibration cues: 4-7-8, box breathing, cyclic sighing and more. Choose one on the timer page and follow the circle.</p>
                 <div class="hero-actions">
                     <a class="cta-button" href="/timer" data-free-cta>Try the timer, free</a>
                     <a class="cta-soft" href="/pro">See the plan</a>
@@ -559,7 +533,6 @@
                     <a href="/breathing-exercises-for-panic-attacks">For panic attacks</a>
                     <a href="/breathing-exercises-for-focus">For focus</a>
                     <a href="/breathing-exercises-for-high-blood-pressure">For blood pressure</a>
-                    <a href="/4-7-8-breathing-technique">4-7-8 full guide</a>
                 </nav>
 
                 <nav class="footer-nav" aria-label="Compare and research">

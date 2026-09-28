@@ -1,26 +1,24 @@
 # robots.txt for https://helpmebreath.com/
 
+# /render is not blocked here on purpose: it carries <meta name="robots"
+# content="noindex, nofollow">, and a crawler that is refused the page never
+# sees that tag. /api/ answers with an X-Robots-Tag: noindex header as well.
 User-agent: *
 Allow: /
-Disallow: /render
 Disallow: /api/
 
 # AI search engines are a real referral channel: let them read the content.
 # A crawler obeys the single most specific group that matches it and ignores
-# `User-agent: *` entirely, so each named group repeats the Disallow lines.
+# `User-agent: *` entirely, so each named group repeats the Disallow line.
 User-agent: GPTBot
-Allow: /
-Disallow: /render
-Disallow: /api/
-
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
 User-agent: ClaudeBot
-Allow: /
-Disallow: /render
-Disallow: /api/
-
+User-agent: Claude-SearchBot
+User-agent: Claude-User
 User-agent: PerplexityBot
+User-agent: Perplexity-User
 Allow: /
-Disallow: /render
 Disallow: /api/
 
 Sitemap: https://helpmebreath.com/sitemap.xml
