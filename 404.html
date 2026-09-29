@@ -127,11 +127,14 @@
 
         .lockup-mark {
             display: block;
-            width: 26px;
-            height: 26px;
-            color: var(--green);
+            width: auto;
+            height: 30px;
+            aspect-ratio: 330 / 435;
+            color: var(--ink);
             flex: 0 0 auto;
         }
+
+        .lockup-mark-accent { stroke: var(--green); }
 
         .wordmark {
             font-family: var(--display);
@@ -296,8 +299,10 @@
     <header class="site-header">
         <div class="site-header-inner">
             <a class="lockup" href="/" aria-label="Help Me Breathe, home">
-                <svg class="lockup-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-                    <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                <svg class="lockup-mark" viewBox="0 0 330 435" aria-hidden="true" focusable="false">
+                    <circle cx="165" cy="270" r="145" fill="none" stroke="currentColor" stroke-width="40"/>
+                    <path d="M20 270V20" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round"/>
+                    <circle class="lockup-mark-accent" cx="165" cy="270" r="70" fill="none" stroke-width="34"/>
                 </svg>
                 <span class="wordmark">Help Me Breathe</span>
             </a>
@@ -314,7 +319,9 @@
     <main id="main">
         <div class="card">
             <svg class="mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-                <path d="M66.27 13.46 A40 40 0 1 1 33.73 13.46" fill="none" stroke="currentColor" stroke-width="9"/>
+                <circle cx="165" cy="270" r="145" fill="none" stroke="currentColor" stroke-width="40"/>
+                    <path d="M20 270V20" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round"/>
+                    <circle class="lockup-mark-accent" cx="165" cy="270" r="70" fill="none" stroke-width="34"/>
             </svg>
             <p class="code">Error 404</p>
             <h1>This page drifted away</h1>

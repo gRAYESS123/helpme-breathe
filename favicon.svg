@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Help Me Breathe">
   <title>Help Me Breathe</title>
   <style>
-    .ring { stroke: #0F1B1E; }
-    @media (prefers-color-scheme: dark) { .ring { stroke: #EEF2F0; } }
+    .i { stroke: #0F1B1E; } .a { stroke: #1E5F5A; }
+    @media (prefers-color-scheme: dark) { .i { stroke: #EEF2F0; } .a { stroke: #8FD3C4; } }
   </style>
-  <path class="ring" d="M21.673 4.37 A12.94 12.94 0 1 1 10.327 4.37" fill="none" stroke="#0F1B1E" stroke-width="5.12" stroke-linecap="butt"/>
+  <g transform="translate(4.59 0.96) scale(0.06915)"><circle class="i" cx="165" cy="270" r="139" fill="none" stroke-width="56"/><path class="i" d="M26 270V28" fill="none" stroke-width="56" stroke-linecap="round"/><circle class="a" cx="165" cy="270" r="62" fill="none" stroke-width="46"/></g>
 </svg>

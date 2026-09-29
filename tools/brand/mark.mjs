@@ -1,15 +1,16 @@
 /**
  * Help Me Breathe — the mark.
  *
- * A ring with a single gap at twelve o'clock. Canonical geometry: radius 40 on
- * a 100-unit grid, stroke 9, butt caps, a 48deg gap centred at the top. That
- * yields exactly the path in docs/BRAND.md:
+ * Since 2026-09-29 the logo is the "b": an ink ring, a stem that rises from
+ * the ring's left edge with a round cap, and a smaller teal ring inside. The
+ * construction lives in B below (a 330 x 435 grid, rebuilt as exact geometry
+ * from the owner's approved image, docs/private/brand/logo-b/). B_SMALL is
+ * the same construction with heavier strokes for 16-32px, where the regular
+ * weights smear.
  *
- *   M66.27 13.46 A40 40 0 1 1 33.73 13.46
- *
- * Small sizes thicken the stroke and widen the gap so the opening survives a
- * single device pixel. Every helper below returns plain SVG source strings so
- * they can be written to disk or handed to a headless browser unchanged.
+ * The older ring-with-a-gap helpers (ringPath, CANONICAL, ...) stay: the Open
+ * Graph cards and pins still draw the large ring as a picture of the timer,
+ * which is the product, not the logo. Every helper returns plain SVG source.
  */
 
 const round = (n, p = 2) => {
@@ -76,38 +77,70 @@ export function ringMarkup(ring, color, extra = '') {
 }
 
 /* ------------------------------------------------------------------ *
+ * The "b" mark
+ * ------------------------------------------------------------------ */
+
+import { readFileSync } from 'node:fs';
+
+/** Regular weight: every size from 40px up. */
+export const B = { w: 330, h: 435, cx: 165, cy: 270, r: 145, stroke: 40, innerR: 70, innerStroke: 34, stemTop: 20 };
+/** Small-size weight: favicons and anything under ~40px. */
+export const B_SMALL = { w: 330, h: 435, cx: 165, cy: 270, r: 139, stroke: 56, innerR: 62, innerStroke: 46, stemTop: 28 };
+
+/**
+ * The mark's shapes, placed so the whole mark is `height` tall with its
+ * top-left corner at (x, y). `ink` and `accent` may be colours or, for inline
+ * page SVG, left out in favour of the given class names.
+ */
+export function bShapes({ x = 0, y = 0, height = B.h, ink, accent, geo = B, inkClass = '', accentClass = '' }) {
+  const s = height / geo.h;
+  const inkAttr = ink ? ` stroke="${ink}"` : '';
+  const accAttr = accent ? ` stroke="${accent}"` : '';
+  const ic = inkClass ? ` class="${inkClass}"` : '';
+  const ac = accentClass ? ` class="${accentClass}"` : '';
+  return `<g transform="translate(${round(x, 3)} ${round(y, 3)}) scale(${round(s, 5)})">` +
+    `<circle${ic} cx="${geo.cx}" cy="${geo.cy}" r="${geo.r}" fill="none"${inkAttr} stroke-width="${geo.stroke}"/>` +
+    `<path${ic} d="M${geo.cx - geo.r} ${geo.cy}V${geo.stemTop}" fill="none"${inkAttr} stroke-width="${geo.stroke}" stroke-linecap="round"/>` +
+    `<circle${ac} cx="${geo.cx}" cy="${geo.cy}" r="${geo.innerR}" fill="none"${accAttr} stroke-width="${geo.innerStroke}"/></g>`;
+}
+
+/** Width of the mark at a given height. */
+export const bWidth = (height, geo = B) => (geo.w / geo.h) * height;
+
+/** A square document with the mark centred at `fill` of the height. */
+export function bSquare({ size, ink, accent, fill = 0.94, geo = B, ground = null, rx = 0 }) {
+  const h = size * fill;
+  const x = (size - bWidth(h, geo)) / 2;
+  const y = (size - h) / 2;
+  const bg = ground ? `<rect width="${size}" height="${size}" rx="${round(rx, 2)}" fill="${ground}"/>` : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="Help Me Breathe">${bg}${bShapes({ x, y, height: h, ink, accent, geo })}</svg>`;
+}
+
+/* ------------------------------------------------------------------ *
  * Favicon
  * ------------------------------------------------------------------ */
 
-/** 32px geometry: stroke 16% of the grid, gap 52deg. */
-export const FAVICON_32 = ringForBox({ size: 32, strokeFraction: 0.16, gapDeg: 52, pad: 0.5 });
-/** 16px geometry: stroke 20% of the grid, gap 56deg. */
-export const FAVICON_16 = ringForBox({ size: 16, strokeFraction: 0.2, gapDeg: 56, pad: 0.25 });
-
 /**
- * favicon.svg — written at the 32px geometry, ring only, transparent ground.
- * SVG has no way to swap geometry by rendered size, so the 16px deltas ship as
- * a separate raster (favicon-16.png). The colour, however, can respond to the
- * browser chrome, so it does.
+ * favicon.svg — the small-size mark, transparent ground. The colours follow
+ * the browser chrome so the mark stays visible on a dark tab strip.
  */
-export function faviconSvg({ day, night }) {
-  const r = FAVICON_32;
+export function faviconSvg({ day, night, accentDay, accentNight }) {
+  const h = 32 * 0.94;
+  const x = (32 - bWidth(h, B_SMALL)) / 2;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Help Me Breathe">
   <title>Help Me Breathe</title>
   <style>
-    .ring { stroke: ${day}; }
-    @media (prefers-color-scheme: dark) { .ring { stroke: ${night}; } }
+    .i { stroke: ${day}; } .a { stroke: ${accentDay}; }
+    @media (prefers-color-scheme: dark) { .i { stroke: ${night}; } .a { stroke: ${accentNight}; } }
   </style>
-  <path class="ring" d="${r.d}" fill="none" stroke="${day}" stroke-width="${r.stroke}" stroke-linecap="butt"/>
+  ${bShapes({ x, y: (32 - h) / 2, height: h, geo: B_SMALL, inkClass: 'i', accentClass: 'a' })}
 </svg>
 `;
 }
 
-/** Standalone ring document, used to raster the two favicon PNGs. */
-export function ringDocument({ size, ring, color }) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
-  ${ringMarkup(ring, color)}
-</svg>`;
+/** Standalone favicon raster source at 16 or 32px. */
+export function faviconDocument({ size, ink, accent }) {
+  return bSquare({ size, ink, accent, geo: B_SMALL, fill: 0.94 });
 }
 
 /* ------------------------------------------------------------------ *
@@ -115,74 +148,47 @@ export function ringDocument({ size, ring, color }) {
  * ------------------------------------------------------------------ */
 
 /**
- * Maskable app icon: a green tile with a 22% corner radius and a paper ring
- * held inside the central 80% safe zone.
+ * Maskable app icon: a mist tile with a 22% corner radius and the mark held
+ * inside the central 80% safe zone (its height is 62% of the tile, so even
+ * the stem's cap stays inside a circular mask).
  */
-export function appIconSvg({ size, tile, ring: ringColor, radiusFraction = 0.22, safeZone = 0.8, squareTile = false }) {
-  const safeRadius = (size * safeZone) / 2;
-  // r + stroke/2 <= safeRadius, with stroke = STROKE_RATIO * r
-  const r = safeRadius / (1 + STROKE_RATIO / 2);
-  const stroke = r * STROKE_RATIO;
-  const ring = {
-    r: round(r, 2),
-    stroke: round(stroke, 2),
-    d: ringPath(size / 2, size / 2, r, CANONICAL.gap, 2),
-  };
-  const rx = squareTile ? 0 : round(size * radiusFraction, 2);
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="Help Me Breathe">
-  <rect width="${size}" height="${size}" rx="${rx}" fill="${tile}"/>
-  ${ringMarkup(ring, ringColor)}
-</svg>`;
+export function appIconSvg({ size, tile, ink, accent, radiusFraction = 0.22, squareTile = false }) {
+  return bSquare({ size, ink, accent, fill: 0.62, ground: tile, rx: squareTile ? 0 : size * radiusFraction });
 }
 
 /* ------------------------------------------------------------------ *
  * Lockup
  * ------------------------------------------------------------------ */
 
-/**
- * Horizontal lockup geometry. Clear space on every side equals the ring stroke
- * times four, which is what sets the viewBox padding.
- */
-export const LOCKUP = (() => {
-  const r = 24;
-  const stroke = round(r * STROKE_RATIO, 2); // 5.4
-  const clear = stroke * 4; // 21.6
-  const outer = r + stroke / 2; // 26.7
-  const cy = 60;
-  const cx = round(clear + outer, 2); // 48.3
-  return {
-    width: 480,
-    height: 120,
-    cx,
-    cy,
-    r,
-    stroke,
-    clear,
-    outer,
-    d: ringPath(cx, cy, r, CANONICAL.gap, 2),
-    textX: round(cx + outer + clear, 2),
-    baseline: 74,
-    fontSize: 44,
-    tracking: -0.012,
-  };
-})();
+const WORDMARK = JSON.parse(readFileSync(new URL('./wordmark.json', import.meta.url), 'utf8'));
 
 /**
- * images/logo.svg — ring plus a real <text> wordmark. A webfont cannot be
- * embedded in a standalone SVG that other sites may hotlink, so the wordmark
- * names Newsreader and falls back through the display stack. The outlined
- * raster (images/logo.png) is the one to use where the exact letterforms
- * matter.
+ * The wordmark as outlined paths, `size` px font size, baseline at (x, y).
+ * Outlined because a standalone SVG cannot rely on Figtree being installed.
  */
-export function logoSvg({ ring: ringColor, ink, displayStack }) {
+export function wordmarkPath({ x, y, size, fill }) {
+  const s = size / WORDMARK.unitsPerEm;
+  return `<path transform="translate(${round(x, 3)} ${round(y, 3)}) scale(${round(s, 5)})" fill="${fill}" d="${WORDMARK.d}"/>`;
+}
+export const wordmarkWidth = (size) => (WORDMARK.advance / WORDMARK.unitsPerEm) * size;
+
+/** Horizontal lockup geometry: mark 120 tall, wordmark 56px, gap 28. */
+export const LOCKUP = (() => {
+  const markH = 120;
+  const fontSize = 56;
+  const gap = 28;
+  const markW = bWidth(markH);
+  const textX = markW + gap;
+  return { markH, markW, fontSize, gap, textX, baseline: round(markH * 0.8, 2), width: Math.ceil(textX + wordmarkWidth(fontSize) + 4), height: markH };
+})();
+
+/** images/logo.svg — the mark and the outlined wordmark. */
+export function logoSvg({ ink, accent }) {
   const L = LOCKUP;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${L.width} ${L.height}" width="${L.width}" height="${L.height}" role="img" aria-label="Help Me Breathe">
   <title>Help Me Breathe</title>
-  <path d="${L.d}" fill="none" stroke="${ringColor}" stroke-width="${L.stroke}" stroke-linecap="butt"/>
-  <text x="${L.textX}" y="${L.baseline}" fill="${ink}" font-family="${displayStack.replace(/"/g, '&quot;')}" font-size="${L.fontSize}" font-weight="500" letter-spacing="${round(
-    L.fontSize * L.tracking,
-    3
-  )}">Help Me Breathe</text>
+  ${bShapes({ height: L.markH, ink, accent })}
+  ${wordmarkPath({ x: L.textX, y: L.baseline, size: L.fontSize, fill: ink })}
 </svg>
 `;
 }

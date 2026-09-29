@@ -37,7 +37,7 @@ import {
   hueOf,
   lstar,
 } from './tokens.mjs';
-import { faviconSvg, logoSvg, appIconSvg, ringDocument, FAVICON_16, FAVICON_32 } from './mark.mjs';
+import { faviconSvg, logoSvg, appIconSvg, faviconDocument, LOCKUP } from './mark.mjs';
 import { ogHtml, pinHtml, logoHtml, svgHtml } from './templates.mjs';
 import { imageSize } from './imagesize.mjs';
 
@@ -236,31 +236,31 @@ async function shoot(browser, { html, width, height, out, type = 'png', quality,
  * Vector assets — written straight from the geometry module.
  * ------------------------------------------------------------------ */
 function writeVectors() {
-  const favicon = faviconSvg({ day: DAY.ink, night: NIGHT.ink });
+  const favicon = faviconSvg({ day: DAY.ink, night: NIGHT.ink, accentDay: DAY.green, accentNight: NIGHT.green });
   writeFileSync(join(ROOT, 'favicon.svg'), favicon, 'utf8');
 
-  const logo = logoSvg({ ring: DAY.ink, ink: DAY.ink, displayStack: DISPLAY_STACK });
+  const logo = logoSvg({ ink: DAY.ink, accent: DAY.green });
   mkdirSync(join(ROOT, 'images'), { recursive: true });
   writeFileSync(join(ROOT, 'images', 'logo.svg'), logo, 'utf8');
 
   record('favicon.svg', { width: 32, height: 32 });
-  record('images/logo.svg', { width: 480, height: 120 });
+  record('images/logo.svg', { width: LOCKUP.width, height: LOCKUP.height });
 }
 
 /* ------------------------------------------------------------------ *
  * Build groups
  * ------------------------------------------------------------------ */
 async function buildIcons(browser) {
-  // Favicon rasters: the 16px file carries its own thicker geometry.
+  // Favicon rasters: both use the small-size weights of the mark.
   await shoot(browser, {
-    html: svgHtml({ svg: ringDocument({ size: 16, ring: FAVICON_16, color: DAY.ink }), width: 16, height: 16 }),
+    html: svgHtml({ svg: faviconDocument({ size: 16, ink: DAY.ink, accent: DAY.green }), width: 16, height: 16 }),
     width: 16,
     height: 16,
     out: 'favicon-16.png',
     transparent: true,
   });
   await shoot(browser, {
-    html: svgHtml({ svg: ringDocument({ size: 32, ring: FAVICON_32, color: DAY.ink }), width: 32, height: 32 }),
+    html: svgHtml({ svg: faviconDocument({ size: 32, ink: DAY.ink, accent: DAY.green }), width: 32, height: 32 }),
     width: 32,
     height: 32,
     out: 'favicon-32.png',
@@ -269,7 +269,7 @@ async function buildIcons(browser) {
   record('favicon-16.png', { width: 16, height: 16 });
   record('favicon-32.png', { width: 32, height: 32 });
 
-  // App icons: ink tile, mist ring, ring inside the central 80%.
+  // App icons: mist tile, the colour mark inside the central 80%.
   // The PWA tiles keep the 22% corner radius with TRANSPARENT corners, not
   // white ones: manifest.json declares them "any maskable", and a launcher
   // mask (circle or squircle) falls inside a 22%-radius rounded rect at every
@@ -283,7 +283,7 @@ async function buildIcons(browser) {
     { size: 180, out: 'images/apple-touch-icon.png', squareTile: true, transparent: false },
   ];
   for (const t of tiles) {
-    const svg = appIconSvg({ size: t.size, tile: DAY.ink, ring: DAY.paper, squareTile: t.squareTile });
+    const svg = appIconSvg({ size: t.size, tile: DAY.paper, ink: DAY.ink, accent: DAY.green, squareTile: t.squareTile });
     await shoot(browser, {
       html: svgHtml({ svg, width: t.size, height: t.size }),
       width: t.size,
@@ -297,7 +297,7 @@ async function buildIcons(browser) {
 
 async function buildLogo(browser) {
   await shoot(browser, {
-    html: logoHtml({ width: 1200, height: 300, ringColor: DAY.ink, ink: DAY.ink }),
+    html: logoHtml({ width: 1200, height: 300, ink: DAY.ink, accent: DAY.green }),
     width: 1200,
     height: 300,
     out: 'images/logo.png',
@@ -346,7 +346,7 @@ async function main() {
   if (flag('verify')) {
     if (wants('vectors')) {
       record('favicon.svg', { width: 32, height: 32 });
-      record('images/logo.svg', { width: 480, height: 120 });
+      record('images/logo.svg', { width: LOCKUP.width, height: LOCKUP.height });
     }
     if (wants('icons')) {
       record('favicon-16.png', { width: 16, height: 16 });
