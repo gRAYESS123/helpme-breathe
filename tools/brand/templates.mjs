@@ -8,7 +8,7 @@
  */
 
 import { DAY, FONT_CSS_URL, DISPLAY_STACK, UI_STACK, MONO_STACK, SITE_LABEL, TECHNIQUE_ORDER, ACCENTS, accentFor } from './tokens.mjs';
-import { ringPath, STROKE_RATIO, CANONICAL } from './mark.mjs';
+import { ringPath, STROKE_RATIO, CANONICAL, bShapes, bWidth } from './mark.mjs';
 
 const esc = (s) =>
   String(s)
@@ -63,14 +63,18 @@ function signatureStrip({ x, y, width, active, base = 6, tall = 11 }) {
   return `<div style="position:absolute;left:0;top:0">${bars}</div>`;
 }
 
+/** The "b" mark as a standalone inline SVG block, `height` px tall. */
+function markSvg({ height, ink, accent }) {
+  const w = bWidth(height);
+  return `<svg width="${round(w)}" height="${round(height)}" viewBox="0 0 ${round(w, 3)} ${round(height, 3)}" aria-hidden="true">${bShapes({ height, ink, accent })}</svg>`;
+}
+
 /** Small lockup used in the corner of every card. */
-function lockup({ x, y, size, ringColor, ink }) {
-  const r = size / 2;
-  const stroke = r * STROKE_RATIO;
+function lockup({ x, y, size, ink, accent = DAY.green }) {
   return `<div style="position:absolute;left:${x}px;top:${y}px;display:flex;align-items:center;gap:${round(
-    size * 0.52
+    size * 0.46
   )}px">
-    ${ringSvg({ r, color: ringColor })}
+    ${markSvg({ height: round(size * 1.25), ink, accent })}
     <span class="display" style="font-size:${round(size * 1.02)}px;font-weight:500;letter-spacing:-0.012em;color:${ink};line-height:1">Help Me Breathe</span>
   </div>`;
 }
@@ -186,25 +190,20 @@ ${head(`
  * Logo raster (transparent)
  * ------------------------------------------------------------------ */
 
-export function logoHtml({ width, height, ringColor, ink }) {
-  // The 480x120 lockup scaled to the raster size.
-  const scale = width / 480;
-  const r = 24 * scale;
-  const stroke = r * STROKE_RATIO;
-  const clear = stroke * 4;
-  const outer = r + stroke / 2;
-  const fontSize = 44 * scale;
+export function logoHtml({ width, height, ink, accent }) {
+  // The horizontal lockup scaled to the raster size: mark 80% of the height.
+  const markH = height * 0.8;
+  const fontSize = markH * (56 / 120);
+  const pad = height * 0.1;
   return `<!-- lockup -->
 ${head(`
-  .lockup { position: relative; width: ${width}px; height: ${height}px; display: flex; align-items: center; padding-left: ${round(
-    clear
-  )}px; }
+  .lockup { position: relative; width: ${width}px; height: ${height}px; display: flex; align-items: center; padding-left: ${round(pad)}px; }
   .word { font-size: ${round(fontSize)}px; font-weight: 500; letter-spacing: -0.012em; color: ${ink}; line-height: 1; margin-left: ${round(
-    clear
+    markH * (28 / 120)
   )}px; }
 `)}
 <div class="lockup">
-  ${ringSvg({ r, color: ringColor })}
+  ${markSvg({ height: markH, ink, accent })}
   <span class="display word">Help Me Breathe</span>
 </div>`;
 }

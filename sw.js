@@ -12,7 +12,7 @@
  * so the two latin files are part of the shell and work offline.
  * Changing this file is what triggers the service-worker update.
  */
-const CACHE_NAME = 'hmb-v11-selfhost-fonts-2026-09-17';
+const CACHE_NAME = 'hmb-v12-b-logo-2026-09-29';
 // The clean URL, never '/offline.html': under cleanUrls Vercel answers the
 // .html path with a 308, and a redirected response cannot be served for a
 // navigation (Chrome fails the request instead of showing the page).

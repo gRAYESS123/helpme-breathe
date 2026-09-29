@@ -694,11 +694,15 @@ body:has([data-breathing-app]):not(.render-body):not(:has(.timer-pair)) .site-he
 
 .lockup-mark {
     display: block;
-    width: 24px;
-    height: 24px;
+    width: auto;
+    height: 28px;
+    aspect-ratio: 330 / 435;
     color: var(--ink);
     flex: 0 0 auto;
 }
+
+/* The logo's inner ring: the link teal, which night and dusk lighten. */
+.lockup-mark-accent { stroke: var(--link); }
 
 .wordmark {
     font-family: var(--sans);

@@ -1,7 +1,7 @@
 {
   "name": "Help Me Breathe — Guided Breathing Exercises",
   "short_name": "Breathe",
-  "description": "Free guided breathing timer with seven patterns: 4-7-8, box breathing, heart coherence, cyclic sighing, extended exhale, triangle and energizing breath.",
+  "description": "Guided breathing timer with seven patterns: 4-7-8, box breathing, heart coherence, cyclic sighing, extended exhale, triangle and energizing breath. Three sessions free, then one plan.",
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
